@@ -1,0 +1,11 @@
+-I
+C:/qt-win-opensource-src-4.4.1/include
+-I
+C:/qt-win-opensource-src-4.4.1/include/QtGui
+-I
+C:/qt-win-opensource-src-4.4.1/include/QtXml
+-I
+C:/qt-win-opensource-src-4.4.1/include/QtCore
+-o
+C:/Users/david/Documents/Visual Studio 2005/Projects/thermite/trunk/Thermite2/include/moc_ChooseMeshWidget.cxx
+C:/Users/david/Documents/Visual Studio 2005/Projects/thermite/trunk/Thermite2/include/ChooseMeshWidget.h

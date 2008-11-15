@@ -1,0 +1,42 @@
+material jaiqua
+{
+	// Hardware skinning techniique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			{
+			
+			}
+			// alternate shadow caster program
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			
+			}
+
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+
+	// Software blending technique
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+	
+}

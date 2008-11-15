@@ -1,0 +1,9 @@
+<RCC>
+  <qresource>
+    <file>images/QtOgreLogo.png</file>
+	<file>icons/application-exit.svg</file>
+	<file>icons/go-previous.svg</file>
+	<file>icons/preferences-system.svg</file>
+	<file>icons/utilities-log-viewer.svg</file>
+  </qresource>
+</RCC>

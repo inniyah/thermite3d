@@ -1,0 +1,130 @@
+<ui version="4.0" >
+ <class>MainMenu</class>
+ <widget class="QDialog" name="MainMenu" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>258</width>
+    <height>308</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Main Menu</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" >
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="../resources/DemoResources.qrc" >:/images/QtOgreLogo.png</pixmap>
+     </property>
+     <property name="scaledContents" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="mResumeButton" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Resume</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../resources/DemoResources.qrc" >
+       <normaloff>:/icons/go-previous.svg</normaloff>:/icons/go-previous.svg</iconset>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="mSettingsButton" >
+     <property name="enabled" >
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Settings...</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../resources/DemoResources.qrc" >
+       <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="mViewLogsButton" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>View Logs...</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../resources/DemoResources.qrc" >
+       <normaloff>:/icons/utilities-log-viewer.svg</normaloff>:/icons/utilities-log-viewer.svg</iconset>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="mQuitButton" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Quit</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../resources/DemoResources.qrc" >
+       <normaloff>:/icons/application-exit.svg</normaloff>:/icons/application-exit.svg</iconset>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources/DemoResources.qrc" />
+ </resources>
+ <connections/>
+</ui>
