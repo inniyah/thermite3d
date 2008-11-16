@@ -7,7 +7,9 @@ FIND_PACKAGE(Boost 1.34.1 COMPONENTS program_options filesystem REQUIRED)
 
 #Custom modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(OGRE REQUIRED)
+FIND_PACKAGE(OGREBullet REQUIRED)
 FIND_PACKAGE(PolyVox REQUIRED)
 FIND_PACKAGE(QtOgre REQUIRED)
 
@@ -17,6 +19,7 @@ SET(SRC_FILES
 	source/DataStreamAdapter.cpp
 	source/DemoGameLogic.cpp
 	source/MainMenu.cpp
+	source/PhysicalObject.cpp
 	source/SurfacePatchRenderable.cpp
 	source/TimeStampedRenderOperation.cpp
 	source/TimeStampedRenderOperationCache.cpp
@@ -24,6 +27,8 @@ SET(SRC_FILES
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializer.cpp
+	source/World.cpp
+	source/WorldRegion.cpp
 )
 
 SET(INC_FILES
@@ -31,13 +36,18 @@ SET(INC_FILES
 	include/DataStreamAdapter.h
 	include/DemoGameLogic.h
 	include/MainMenu.h
+	include/PhysicalObject.h
 	include/SurfacePatchRenderable.h
+	include/ThermiteForwardDeclarations.h
 	include/TimeStampedRenderOperation.h
 	include/TimeStampedRenderOperationCache.h
 	include/TimeStampedSurfacePatchCache.h
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializer.h
+	include/World.h
+	include/WorldRegion.h
+
 )
 
 SET(UI_FILES
@@ -64,10 +74,10 @@ QT4_WRAP_CPP(MOC_SRCS ${INC_FILES})
 QT4_WRAP_UI(UI_SRCS ${UI_FILES})
 QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${QTOGRE_INCLUDE_DIR} ${OGRE_INCLUDE_DIR} ${POLYVOX_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-LINK_DIRECTORIES(${OGRE_LIB_DIR} ${QTOGRE_LIB_DIR} ${POLYVOX_LIB_DIR} ${Boost_LIBRARY_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${QTOGRE_INCLUDE_DIR} ${OGRE_INCLUDE_DIR} ${POLYVOX_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIR} ${OGREBULLET_INCLUDE_DIR})
+LINK_DIRECTORIES(${OGRE_LIB_DIR} ${QTOGRE_LIB_DIR} ${POLYVOX_LIB_DIR} ${Boost_LIBRARY_DIRS} ${BULLET_LIB_DIR} ${OGREBULLET_LIB_DIR})
 ADD_EXECUTABLE(Thermite2 WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
-TARGET_LINK_LIBRARIES(Thermite2 ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QTOGRE_LIBRARIES} ${POLYVOX_LIBRARIES} ${BOOST_LIBRARIES})
+TARGET_LINK_LIBRARIES(Thermite2 ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QTOGRE_LIBRARIES} ${POLYVOX_LIBRARIES} ${BOOST_LIBRARIES} ${OGREBULLET_LIBRARIES} ${BULLET_LIBRARIES})
 
 #Install
 INSTALL(TARGETS Thermite2
