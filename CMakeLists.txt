@@ -14,22 +14,30 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(SRC_FILES
 	source/main.cpp
 	source/ChooseMeshWidget.cpp
+	source/DataStreamAdapter.cpp
 	source/DemoGameLogic.cpp
 	source/MainMenu.cpp
 	source/SurfacePatchRenderable.cpp
 	source/TimeStampedRenderOperation.cpp
 	source/TimeStampedRenderOperationCache.cpp
 	source/TimeStampedSurfacePatchCache.cpp
+	source/VolumeManager.cpp
+	source/VolumeResource.cpp
+	source/VolumeSerializer.cpp
 )
 
 SET(INC_FILES
 	include/ChooseMeshWidget.h
+	include/DataStreamAdapter.h
 	include/DemoGameLogic.h
 	include/MainMenu.h
 	include/SurfacePatchRenderable.h
 	include/TimeStampedRenderOperation.h
 	include/TimeStampedRenderOperationCache.h
 	include/TimeStampedSurfacePatchCache.h
+	include/VolumeManager.h
+	include/VolumeResource.h
+	include/VolumeSerializer.h
 )
 
 SET(UI_FILES
