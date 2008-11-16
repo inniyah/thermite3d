@@ -28,6 +28,9 @@ namespace QtOgre
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/models", "FileSystem");
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/textures", "FileSystem");
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/materials", "FileSystem");
+		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/models", "FileSystem");
+		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/textures", "FileSystem");
+		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/materials", "FileSystem");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		// Create the generic scene manager
