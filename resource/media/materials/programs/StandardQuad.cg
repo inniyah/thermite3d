@@ -1,0 +1,20 @@
+//Based on Code from Ogre compositor example
+void StandardQuadVP
+(
+    in float4 inPos : POSITION,
+
+    out float4 outPos : POSITION,
+    out float2 outUV : TEXCOORD0,
+
+    uniform float4x4 worldViewProj
+)
+{
+    // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+    outPos = mul(worldViewProj, inPos);
+
+    // The input positions adjusted by texel offsets, so clean up inaccuracies
+    inPos.xy = sign(inPos.xy);
+
+    // Convert to image-space
+    outUV = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+}

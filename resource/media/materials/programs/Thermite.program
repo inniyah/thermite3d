@@ -1,0 +1,27 @@
+vertex_program SingleOneLightVertexProgram cg
+{
+	source SingleVertexProgram.cg
+	entry_point OneLight
+	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
+}
+
+vertex_program PassThroughVertexProgram cg
+{
+	source PassThroughVertexProgram.cg
+	entry_point main
+	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
+}
+
+fragment_program SingleFragmentProgram cg
+{
+	source SingleFragmentProgram.cg
+	entry_point main
+	profiles ps_3_x ps_3_0 ps_2_x ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1 fp40 fp30 fp20 arbfp1
+}
+
+fragment_program BlackFragmentProgram cg
+{
+	source BlackFragmentProgram.cg
+	entry_point main
+	profiles ps_3_x ps_3_0 ps_2_x ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1 fp40 fp30 fp20 arbfp1
+}

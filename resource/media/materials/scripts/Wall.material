@@ -1,0 +1,23 @@
+material WallMaterial : ColourMap2DOneLight
+{
+	technique
+	{
+		pass
+		{
+		        scene_blend alpha_blend
+			texture_unit
+			{
+				texture wall.png
+			}
+		}
+	}
+	
+	technique
+	{
+	         pass
+	         {
+	             ambient 0.0 0.2 0.0
+	             diffuse 0.0 0.5 0.0
+	         }
+	}
+}

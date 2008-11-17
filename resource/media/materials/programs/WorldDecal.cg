@@ -1,0 +1,121 @@
+void WorldDecalVP(float4 position : POSITION,
+						  float3 normal   : NORMAL,
+						  float2 alpha		  : TEXCOORD0,
+						  
+						  out float4 oPosition : POSITION,
+						  out float4 oUv	   : TEXCOORD0,
+						  out float4 oNormal   : TEXCOORD1,
+						  out float2 oAlpha    : TEXCOORD2,
+
+						  uniform float4x4 world,
+						  uniform float4x4 viewProj)
+{
+	//oUv = position / 16.0f;
+	oPosition = mul(world, position);
+	oUv = oPosition;
+	//oUv = float4(0.25,0.25,0.0,0.0);
+	oPosition = mul(viewProj, oPosition);
+	
+	normal = normalize(normal);
+	oNormal = float4(normal, 0.0);
+	
+	oAlpha = alpha;
+}
+
+float4 WorldDecalFP(float4 position : POSITION,
+						  float4 uv		  : TEXCOORD0,
+						  float4 normal   : TEXCOORD1,
+						  float2 alpha    : TEXCOORD2,
+						  
+						uniform sampler2D colourMap0 : TEXUNIT0, 
+						uniform sampler2D colourMap1 : TEXUNIT1,
+						uniform sampler2D colourMap2 : TEXUNIT2,
+						uniform sampler2D colourMap3 : TEXUNIT3,
+						uniform sampler2D colourMap4 : TEXUNIT4,
+						uniform sampler2D colourMap5 : TEXUNIT5,
+						uniform sampler2D colourMap6 : TEXUNIT6,
+						uniform sampler2D colourMap7 : TEXUNIT7) :COLOR
+{
+	//return float4(1.0,0.0,0.0,1.0);
+	//float4 t = float4(0.25,0.75,0.0,0.0);
+	uv /= 20.0f;
+	//return tex2D(colourMap0, uv.xy);
+	
+	float3 colourMapValueXY;
+	float3 colourMapValueYZ;
+	float3 colourMapValueXZ;
+	
+	//FIXME - For some reason, precomputing the derivatives seemed to hurt performance.
+	//But without doing it, Direct3D got wouldn't let me use more than two textures.
+	//It appeared to be a bug...
+	float2 uvDelta; uvDelta.x = ddx( uv ).x; uvDelta.y = ddy( uv ).y; 
+	
+	if(alpha.x < 0.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = float3(0.0,0.0,0.0);
+		colourMapValueYZ = float3(0.0,0.0,0.0);
+		colourMapValueXZ = float3(0.0,0.0,0.0);
+	}	
+	else if(alpha.x < 1.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap0, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap0, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap0, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 2.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap1, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap1, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap1, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 3.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap2, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap2, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap2, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 4.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap3, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap3, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap3, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 5.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap4, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap4, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap4, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 6.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap5, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap5, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap5, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 7.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap6, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap6, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap6, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	else if(alpha.x < 8.5)
+	{
+		//Retrieve the 3 samples
+		colourMapValueXY = tex2D(colourMap7, uv.xy, uvDelta.x, uvDelta.y).rgb * abs(normal.z);
+		colourMapValueYZ = tex2D(colourMap7, uv.yz, uvDelta.x, uvDelta.y).rgb * abs(normal.x);
+		colourMapValueXZ = tex2D(colourMap7, uv.xz, uvDelta.x, uvDelta.y).rgb * abs(normal.y);
+	}
+	
+	float3 colourMapValue = colourMapValueXY + colourMapValueYZ + colourMapValueXZ;
+	
+	return float4(colourMapValue*alpha.y, alpha.y);
+}
+

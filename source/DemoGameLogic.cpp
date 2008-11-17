@@ -9,6 +9,8 @@
 #include <OgreResourceGroupManager.h>
 #include <OgreRoot.h>
 
+#include <QDirIterator>
+
 namespace QtOgre
 {
 	DemoGameLogic::DemoGameLogic(void)
@@ -25,12 +27,11 @@ namespace QtOgre
 		mDemoLog->logMessage("A demonstration warning message", LL_WARNING);
 		mDemoLog->logMessage("A demonstration error message", LL_ERROR);
 
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/models", "FileSystem");
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/textures", "FileSystem");
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("./media/materials", "FileSystem");
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/models", "FileSystem");
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/textures", "FileSystem");
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/media/materials", "FileSystem");
+		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/models", "FileSystem");
+		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/textures", "FileSystem");
+		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/materials", "FileSystem");
+		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/", "FileSystem", "General", true);
+		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		// Create the generic scene manager
@@ -176,5 +177,14 @@ namespace QtOgre
 	Log* DemoGameLogic::demoLog(void)
 	{
 		return mDemoLog;
+	}
+
+	void DemoGameLogic::addResourceDirectory(const QString& directoryName)
+	{
+		QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+		while (it.hasNext())
+		{
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
+		} 
 	}
 }

@@ -1,0 +1,13 @@
+material WoodMaterial : ColourMap2DFourLights
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture test.png
+			}
+		}
+	}
+}

@@ -1,0 +1,14 @@
+material DemoMetal
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				scale 0.125 0.125
+				texture BumpyMetal.jpg
+			}
+		}
+	}
+}

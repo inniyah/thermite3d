@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout >
+    <Window Type="DefaultWindow" Name="MainWindow" >
+        <Property Name="Text" Value="Save ./output.volume" />
+        <Property Name="InheritsAlpha" Value="False" />
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window Type="TaharezLook/Button" Name="Play" >
+            <Property Name="Text" Value="Play" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.33,0},{0.1,0},{0.66,0},{0.2,0}}" />
+        </Window>
+        <Window Type="TaharezLook/Button" Name="ResumeButton" >
+            <Property Name="Text" Value="Resume" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.33,0},{0.1,0},{0.66,0},{0.2,0}}" />
+        </Window>
+        <Window Type="TaharezLook/Button" Name="LoadSceneButton" >
+            <Property Name="Text" Value="Load Scene" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.33,0},{0.3,0},{0.66,0},{0.4,0}}" />
+        </Window>
+        <Window Type="TaharezLook/Button" Name="ConfigureButton" >
+            <Property Name="Text" Value="Configure" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.33,0},{0.5,0},{0.66,0},{0.6,0}}" />
+        </Window>
+        <Window Type="TaharezLook/Button" Name="QuitButton" >
+            <Property Name="Text" Value="Quit" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.33,0},{0.7,0},{0.66,0},{0.8,0}}" />
+        </Window>
+    </Window>
+</GUILayout>

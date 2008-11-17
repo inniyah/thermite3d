@@ -1,0 +1,24 @@
+Debris
+{
+    material        Debris
+    particle_width  3
+    particle_height 3
+    cull_each       false
+    quota           100000
+
+    // Area emitter
+    emitter Ellipsoid
+    {
+        angle           20
+        emission_rate   5000
+        time_to_live    5
+        velocity    	5
+        width           50
+        height          50
+        depth           50
+        duration        0.1
+        //colour_range_start 0.48 0.4 0.31
+        //colour_range_end 0.27 0.2 0.16
+        colour 1 1 1 1
+    }
+}

@@ -39,6 +39,8 @@ namespace QtOgre
 		QtOgre::Log* demoLog(void);
 
 	private:
+		void addResourceDirectory(const QString& directoryName);
+
 		QHash<int, KeyStates> mKeyStates;
 		QPoint mLastFrameMousePos;
 		QPoint mCurrentMousePos;

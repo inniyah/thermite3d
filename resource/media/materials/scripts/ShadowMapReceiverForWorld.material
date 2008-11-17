@@ -1,0 +1,93 @@
+// Shadow map receiver for the world
+material ShadowMapReceiverForWorldMaterial
+{
+	// This technique supports dynamic shadows
+	technique
+	{		
+		//Because of the way that boundaries between materials are rendered additivly, we need
+		//to start with a completely black background. Even ambient light is not handled here.
+		pass Background
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0 
+			vertex_program_ref PassThroughVertexProgram
+			{
+				param_named_auto world world_matrix
+				param_named_auto viewProj viewproj_matrix
+			}
+			
+			fragment_program_ref BlackFragmentProgram
+			{
+			}			
+		}
+		
+		// Now do the lighting pass
+		// NB we don't do decal texture here because this is repeated per light
+		pass Lighting
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0 
+			
+			// do this for each light
+			//iteration once_per_light
+
+			scene_blend add
+
+			// Vertex program reference
+			vertex_program_ref ShadowMapReceiverForWorldVP
+			{
+			}
+
+			// Fragment program
+			fragment_program_ref ShadowMapReceiverForWorldFP
+			{
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode wrap
+				filtering none
+			}
+			
+			texture_unit
+			{
+				texture bricks.jpg
+			}
+			
+			texture_unit
+			{
+				texture castle_wall.png
+			}
+			
+			texture_unit
+			{
+				texture roof_tiles.png
+			}
+			
+			texture_unit
+			{
+				texture grass.png
+			}
+			
+			texture_unit
+			{
+				texture water.png
+			}
+			
+			texture_unit
+			{
+				texture ground.png
+			}
+			
+			texture_unit
+			{
+				texture stained_glass.png
+			}
+		}
+	}
+}

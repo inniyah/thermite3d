@@ -1,0 +1,6 @@
+fragment_program LightingAndDecalCombinerFP cg
+{
+	source LightingAndDecalCombiner.cg
+	entry_point LightingAndDecalCombinerFP
+	profiles ps_2_0 arbfp1
+}
