@@ -4,6 +4,9 @@
 #include "LogManager.h"
 #include "OgreWidget.h"
 
+#include "SurfacePatchRenderable.h"
+#include "VolumeManager.h"
+
 #include <OgreEntity.h>
 #include <OgreRenderWindow.h>
 #include <OgreResourceGroupManager.h>
@@ -27,10 +30,6 @@ namespace QtOgre
 		mDemoLog->logMessage("A demonstration warning message", LL_WARNING);
 		mDemoLog->logMessage("A demonstration error message", LL_ERROR);
 
-		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/models", "FileSystem");
-		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/textures", "FileSystem");
-		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("C:/Program Files (x86)/Thermite2/share/thermite/media/materials", "FileSystem");
-		//Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../share/thermite/", "FileSystem", "General", true);
 		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
@@ -81,6 +80,12 @@ namespace QtOgre
 		mIsFirstFrame = true;
 
 		mCameraSpeed = 10.0;
+
+		//Onto the good stuff...
+		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
+		Ogre::VolumeManager* vm = new Ogre::VolumeManager;
+		mWorld = new World(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
+		mWorld->loadScene("Castle");
 	}
 
 	void DemoGameLogic::update(void)
@@ -129,6 +134,9 @@ namespace QtOgre
 		mLastFrameWheelPos = mCurrentWheelPos;
 
 		mIsFirstFrame = false;
+
+		//The fun stuff!
+		mWorld->updatePolyVoxGeometry();
 	}
 
 	void DemoGameLogic::shutdown(void)

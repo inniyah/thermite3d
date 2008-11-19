@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class World
 {
 public:
-	World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize);
+	World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
 	~World(void);
 
 	void initialisePhysics(void);
@@ -48,7 +48,7 @@ public:
 	//void updatePolyVoxGeometryWorks();
 	void updatePolyVoxGeometry();
 
-	Application* app;
+	//Application* app;
 	
 
 public:

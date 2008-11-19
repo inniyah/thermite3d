@@ -47,7 +47,7 @@ using namespace PolyVox;
 using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
 
-World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize)
+World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
 :dummyCounter(0)
 ,cubeCounter(0)
 ,m_vecGravity(vecGravity)
@@ -57,7 +57,8 @@ World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Og
 
 	memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 
-	m_pOgreSceneManager = new DefaultSceneManager("EngineSceneManager");
+	//m_pOgreSceneManager = new DefaultSceneManager("EngineSceneManager");
+	m_pOgreSceneManager = sceneManager;
 	m_pOgreMenuSceneManager = new DefaultSceneManager("MenuSceneManager");
 
 	m_pOgreSceneManager->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);

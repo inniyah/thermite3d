@@ -5,6 +5,8 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 
+#include "World.h"
+
 #include <OgrePrerequisites.h>
 
 #include <QHash>
@@ -69,6 +71,9 @@ namespace QtOgre
 		Ogre::Camera* mCamera;
 		Ogre::SceneManager* mSceneManager;
 		QtOgre::Log* mDemoLog;
+
+		//Thermite stuff
+		World* mWorld;
 	};
 }
 

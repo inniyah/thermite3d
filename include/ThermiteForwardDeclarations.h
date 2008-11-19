@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __ForwardDeclarations_H__
 #define __ForwardDeclarations_H__
 
-class Application;
+//class Application;
 class GameState;
 //class IndexedSurfacePatchCollisionShape;
 class LoadSceneMenuPage;
