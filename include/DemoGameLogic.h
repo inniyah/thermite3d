@@ -57,6 +57,7 @@ namespace QtOgre
 		bool mIsFirstFrame;
 
 		float mCameraSpeed;
+		float mCameraRotationalSpeed;
 
 		Ogre::Entity *mJaiquaEntity;
 		Ogre::SceneNode* mJaiquaNode;

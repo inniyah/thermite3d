@@ -30,6 +30,8 @@ namespace QtOgre
 		mDemoLog->logMessage("A demonstration warning message", LL_WARNING);
 		mDemoLog->logMessage("A demonstration error message", LL_ERROR);
 
+		Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
+
 		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
@@ -38,8 +40,8 @@ namespace QtOgre
 
 		mCamera = mSceneManager->createCamera("Cam");
 
-		mCamera->setPosition(10, 10, 10);
-		mCamera->lookAt(0, 0, 0);
+		mCamera->setPosition(128,128,256);
+		mCamera->lookAt(128, 0, 128);
 		mCamera->setNearClipDistance(1.0);
 		mCamera->setFarClipDistance(1000.0);
 		mCamera->setFOVy(Ogre::Radian(1.0f));
@@ -79,7 +81,8 @@ namespace QtOgre
 
 		mIsFirstFrame = true;
 
-		mCameraSpeed = 10.0;
+		mCameraSpeed = 50.0;
+		mCameraRotationalSpeed = 0.01;
 
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
@@ -120,8 +123,8 @@ namespace QtOgre
 		if(!mIsFirstFrame)
 		{
 			QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
-			mCamera->yaw(Ogre::Radian(-mouseDelta.x() * timeElapsedInSeconds));
-			mCamera->pitch(Ogre::Radian(-mouseDelta.y() * timeElapsedInSeconds));
+			mCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
+			mCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
 
 			int wheelDelta = mCurrentWheelPos - mLastFrameWheelPos;
 			Ogre::Radian fov = mCamera->getFOVy();
