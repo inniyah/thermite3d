@@ -5,6 +5,7 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 
+#include "PhysicalObject.h"
 #include "World.h"
 
 #include <OgrePrerequisites.h>
@@ -12,6 +13,8 @@
 #include <QHash>
 
 #include <QTime>
+
+#include <queue>
 
 namespace QtOgre
 {
@@ -43,6 +46,8 @@ namespace QtOgre
 	private:
 		void addResourceDirectory(const QString& directoryName);
 
+		void createCube(float xPos, float zPos);
+
 		QHash<int, KeyStates> mKeyStates;
 		QPoint mLastFrameMousePos;
 		QPoint mCurrentMousePos;
@@ -54,7 +59,7 @@ namespace QtOgre
 		int mLastFrameTime;
 		int mCurrentTime;
 
-		bool mIsFirstFrame;
+		unsigned int mCurrentFrameNumber;
 
 		float mCameraSpeed;
 		float mCameraRotationalSpeed;
@@ -75,6 +80,9 @@ namespace QtOgre
 
 		//Thermite stuff
 		World* mWorld;
+		int cubeCounter; //For unique names
+
+		std::queue<PhysicalObject*> m_queueObjects;
 	};
 }
 

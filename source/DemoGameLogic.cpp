@@ -18,6 +18,7 @@ namespace QtOgre
 {
 	DemoGameLogic::DemoGameLogic(void)
 		:GameLogic()
+		,mCurrentFrameNumber(0)
 	{
 	}
 
@@ -30,7 +31,7 @@ namespace QtOgre
 		mDemoLog->logMessage("A demonstration warning message", LL_WARNING);
 		mDemoLog->logMessage("A demonstration error message", LL_ERROR);
 
-		Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
+		//Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
 
 		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
@@ -79,7 +80,7 @@ namespace QtOgre
 		mTime = new QTime;
 		mTime->start();
 
-		mIsFirstFrame = true;
+		mCurrentFrameNumber = 0;
 
 		mCameraSpeed = 50.0;
 		mCameraRotationalSpeed = 0.01;
@@ -120,7 +121,7 @@ namespace QtOgre
 			mCamera->setPosition(mCamera->getPosition() + mCamera->getRight() * distance);
 		}
 
-		if(!mIsFirstFrame)
+		if(mCurrentFrameNumber != 0)
 		{
 			QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
 			mCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
@@ -136,10 +137,20 @@ namespace QtOgre
 		mLastFrameMousePos = mCurrentMousePos;
 		mLastFrameWheelPos = mCurrentWheelPos;
 
-		mIsFirstFrame = false;
-
 		//The fun stuff!
 		mWorld->updatePolyVoxGeometry();
+
+		if(mCurrentFrameNumber % 100 == 0)
+		{
+			srand(mCurrentFrameNumber);
+			int iX = rand() % 150 + 50;
+			int iY = rand() % 150 + 50;
+			createCube(iX,iY);
+		}
+
+		mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds,1000.0f);
+
+		++mCurrentFrameNumber;
 	}
 
 	void DemoGameLogic::shutdown(void)
@@ -197,5 +208,18 @@ namespace QtOgre
 		{
 			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
 		} 
+	}
+
+	void DemoGameLogic::createCube(float xPos, float zPos)
+	{	
+		PhysicalObject* obj = new PhysicalObject(mWorld, "test", Ogre::Vector3(xPos,128.0,zPos));
+		m_queueObjects.push(obj);
+
+		while(m_queueObjects.size() > 25)
+		{
+			PhysicalObject* toDel = m_queueObjects.front();
+			m_queueObjects.pop();
+			delete toDel;
+		}
 	}
 }
