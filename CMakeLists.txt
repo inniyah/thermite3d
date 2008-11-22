@@ -15,7 +15,6 @@ FIND_PACKAGE(QtOgre REQUIRED)
 
 SET(SRC_FILES
 	source/main.cpp
-	source/ChooseMeshWidget.cpp
 	source/DataStreamAdapter.cpp
 	source/MainMenu.cpp
 	source/PhysicalObject.cpp
@@ -32,7 +31,6 @@ SET(SRC_FILES
 )
 
 SET(INC_FILES
-	include/ChooseMeshWidget.h
 	include/DataStreamAdapter.h
 	include/MainMenu.h
 	include/PhysicalObject.h
@@ -51,7 +49,6 @@ SET(INC_FILES
 )
 
 SET(UI_FILES
-	ui/ChooseMeshWidget.ui
 	ui/MainMenu.ui
 )
 

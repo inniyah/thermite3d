@@ -26,8 +26,8 @@ namespace QtOgre
 	{
 		mApplication->setUpdateInterval(0);
 
-		mDemoLog = mApplication->createLog("Demo");
-		mDemoLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
+		mThermiteLog = mApplication->createLog("Thermite");
+		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
 
 		#if defined(_DEBUG)
 			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
@@ -53,31 +53,7 @@ namespace QtOgre
 
 		mSceneManager->setAmbientLight( Ogre::ColourValue( 1, 1, 1 ) );
 
-		mJaiquaEntity = mSceneManager->createEntity( "Jaiqua", "jaiqua.mesh" );
-		mJaiquaNode = mSceneManager->getRootSceneNode()->createChildSceneNode( "JaiquaNode" );
-		mJaiquaNode->attachObject( mJaiquaEntity );
-		mJaiquaNode->scale(0.4,0.4,0.4);
-		mJaiquaNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(-1.57));
-
-		mJaiquaEntity->getAnimationState("Walk")->setLoop(true);
-		mJaiquaEntity->getAnimationState("Walk")->setEnabled(true);
-
-		mRobotEntity = mSceneManager->createEntity( "Robot", "robot.mesh" );
-		mRobotNode = mSceneManager->getRootSceneNode()->createChildSceneNode( "RobotNode" );
-		mRobotNode->attachObject( mRobotEntity );
-		mRobotNode->scale(0.1,0.1,0.1);
-		mRobotNode->translate(Ogre::Vector3(3.0,0.0,0.0));
-		mRobotEntity->setVisible(false);
-
-		mRobotEntity->getAnimationState("Walk")->setLoop(true);
-		mRobotEntity->getAnimationState("Walk")->setEnabled(true);
-
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
-
-		mChooseMeshWidget = new ChooseMeshWidget(mJaiquaEntity, mRobotEntity, qApp->mainWidget());
-		mChooseMeshWidget->setWindowOpacity(qApp->settings()->value("System/DefaultWindowOpacity", 1.0).toDouble());
-		mChooseMeshWidget->move(qApp->mainWidget()->geometry().left() + qApp->mainWidget()->geometry().width() - mChooseMeshWidget->frameGeometry().width() - 10, qApp->mainWidget()->geometry().top() + 10);
-		mChooseMeshWidget->show();
 
 		mTime = new QTime;
 		mTime->start();
@@ -100,9 +76,6 @@ namespace QtOgre
 		mCurrentTime = mTime->elapsed();
 
 		float timeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;
-
-		mRobotEntity->getAnimationState("Walk")->addTime(timeElapsedInSeconds);
-		mJaiquaEntity->getAnimationState("Walk")->addTime(timeElapsedInSeconds);
 
 		float distance = mCameraSpeed * timeElapsedInSeconds;
 
@@ -164,12 +137,6 @@ namespace QtOgre
 
 	void DemoGameLogic::shutdown(void)
 	{
-		mSceneManager->destroyEntity(mRobotEntity);
-		mSceneManager->getRootSceneNode()->removeAndDestroyAllChildren();
-		mSceneManager->destroyAllEntities();
-		mSceneManager->destroyAllCameras();
-		mSceneManager->destroyAllAnimationStates();
-		mSceneManager->destroyAllAnimations();
 		Ogre::Root::getSingleton().destroySceneManager(mSceneManager);
 	}
 
@@ -179,7 +146,6 @@ namespace QtOgre
 
 		if(event->key() == Qt::Key_Escape)
 		{
-			//qApp->centerWidget(mMainMenu, qApp->mMainWindow);
 			mMainMenu->exec();
 		}
 	}
@@ -205,9 +171,9 @@ namespace QtOgre
 		mCurrentWheelPos += event->delta();
 	}
 
-	Log* DemoGameLogic::demoLog(void)
+	Log* DemoGameLogic::thermiteLog(void)
 	{
-		return mDemoLog;
+		return mThermiteLog;
 	}
 
 	void DemoGameLogic::addResourceDirectory(const QString& directoryName)

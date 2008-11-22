@@ -1,7 +1,6 @@
 #ifndef DEMOGAMELOGIC_H_
 #define DEMOGAMELOGIC_H_
 
-#include "ChooseMeshWidget.h"
 #include "GameLogic.h"
 #include "MainMenu.h"
 
@@ -41,7 +40,7 @@ namespace QtOgre
 
 		void onWheel(QWheelEvent* event);
 
-		QtOgre::Log* demoLog(void);
+		QtOgre::Log* thermiteLog(void);
 
 	private:
 		void addResourceDirectory(const QString& directoryName);
@@ -67,16 +66,11 @@ namespace QtOgre
 		Ogre::Entity *mJaiquaEntity;
 		Ogre::SceneNode* mJaiquaNode;
 
-		Ogre::Entity *mRobotEntity;
-		Ogre::SceneNode* mRobotNode;
-
-		ChooseMeshWidget* mChooseMeshWidget;
-
 		MainMenu* mMainMenu;
 
 		Ogre::Camera* mCamera;
 		Ogre::SceneManager* mSceneManager;
-		QtOgre::Log* mDemoLog;
+		QtOgre::Log* mThermiteLog;
 
 		//Thermite stuff
 		World* mWorld;
