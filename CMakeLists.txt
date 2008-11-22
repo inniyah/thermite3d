@@ -17,10 +17,10 @@ SET(SRC_FILES
 	source/main.cpp
 	source/ChooseMeshWidget.cpp
 	source/DataStreamAdapter.cpp
-	source/DemoGameLogic.cpp
 	source/MainMenu.cpp
 	source/PhysicalObject.cpp
 	source/SurfacePatchRenderable.cpp
+	source/ThermiteGameLogic.cpp
 	source/TimeStampedRenderOperation.cpp
 	source/TimeStampedRenderOperationCache.cpp
 	source/TimeStampedSurfacePatchCache.cpp
@@ -34,11 +34,11 @@ SET(SRC_FILES
 SET(INC_FILES
 	include/ChooseMeshWidget.h
 	include/DataStreamAdapter.h
-	include/DemoGameLogic.h
 	include/MainMenu.h
 	include/PhysicalObject.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
+	include/ThermiteGameLogic.h
 	include/TimeStampedRenderOperation.h
 	include/TimeStampedRenderOperationCache.h
 	include/TimeStampedSurfacePatchCache.h

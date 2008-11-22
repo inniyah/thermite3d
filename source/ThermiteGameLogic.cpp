@@ -1,4 +1,4 @@
-#include "DemoGameLogic.h"
+#include "ThermiteGameLogic.h"
 #include "MainMenu.h"
 
 #include "LogManager.h"
