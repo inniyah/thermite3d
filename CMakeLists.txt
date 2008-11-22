@@ -177,5 +177,5 @@ ENDIF(WIN32)
 
 #INSTALL(DIRECTORY resources DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
 #INSTALL(DIRECTORY media DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
-INSTALL(DIRECTORY resource DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
+INSTALL(DIRECTORY resources/Ogre DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
 #INSTALL(FILES resource/resources.cfg DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite)
