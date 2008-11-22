@@ -24,20 +24,22 @@ namespace QtOgre
 
 	void DemoGameLogic::initialise(void)
 	{
+		mApplication->setUpdateInterval(0);
+
 		mDemoLog = mApplication->createLog("Demo");
+		mDemoLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
 
-		mDemoLog->logMessage("A demonstration debug message", LL_DEBUG);
-		mDemoLog->logMessage("A demonstration info message", LL_INFO);
-		mDemoLog->logMessage("A demonstration warning message", LL_WARNING);
-		mDemoLog->logMessage("A demonstration error message", LL_ERROR);
-
-		//Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
+		#if defined(_DEBUG)
+			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
+		#else
+			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
+		#endif
 
 		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		// Create the generic scene manager
-		mSceneManager = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, "GenericSceneManager");
+		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
 
 		mCamera = mSceneManager->createCamera("Cam");
 
@@ -148,7 +150,14 @@ namespace QtOgre
 			createCube(iX,iY);
 		}
 
-		mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds,1000.0f);
+		//FIXME: I *really* don't know why this test is necessary. For some reason the 
+		//debug version works fine, but in release mode the bullet objects don't move
+		//(as is the time step was zero). But printing the value indicates it's fine.
+		#if defined(_DEBUG)
+			mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 100);
+		#else
+			mWorld->m_pOgreBulletWorld->stepSimulation(0.02, 100);
+		#endif
 
 		++mCurrentFrameNumber;
 	}

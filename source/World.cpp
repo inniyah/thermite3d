@@ -120,7 +120,7 @@ void World::updatePolyVoxGeometry()
 		timer->reset();
 
 		//Iterate over each region in the VolumeChangeTracker
-		for(PolyVox::uint16 regionZ = 8; regionZ < 9; ++regionZ)
+		for(PolyVox::uint16 regionZ = 0; regionZ < POLYVOX_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionZ)
 		{		
 			for(PolyVox::uint16 regionY = 0; regionY < POLYVOX_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionY)
 			{
