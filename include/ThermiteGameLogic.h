@@ -1,5 +1,5 @@
-#ifndef DEMOGAMELOGIC_H_
-#define DEMOGAMELOGIC_H_
+#ifndef THERMITEGAMELOGIC_H_
+#define THERMITEGAMELOGIC_H_
 
 #include "GameLogic.h"
 #include "MainMenu.h"
@@ -23,10 +23,10 @@ namespace QtOgre
 		KS_PRESSED
 	};
 
-	class DemoGameLogic : public GameLogic
+	class ThermiteGameLogic : public GameLogic
 	{
 	public:
-		DemoGameLogic(void);
+		ThermiteGameLogic(void);
 
 		void initialise(void);
 		void update(void);

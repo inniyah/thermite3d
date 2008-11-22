@@ -16,13 +16,13 @@
 
 namespace QtOgre
 {
-	DemoGameLogic::DemoGameLogic(void)
+	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 	{
 	}
 
-	void DemoGameLogic::initialise(void)
+	void ThermiteGameLogic::initialise(void)
 	{
 		mApplication->setUpdateInterval(0);
 
@@ -70,7 +70,7 @@ namespace QtOgre
 		mWorld->loadScene("Castle");
 	}
 
-	void DemoGameLogic::update(void)
+	void ThermiteGameLogic::update(void)
 	{
 		mLastFrameTime = mCurrentTime;
 		mCurrentTime = mTime->elapsed();
@@ -135,12 +135,12 @@ namespace QtOgre
 		++mCurrentFrameNumber;
 	}
 
-	void DemoGameLogic::shutdown(void)
+	void ThermiteGameLogic::shutdown(void)
 	{
 		Ogre::Root::getSingleton().destroySceneManager(mSceneManager);
 	}
 
-	void DemoGameLogic::onKeyPress(QKeyEvent* event)
+	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)
 	{
 		mKeyStates[event->key()] = KS_PRESSED;
 
@@ -150,33 +150,33 @@ namespace QtOgre
 		}
 	}
 
-	void DemoGameLogic::onKeyRelease(QKeyEvent* event)
+	void ThermiteGameLogic::onKeyRelease(QKeyEvent* event)
 	{
 		mKeyStates[event->key()] = KS_RELEASED;
 	}
 
-	void DemoGameLogic::onMousePress(QMouseEvent* event)
+	void ThermiteGameLogic::onMousePress(QMouseEvent* event)
 	{
 		mCurrentMousePos = event->pos();
 		mLastFrameMousePos = mCurrentMousePos;
 	}
 
-	void DemoGameLogic::onMouseMove(QMouseEvent* event)
+	void ThermiteGameLogic::onMouseMove(QMouseEvent* event)
 	{
 		mCurrentMousePos = event->pos();
 	}
 
-	void DemoGameLogic::onWheel(QWheelEvent* event)
+	void ThermiteGameLogic::onWheel(QWheelEvent* event)
 	{
 		mCurrentWheelPos += event->delta();
 	}
 
-	Log* DemoGameLogic::thermiteLog(void)
+	Log* ThermiteGameLogic::thermiteLog(void)
 	{
 		return mThermiteLog;
 	}
 
-	void DemoGameLogic::addResourceDirectory(const QString& directoryName)
+	void ThermiteGameLogic::addResourceDirectory(const QString& directoryName)
 	{
 		QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 		while (it.hasNext())
@@ -185,7 +185,7 @@ namespace QtOgre
 		} 
 	}
 
-	void DemoGameLogic::createCube(float xPos, float zPos)
+	void ThermiteGameLogic::createCube(float xPos, float zPos)
 	{	
 		PhysicalObject* obj = new PhysicalObject(mWorld, "test", Ogre::Vector3(xPos,128.0,zPos));
 		m_queueObjects.push(obj);
