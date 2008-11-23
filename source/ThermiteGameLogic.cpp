@@ -41,6 +41,14 @@ namespace QtOgre
 		// Create the generic scene manager
 		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
 
+		mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+		//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
+		mSceneManager->setShadowTextureSelfShadow(true);
+		mSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+		mSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+		mSceneManager->setShadowCasterRenderBackFaces(true);
+		mSceneManager->setShadowTextureSize(1024);
+
 		mCamera = mSceneManager->createCamera("Cam");
 
 		mCamera->setPosition(128,128,256);
@@ -51,7 +59,15 @@ namespace QtOgre
 
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
 
-		mSceneManager->setAmbientLight( Ogre::ColourValue( 1, 1, 1 ) );
+		mSceneManager->setAmbientLight( Ogre::ColourValue( 0.3, 0.3, 0.3 ) );
+
+		light1 = mSceneManager->createLight( "Light1" );
+		light1->setType( Ogre::Light::LT_DIRECTIONAL);
+		light1->setDiffuseColour(Ogre::ColourValue(0.7,0.7,0.7));
+
+		Ogre::Vector3 pos1(256,128,256);
+		light1->setPosition(pos1);
+		light1->setDirection(Ogre::Vector3(128.0f, 0.0f, 128.0f) - pos1);
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
 

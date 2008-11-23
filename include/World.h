@@ -45,15 +45,10 @@ public:
 
 	bool World::loadScene(const Ogre::String& filename);
 
-	//void updatePolyVoxGeometryWorks();
-	void updatePolyVoxGeometry();
-
-	//Application* app;
-	
+	void updatePolyVoxGeometry();	
 
 public:
 	Ogre::SceneManager* m_pOgreSceneManager;
-	Ogre::SceneManager* m_pOgreMenuSceneManager;
 
 	PolyVox::VolumeChangeTracker* volumeChangeTracker;
 
@@ -65,12 +60,7 @@ public:
 
 	std::map<PolyVox::Vector3DInt32, WorldRegion*> m_mapWorldRegions;
 
-	//std::list<PolyVox::IndexedSurfacePatch*> getChangedRegionGeometry(PolyVox::VolumeChangeTracker& volume);
-
 private:
-	int dummyCounter;
-	int cubeCounter; //For unique names
-
 	Ogre::Vector3 m_vecGravity;
 	Ogre::AxisAlignedBox m_boxPhysicsBounds;
 	Ogre::Real m_rVoxelSize;

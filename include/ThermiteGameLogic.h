@@ -77,6 +77,9 @@ namespace QtOgre
 		int cubeCounter; //For unique names
 
 		std::queue<PhysicalObject*> m_queueObjects;
+
+		Ogre::Light* light1;
+		Ogre::SceneNode* lightNode1;
 	};
 }
 

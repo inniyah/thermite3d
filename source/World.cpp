@@ -48,27 +48,13 @@ using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
 
 World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
-:dummyCounter(0)
-,cubeCounter(0)
-,m_vecGravity(vecGravity)
+:m_vecGravity(vecGravity)
 ,m_boxPhysicsBounds(boxPhysicsBounds)
 ,m_rVoxelSize(rVoxelSize)
 {
-
 	memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 
-	//m_pOgreSceneManager = new DefaultSceneManager("EngineSceneManager");
 	m_pOgreSceneManager = sceneManager;
-	m_pOgreMenuSceneManager = new DefaultSceneManager("MenuSceneManager");
-
-	m_pOgreSceneManager->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-	m_pOgreSceneManager->setShadowTextureSelfShadow(true);
-	m_pOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-	m_pOgreSceneManager->setShadowTexturePixelFormat(PF_FLOAT32_R);
-	m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
-	m_pOgreSceneManager->setShadowTextureSize(1024);
-
 
 	volumeChangeTracker = new VolumeChangeTracker();
 
