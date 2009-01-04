@@ -13,6 +13,7 @@
 #include <OgreRoot.h>
 
 #include <QDirIterator>
+#include <QKeyEvent>
 
 namespace QtOgre
 {

@@ -16,6 +16,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(SRC_FILES
 	source/main.cpp
 	source/DataStreamAdapter.cpp
+	source/DotSceneWithVolumeHandler.cpp
 	source/MainMenu.cpp
 	source/PhysicalObject.cpp
 	source/SurfacePatchRenderable.cpp
@@ -32,6 +33,7 @@ SET(SRC_FILES
 
 SET(INC_FILES
 	include/DataStreamAdapter.h
+	include/DotSceneWithVolumeHandler.h
 	include/MainMenu.h
 	include/PhysicalObject.h
 	include/SurfacePatchRenderable.h
@@ -65,6 +67,7 @@ IF (WIN32)
 	SET(QT_USE_QTMAIN 1)
 ENDIF (WIN32)
 SET(QT_USE_QTGUI 1)
+SET(QT_USE_QTXML 1)
 INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(MOC_SRCS ${INC_FILES})

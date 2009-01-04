@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "World.h"
 
 #include "Application.h"
+#include "DotSceneWithVolumeHandler.h"
 #include "VolumeManager.h"
 
 #include "TimeStampedSurfacePatchCache.h"
@@ -79,6 +80,19 @@ void World::initialisePhysics(void)
 
 bool World::loadScene(const Ogre::String& filename)
 {
+	DotSceneWithVolumeHandler handler(m_pOgreSceneManager);
+	QXmlSimpleReader reader;
+	reader.setContentHandler(&handler);
+	reader.setErrorHandler(&handler);
+
+	QFile file("C:\\ogreaddons\\dotsceneformat\\Source\\Common\\trunk\\main\\XmlNodeProcessor\\test.scene");
+    file.open(QFile::ReadOnly | QFile::Text);
+	QXmlInputSource xmlInputSource(&file);
+    reader.parse(xmlInputSource);
+
+	return 0;
+
+
 	volumeResource = VolumeManager::getSingletonPtr()->load(filename + ".volume", "General");
 	if(volumeResource.isNull())
 	{
