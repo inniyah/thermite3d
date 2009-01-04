@@ -3,7 +3,7 @@
 # This module defines
 #  QTOGRE_INCLUDE_DIR
 #  QTOGRE_LIBRARIES, the libraries to link against to use QTOGRE.
-#  QTOGRE_LIB_DIR, the location of the libraries
+#  QTOGRE_LIBRARY_DIRS, the location of the libraries
 #  QTOGRE_FOUND, If false, do not try to use QTOGRE
 #
 # Copyright © 2007, Matt Williams
@@ -17,8 +17,8 @@ ENDIF (QTOGRE_LIBRARIES AND QTOGRE_INCLUDE_DIR)
 
 IF (WIN32) #Windows
 	MESSAGE(STATUS "Looking for QtOgre")
-	SET(QTOGRE_INCLUDE_DIR "C:\\ogreaddons\\QtOgreFramework\\QtOgre\\include")
-	SET(QTOGRE_LIB_DIR debug "C:\\ogreaddons\\QtOgreFramework\\QtOgre\\debug" optimized "C:\\ogreaddons\\QtOgreFramework\\QtOgre\\release")
+	SET(QTOGRE_INCLUDE_DIR "C:\\Program Files (x86)\\QtOgreFramework\\include")
+	SET(QTOGRE_LIBRARY_DIRS debug "C:\\Program Files (x86)\\QtOgreFramework\\lib" optimized "C:\\Program Files (x86)\\QtOgreFramework\\lib")
 	SET(QTOGRE_LIBRARIES debug QtOgre_d optimized QtOgre)
 ELSE (WIN32) #Unix
 	#CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
@@ -29,13 +29,14 @@ ELSE (WIN32) #Unix
 	#SET(OGRE_LIBRARIES ${OGRE_LIBRARIES} CACHE STRING "")
 ENDIF (WIN32)
 
-#Do some preparation
-SEPARATE_ARGUMENTS(QTOGRE_INCLUDE_DIR)
-SEPARATE_ARGUMENTS(QTOGRE_LIBRARIES)
+#Do some preparation - currently commented out as it seems to treat spaces as seperators
+#This causes problems with windows paths.
+#SEPARATE_ARGUMENTS(QTOGRE_INCLUDE_DIR)
+#SEPARATE_ARGUMENTS(QTOGRE_LIBRARIES)
 
 SET(QTOGRE_INCLUDE_DIR ${QTOGRE_INCLUDE_DIR} CACHE PATH "")
 SET(QTOGRE_LIBRARIES ${QTOGRE_LIBRARIES} CACHE STRING "")
-SET(QTOGRE_LIB_DIR ${QTOGRE_LIB_DIR} CACHE PATH "")
+SET(QTOGRE_LIBRARY_DIRS ${QTOGRE_LIBRARY_DIRS} CACHE PATH "")
 
 IF (QTOGRE_INCLUDE_DIR AND QTOGRE_LIBRARIES)
 	SET(QTOGRE_FOUND TRUE)
@@ -43,7 +44,7 @@ ENDIF (QTOGRE_INCLUDE_DIR AND QTOGRE_LIBRARIES)
 
 IF (QTOGRE_FOUND)
 	IF (NOT QTOGRE_FIND_QUIETLY)
-		MESSAGE(STATUS "  libraries : ${QTOGRE_LIBRARIES} from ${QTOGRE_LIB_DIR}")
+		MESSAGE(STATUS "  libraries : ${QTOGRE_LIBRARIES} from ${QTOGRE_LIBRARY_DIRS}")
 		MESSAGE(STATUS "  includes  : ${QTOGRE_INCLUDE_DIR}")
 	ENDIF (NOT QTOGRE_FIND_QUIETLY)
 ELSE (QTOGRE_FOUND)
