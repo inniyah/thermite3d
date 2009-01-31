@@ -32,7 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "PolyVoxCore/BlockVolume.h"
 
 #include <OgreResourceManager.h>
-#include <boost/cstdint.hpp>
 
 namespace Ogre
 {
@@ -44,7 +43,7 @@ namespace Ogre
 			Ogre::ManualResourceLoader *loader = 0);
 		~VolumeResource();
 
-		PolyVox::BlockVolume<boost::uint8_t>* volume;
+		PolyVox::BlockVolume<PolyVox::uint8>* volume;
 
 	protected:
 

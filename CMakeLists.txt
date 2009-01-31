@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(Thermite2)
 
 #Standard modules
-FIND_PACKAGE(Boost 1.34.1 COMPONENTS program_options filesystem REQUIRED)
+#FIND_PACKAGE(Boost 1.34.1 COMPONENTS program_options filesystem REQUIRED)
 
 #Custom modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)

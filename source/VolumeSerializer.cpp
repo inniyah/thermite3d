@@ -51,7 +51,7 @@ namespace Ogre
 		outFile.close ();
 	}*/
 
-	void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, BlockVolume<boost::uint8_t> **pDest)
+	void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, BlockVolume<PolyVox::uint8> **pDest)
 	{
 		//pDest->setString (stream->getAsString ());
 		//Volume vol;

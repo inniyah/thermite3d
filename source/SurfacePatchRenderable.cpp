@@ -26,13 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "PolyVoxCore/SurfaceVertex.h"
 #include "OgreVertexIndexData.h"
 
-#include <boost/cstdint.hpp>
-
 #include <limits>
 
 using namespace PolyVox;
 using namespace Ogre;
-using namespace boost;
 
 #pragma region Constructors/Destructors
 SurfacePatchRenderable::SurfacePatchRenderable(const String& strName)

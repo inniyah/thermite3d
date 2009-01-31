@@ -28,8 +28,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PolyVoxCore/PolyVoxForwardDeclarations.h"
 
-#include <boost/cstdint.hpp>
-
 namespace Ogre
 {
 	class VolumeSerializer : public Ogre::Serializer
@@ -39,7 +37,7 @@ namespace Ogre
 		virtual ~VolumeSerializer ();
 
 		//void exportVolume (const Volume *pText, const Ogre::String &fileName);
-		void importVolume (Ogre::DataStreamPtr &stream, PolyVox::BlockVolume<boost::uint8_t> **pDest);
+		void importVolume (Ogre::DataStreamPtr &stream, PolyVox::BlockVolume<PolyVox::uint8> **pDest);
 	};
 }
 

@@ -17,8 +17,8 @@ ENDIF (QTOGRE_LIBRARIES AND QTOGRE_INCLUDE_DIR)
 
 IF (WIN32) #Windows
 	MESSAGE(STATUS "Looking for QtOgre")
-	SET(QTOGRE_INCLUDE_DIR "C:\\Program Files (x86)\\QtOgreFramework\\include")
-	SET(QTOGRE_LIBRARY_DIRS debug "C:\\Program Files (x86)\\QtOgreFramework\\lib" optimized "C:\\Program Files (x86)\\QtOgreFramework\\lib")
+	SET(QTOGRE_INCLUDE_DIR "C:\\Program Files\\QtOgreFramework\\include")
+	SET(QTOGRE_LIBRARY_DIRS debug "C:\\Program Files\\QtOgreFramework\\lib" optimized "C:\\Program Files (x86)\\QtOgreFramework\\lib")
 	SET(QTOGRE_LIBRARIES debug QtOgre_d optimized QtOgre)
 ELSE (WIN32) #Unix
 	#CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
