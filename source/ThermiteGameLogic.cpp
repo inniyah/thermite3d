@@ -50,25 +50,7 @@ namespace QtOgre
 		mSceneManager->setShadowCasterRenderBackFaces(true);
 		mSceneManager->setShadowTextureSize(1024);
 
-		mCamera = mSceneManager->createCamera("Cam");
-
-		mCamera->setPosition(128,128,256);
-		mCamera->lookAt(128, 0, 128);
-		mCamera->setNearClipDistance(1.0);
-		mCamera->setFarClipDistance(1000.0);
-		mCamera->setFOVy(Ogre::Radian(1.0f));
-
-		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
-
 		mSceneManager->setAmbientLight( Ogre::ColourValue( 0.3, 0.3, 0.3 ) );
-
-		light1 = mSceneManager->createLight( "Light1" );
-		light1->setType( Ogre::Light::LT_DIRECTIONAL);
-		light1->setDiffuseColour(Ogre::ColourValue(0.7,0.7,0.7));
-
-		Ogre::Vector3 pos1(256,128,256);
-		light1->setPosition(pos1);
-		light1->setDirection(Ogre::Vector3(128.0f, 0.0f, 128.0f) - pos1);
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
 
@@ -85,6 +67,26 @@ namespace QtOgre
 		VolumeManager* vm = new VolumeManager;
 		mWorld = new World(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mWorld->loadScene("Castle");
+
+		//mCamera = mSceneManager->createCamera("Cam");
+		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
+		mCamera = camIter.peekNextValue();
+
+		//mCamera->setPosition(128,128,256);
+		//mCamera->lookAt(128, 0, 128);
+		mCamera->setNearClipDistance(1.0);
+		mCamera->setFarClipDistance(1000.0);
+		mCamera->setFOVy(Ogre::Radian(1.0f));
+
+		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+
+		light1 = mSceneManager->createLight( "Light1" );
+		light1->setType( Ogre::Light::LT_DIRECTIONAL);
+		light1->setDiffuseColour(Ogre::ColourValue(0.7,0.7,0.7));
+
+		Ogre::Vector3 pos1(256,128,256);
+		light1->setPosition(pos1);
+		light1->setDirection(Ogre::Vector3(128.0f, 0.0f, 128.0f) - pos1);
 	}
 
 	void ThermiteGameLogic::update(void)

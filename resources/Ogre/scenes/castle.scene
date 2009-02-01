@@ -1,0 +1,39 @@
+<?xml version="1.0" standalone="yes"?>
+<scene formatVersion="2.0">
+	<environment>
+		<!--skyBox material="SkyBox" distance="100.0" drawFirst="true">
+			<rotation qw="0" qx="0" qy="1" qz="0"/>
+		</skyBox-->
+	</environment>
+	<nodes>
+		<node name="CameraNode">			
+			<camera name="Camera" fov="1.0">
+				<position x="500" y="0" z="0" />
+				<lookTarget>
+					<position x="0" y="0" z="0" />
+				</lookTarget>
+			</camera>
+		</node>
+		<!--node name="CubeNode">
+			<scale x="0.02" y="0.02" z="0.02" />
+			<rotation qw="0" qx="0" qy="1" qz="0"/>
+			<position x="-5" y="0" z="0" />			
+			<entity meshFile="Cube.mesh" name="Cube" castShadows="True"/>
+		</node-->
+		<node name="BulletBoxNode1">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="10" y="10" z="10" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere1" castShadows="True"/>
+		</node>
+		<node name="BulletBoxNode2">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="30" y="10" z="10" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere2" castShadows="True"/>
+		</node>
+		<node name="BulletBoxNode3">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="50" y="10" z="10" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere3" castShadows="True"/>
+		</node>
+	</nodes>
+</scene>

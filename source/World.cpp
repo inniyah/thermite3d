@@ -80,7 +80,7 @@ void World::initialisePhysics(void)
 
 bool World::loadScene(const Ogre::String& filename)
 {
-	/*DotSceneWithVolumeHandler handler(m_pOgreSceneManager);
+	DotSceneWithVolumeHandler handler(m_pOgreSceneManager);
 	QXmlSimpleReader reader;
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);
@@ -90,7 +90,7 @@ bool World::loadScene(const Ogre::String& filename)
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);
 
-	return 0;*/
+	//return 0;
 
 
 	volumeResource = VolumeManager::getSingletonPtr()->load(filename + ".volume", "General");
