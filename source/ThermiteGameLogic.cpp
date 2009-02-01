@@ -140,14 +140,8 @@ namespace QtOgre
 			createCube(iX,iY);
 		}
 
-		//FIXME: I *really* don't know why this test is necessary. For some reason the 
-		//debug version works fine, but in release mode the bullet objects don't move
-		//(as is the time step was zero). But printing the value indicates it's fine.
-		#if defined(_DEBUG)
-			mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 100);
-		#else
-			mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 100);
-		#endif
+		
+		mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 
 		++mCurrentFrameNumber;
 	}
