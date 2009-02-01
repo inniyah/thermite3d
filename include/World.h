@@ -52,7 +52,7 @@ public:
 
 	PolyVox::VolumeChangeTracker* volumeChangeTracker;
 
-	Ogre::VolumeResourcePtr volumeResource;
+	VolumeResourcePtr volumeResource;
 
 	OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 

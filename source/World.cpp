@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <OgreSceneManager.h>
 #include <OgreTimer.h>
 
-using namespace Ogre;
+//using namespace Ogre;
 using namespace PolyVox;
 using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
@@ -85,7 +85,7 @@ bool World::loadScene(const Ogre::String& filename)
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);
 
-	QFile file("C:\\ogreaddons\\dotsceneformat\\Source\\Common\\trunk\\main\\XmlNodeProcessor\\test.scene");
+	QFile file("C:\\Program Files\\Thermite2\\share\\thermite\\Ogre\\scenes\\castle.scene");
     file.open(QFile::ReadOnly | QFile::Text);
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);
@@ -96,7 +96,7 @@ bool World::loadScene(const Ogre::String& filename)
 	volumeResource = VolumeManager::getSingletonPtr()->load(filename + ".volume", "General");
 	if(volumeResource.isNull())
 	{
-		LogManager::getSingleton().logMessage("Failed to load volume");
+		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 	}
 
 	//volumeResource->volume->tidy();
@@ -180,7 +180,7 @@ void World::updatePolyVoxGeometry()
 							//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
 							//For the graphics geometry this is done automatically each time Ogre tries to render a SurfacePatchRenderable.
 							IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-							pWorldRegion->setPhysicsData(Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
+							pWorldRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
 						}
 
 						//The WorldRegion is now up to date. Update the time stamp to indicate this

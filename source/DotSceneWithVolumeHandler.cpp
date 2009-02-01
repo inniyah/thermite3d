@@ -4,12 +4,13 @@
 #include <OgreSceneManager.h>
 
 DotSceneWithVolumeHandler::DotSceneWithVolumeHandler(Ogre::SceneManager* sceneManager)
+:DotSceneHandler(sceneManager)
 {
-	mSceneManager = sceneManager;
+	//mSceneManager = sceneManager;
 }
 
-bool DotSceneWithVolumeHandler::startElement(const QString & /* namespaceURI */,
-								   const QString & /* localName */,
+/*bool DotSceneWithVolumeHandler::startElement(const QString & ,
+								   const QString & ,
 								   const QString &qName,
 								   const QXmlAttributes &attributes)
 {
@@ -34,4 +35,4 @@ bool DotSceneWithVolumeHandler::startElement(const QString & /* namespaceURI */,
 	}
 
 	return true;
-}
+}*/

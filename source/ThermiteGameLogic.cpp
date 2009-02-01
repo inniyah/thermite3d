@@ -82,7 +82,7 @@ namespace QtOgre
 
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
-		Ogre::VolumeManager* vm = new Ogre::VolumeManager;
+		VolumeManager* vm = new VolumeManager;
 		mWorld = new World(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mWorld->loadScene("Castle");
 	}
@@ -146,7 +146,7 @@ namespace QtOgre
 		#if defined(_DEBUG)
 			mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 100);
 		#else
-			mWorld->m_pOgreBulletWorld->stepSimulation(0.02, 100);
+			mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 100);
 		#endif
 
 		++mCurrentFrameNumber;

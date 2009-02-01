@@ -25,27 +25,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <OgreResourceManager.h>
 #include "VolumeResource.h"
 
-namespace Ogre
+
+class VolumeManager : public Ogre::ResourceManager, public Ogre::Singleton<VolumeManager>
 {
-	class VolumeManager : public Ogre::ResourceManager, public Ogre::Singleton<VolumeManager>
-	{
-	protected:
+protected:
 
-		// must implement this from ResourceManager's interface
-		Ogre::Resource *createImpl(const Ogre::String &name, Ogre::ResourceHandle handle, 
-			const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
-			const Ogre::NameValuePairList *createParams);
+	// must implement this from ResourceManager's interface
+	Ogre::Resource *createImpl(const Ogre::String &name, Ogre::ResourceHandle handle, 
+		const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
+		const Ogre::NameValuePairList *createParams);
 
-	public:
+public:
 
-		VolumeManager ();
-		virtual ~VolumeManager ();
+	VolumeManager ();
+	virtual ~VolumeManager ();
 
-		virtual VolumeResourcePtr load (const Ogre::String &name, const Ogre::String &group);
+	virtual VolumeResourcePtr load (const Ogre::String &name, const Ogre::String &group);
 
-		static VolumeManager &getSingleton ();
-		static VolumeManager *getSingletonPtr ();
-	};
-}
+	static VolumeManager &getSingleton ();
+	static VolumeManager *getSingletonPtr ();
+};
 
 #endif

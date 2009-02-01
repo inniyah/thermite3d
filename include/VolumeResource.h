@@ -33,63 +33,60 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <OgreResourceManager.h>
 
-namespace Ogre
+class VolumeResource : public Ogre::Resource
 {
-	class VolumeResource : public Ogre::Resource
+public:		
+	VolumeResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
+		Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
+		Ogre::ManualResourceLoader *loader = 0);
+	~VolumeResource();
+
+	PolyVox::BlockVolume<PolyVox::uint8>* volume;
+
+protected:
+
+	// must implement these from the Ogre::Resource interface
+	void loadImpl ();
+	void unloadImpl ();
+	size_t calculateSize () const;
+};
+
+class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 
+{
+public:
+	VolumeResourcePtr () : Ogre::SharedPtr<VolumeResource> () {}
+	explicit VolumeResourcePtr (VolumeResource *rep) : Ogre::SharedPtr<VolumeResource> (rep) {}
+	VolumeResourcePtr (const VolumeResourcePtr &r) : Ogre::SharedPtr<VolumeResource> (r) {} 
+	VolumeResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<VolumeResource> ()
 	{
-	public:		
-		VolumeResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
-			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
-			Ogre::ManualResourceLoader *loader = 0);
-		~VolumeResource();
-
-		PolyVox::BlockVolume<PolyVox::uint8>* volume;
-
-	protected:
-
-		// must implement these from the Ogre::Resource interface
-		void loadImpl ();
-		void unloadImpl ();
-		size_t calculateSize () const;
-	};
-
-	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 
-	{
-	public:
-		VolumeResourcePtr () : Ogre::SharedPtr<VolumeResource> () {}
-		explicit VolumeResourcePtr (VolumeResource *rep) : Ogre::SharedPtr<VolumeResource> (rep) {}
-		VolumeResourcePtr (const VolumeResourcePtr &r) : Ogre::SharedPtr<VolumeResource> (r) {} 
-		VolumeResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<VolumeResource> ()
+		// lock & copy other mutex pointer
+		OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
+			OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
+			pRep = static_cast<VolumeResource*> (r.getPointer ());
+		pUseCount = r.useCountPointer ();
+		if (pUseCount)
 		{
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<VolumeResource*> (r.getPointer ());
-			pUseCount = r.useCountPointer ();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
+			++ (*pUseCount);
 		}
+	}
 
-		/// Operator used to convert a ResourcePtr to a VolumeResourcePtr
-		VolumeResourcePtr& operator=(const Ogre::ResourcePtr& r)
-		{
-			if (pRep == static_cast<VolumeResource*> (r.getPointer ()))
-				return *this;
-			release ();
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<VolumeResource*> (r.getPointer());
-			pUseCount = r.useCountPointer ();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
+	/// Operator used to convert a ResourcePtr to a VolumeResourcePtr
+	VolumeResourcePtr& operator=(const Ogre::ResourcePtr& r)
+	{
+		if (pRep == static_cast<VolumeResource*> (r.getPointer ()))
 			return *this;
+		release ();
+		// lock & copy other mutex pointer
+		OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
+			OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
+			pRep = static_cast<VolumeResource*> (r.getPointer());
+		pUseCount = r.useCountPointer ();
+		if (pUseCount)
+		{
+			++ (*pUseCount);
 		}
-	};
-}
+		return *this;
+	}
+};
 
 #endif

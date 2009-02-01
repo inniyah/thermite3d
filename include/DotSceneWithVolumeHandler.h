@@ -6,16 +6,18 @@
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
 
-class DotSceneWithVolumeHandler : public QXmlDefaultHandler
+#include "DotSceneHandler.h"
+
+class DotSceneWithVolumeHandler : public DotSceneHandler
 {
 public:
 	DotSceneWithVolumeHandler(Ogre::SceneManager* sceneManager);
 
-	bool startElement(const QString &, const QString &, const QString &qName, const QXmlAttributes &attributes);
+	//bool startElement(const QString &, const QString &, const QString &qName, const QXmlAttributes &attributes);
 
 private:
-	Ogre::SceneManager* mSceneManager;
-	Ogre::SceneNode* mCurrentNode;
+	//Ogre::SceneManager* mSceneManager;
+	//Ogre::SceneNode* mCurrentNode;
 };
 
 #endif //__DotSceneWithVolumeHandler_H__
