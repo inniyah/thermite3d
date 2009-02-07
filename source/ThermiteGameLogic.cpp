@@ -71,14 +71,6 @@ namespace QtOgre
 		mCamera = camIter.peekNextValue();
 
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
-
-		light1 = mSceneManager->createLight( "Light1" );
-		light1->setType( Ogre::Light::LT_DIRECTIONAL);
-		light1->setDiffuseColour(Ogre::ColourValue(0.7,0.7,0.7));
-
-		Ogre::Vector3 pos1(256,128,256);
-		light1->setPosition(pos1);
-		light1->setDirection(Ogre::Vector3(128.0f, 0.0f, 128.0f) - pos1);
 	}
 
 	void ThermiteGameLogic::update(void)
