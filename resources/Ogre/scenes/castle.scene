@@ -27,18 +27,33 @@
 		</node-->
 		<node name="BulletBoxNode1">
 			<scale x="3.0" y="3.0" z="3.0" />
-			<position x="10" y="10" z="10" />			
+			<position x="0" y="0" z="0" />			
 			<entity meshFile="bulletbox.mesh" name="Sphere1" castShadows="True"/>
 		</node>
 		<node name="BulletBoxNode2">
 			<scale x="3.0" y="3.0" z="3.0" />
-			<position x="30" y="10" z="10" />			
+			<position x="20" y="20" z="20" />			
 			<entity meshFile="bulletbox.mesh" name="Sphere2" castShadows="True"/>
 		</node>
 		<node name="BulletBoxNode3">
 			<scale x="3.0" y="3.0" z="3.0" />
-			<position x="50" y="10" z="10" />			
+			<position x="40" y="40" z="40" />			
 			<entity meshFile="bulletbox.mesh" name="Sphere3" castShadows="True"/>
+		</node>
+		<node name="BulletBoxNode4">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="60" y="60" z="60" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere4" castShadows="True"/>
+		</node>
+		<node name="BulletBoxNode5">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="80" y="80" z="80" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere5" castShadows="True"/>
+		</node>
+		<node name="BulletBoxNode6">
+			<scale x="3.0" y="3.0" z="3.0" />
+			<position x="100" y="100" z="100" />			
+			<entity meshFile="bulletbox.mesh" name="Sphere6" castShadows="True"/>
 		</node>
 	</nodes>
 </scene>

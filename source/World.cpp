@@ -80,7 +80,7 @@ void World::initialisePhysics(void)
 
 bool World::loadScene(const Ogre::String& filename)
 {
-	DotSceneWithVolumeHandler handler(m_pOgreSceneManager);
+	DotSceneWithVolumeHandler handler(this);
 	QXmlSimpleReader reader;
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);

@@ -34,6 +34,7 @@ class PhysicalObject
 {
 public:
 	PhysicalObject(World* pParentWorld ,std::string strMeshName, Ogre::Vector3 vecInitialPos);
+	PhysicalObject(World* pParentWorld , Ogre::Entity* entity);
 	~PhysicalObject();
 
 	std::string makeUniqueName(const std::string& strBase);

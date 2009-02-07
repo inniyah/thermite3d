@@ -66,7 +66,7 @@ namespace QtOgre
 		mWorld = new World(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mWorld->loadScene("Castle");
 
-		//mCamera = mSceneManager->createCamera("Cam");
+		//This gets the first camer which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
 		mCamera = camIter.peekNextValue();
 
