@@ -72,12 +72,6 @@ namespace QtOgre
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
 		mCamera = camIter.peekNextValue();
 
-		//mCamera->setPosition(128,128,256);
-		//mCamera->lookAt(128, 0, 128);
-		mCamera->setNearClipDistance(1.0);
-		mCamera->setFarClipDistance(1000.0);
-		mCamera->setFOVy(Ogre::Radian(1.0f));
-
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
 
 		light1 = mSceneManager->createLight( "Light1" );

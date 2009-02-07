@@ -8,9 +8,10 @@
 	<nodes>
 		<node name="CameraNode">			
 			<camera name="Camera" fov="1.0">
-				<position x="500" y="0" z="0" />
+			<clipping near="1.0" far="1000" />
+				<position x="128" y="128" z="256" />
 				<lookTarget>
-					<position x="0" y="0" z="0" />
+					<position x="128" y="0" z="128" />
 				</lookTarget>
 			</camera>
 		</node>
