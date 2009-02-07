@@ -50,8 +50,6 @@ namespace QtOgre
 		mSceneManager->setShadowCasterRenderBackFaces(true);
 		mSceneManager->setShadowTextureSize(1024);
 
-		mSceneManager->setAmbientLight( Ogre::ColourValue( 0.3, 0.3, 0.3 ) );
-
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
 
 		mTime = new QTime;
