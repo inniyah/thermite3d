@@ -27,7 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "OgreSceneNode.h"
 
 #include "Shapes/OgreBulletCollisionsBoxShape.h"
+#include "Shapes/OgreBulletCollisionsConvexHullShape.h"
+#include "Shapes/OgreBulletCollisionsGImpactShape.h"
 #include "Shapes/OgreBulletCollisionsSphereShape.h"
+#include "Shapes/OgreBulletCollisionsTrimeshShape.h"
+#include "Utils/OgreBulletCollisionsMeshToShapeConverter.h"
 #include "OgreBulletDynamicsRigidBody.h"
 
 using namespace Ogre;
@@ -85,11 +89,17 @@ PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
 	const float      gDynamicBodyFriction    = 0.6f;
 	const float      gDynamicBodyMass        = 1.0f;
 
-	Vector3 size(3.0,3.0,3.0);
+	//Vector3 size(3.0,3.0,3.0);
 
 	m_pSceneNode = entity->getParentSceneNode();
 
-	m_pCollisionShape = new BoxCollisionShape(size);
+	Matrix4 scale = Matrix4::IDENTITY;
+	scale.setScale(Vector3(0.5,0.5,0.5));
+
+	//m_pCollisionShape = new BoxCollisionShape(size);
+	StaticMeshToShapeConverter *trimeshConverter = new StaticMeshToShapeConverter(entity, scale);
+    //m_pCollisionShape = trimeshConverter->createConvex();
+	m_pCollisionShape = new GImpactConcaveShape(trimeshConverter->mVertexBuffer, trimeshConverter->mVertexCount, trimeshConverter->mIndexBuffer, trimeshConverter->mIndexCount);
 
 	m_pRigidBody = new RigidBody(makeUniqueName("PO_RB"), m_pParentWorld->m_pOgreBulletWorld);
 	//m_pSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode ();

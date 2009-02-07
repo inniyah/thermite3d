@@ -51,9 +51,9 @@
 			<entity meshFile="bulletbox.mesh" name="Sphere5" castShadows="True"/>
 		</node>
 		<node name="BulletBoxNode6">
-			<scale x="3.0" y="3.0" z="3.0" />
-			<position x="100" y="100" z="100" />			
-			<entity meshFile="bulletbox.mesh" name="Sphere6" castShadows="True"/>
+			<scale x="0.5" y="0.5" z="0.5" />
+			<position x="150" y="150" z="150" />			
+			<entity meshFile="robot.mesh" name="Sphere6" castShadows="True"/>
 		</node>
 	</nodes>
 </scene>

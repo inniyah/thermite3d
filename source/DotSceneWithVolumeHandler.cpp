@@ -17,14 +17,6 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 {
 	Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
 
-	//The entities parent SceneNode will be manipulated by the physics engine. However, it is
-	//possible this parent will have many children, and we don't want all of them to be affected.
-	//Therefore we create an intermediary SceneNode which will have only our Entity as a child.
-	//Ogre::SceneNode* parentSceneNode = entity->getParentSceneNode();
-	//parentSceneNode->detachObject(entity);
-	//Ogre::SceneNode* intermediarySceneNode = parentSceneNode->createChildSceneNode();
-	//intermediarySceneNode->attachObject(entity);
-
 	PhysicalObject* physObj = new PhysicalObject(mWorld, entity);
 
 	return entity;
