@@ -93,8 +93,14 @@ PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
 
 	m_pSceneNode = entity->getParentSceneNode();
 
+	Vector3 position = m_pSceneNode->getPosition();
+
 	Matrix4 scale = Matrix4::IDENTITY;
-	scale.setScale(Vector3(0.5,0.5,0.5));
+	
+	scale.setScale(m_pSceneNode->getScale());
+	//scale.setTrans(Vector3(0.0,0.0,0.0));
+
+	//Matrix4 scale = m_pSceneNode->getScale();
 
 	//m_pCollisionShape = new BoxCollisionShape(size);
 	StaticMeshToShapeConverter *trimeshConverter = new StaticMeshToShapeConverter(entity, scale);
@@ -105,7 +111,7 @@ PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
 	//m_pSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode ();
 	//m_pSceneNode->attachObject (m_pEntity);
 	//m_pSceneNode->scale(size);
-	Vector3 position = m_pSceneNode->getPosition();
+	
 	//m_pSceneNode->setPosition(0.0,0.0,0.0);
 	m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, gDynamicBodyRestitution, gDynamicBodyFriction, gDynamicBodyMass, position, Quaternion(0,0.5,0,1));
 	m_pRigidBody->setLinearVelocity(0.0,0.0,0.0);
