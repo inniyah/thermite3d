@@ -33,7 +33,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class PhysicalObject
 {
 public:
-	PhysicalObject(World* pParentWorld ,std::string strMeshName, Ogre::Vector3 vecInitialPos);
 	PhysicalObject(World* pParentWorld , Ogre::Entity* entity);
 	~PhysicalObject();
 

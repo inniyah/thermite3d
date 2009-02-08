@@ -117,15 +117,6 @@ namespace QtOgre
 
 		//The fun stuff!
 		mWorld->updatePolyVoxGeometry();
-
-		if(mCurrentFrameNumber % 100 == 0)
-		{
-			srand(mCurrentFrameNumber);
-			int iX = rand() % 150 + 50;
-			int iY = rand() % 150 + 50;
-			createCube(iX,iY);
-		}
-
 		
 		mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 
@@ -180,18 +171,5 @@ namespace QtOgre
 		{
 			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
 		} 
-	}
-
-	void ThermiteGameLogic::createCube(float xPos, float zPos)
-	{	
-		PhysicalObject* obj = new PhysicalObject(mWorld, "test", Ogre::Vector3(xPos,128.0,zPos));
-		m_queueObjects.push(obj);
-
-		while(m_queueObjects.size() > 25)
-		{
-			PhysicalObject* toDel = m_queueObjects.front();
-			m_queueObjects.pop();
-			delete toDel;
-		}
 	}
 }

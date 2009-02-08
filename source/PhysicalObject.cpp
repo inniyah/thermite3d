@@ -41,43 +41,6 @@ using namespace OgreBulletDynamics;
 unsigned long PhysicalObject::m_iNameGen = 0;
 unsigned long PhysicalObject::m_iNextObject = 0;
 
-PhysicalObject::PhysicalObject(World* pParentWorld, std::string strMeshName, Vector3 vecInitialPos)
-:m_pEntity(0)
-,m_pSceneNode(0)
-,m_pCollisionShape(0)
-,m_pRigidBody(0)
-,m_pParentWorld(pParentWorld)
-{
-	const float      gDynamicBodyRestitution = 0.6f;
-	const float      gDynamicBodyFriction    = 0.6f;
-	const float      gDynamicBodyMass        = 1.0f;
-
-	Vector3 size(5.0,5.0,5.0);
-	//Vector3 pos(xPos,yPos,128.0);
-
-	if(m_iNextObject % 2 == 0)
-	{
-		//Add a cube
-		m_pEntity = m_pParentWorld->m_pOgreSceneManager->createEntity(makeUniqueName("PO_ENT"),"bulletbox.mesh");
-		m_pCollisionShape = new BoxCollisionShape(size);
-	}
-	else
-	{
-		//Add a sphere
-		m_pEntity = m_pParentWorld->m_pOgreSceneManager->createEntity(makeUniqueName("PO_ENT"),"ellipsoid.mesh");
-		m_pEntity->setMaterialName("Bullet/Ball");
-		m_pCollisionShape = new SphereCollisionShape(5.0);
-	}
-	m_iNextObject++;
-
-	m_pRigidBody = new RigidBody(makeUniqueName("PO_RB"), m_pParentWorld->m_pOgreBulletWorld);
-	m_pSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode ();
-	m_pSceneNode->attachObject (m_pEntity);
-	m_pSceneNode->scale(size);
-	m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, gDynamicBodyRestitution, gDynamicBodyFriction, gDynamicBodyMass, vecInitialPos, Quaternion(0,0.5,0,1));
-	m_pRigidBody->setLinearVelocity(0.0,0.0,0.0);
-}
-
 PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
 	:m_pEntity(entity)
 	,m_pSceneNode(0)
