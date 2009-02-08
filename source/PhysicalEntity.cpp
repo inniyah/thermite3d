@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#include "PhysicalObject.h"
+#include "PhysicalEntity.h"
 
 #include "World.h"
 
@@ -38,10 +38,10 @@ using namespace Ogre;
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
 
-unsigned long PhysicalObject::m_iNameGen = 0;
-unsigned long PhysicalObject::m_iNextObject = 0;
+unsigned long PhysicalEntity::m_iNameGen = 0;
+unsigned long PhysicalEntity::m_iNextObject = 0;
 
-PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
+PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity)
 	:m_pEntity(entity)
 	,m_pSceneNode(0)
 	,m_pCollisionShape(0)
@@ -80,7 +80,7 @@ PhysicalObject::PhysicalObject(World* pParentWorld , Ogre::Entity* entity)
 	m_pRigidBody->setLinearVelocity(0.0,0.0,0.0);
 }
 
-PhysicalObject::~PhysicalObject()
+PhysicalEntity::~PhysicalEntity()
 {
 	//Ogre::LogManager::getSingleton().logMessage("Removing Physical Object");
 	//m_pParentWorld->m_pOgreBulletWorld->removeObject(m_pRigidBody);
@@ -100,7 +100,7 @@ PhysicalObject::~PhysicalObject()
 	m_pCollisionShape = 0;*/
 }
 
-std::string PhysicalObject::makeUniqueName(const std::string& strBase)
+std::string PhysicalEntity::makeUniqueName(const std::string& strBase)
 {
 	std::stringstream ssName;
 	ssName << strBase << " " << ++m_iNameGen;

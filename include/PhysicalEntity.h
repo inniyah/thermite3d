@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __PhysicalObject_H__
-#define __PhysicalObject_H__
+#ifndef __PhysicalEntity_H__
+#define __PhysicalEntity_H__
 
 #include "ThermiteForwardDeclarations.h"
 
@@ -30,11 +30,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "OgreBulletDynamicsPreRequisites.h"
 
-class PhysicalObject
+class PhysicalEntity
 {
 public:
-	PhysicalObject(World* pParentWorld , Ogre::Entity* entity);
-	~PhysicalObject();
+	PhysicalEntity(World* pParentWorld , Ogre::Entity* entity);
+	~PhysicalEntity();
 
 	std::string makeUniqueName(const std::string& strBase);
 

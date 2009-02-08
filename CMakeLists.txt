@@ -18,7 +18,7 @@ SET(SRC_FILES
 	source/DataStreamAdapter.cpp
 	source/DotSceneWithVolumeHandler.cpp
 	source/MainMenu.cpp
-	source/PhysicalObject.cpp
+	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/TimeStampedRenderOperation.cpp
@@ -35,7 +35,7 @@ SET(INC_FILES
 	include/DataStreamAdapter.h
 	include/DotSceneWithVolumeHandler.h
 	include/MainMenu.h
-	include/PhysicalObject.h
+	include/PhysicalEntity.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h

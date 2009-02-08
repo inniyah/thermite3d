@@ -3,7 +3,7 @@
 #include <OgreEntity.h>
 #include <OgreSceneManager.h>
 
-#include "PhysicalObject.h"
+#include "PhysicalEntity.h"
 #include "World.h"
 
 DotSceneWithVolumeHandler::DotSceneWithVolumeHandler(World* world)
@@ -17,7 +17,7 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 {
 	Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
 
-	PhysicalObject* physObj = new PhysicalObject(mWorld, entity);
+	PhysicalEntity* physObj = new PhysicalEntity(mWorld, entity);
 
 	return entity;
 }
