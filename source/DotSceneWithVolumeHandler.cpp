@@ -17,7 +17,7 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 {
 	Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
 
-	PhysicalEntity* physObj = new PhysicalEntity(mWorld, entity);
+	PhysicalEntity* physObj = new PhysicalEntity(mWorld, entity, 0.6, 0.6, 0.1, PhysicalEntity::CST_SPHERE);
 
 	return entity;
 }

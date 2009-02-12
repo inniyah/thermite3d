@@ -38,44 +38,56 @@ using namespace Ogre;
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
 
-PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity)
+PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType)
 	:m_pEntity(entity)
 	,m_pSceneNode(0)
 	,m_pCollisionShape(0)
 	,m_pRigidBody(0)
 	,m_pParentWorld(pParentWorld)
 {
-	const float      gDynamicBodyRestitution = 0.6f;
-	const float      gDynamicBodyFriction    = 0.6f;
-	const float      gDynamicBodyMass        = 1.0f;
-
-	//Vector3 size(3.0,3.0,3.0);
-
 	m_pSceneNode = entity->getParentSceneNode();
 
-	Vector3 position = m_pSceneNode->getPosition();
-
-	Matrix4 scale = Matrix4::IDENTITY;
-	
+	//This code is not fully understood. It seems the 'transform' parameter which is passed to StaticMeshToShapeConverter
+	//should be just the scale - passing the nodes '_getFullTransform()' seems to cause problems. Therefore the position
+	//and orientation are extracted and passed seperatly when the shape is set on the rigid body later on.
+	//Also, note that the position and orientation are stored in variables which are passed to 'setShape()' later.
+	//Embedding m_pSceneNode->getPosition() directly into the setShape() call seems to cause problems because the position
+	//is passed by reference and then set back on the scene node within setShape(). Or something :-S
+	Matrix4 scale = Matrix4::IDENTITY;	
 	scale.setScale(m_pSceneNode->getScale());
-	//scale.setTrans(Vector3(0.0,0.0,0.0));
+	Vector3 position = m_pSceneNode->getPosition();
+	Quaternion orientation = m_pSceneNode->getOrientation();	
 
-	//Matrix4 scale = m_pSceneNode->getScale();
-
-	//m_pCollisionShape = new BoxCollisionShape(size);
-	StaticMeshToShapeConverter *trimeshConverter = new StaticMeshToShapeConverter(entity, scale);
-    //m_pCollisionShape = trimeshConverter->createConvex();
-	m_pCollisionShape = new GImpactConcaveShape(trimeshConverter->mVertexBuffer, trimeshConverter->mVertexCount, trimeshConverter->mIndexBuffer, trimeshConverter->mIndexCount);
-
+	//Create our desired collision shape.
+	StaticMeshToShapeConverter *converter = new StaticMeshToShapeConverter(entity, scale);
+	switch(collisionShapeType)
+	{
+	case CST_BOX:
+		{
+			m_pCollisionShape = converter->createBox();
+			break;
+		}
+	case CST_SPHERE:
+		{
+			m_pCollisionShape = converter->createSphere();
+			break;
+		}
+	case CST_CONVEX_HULL:
+		{
+			m_pCollisionShape = converter->createConvex();
+			break;
+		}
+	case CST_EXACT:
+		{			
+			m_pCollisionShape = converter->createGImpactConcave();
+			break;
+		}
+	}
+	
+	//Create the rigid body and set the colision shape for it.
 	std::string name = Thermite::generateUID("PO_RB");
 	m_pRigidBody = new RigidBody(name, m_pParentWorld->m_pOgreBulletWorld);
-	//m_pSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode ();
-	//m_pSceneNode->attachObject (m_pEntity);
-	//m_pSceneNode->scale(size);
-	
-	//m_pSceneNode->setPosition(0.0,0.0,0.0);
-	m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, gDynamicBodyRestitution, gDynamicBodyFriction, gDynamicBodyMass, position, Quaternion(0,0.5,0,1));
-	m_pRigidBody->setLinearVelocity(0.0,0.0,0.0);
+	m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, restitution, friction, mass, position, orientation);
 }
 
 PhysicalEntity::~PhysicalEntity()

@@ -33,7 +33,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class PhysicalEntity
 {
 public:
-	PhysicalEntity(World* pParentWorld , Ogre::Entity* entity);
+	enum CollisionShapeType
+	{
+		CST_BOX,
+		CST_SPHERE,
+		CST_CONVEX_HULL,
+		CST_EXACT
+	};
+
+	PhysicalEntity(World* pParentWorld , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType = CST_BOX);
 	~PhysicalEntity();
 
 	Ogre::Entity* m_pEntity;
