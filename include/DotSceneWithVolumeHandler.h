@@ -19,11 +19,7 @@ public:
 protected:
 	virtual Ogre::Entity* handleEntity(const QXmlAttributes &attributes);
 
-	//bool startElement(const QString &, const QString &, const QString &qName, const QXmlAttributes &attributes);
-
 private:
-	//Ogre::SceneManager* mSceneManager;
-	//Ogre::SceneNode* mCurrentNode;
 	World* mWorld;
 };
 
