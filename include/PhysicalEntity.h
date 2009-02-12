@@ -36,15 +36,11 @@ public:
 	PhysicalEntity(World* pParentWorld , Ogre::Entity* entity);
 	~PhysicalEntity();
 
-	std::string makeUniqueName(const std::string& strBase);
-
 	Ogre::Entity* m_pEntity;
 	Ogre::SceneNode* m_pSceneNode;
 	OgreBulletCollisions::CollisionShape* m_pCollisionShape;
 	OgreBulletDynamics::RigidBody* m_pRigidBody;
 	World* m_pParentWorld;
-	static unsigned long m_iNameGen; //Used for unique names
-	static unsigned long m_iNextObject; //Used to cycle through objects whic are dropped.
 };
 
 #endif

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma endregion
 
 #include "PhysicalEntity.h"
-
+#include "Utility.h"
 #include "World.h"
 
 #include "OgreEntity.h"
@@ -37,9 +37,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using namespace Ogre;
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
-
-unsigned long PhysicalEntity::m_iNameGen = 0;
-unsigned long PhysicalEntity::m_iNextObject = 0;
 
 PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity)
 	:m_pEntity(entity)
@@ -70,7 +67,8 @@ PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity)
     //m_pCollisionShape = trimeshConverter->createConvex();
 	m_pCollisionShape = new GImpactConcaveShape(trimeshConverter->mVertexBuffer, trimeshConverter->mVertexCount, trimeshConverter->mIndexBuffer, trimeshConverter->mIndexCount);
 
-	m_pRigidBody = new RigidBody(makeUniqueName("PO_RB"), m_pParentWorld->m_pOgreBulletWorld);
+	std::string name = Thermite::generateUID("PO_RB");
+	m_pRigidBody = new RigidBody(name, m_pParentWorld->m_pOgreBulletWorld);
 	//m_pSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode ();
 	//m_pSceneNode->attachObject (m_pEntity);
 	//m_pSceneNode->scale(size);
@@ -98,11 +96,4 @@ PhysicalEntity::~PhysicalEntity()
 
 	/*delete m_pCollisionShape;
 	m_pCollisionShape = 0;*/
-}
-
-std::string PhysicalEntity::makeUniqueName(const std::string& strBase)
-{
-	std::stringstream ssName;
-	ssName << strBase << " " << ++m_iNameGen;
-	return ssName.str();
 }

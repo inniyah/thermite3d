@@ -4,7 +4,7 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 
-#include "PhysicalObject.h"
+#include "PhysicalEntity.h"
 #include "World.h"
 
 #include <OgrePrerequisites.h>

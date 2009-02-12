@@ -24,6 +24,7 @@ SET(SRC_FILES
 	source/TimeStampedRenderOperation.cpp
 	source/TimeStampedRenderOperationCache.cpp
 	source/TimeStampedSurfacePatchCache.cpp
+	source/Utility.cpp
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializer.cpp
@@ -42,6 +43,7 @@ SET(INC_FILES
 	include/TimeStampedRenderOperation.h
 	include/TimeStampedRenderOperationCache.h
 	include/TimeStampedSurfacePatchCache.h
+	include/Utility.h
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializer.h
