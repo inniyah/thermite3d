@@ -2,9 +2,9 @@
 <scene formatVersion="2.0">
 	<environment>
 		<colourAmbient r="0.3" g="0.3" b="0.3" />
-		<!--skyBox material="SkyBox" distance="100.0" drawFirst="true">
+		<skyBox material="SkyBox" distance="100.0" drawFirst="true">
 			<rotation qw="0" qx="0" qy="1" qz="0"/>
-		</skyBox-->
+		</skyBox>
 	</environment>
 	<nodes>
 		<node name="CameraNode">			
