@@ -19,23 +19,23 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 
 	float restitution = convertWithDefault(attributes.value("restitution"), 1.0f);
 	float friction = convertWithDefault(attributes.value("friction"), 1.0f);
-	float mass = convertWithDefault(attributes.value("mass"), 1.0f);
+	float mass = convertWithDefault(attributes.value("mass"), 0.0f);
 
 	QString collisionShape = convertWithDefault(attributes.value("collisionShape"), "box");
 	PhysicalEntity::CollisionShapeType collisionShapeType;
-	if(collisionShape.compare("box"))
+	if(collisionShape.compare("box") == 0)
 	{
 		collisionShapeType = PhysicalEntity::CST_BOX;
 	}
-	else if(collisionShape.compare("sphere"))
+	else if(collisionShape.compare("sphere") == 0)
 	{
 		collisionShapeType = PhysicalEntity::CST_SPHERE;
 	}
-	else if(collisionShape.compare("convexHull"))
+	else if(collisionShape.compare("convexHull") == 0)
 	{
 		collisionShapeType = PhysicalEntity::CST_CONVEX_HULL;
 	}
-	else if(collisionShape.compare("exact"))
+	else if(collisionShape.compare("exact") == 0)
 	{
 		collisionShapeType = PhysicalEntity::CST_EXACT;
 	}
