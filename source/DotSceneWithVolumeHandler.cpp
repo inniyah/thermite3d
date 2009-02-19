@@ -4,6 +4,9 @@
 #include <OgreSceneManager.h>
 
 #include "PhysicalEntity.h"
+#include "TimeStampedRenderOperationCache.h"
+#include "TimeStampedSurfacePatchCache.h"
+#include "VolumeManager.h"
 #include "World.h"
 
 DotSceneWithVolumeHandler::DotSceneWithVolumeHandler(World* world)
@@ -11,6 +14,21 @@ DotSceneWithVolumeHandler::DotSceneWithVolumeHandler(World* world)
 ,mWorld(world)
 {
 	//mSceneManager = sceneManager;
+}
+
+bool DotSceneWithVolumeHandler::startElement(const QString& namespaceURI,
+								   const QString& localName,
+								   const QString& qName,
+								   const QXmlAttributes &attributes)
+{
+	DotSceneHandler::startElement(namespaceURI, localName, qName, attributes);
+
+	if(qName == "volume")
+	{
+		handleVolume(attributes);
+	}
+
+	return true;
 }
 
 Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attributes)
@@ -43,4 +61,22 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 	PhysicalEntity* physEnt = new PhysicalEntity(mWorld, entity, restitution, friction, mass, collisionShapeType);
 
 	return entity;
+}
+
+void* DotSceneWithVolumeHandler::handleVolume(const QXmlAttributes &attributes)
+{
+	mWorld->volumeResource = VolumeManager::getSingletonPtr()->load("castle.volume", "General");
+	if(mWorld->volumeResource.isNull())
+	{
+		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
+	}
+
+	mWorld->volumeChangeTracker->setVolumeData(mWorld->volumeResource->volume);
+
+	mWorld->volumeChangeTracker->setAllRegionsModified();
+
+	TimeStampedSurfacePatchCache::getInstance()->m_vctTracker = mWorld->volumeChangeTracker;
+	TimeStampedRenderOperationCache::getInstance()->m_vctTracker = mWorld->volumeChangeTracker;
+
+	return 0;
 }

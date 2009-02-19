@@ -90,26 +90,6 @@ bool World::loadScene(const Ogre::String& filename)
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);
 
-	//return 0;
-
-
-	volumeResource = VolumeManager::getSingletonPtr()->load(filename + ".volume", "General");
-	if(volumeResource.isNull())
-	{
-		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
-	}
-
-	//volumeResource->volume->tidy();
-	volumeChangeTracker->setVolumeData(volumeResource->volume);
-	//volumeChangeTracker->volumeData = volumeResource->volume;
-
-	//volumeChangeTracker->volumeData->tidy();
-
-	volumeChangeTracker->setAllRegionsModified();
-
-	TimeStampedSurfacePatchCache::getInstance()->m_vctTracker = volumeChangeTracker;
-	TimeStampedRenderOperationCache::getInstance()->m_vctTracker = volumeChangeTracker;
-
 	return true;
 }
 

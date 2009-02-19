@@ -16,8 +16,11 @@ public:
 	//requires a Thermite World so it can also set up physics on the entities.
 	DotSceneWithVolumeHandler(World* world);
 
+	bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes &attributes);
+
 protected:
 	virtual Ogre::Entity* handleEntity(const QXmlAttributes &attributes);
+	virtual void* handleVolume(const QXmlAttributes &attributes);
 
 private:
 	World* mWorld;
