@@ -85,7 +85,7 @@ bool World::loadScene(const Ogre::String& filename)
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);
 
-	QFile file("C:\\Program Files\\Thermite2\\share\\thermite\\Ogre\\scenes\\castle.scene");
+	QFile file("C:\\Program Files\\Thermite2\\share\\thermite\\Ogre\\scenes\\load_me.scene");
     file.open(QFile::ReadOnly | QFile::Text);
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);

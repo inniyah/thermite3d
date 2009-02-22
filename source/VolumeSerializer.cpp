@@ -57,5 +57,5 @@ void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, BlockVolume<Po
 	//Ogre::DataStreamPtr file = stream;
 	std::istream stdStream(new DataStreamAdapter(stream)); 
 
-	*pDest = loadVolumeRaw(stdStream);
+	*pDest = loadVolumeRle(stdStream);
 }

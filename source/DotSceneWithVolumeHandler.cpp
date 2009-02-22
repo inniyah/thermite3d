@@ -65,7 +65,9 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 
 void* DotSceneWithVolumeHandler::handleVolume(const QXmlAttributes &attributes)
 {
-	mWorld->volumeResource = VolumeManager::getSingletonPtr()->load("castle.volume", "General");
+	QString volumeSource = convertWithDefault(attributes.value("source"), "");
+
+	mWorld->volumeResource = VolumeManager::getSingletonPtr()->load(volumeSource.toStdString(), "General");
 	if(mWorld->volumeResource.isNull())
 	{
 		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");

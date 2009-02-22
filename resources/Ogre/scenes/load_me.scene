@@ -6,7 +6,7 @@
 			<rotation qw="0" qx="0" qy="1" qz="0"/>
 		</skyBox>
 	</environment>
-	<volume source="castle.volume"/>
+	<volume source="terrain.volume"/>
 	<nodes>
 		<node name="CameraNode">			
 			<camera name="Camera" fov="1.0">
