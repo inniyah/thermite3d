@@ -41,14 +41,14 @@ public:
 		CST_EXACT
 	};
 
-	PhysicalEntity(World* pParentWorld , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType = CST_BOX);
+	PhysicalEntity(Map* pParentMap , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType = CST_BOX);
 	~PhysicalEntity();
 
 	Ogre::Entity* m_pEntity;
 	Ogre::SceneNode* m_pSceneNode;
 	OgreBulletCollisions::CollisionShape* m_pCollisionShape;
 	OgreBulletDynamics::RigidBody* m_pRigidBody;
-	World* m_pParentWorld;
+	Map* m_pParentMap;
 };
 
 #endif

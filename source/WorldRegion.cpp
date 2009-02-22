@@ -21,10 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "WorldRegion.h"
 
+#include "Map.h"
 #include "TimeStampedSurfacePatchCache.h"
 #include "SurfacePatchRenderable.h"
 #include "PolyVoxCore/Vector.h"
-#include "World.h"
 
 #include "OgreBulletDynamicsRigidBody.h"
 
@@ -37,10 +37,10 @@ using namespace PolyVox;
 
 unsigned long WorldRegion::m_iNameGen = 0;
 
-WorldRegion::WorldRegion(World* pParentWorld, PolyVox::Vector3DInt32 v3dPos)
+WorldRegion::WorldRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
 :m_pOgreSceneNode(0)
 ,m_pSurfacePatchRenderable(0)
-,m_pParentWorld(pParentWorld)
+,m_pParentMap(pParentMap)
 ,mBody(0)
 ,mTriMesh(0)
 ,mShape(0)
@@ -48,11 +48,11 @@ WorldRegion::WorldRegion(World* pParentWorld, PolyVox::Vector3DInt32 v3dPos)
 	m_v3dPos = v3dPos;
 
 	const std::string& strNodeName = makeUniqueName("SN");
-	m_pOgreSceneNode = m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
+	m_pOgreSceneNode = m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
 	m_pOgreSceneNode->setPosition(Ogre::Vector3(m_v3dPos.getX(),m_v3dPos.getY(),m_v3dPos.getZ()));
 
 	const std::string& strSprName = makeUniqueName("SPR");
-	m_pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentWorld->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+	m_pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 	m_pSurfacePatchRenderable->setMaterial("ShadowMapReceiverForWorldMaterial");
 	m_pSurfacePatchRenderable->setCastShadows(true);
 	m_pOgreSceneNode->attachObject(m_pSurfacePatchRenderable);
@@ -70,13 +70,13 @@ WorldRegion::~WorldRegion()
 		{
 			m_pOgreSceneNode->detachObject(m_pSurfacePatchRenderable);
 		}
-		m_pParentWorld->m_pOgreSceneManager->destroyMovableObject(m_pSurfacePatchRenderable);
+		m_pParentMap->m_pOgreSceneManager->destroyMovableObject(m_pSurfacePatchRenderable);
 		m_pSurfacePatchRenderable = 0;
 	}
 
 	if(m_pOgreSceneNode != 0)
 	{
-		m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->removeAndDestroyChild(m_pOgreSceneNode->getName());
+		m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->removeAndDestroyChild(m_pOgreSceneNode->getName());
 		m_pOgreSceneNode = 0;
 	}
 }
@@ -128,7 +128,7 @@ void WorldRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
 		mBody->getWorldTransform().setOrigin(btVector3(pos.x, pos.y, pos.z));
 		mBody->getWorldTransform().setRotation(btQuaternion(0, 0, 0, 1));
 
-		m_pParentWorld->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
+		m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
 	/*}
 	else
 	{
@@ -140,13 +140,13 @@ void WorldRegion::destroyPhysicsData(void)
 {	
 	if(mBody != 0)
 	{
-		m_pParentWorld->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
+		m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
 		delete mBody;
 		mBody = 0;
 	}
 	/*if(m_pRigidBody != 0)
 	{
-		//m_pParentWorld->m_pOgreBulletWorld->removeObject(m_pRigidBody);					
+		//m_pParentMap->m_pOgreBulletWorld->removeObject(m_pRigidBody);					
 		delete m_pRigidBody;
 		m_pRigidBody = 0;
 	}*/

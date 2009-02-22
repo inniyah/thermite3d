@@ -4,8 +4,8 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 
+#include "Map.h"
 #include "PhysicalEntity.h"
-#include "World.h"
 
 #include <OgrePrerequisites.h>
 
@@ -73,7 +73,7 @@ namespace QtOgre
 		QtOgre::Log* mThermiteLog;
 
 		//Thermite stuff
-		World* mWorld;
+		Map* mMap;
 		int cubeCounter; //For unique names
 
 		std::queue<PhysicalObject*> m_queueObjects;

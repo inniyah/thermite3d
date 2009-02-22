@@ -39,7 +39,7 @@ namespace OgreBulletDynamics
 class WorldRegion
 {
 public:
-	WorldRegion(World* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
+	WorldRegion(Map* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
 	~WorldRegion();
 
 	void setPhysicsData(Ogre::Vector3 pos, PolyVox::IndexedSurfacePatch& isp);
@@ -57,7 +57,7 @@ private:
 private:
 	SurfacePatchRenderable* m_pSurfacePatchRenderable;
 
-	World* m_pParentWorld;
+	Map* m_pParentMap;
 
 	btTriangleMesh* mTriMesh;
 	btBvhTriangleMeshShape* mShape;

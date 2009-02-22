@@ -16,8 +16,9 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(SRC_FILES
 	source/main.cpp
 	source/DataStreamAdapter.cpp
-	source/DotSceneWithVolumeHandler.cpp
 	source/MainMenu.cpp
+	source/Map.cpp
+	source/MapHandler.cpp
 	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
@@ -28,14 +29,14 @@ SET(SRC_FILES
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializer.cpp
-	source/World.cpp
 	source/WorldRegion.cpp
 )
 
 SET(INC_FILES
 	include/DataStreamAdapter.h
-	include/DotSceneWithVolumeHandler.h
 	include/MainMenu.h
+	include/Map.h
+	include/MapHandler.h
 	include/PhysicalEntity.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
@@ -47,7 +48,6 @@ SET(INC_FILES
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializer.h
-	include/World.h
 	include/WorldRegion.h
 
 )

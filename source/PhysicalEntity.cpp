@@ -19,9 +19,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
+#include "Map.h"
 #include "PhysicalEntity.h"
 #include "Utility.h"
-#include "World.h"
 
 #include "OgreEntity.h"
 #include "OgreSceneNode.h"
@@ -38,12 +38,12 @@ using namespace Ogre;
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
 
-PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType)
+PhysicalEntity::PhysicalEntity(Map* pParentMap, Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType)
 	:m_pEntity(entity)
 	,m_pSceneNode(0)
 	,m_pCollisionShape(0)
 	,m_pRigidBody(0)
-	,m_pParentWorld(pParentWorld)
+	,m_pParentMap(pParentMap)
 {
 	m_pSceneNode = entity->getParentSceneNode();
 
@@ -86,20 +86,20 @@ PhysicalEntity::PhysicalEntity(World* pParentWorld , Ogre::Entity* entity, float
 	
 	//Create the rigid body and set the colision shape for it.
 	std::string name = Thermite::generateUID("PO_RB");
-	m_pRigidBody = new RigidBody(name, m_pParentWorld->m_pOgreBulletWorld);
+	m_pRigidBody = new RigidBody(name, m_pParentMap->m_pOgreBulletWorld);
 	m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, restitution, friction, mass, position, orientation);
 }
 
 PhysicalEntity::~PhysicalEntity()
 {
 	//Ogre::LogManager::getSingleton().logMessage("Removing Physical Object");
-	//m_pParentWorld->m_pOgreBulletWorld->removeObject(m_pRigidBody);
+	//m_pParentMap->m_pOgreBulletWorld->removeObject(m_pRigidBody);
 	delete m_pRigidBody;
 	m_pRigidBody = 0;
 
 	m_pSceneNode->detachObject(m_pEntity);
-	m_pParentWorld->m_pOgreSceneManager->destroyEntity(m_pEntity);
-	m_pParentWorld->m_pOgreSceneManager->getRootSceneNode()->removeAndDestroyChild(m_pSceneNode->getName());
+	m_pParentMap->m_pOgreSceneManager->destroyEntity(m_pEntity);
+	m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->removeAndDestroyChild(m_pSceneNode->getName());
 
 	m_pSceneNode = 0;
 	m_pEntity = 0;

@@ -1,22 +1,22 @@
-#include "DotSceneWithVolumeHandler.h"
+#include "MapHandler.h"
 
 #include <OgreEntity.h>
 #include <OgreSceneManager.h>
 
+#include "Map.h"
 #include "PhysicalEntity.h"
 #include "TimeStampedRenderOperationCache.h"
 #include "TimeStampedSurfacePatchCache.h"
 #include "VolumeManager.h"
-#include "World.h"
 
-DotSceneWithVolumeHandler::DotSceneWithVolumeHandler(World* world)
-:DotSceneHandler(world->m_pOgreSceneManager)
-,mWorld(world)
+MapHandler::MapHandler(Map* map)
+:DotSceneHandler(map->m_pOgreSceneManager)
+,mMap(map)
 {
 	//mSceneManager = sceneManager;
 }
 
-bool DotSceneWithVolumeHandler::startElement(const QString& namespaceURI,
+bool MapHandler::startElement(const QString& namespaceURI,
 								   const QString& localName,
 								   const QString& qName,
 								   const QXmlAttributes &attributes)
@@ -31,7 +31,7 @@ bool DotSceneWithVolumeHandler::startElement(const QString& namespaceURI,
 	return true;
 }
 
-Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attributes)
+Ogre::Entity* MapHandler::handleEntity(const QXmlAttributes &attributes)
 {
 	Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
 
@@ -58,27 +58,27 @@ Ogre::Entity* DotSceneWithVolumeHandler::handleEntity(const QXmlAttributes &attr
 		collisionShapeType = PhysicalEntity::CST_EXACT;
 	}
 
-	PhysicalEntity* physEnt = new PhysicalEntity(mWorld, entity, restitution, friction, mass, collisionShapeType);
+	PhysicalEntity* physEnt = new PhysicalEntity(mMap, entity, restitution, friction, mass, collisionShapeType);
 
 	return entity;
 }
 
-void* DotSceneWithVolumeHandler::handleVolume(const QXmlAttributes &attributes)
+void* MapHandler::handleVolume(const QXmlAttributes &attributes)
 {
 	QString volumeSource = convertWithDefault(attributes.value("source"), "");
 
-	mWorld->volumeResource = VolumeManager::getSingletonPtr()->load(volumeSource.toStdString(), "General");
-	if(mWorld->volumeResource.isNull())
+	mMap->volumeResource = VolumeManager::getSingletonPtr()->load(volumeSource.toStdString(), "General");
+	if(mMap->volumeResource.isNull())
 	{
 		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 	}
 
-	mWorld->volumeChangeTracker->setVolumeData(mWorld->volumeResource->volume);
+	mMap->volumeChangeTracker->setVolumeData(mMap->volumeResource->volume);
 
-	mWorld->volumeChangeTracker->setAllRegionsModified();
+	mMap->volumeChangeTracker->setAllRegionsModified();
 
-	TimeStampedSurfacePatchCache::getInstance()->m_vctTracker = mWorld->volumeChangeTracker;
-	TimeStampedRenderOperationCache::getInstance()->m_vctTracker = mWorld->volumeChangeTracker;
+	TimeStampedSurfacePatchCache::getInstance()->m_vctTracker = mMap->volumeChangeTracker;
+	TimeStampedRenderOperationCache::getInstance()->m_vctTracker = mMap->volumeChangeTracker;
 
 	return 0;
 }

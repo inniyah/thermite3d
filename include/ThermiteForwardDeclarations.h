@@ -27,6 +27,7 @@ class GameState;
 //class IndexedSurfacePatchCollisionShape;
 class LoadSceneMenuPage;
 class MainMenuPage;
+class Map;
 class MenuPage;
 class MenuState;
 class PhysicalObject;
@@ -37,7 +38,6 @@ class SurfacePatchRenderable;
 //class VolumeManager;
 //class VolumeResourse;
 //class VolumeSerializer;
-class World;
 class WorldRegion;
 
 #endif

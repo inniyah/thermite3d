@@ -63,8 +63,8 @@ namespace QtOgre
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
-		mWorld = new World(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
-		mWorld->loadScene("Castle");
+		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
+		mMap->loadScene("Castle");
 
 		//This gets the first camer which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
@@ -116,9 +116,9 @@ namespace QtOgre
 		mLastFrameWheelPos = mCurrentWheelPos;
 
 		//The fun stuff!
-		mWorld->updatePolyVoxGeometry();
+		mMap->updatePolyVoxGeometry();
 		
-		mWorld->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
+		mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 
 		++mCurrentFrameNumber;
 	}

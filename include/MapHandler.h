@@ -1,5 +1,5 @@
-#ifndef __DotSceneWithVolumeHandler_H__
-#define __DotSceneWithVolumeHandler_H__
+#ifndef __MapHandler_H__
+#define __MapHandler_H__
 
 #include <OgrePrerequisites.h>
 
@@ -9,12 +9,12 @@
 #include "DotSceneHandler.h"
 #include "ThermiteForwardDeclarations.h"
 
-class DotSceneWithVolumeHandler : public DotSceneHandler
+class MapHandler : public DotSceneHandler
 {
 public:
 	//Rather than just taking a SceneManager, this DotSceneHandler subclass
-	//requires a Thermite World so it can also set up physics on the entities.
-	DotSceneWithVolumeHandler(World* world);
+	//requires a Thermite Map so it can also set up physics on the entities.
+	MapHandler(Map* map);
 
 	bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes &attributes);
 
@@ -23,7 +23,7 @@ protected:
 	virtual void* handleVolume(const QXmlAttributes &attributes);
 
 private:
-	World* mWorld;
+	Map* mMap;
 };
 
-#endif //__DotSceneWithVolumeHandler_H__
+#endif //__MapHandler_H__

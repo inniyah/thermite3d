@@ -19,10 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#include "World.h"
+#include "Map.h"
 
 #include "Application.h"
-#include "DotSceneWithVolumeHandler.h"
+#include "MapHandler.h"
 #include "VolumeManager.h"
 
 #include "TimeStampedSurfacePatchCache.h"
@@ -48,7 +48,7 @@ using namespace PolyVox;
 using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
 
-World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
+Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
 :m_vecGravity(vecGravity)
 ,m_boxPhysicsBounds(boxPhysicsBounds)
 ,m_rVoxelSize(rVoxelSize)
@@ -66,21 +66,21 @@ World::World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Og
 	m_pOgreSceneManager->setSkyBox(true, "SkyBox");
 }
 
-World::~World(void)
+Map::~Map(void)
 {
 
 }
 
-void World::initialisePhysics(void)
+void Map::initialisePhysics(void)
 {
 	const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
 	const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
 	m_pOgreBulletWorld = new DynamicsWorld(m_pOgreSceneManager, bounds, gravityVector);
 }
 
-bool World::loadScene(const Ogre::String& filename)
+bool Map::loadScene(const Ogre::String& filename)
 {
-	DotSceneWithVolumeHandler handler(this);
+	MapHandler handler(this);
 	QXmlSimpleReader reader;
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);
@@ -93,7 +93,7 @@ bool World::loadScene(const Ogre::String& filename)
 	return true;
 }
 
-void World::updatePolyVoxGeometry()
+void Map::updatePolyVoxGeometry()
 {
 	if(!volumeResource.isNull())
 	{

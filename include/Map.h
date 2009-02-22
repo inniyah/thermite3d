@@ -35,15 +35,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <map>
 
-class World
+class Map
 {
 public:
-	World(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
-	~World(void);
+	Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
+	~Map(void);
 
 	void initialisePhysics(void);
 
-	bool World::loadScene(const Ogre::String& filename);
+	bool Map::loadScene(const Ogre::String& filename);
 
 	void updatePolyVoxGeometry();	
 
