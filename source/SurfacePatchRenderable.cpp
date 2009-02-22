@@ -149,11 +149,11 @@ void SurfacePatchRenderable::_updateRenderQueue(RenderQueue* queue)
 {
 	Vector3 camPos = m_pCamera->getDerivedPosition();
 	float dist = m_v3dPos.distance(camPos);
-	if(dist > 400)
+	if(dist > 800)
 	{
 		m_RenderOp = TimeStampedRenderOperationCache::getInstance()->getRenderOperation(Vector3DInt32(m_v3dPos.x+0.5,m_v3dPos.y+0.5,m_v3dPos.z+0.5), 2)->m_renderOperation;
 	}
-	else if(dist > 200)
+	else if(dist > 400)
 	{
 		m_RenderOp = TimeStampedRenderOperationCache::getInstance()->getRenderOperation(Vector3DInt32(m_v3dPos.x+0.5,m_v3dPos.y+0.5,m_v3dPos.z+0.5), 1)->m_renderOperation;
 	}

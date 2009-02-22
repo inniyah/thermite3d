@@ -1,6 +1,7 @@
 #include "TimeStampedSurfacePatchCache.h"
 
 #include "PolyVoxCore/BlockVolume.h"
+#include "PolyVoxCore/GradientEstimators.h"
 #include "PolyVoxCore/SurfaceExtractors.h"
 
 using namespace PolyVox;
@@ -56,8 +57,7 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		region.cropTo(m_vctTracker->getVolumeData()->getEnclosingRegion());
 
 		extractSurface(m_vctTracker->getVolumeData(), lod, region, ispResult);
-
-		ispResult->m_v3dRegionPosition = position;
+		computeNormalsForVertices(m_vctTracker->getVolumeData(), *ispResult, SOBEL);
 		ispResult->m_iTimeStamp = m_vctTracker->getCurrentTime();
 	}
 
