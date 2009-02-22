@@ -35,5 +35,11 @@
 			<position x="100" y="100" z="150" />			
 			<entity meshFile="ogrehead.mesh" name="OgreHeadMesh" castShadows="True" collisionShape="exact" mass="1.0"/>
 		</node>
+		<node name="Water">
+			<scale x="126" y="126" z="1" />
+			<position x="127.5" y="20" z="127.5" />	
+			<rotation qw="0.707" qx="-0.707" qy="0" qz="0"/>					
+			<entity meshFile="water.mesh" name="WaterMesh" castShadows="True" collisionShape="exact" mass="0.0"/>
+		</node>
 	</nodes>
 </scene>
