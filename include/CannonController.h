@@ -13,6 +13,9 @@ class CannonController : public QDialog, private Ui::CannonController
 
 public:
 	CannonController(QWidget* parent = 0, Qt::WindowFlags f = 0);
+
+	int direction(void);
+	int elevation(void);
 };
 
 #endif /*THERMITE_CANNONCONTROLLER_H_*/

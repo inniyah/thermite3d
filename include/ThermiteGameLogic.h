@@ -80,8 +80,10 @@ namespace QtOgre
 
 		std::queue<PhysicalObject*> m_queueObjects;
 
-		Ogre::Light* light1;
-		Ogre::SceneNode* lightNode1;
+		//Ogre::Light* light1;
+		//Ogre::SceneNode* lightNode1;
+		Ogre::Entity* mCannon;
+		Ogre::SceneNode* mCannonNode;
 	};
 }
 

@@ -50,9 +50,7 @@ namespace QtOgre
 		mSceneManager->setShadowCasterRenderBackFaces(true);
 		mSceneManager->setShadowTextureSize(1024);
 
-		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
-		mCannonController = new CannonController;
-		mCannonController->show();
+		mMainMenu = new MainMenu(qApp, qApp->mainWidget());		
 
 		mTime = new QTime;
 		mTime->start();
@@ -68,11 +66,19 @@ namespace QtOgre
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->loadScene("Castle");
 
-		//This gets the first camer which was found in the scene.
+		//This gets the first camera which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
 		mCamera = camIter.peekNextValue();
 
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+
+		mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
+		mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
+		mCannonNode->attachObject(mCannon);
+		mCannonNode->setPosition(128.0f, 32.0f, 128.0f);
+
+		mCannonController = new CannonController(qApp->mainWidget(), Qt::Tool);
+		mCannonController->show();
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -116,6 +122,13 @@ namespace QtOgre
 		}
 		mLastFrameMousePos = mCurrentMousePos;
 		mLastFrameWheelPos = mCurrentWheelPos;
+
+		//Update the cannon
+		float directionInDegrees = mCannonController->direction();
+		float elevationInDegrees = mCannonController->elevation();
+		mCannonNode->setOrientation(Ogre::Quaternion::IDENTITY);
+		mCannonNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
+		mCannonNode->rotate(Ogre::Vector3(1.0,0.0,0.0), Ogre::Radian((90.0 - elevationInDegrees) / 57.0)); //Elevation
 
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
