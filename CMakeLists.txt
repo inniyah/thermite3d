@@ -15,6 +15,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 
 SET(SRC_FILES
 	source/main.cpp
+	source/CannonController.cpp
 	source/DataStreamAdapter.cpp
 	source/MainMenu.cpp
 	source/Map.cpp
@@ -33,6 +34,7 @@ SET(SRC_FILES
 )
 
 SET(INC_FILES
+	include/CannonController.h
 	include/DataStreamAdapter.h
 	include/MainMenu.h
 	include/Map.h
@@ -53,6 +55,7 @@ SET(INC_FILES
 )
 
 SET(UI_FILES
+	ui/CannonController.ui
 	ui/MainMenu.ui
 )
 

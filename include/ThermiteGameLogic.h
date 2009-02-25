@@ -1,6 +1,7 @@
 #ifndef THERMITEGAMELOGIC_H_
 #define THERMITEGAMELOGIC_H_
 
+#include "CannonController.h"
 #include "GameLogic.h"
 #include "MainMenu.h"
 
@@ -67,6 +68,7 @@ namespace QtOgre
 		Ogre::SceneNode* mJaiquaNode;
 
 		MainMenu* mMainMenu;
+		CannonController* mCannonController;
 
 		Ogre::Camera* mCamera;
 		Ogre::SceneManager* mSceneManager;

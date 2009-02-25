@@ -51,6 +51,8 @@ namespace QtOgre
 		mSceneManager->setShadowTextureSize(1024);
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());
+		mCannonController = new CannonController;
+		mCannonController->show();
 
 		mTime = new QTime;
 		mTime->start();
