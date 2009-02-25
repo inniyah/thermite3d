@@ -85,7 +85,7 @@ bool Map::loadScene(const Ogre::String& filename)
 	reader.setContentHandler(&handler);
 	reader.setErrorHandler(&handler);
 
-	QFile file("C:\\Program Files\\Thermite\\share\\thermite\\Ogre\\maps\\load_me.map");
+	QFile file("..\\share\\thermite\\Ogre\\maps\\load_me.map");
     file.open(QFile::ReadOnly | QFile::Text);
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);
