@@ -24,6 +24,7 @@ IF (WIN32) #Windows
 		SET(POLYVOX_LIBRARIES debug PolyVoxCore_d debug PolyVoxUtil_d optimized PolyVoxCore optimized PolyVoxUtil)
 	ENDIF (POLYVOX_HOME_EXISTS)
 ELSE (WIN32) #Unix
+	MESSAGE(STATUS "PolyVox check not written for Unix yet")
 	#CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
 	#FIND_PACKAGE(PkgConfig)
 	#PKG_SEARCH_MODULE(OGRE OGRE)

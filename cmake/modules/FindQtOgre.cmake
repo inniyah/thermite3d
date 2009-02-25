@@ -21,6 +21,7 @@ IF (WIN32) #Windows
 	SET(QTOGRE_LIBRARY_DIRS debug "C:\\Program Files\\QtOgreFramework\\lib" optimized "C:\\Program Files (x86)\\QtOgreFramework\\lib")
 	SET(QTOGRE_LIBRARIES debug QtOgre_d optimized QtOgre)
 ELSE (WIN32) #Unix
+	MESSAGE(STATUS "QtOgre check not written for Unix yet")
 	#CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
 	#FIND_PACKAGE(PkgConfig)
 	#PKG_SEARCH_MODULE(OGRE OGRE)
