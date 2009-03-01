@@ -180,3 +180,101 @@ void Map::updatePolyVoxGeometry()
 	Ogre::LogManager::getSingleton().logMessage(ss.str()); 
 	}*/
 }
+
+void Map::createAxis(unsigned int uSideLength)
+{
+	float fSideLength = static_cast<float>(uSideLength);
+	float fHalfSideLength = fSideLength/2.0;
+	Ogre::Vector3 vecOriginAndConeScale(4.0,4.0,4.0);
+
+	//Create the main node for the axes
+	m_axisNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+
+	//Create sphere representing origin
+	Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *originSphereEntity = m_pOgreSceneManager->createEntity( "Origin Sphere", "Sphere.mesh" );
+	originSphereEntity->setMaterialName("WhiteMaterial");
+	originSphereEntity->setCastShadows(false);
+	originNode->attachObject(originSphereEntity);
+	originNode->scale(vecOriginAndConeScale);
+
+	//Create arrow body for x-axis
+	Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *xAxisCylinderEntity = m_pOgreSceneManager->createEntity( "X Axis Cylinder", "Cylinder.mesh" );
+	xAxisCylinderEntity->setMaterialName("RedMaterial");
+	xAxisCylinderEntity->setCastShadows(false);
+	xAxisCylinderNode->attachObject(xAxisCylinderEntity);			
+	xAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fHalfSideLength-4.0));
+	xAxisCylinderNode->translate(Ogre::Vector3(fHalfSideLength,0.0,0.0));
+	xAxisCylinderNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Radian(1.5707));
+
+	//Create arrow head for x-axis
+	Ogre::SceneNode *xAxisConeNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *xAxisConeEntity = m_pOgreSceneManager->createEntity( "X Axis Cone", "Cone.mesh" );
+	xAxisConeEntity->setMaterialName("RedMaterial");
+	xAxisConeEntity->setCastShadows(false);
+	xAxisConeNode->attachObject(xAxisConeEntity);		
+	xAxisConeNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Radian(1.5707));
+	xAxisConeNode->scale(vecOriginAndConeScale);
+	xAxisConeNode->translate(Ogre::Vector3(fSideLength-4.0,0.0,0.0));
+
+	//Create arrow body for y-axis
+	Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *yAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Y Axis Cylinder", "Cylinder.mesh" );
+	yAxisCylinderEntity->setMaterialName("GreenMaterial");
+	yAxisCylinderEntity->setCastShadows(false);
+	yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
+	yAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fHalfSideLength-4.0));
+	yAxisCylinderNode->translate(Ogre::Vector3(0.0,fHalfSideLength,0.0));
+	yAxisCylinderNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Radian(1.5707));
+
+	//Create arrow head for y-axis
+	Ogre::SceneNode *yAxisConeNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *yAxisConeEntity = m_pOgreSceneManager->createEntity( "Y Axis Cone", "Cone.mesh" );
+	yAxisConeEntity->setMaterialName("GreenMaterial");
+	yAxisConeEntity->setCastShadows(false);
+	yAxisConeNode->attachObject(yAxisConeEntity);		
+	yAxisConeNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Radian(-1.5707));
+	yAxisConeNode->scale(vecOriginAndConeScale);
+	yAxisConeNode->translate(Ogre::Vector3(0.0,fSideLength-4.0,0.0));
+
+	//Create arrow body for z-axis
+	Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *zAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Z Axis Cylinder", "Cylinder.mesh" );
+	zAxisCylinderEntity->setMaterialName("BlueMaterial");
+	zAxisCylinderEntity->setCastShadows(false);
+	zAxisCylinderNode->attachObject(zAxisCylinderEntity);
+	zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfSideLength));
+	zAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fHalfSideLength-4.0));	
+
+	//Create arrow head for z-axis
+	Ogre::SceneNode *zAxisConeNode = m_axisNode->createChildSceneNode();
+	Ogre::Entity *zAxisConeEntity = m_pOgreSceneManager->createEntity( "Z Axis Cone", "Cone.mesh" );
+	zAxisConeEntity->setMaterialName("BlueMaterial");
+	zAxisConeEntity->setCastShadows(false);
+	zAxisConeNode->attachObject(zAxisConeEntity);
+	zAxisConeNode->translate(Ogre::Vector3(0.0,0.0,fSideLength-4.0));
+	zAxisConeNode->scale(vecOriginAndConeScale);
+
+	//Create remainder of box		
+	Ogre::ManualObject* remainingBox = m_pOgreSceneManager->createManualObject("Remaining Box");
+	remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
+	remainingBox->position(0.0,			0.0,			0.0			);	remainingBox->position(0.0,			0.0,			fSideLength	);
+	remainingBox->position(0.0,			fSideLength,	0.0			);	remainingBox->position(0.0,			fSideLength,	fSideLength	);
+	remainingBox->position(fSideLength, 0.0,			0.0			);	remainingBox->position(fSideLength, 0.0,			fSideLength	);
+	remainingBox->position(fSideLength, fSideLength,	0.0			);	remainingBox->position(fSideLength, fSideLength,	fSideLength	);
+
+	remainingBox->position(0.0,			0.0,			0.0			);	remainingBox->position(0.0,			fSideLength,	0.0			);
+	remainingBox->position(0.0,			0.0,			fSideLength	);	remainingBox->position(0.0,			fSideLength,	fSideLength	);
+	remainingBox->position(fSideLength, 0.0,			0.0			);	remainingBox->position(fSideLength, fSideLength,	0.0			);
+	remainingBox->position(fSideLength, 0.0,			fSideLength	);	remainingBox->position(fSideLength, fSideLength,	fSideLength	);
+
+	remainingBox->position(0.0,			0.0,			0.0			);	remainingBox->position(fSideLength, 0.0,			0.0			);
+	remainingBox->position(0.0,			0.0,			fSideLength	);	remainingBox->position(fSideLength, 0.0,			fSideLength	);
+	remainingBox->position(0.0,			fSideLength,	0.0			);	remainingBox->position(fSideLength, fSideLength,	0.0			);
+	remainingBox->position(0.0,			fSideLength,	fSideLength	);	remainingBox->position(fSideLength, fSideLength,	fSideLength	);
+	remainingBox->end();
+	remainingBox->setCastShadows(false);
+	Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
+	remainingBoxNode->attachObject(remainingBox);
+}

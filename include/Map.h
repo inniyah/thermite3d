@@ -47,6 +47,8 @@ public:
 
 	void updatePolyVoxGeometry();	
 
+	void createAxis(unsigned int uSideLength);
+
 public:
 	Ogre::SceneManager* m_pOgreSceneManager;
 
@@ -66,6 +68,8 @@ private:
 	Ogre::Real m_rVoxelSize;
 
 	Ogre::Timer* timer;
+
+	Ogre::SceneNode* m_axisNode;
 
 	PolyVox::int32 m_iRegionTimeStamps[PolyVox::POLYVOX_VOLUME_SIDE_LENGTH_IN_REGIONS][PolyVox::POLYVOX_VOLUME_SIDE_LENGTH_IN_REGIONS][PolyVox::POLYVOX_VOLUME_SIDE_LENGTH_IN_REGIONS];
 };

@@ -5,7 +5,7 @@
 
 #include "Application.h"
 
-namespace QtOgre
+namespace Thermite
 {
 
 	class MainMenu : public QDialog, private Ui::MainMenu
@@ -13,7 +13,7 @@ namespace QtOgre
 		Q_OBJECT
 
 	public:
-		MainMenu(Application* application, QWidget* mainWidget, QWidget *parent = 0);
+		MainMenu(QtOgre::Application* application, QWidget* mainWidget, QWidget *parent = 0);
 
 	public slots:
 		void on_mQuitButton_clicked(void);
@@ -22,7 +22,7 @@ namespace QtOgre
 		void on_mViewLogsButton_clicked(void);
 
 	private:
-		Application *mApplication;
+		QtOgre::Application *mApplication;
 		QWidget* mMainWidget;
 
 	};

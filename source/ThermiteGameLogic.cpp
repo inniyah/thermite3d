@@ -1,5 +1,6 @@
 #include "ThermiteGameLogic.h"
 #include "MainMenu.h"
+#include "Shell.h"
 
 #include "LogManager.h"
 #include "OgreWidget.h"
@@ -15,7 +16,9 @@
 #include <QDirIterator>
 #include <QKeyEvent>
 
-namespace QtOgre
+using namespace QtOgre;
+
+namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
@@ -64,7 +67,9 @@ namespace QtOgre
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
-		mMap->loadScene("Castle");
+		mMap->loadScene("");
+
+		mMap->createAxis(256);
 
 		//This gets the first camera which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
@@ -75,10 +80,13 @@ namespace QtOgre
 		mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
 		mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
 		mCannonNode->attachObject(mCannon);
-		mCannonNode->setPosition(128.0f, 32.0f, 128.0f);
+		mCannonNode->setPosition(200.0f, 65.0f, 80.0f);
+		mCannonNode->setScale(3.0,3.0,3.0);
 
-		mCannonController = new CannonController(qApp->mainWidget(), Qt::Tool);
+		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
 		mCannonController->show();
+
+		mApplication->hideLogManager();
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -128,7 +136,7 @@ namespace QtOgre
 		float elevationInDegrees = mCannonController->elevation();
 		mCannonNode->setOrientation(Ogre::Quaternion::IDENTITY);
 		mCannonNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-		mCannonNode->rotate(Ogre::Vector3(1.0,0.0,0.0), Ogre::Radian((90.0 - elevationInDegrees) / 57.0)); //Elevation
+		mCannonNode->rotate(Ogre::Vector3(-1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
 
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
@@ -186,5 +194,17 @@ namespace QtOgre
 		{
 			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
 		} 
+	}
+
+	void ThermiteGameLogic::fireCannon(void)
+	{
+		Shell* shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
+
+		//Update the shell
+		float directionInDegrees = mCannonController->direction();
+		float elevationInDegrees = mCannonController->elevation();
+		shell->m_pSceneNode->setOrientation(Ogre::Quaternion::IDENTITY);
+		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
+		shell->m_pSceneNode->rotate(Ogre::Vector3(-1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
 	}
 }

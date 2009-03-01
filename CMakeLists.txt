@@ -21,6 +21,7 @@ SET(SRC_FILES
 	source/Map.cpp
 	source/MapHandler.cpp
 	source/PhysicalEntity.cpp
+	source/Shell.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/TimeStampedRenderOperation.cpp
@@ -40,6 +41,7 @@ SET(INC_FILES
 	include/Map.h
 	include/MapHandler.h
 	include/PhysicalEntity.h
+	include/Shell.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
@@ -178,6 +180,10 @@ IF(WIN32)
 	
 	INSTALL(FILES $ENV{POLYVOX_HOME}/bin/PolyVoxCore_d.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES $ENV{POLYVOX_HOME}/bin/PolyVoxUtil_d.dll DESTINATION bin CONFIGURATIONS Debug)
+	
+	#Install the settings file
+	INSTALL(FILES Settings.ini DESTINATION bin CONFIGURATIONS Release)	
+	INSTALL(FILES Settings.ini DESTINATION bin CONFIGURATIONS Debug)
 
 	
 	

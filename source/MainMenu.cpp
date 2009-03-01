@@ -4,7 +4,9 @@
 #include "OgreWidget.h"
 #include "SettingsDialog.h"
 
-namespace QtOgre
+using namespace QtOgre;
+
+namespace Thermite
 {
 	MainMenu::MainMenu(Application* application, QWidget* mainWidget, QWidget *parent)
 	:QDialog(parent)

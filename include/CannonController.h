@@ -7,15 +7,25 @@
 #include <QTime>
 #include <QTimer>
 
-class CannonController : public QDialog, private Ui::CannonController
+namespace Thermite
 {
-	Q_OBJECT
+	class ThermiteGameLogic;
 
-public:
-	CannonController(QWidget* parent = 0, Qt::WindowFlags f = 0);
+	class CannonController : public QDialog, private Ui::CannonController
+	{
+		Q_OBJECT
 
-	int direction(void);
-	int elevation(void);
-};
+	public:
+		CannonController(ThermiteGameLogic* pThermiteGameLogic, QWidget* parent = 0, Qt::WindowFlags f = 0);
+
+		int direction(void);
+		int elevation(void);
+
+		ThermiteGameLogic* m_pThermiteGameLogic;
+
+	public slots:
+			void on_fireButton_pressed(void);
+	};
+}
 
 #endif /*THERMITE_CANNONCONTROLLER_H_*/

@@ -5,6 +5,7 @@
 #include <QIcon>
 
 using namespace QtOgre;
+using namespace Thermite;
 
 int main(int argc, char *argv[])
 {

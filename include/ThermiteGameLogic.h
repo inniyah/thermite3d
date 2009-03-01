@@ -16,7 +16,7 @@
 
 #include <queue>
 
-namespace QtOgre
+namespace Thermite
 {
 	enum KeyStates
 	{
@@ -24,7 +24,7 @@ namespace QtOgre
 		KS_PRESSED
 	};
 
-	class ThermiteGameLogic : public GameLogic
+	class ThermiteGameLogic : public QtOgre::GameLogic
 	{
 	public:
 		ThermiteGameLogic(void);
@@ -42,6 +42,8 @@ namespace QtOgre
 		void onWheel(QWheelEvent* event);
 
 		QtOgre::Log* thermiteLog(void);
+
+		void fireCannon(void);
 
 	private:
 		void addResourceDirectory(const QString& directoryName);
@@ -80,8 +82,6 @@ namespace QtOgre
 
 		std::queue<PhysicalObject*> m_queueObjects;
 
-		//Ogre::Light* light1;
-		//Ogre::SceneNode* lightNode1;
 		Ogre::Entity* mCannon;
 		Ogre::SceneNode* mCannonNode;
 	};
