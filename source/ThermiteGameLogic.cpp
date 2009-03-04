@@ -18,12 +18,13 @@
 
 using namespace QtOgre;
 
+using namespace std;
+
 namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
-		,shell(0)
 	{
 	}
 
@@ -144,13 +145,69 @@ namespace Thermite
 		
 		mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 
-		if(shell != 0)
+		list<Shell*> shellsToDelete;
+
+		for(list<Shell*>::iterator iter = m_listShells.begin(); iter != m_listShells.end(); iter++)
 		{
-			shell->update();
+			(*iter)->update();
+			Ogre::Vector3 shellPos = (*iter)->m_vecPosition;
+
+			if(mMap->volumeResource->volume->containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
+			{
+				if(mMap->volumeResource->volume->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
+				{
+					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 10, 0);
+					shellsToDelete.push_back(*iter);
+				}
+			}
+		}
+
+		for(list<Shell*>::iterator iter = shellsToDelete.begin(); iter != shellsToDelete.end(); iter++)
+		{
+			m_listShells.remove(*iter);
+			delete (*iter);
 		}
 
 		++mCurrentFrameNumber;
 	}
+
+	void ThermiteGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8 value)
+{
+	int firstX = static_cast<int>(std::floor(centre.getX() - radius));
+	int firstY = static_cast<int>(std::floor(centre.getY() - radius));
+	int firstZ = static_cast<int>(std::floor(centre.getZ() - radius));
+
+	int lastX = static_cast<int>(std::ceil(centre.getX() + radius));
+	int lastY = static_cast<int>(std::ceil(centre.getY() + radius));
+	int lastZ = static_cast<int>(std::ceil(centre.getZ() + radius));
+
+	float radiusSquared = radius * radius;
+
+	//Check bounds
+	firstX = std::max(firstX,0);
+	firstY = std::max(firstY,0);
+	firstZ = std::max(firstZ,0);
+
+	lastX = std::min(lastX,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
+	lastY = std::min(lastY,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
+	lastZ = std::min(lastZ,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
+
+	mMap->volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ)));
+	for(int z = firstZ; z <= lastZ; ++z)
+	{
+		for(int y = firstY; y <= lastY; ++y)
+		{
+			for(int x = firstX; x <= lastX; ++x)
+			{
+				if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
+				{
+					mMap->volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
+				}
+			}
+		}
+	}
+	mMap->volumeChangeTracker->unlockRegion();
+}
 
 	void ThermiteGameLogic::shutdown(void)
 	{
@@ -204,7 +261,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::fireCannon(void)
 	{
-		shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
+		Shell* shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
 
 		//Update the shell
 		float directionInDegrees = mCannonController->direction();
@@ -216,5 +273,7 @@ namespace Thermite
 		shell->m_vecVelocity = shell->m_pSceneNode->getLocalAxes().GetColumn(2);
 		shell->m_vecVelocity.normalise();
 		shell->m_vecVelocity *= 100.0f;
+
+		m_listShells.push_back(shell);
 	}
 }

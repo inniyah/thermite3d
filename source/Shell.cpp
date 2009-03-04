@@ -16,6 +16,11 @@ namespace Thermite
 		m_pSceneNode->setPosition(vecPosition);
 	}
 
+	Shell::~Shell()
+	{
+		m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->removeChild(m_pSceneNode);
+	}
+
 	void Shell::update(void)
 	{
 		float timeInSeconds = 0.002;
@@ -24,5 +29,7 @@ namespace Thermite
 
 		m_vecPosition += (m_vecVelocity * timeInSeconds);
 		m_pSceneNode->setPosition(m_vecPosition);
+
+		m_pSceneNode->lookAt(m_vecPosition + (m_vecVelocity * 100), Ogre::Node::TS_PARENT, Ogre::Vector3::UNIT_Z);
 	}
 }

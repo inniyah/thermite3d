@@ -15,6 +15,7 @@
 
 #include <QTime>
 
+#include <list>
 #include <queue>
 
 namespace Thermite
@@ -45,6 +46,8 @@ namespace Thermite
 		QtOgre::Log* thermiteLog(void);
 
 		void fireCannon(void);
+
+		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8 value);
 
 	private:
 		void addResourceDirectory(const QString& directoryName);
@@ -86,7 +89,7 @@ namespace Thermite
 		Ogre::Entity* mCannon;
 		Ogre::SceneNode* mCannonNode;
 
-		Shell* shell;
+		std::list<Shell*> m_listShells;
 	};
 }
 

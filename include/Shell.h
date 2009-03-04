@@ -12,6 +12,7 @@ namespace Thermite
 	{
 	public:
 		Shell(Map* pParentMap, Ogre::Vector3 vecPosition, Ogre::Vector3 vecVelocity);
+		~Shell();
 
 		void update(void);
 
