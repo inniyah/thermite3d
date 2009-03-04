@@ -7,6 +7,7 @@
 
 #include "Map.h"
 #include "PhysicalEntity.h"
+#include "ThermiteForwardDeclarations.h"
 
 #include <OgrePrerequisites.h>
 
@@ -84,6 +85,8 @@ namespace Thermite
 
 		Ogre::Entity* mCannon;
 		Ogre::SceneNode* mCannonNode;
+
+		Shell* shell;
 	};
 }
 

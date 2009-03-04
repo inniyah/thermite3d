@@ -23,6 +23,7 @@ namespace Thermite
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
+		,shell(0)
 	{
 	}
 
@@ -143,6 +144,11 @@ namespace Thermite
 		
 		mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 
+		if(shell != 0)
+		{
+			shell->update();
+		}
+
 		++mCurrentFrameNumber;
 	}
 
@@ -198,7 +204,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::fireCannon(void)
 	{
-		Shell* shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
+		shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
 
 		//Update the shell
 		float directionInDegrees = mCannonController->direction();
@@ -206,5 +212,9 @@ namespace Thermite
 		shell->m_pSceneNode->setOrientation(Ogre::Quaternion::IDENTITY);
 		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
 		shell->m_pSceneNode->rotate(Ogre::Vector3(-1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
+
+		shell->m_vecVelocity = shell->m_pSceneNode->getLocalAxes().GetColumn(2);
+		shell->m_vecVelocity.normalise();
+		shell->m_vecVelocity *= 100.0f;
 	}
 }

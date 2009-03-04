@@ -40,4 +40,9 @@ class SurfacePatchRenderable;
 //class VolumeSerializer;
 class WorldRegion;
 
+namespace Thermite
+{
+	class Shell;
+}
+
 #endif

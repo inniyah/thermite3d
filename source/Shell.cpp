@@ -18,5 +18,11 @@ namespace Thermite
 
 	void Shell::update(void)
 	{
+		float timeInSeconds = 0.002;
+		m_vecVelocity *= 0.9999;
+		m_vecVelocity -= Ogre::Vector3(0.0,0.1,0.0);
+
+		m_vecPosition += (m_vecVelocity * timeInSeconds);
+		m_pSceneNode->setPosition(m_vecPosition);
 	}
 }
