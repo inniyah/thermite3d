@@ -149,8 +149,8 @@ namespace Thermite
 
 		for(list<Shell*>::iterator iter = m_listShells.begin(); iter != m_listShells.end(); iter++)
 		{
-			(*iter)->update();
-			Ogre::Vector3 shellPos = (*iter)->m_vecPosition;
+			(*iter)->update(timeElapsedInSeconds);
+			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
 
 			if(mMap->volumeResource->volume->containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
 			{

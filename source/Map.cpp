@@ -245,7 +245,6 @@ void Map::createAxis(unsigned int uSideLength)
 	remainingBox->position(0.0,			fSideLength,	0.0			);	remainingBox->position(fSideLength, fSideLength,	0.0			);
 	remainingBox->position(0.0,			fSideLength,	fSideLength	);	remainingBox->position(fSideLength, fSideLength,	fSideLength	);
 	remainingBox->end();
-	remainingBox->setCastShadows(false);
 	Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
 	remainingBoxNode->attachObject(remainingBox);
 }

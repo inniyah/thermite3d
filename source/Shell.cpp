@@ -7,7 +7,6 @@ namespace Thermite
 {
 	Shell::Shell(Map* pParentMap, Ogre::Vector3 vecPosition, Ogre::Vector3 vecVelocity)
 	:m_pParentMap(pParentMap)
-	,m_vecPosition(vecPosition)
 	,m_vecVelocity(vecVelocity)
 	{
 		m_pSceneNode = m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(generateUID("ShellSceneNode"));
@@ -21,15 +20,23 @@ namespace Thermite
 		m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->removeChild(m_pSceneNode);
 	}
 
-	void Shell::update(void)
+	void Shell::update(float fTimeElapsedInSeconds)
 	{
-		float timeInSeconds = 0.002;
-		m_vecVelocity *= 0.9999;
-		m_vecVelocity -= Ogre::Vector3(0.0,0.1,0.0);
+		float fAirResistance = 0.01f;
+		Ogre::Vector3 vecGravity(0.0,-75.0,0.0);
 
-		m_vecPosition += (m_vecVelocity * timeInSeconds);
-		m_pSceneNode->setPosition(m_vecPosition);
+		//Compute air resistance
+		Ogre::Vector3 vecAirResistance = (-m_vecVelocity) * fAirResistance;
 
-		m_pSceneNode->lookAt(m_vecPosition + (m_vecVelocity * 100), Ogre::Node::TS_PARENT, Ogre::Vector3::UNIT_Z);
+		//Apply air resistance and gravity - allowing for time elapsed
+		m_vecVelocity += vecAirResistance * fTimeElapsedInSeconds;
+		m_vecVelocity += vecGravity * fTimeElapsedInSeconds;
+
+		//Move position by elocity - allowing for time elapsed
+		Ogre::Vector3 vecNewPosition = m_pSceneNode->getPosition() + (m_vecVelocity * fTimeElapsedInSeconds);
+		m_pSceneNode->setPosition(vecNewPosition);
+
+		//Rotate the shell to point in the direction of travel
+		m_pSceneNode->lookAt(vecNewPosition + m_vecVelocity, Ogre::Node::TS_PARENT, Ogre::Vector3::UNIT_Z);
 	}
 }

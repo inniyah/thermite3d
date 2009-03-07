@@ -14,9 +14,8 @@ namespace Thermite
 		Shell(Map* pParentMap, Ogre::Vector3 vecPosition, Ogre::Vector3 vecVelocity);
 		~Shell();
 
-		void update(void);
+		void update(float fTimeElapsedInSeconds);
 
-		Ogre::Vector3 m_vecPosition;
 		Ogre::Vector3 m_vecVelocity;
 		Map* m_pParentMap;
 		Ogre::SceneNode* m_pSceneNode;
