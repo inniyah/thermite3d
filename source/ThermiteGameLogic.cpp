@@ -15,6 +15,7 @@
 
 #include <QDirIterator>
 #include <QKeyEvent>
+#include <QSettings>
 
 using namespace QtOgre;
 
@@ -71,7 +72,10 @@ namespace Thermite
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->loadScene("");
 
-		mMap->createAxis(256);
+		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+		{
+			mMap->createAxis(256);
+		}
 
 		//This gets the first camera which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
