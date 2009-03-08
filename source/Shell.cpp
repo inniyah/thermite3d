@@ -23,7 +23,7 @@ namespace Thermite
 	void Shell::update(float fTimeElapsedInSeconds)
 	{
 		float fAirResistance = 0.01f;
-		Ogre::Vector3 vecGravity(0.0,-75.0,0.0);
+		Ogre::Vector3 vecGravity(0.0,-50.0,0.0);
 
 		//Compute air resistance
 		Ogre::Vector3 vecAirResistance = (-m_vecVelocity) * fAirResistance;

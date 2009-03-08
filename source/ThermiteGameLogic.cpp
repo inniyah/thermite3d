@@ -48,13 +48,16 @@ namespace Thermite
 		// Create the generic scene manager
 		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
 
-		mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-		//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-		mSceneManager->setShadowTextureSelfShadow(true);
-		mSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-		mSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-		mSceneManager->setShadowCasterRenderBackFaces(true);
-		mSceneManager->setShadowTextureSize(1024);
+		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
+		{
+			mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
+			mSceneManager->setShadowTextureSelfShadow(true);
+			mSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+			mSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+			mSceneManager->setShadowCasterRenderBackFaces(true);
+			mSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
+		}
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());		
 
@@ -147,7 +150,10 @@ namespace Thermite
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
 		
-		mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
+		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+		{
+			mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
+		}
 
 		list<Shell*> shellsToDelete;
 

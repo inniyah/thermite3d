@@ -43,6 +43,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <OgreSceneManager.h>
 #include <OgreTimer.h>
 
+#include <QSettings>
+
 //using namespace Ogre;
 using namespace PolyVox;
 using namespace OgreBulletDynamics;
@@ -159,8 +161,11 @@ void Map::updatePolyVoxGeometry()
 
 							//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
 							//For the graphics geometry this is done automatically each time Ogre tries to render a SurfacePatchRenderable.
-							IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-							pWorldRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
+							if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+							{
+								IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+								pWorldRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
+							}
 						}
 
 						//The WorldRegion is now up to date. Update the time stamp to indicate this

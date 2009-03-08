@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "WorldRegion.h"
 
+#include "Application.h"
 #include "Map.h"
 #include "TimeStampedSurfacePatchCache.h"
 #include "SurfacePatchRenderable.h"
@@ -29,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "OgreBulletDynamicsRigidBody.h"
 
 #include "OgreVector3.h"
+
+#include <QSettings>
 
 using namespace Ogre;
 using namespace OgreBulletCollisions;
@@ -54,7 +57,7 @@ WorldRegion::WorldRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
 	const std::string& strSprName = makeUniqueName("SPR");
 	m_pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 	m_pSurfacePatchRenderable->setMaterial("ShadowMapReceiverForWorldMaterial");
-	m_pSurfacePatchRenderable->setCastShadows(true);
+	m_pSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
 	m_pOgreSceneNode->attachObject(m_pSurfacePatchRenderable);
 	m_pSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
 
