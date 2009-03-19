@@ -13,6 +13,9 @@ namespace Thermite
 		m_pEntity = m_pParentMap->m_pOgreSceneManager->createEntity(generateUID("ShellEntity"), "Shell.mesh");
 		m_pSceneNode->attachObject(m_pEntity);
 		m_pSceneNode->setPosition(vecPosition);
+
+		//Tempoary hack so shell doesn't immediatly explode in the cannon
+		m_pSceneNode->setPosition(vecPosition + vecVelocity.normalisedCopy());
 	}
 
 	Shell::~Shell()

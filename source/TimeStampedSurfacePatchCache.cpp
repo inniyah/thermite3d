@@ -57,7 +57,7 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		region.cropTo(m_vctTracker->getVolumeData()->getEnclosingRegion());
 
 		extractSurface(m_vctTracker->getVolumeData(), lod, region, ispResult);
-		computeNormalsForVertices(m_vctTracker->getVolumeData(), *ispResult, CENTRAL_DIFFERENCE);
+		computeNormalsForVertices(m_vctTracker->getVolumeData(), *ispResult, CENTRAL_DIFFERENCE_SMOOTHED);
 		ispResult->m_iTimeStamp = m_vctTracker->getCurrentTime();
 	}
 
