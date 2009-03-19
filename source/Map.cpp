@@ -59,8 +59,6 @@ Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::
 
 	m_pOgreSceneManager = sceneManager;
 
-	volumeChangeTracker = new VolumeChangeTracker();
-
 	timer = new Ogre::Timer();
 
 	initialisePhysics();

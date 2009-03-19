@@ -10,7 +10,11 @@
 #include "TimeStampedSurfacePatchCache.h"
 #include "VolumeManager.h"
 
+#include "PolyVoxUtil/VolumeChangeTracker.h"
+
 #include <QSettings>
+
+using namespace PolyVox;
 
 MapHandler::MapHandler(Map* map)
 :DotSceneHandler(map->m_pOgreSceneManager)
@@ -79,7 +83,7 @@ void* MapHandler::handleVolume(const QXmlAttributes &attributes)
 		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 	}
 
-	mMap->volumeChangeTracker->setVolumeData(mMap->volumeResource->volume);
+	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, POLYVOX_REGION_SIDE_LENGTH);
 
 	mMap->volumeChangeTracker->setAllRegionsModified();
 
