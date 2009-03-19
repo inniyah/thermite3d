@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma endregion
 
 #include "VolumeSerializer.h"
-#include "PolyVoxCore/BlockVolume.h"
+#include "PolyVoxCore/Volume.h"
 
-#include "PolyVoxCore/BlockVolumeIterator.h"
+#include "PolyVoxCore/VolumeIterator.h"
 
 #include "PolyVoxUtil/Serialization.h"
 
@@ -49,7 +49,7 @@ VolumeSerializer::~VolumeSerializer ()
 	outFile.close ();
 }*/
 
-void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, BlockVolume<PolyVox::uint8> **pDest)
+void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox::uint8> **pDest)
 {
 	//pDest->setString (stream->getAsString ());
 	//Volume vol;

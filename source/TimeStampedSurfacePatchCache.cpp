@@ -1,6 +1,6 @@
 #include "TimeStampedSurfacePatchCache.h"
 
-#include "PolyVoxCore/BlockVolume.h"
+#include "PolyVoxCore/Volume.h"
 #include "PolyVoxCore/GradientEstimators.h"
 #include "PolyVoxCore/SurfaceExtractors.h"
 
