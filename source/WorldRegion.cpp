@@ -61,7 +61,7 @@ WorldRegion::WorldRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
 	m_pOgreSceneNode->attachObject(m_pSurfacePatchRenderable);
 	m_pSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
 
-	AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(POLYVOX_REGION_SIDE_LENGTH, POLYVOX_REGION_SIDE_LENGTH, POLYVOX_REGION_SIDE_LENGTH));
+	AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(THERMITE_REGION_SIDE_LENGTH, THERMITE_REGION_SIDE_LENGTH, THERMITE_REGION_SIDE_LENGTH));
 	m_pSurfacePatchRenderable->setBoundingBox(aabb);
 }
 
@@ -110,7 +110,7 @@ void WorldRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
 	}*/
 
 	const btVector3 minAabb(0,0,0);
-	const btVector3 maxAabb(PolyVox::POLYVOX_REGION_SIDE_LENGTH,PolyVox::POLYVOX_REGION_SIDE_LENGTH,PolyVox::POLYVOX_REGION_SIDE_LENGTH);
+	const btVector3 maxAabb(THERMITE_REGION_SIDE_LENGTH,THERMITE_REGION_SIDE_LENGTH,THERMITE_REGION_SIDE_LENGTH);
 	const bool useQuantizedAABB = true;
 	//if(mShape == 0)
 	{

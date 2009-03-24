@@ -42,7 +42,7 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 	}
 
 	//Get the time stamps
-	int32 regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/POLYVOX_REGION_SIDE_LENGTH,position.getY()/POLYVOX_REGION_SIDE_LENGTH,position.getZ()/POLYVOX_REGION_SIDE_LENGTH);
+	int32 regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
 	int32 ispTimeStamp = ispResult->m_iTimeStamp;
 
 	if(regionTimeStamp > ispTimeStamp) //Need to regenerate mesh
