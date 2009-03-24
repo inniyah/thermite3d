@@ -83,7 +83,7 @@ void* MapHandler::handleVolume(const QXmlAttributes &attributes)
 		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 	}
 
-	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, POLYVOX_REGION_SIDE_LENGTH);
+	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, THERMITE_REGION_SIDE_LENGTH);
 
 	mMap->volumeChangeTracker->setAllRegionsModified();
 

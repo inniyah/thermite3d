@@ -1,4 +1,5 @@
 #include "TimeStampedSurfacePatchCache.h"
+#include "ThermiteForwardDeclarations.h"
 
 #include "PolyVoxCore/Volume.h"
 #include "PolyVoxCore/GradientEstimators.h"
@@ -49,9 +50,9 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		const uint16 firstX = position.getX();
 		const uint16 firstY = position.getY();
 		const uint16 firstZ = position.getZ();
-		const uint16 lastX = firstX + POLYVOX_REGION_SIDE_LENGTH;
-		const uint16 lastY = firstY + POLYVOX_REGION_SIDE_LENGTH;
-		const uint16 lastZ = firstZ + POLYVOX_REGION_SIDE_LENGTH;
+		const uint16 lastX = firstX + THERMITE_REGION_SIDE_LENGTH;
+		const uint16 lastY = firstY + THERMITE_REGION_SIDE_LENGTH;
+		const uint16 lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
 
 		Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
 		region.cropTo(m_vctTracker->getVolumeData()->getEnclosingRegion());

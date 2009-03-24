@@ -1,4 +1,6 @@
 #include "TimeStampedRenderOperationCache.h"
+
+#include "ThermiteForwardDeclarations.h"
 #include "TimeStampedSurfacePatchCache.h"
 #include "SurfacePatchRenderable.h"
 
@@ -42,7 +44,7 @@ TimeStampedRenderOperation* TimeStampedRenderOperationCache::getRenderOperation(
 	}
 
 	//Get the time stamps
-	int32 regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/POLYVOX_REGION_SIDE_LENGTH,position.getY()/POLYVOX_REGION_SIDE_LENGTH,position.getZ()/POLYVOX_REGION_SIDE_LENGTH);
+	int32 regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
 	int32 renderOpTimeStamp = renderOpResult->m_iTimeStamp;
 
 	if(regionTimeStamp > renderOpTimeStamp) //Need to regenerate render operation
