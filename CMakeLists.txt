@@ -103,6 +103,7 @@ INSTALL(TARGETS Thermite
 #CONFIGURE_FILE(${OGRE_LIBRARY_DIRS}/RenderSystem_Direct3D9.dll ${CMAKE_CURRENT_BINARY_DIR}/release/RenderSystem_Direct3D9.dll COPYONLY)
 #ENDIF (WIN32)
 
+#Should be able to use INCLUDE(GetPrerequisites)
 IF(WIN32)
 	SET(OGRESDK $ENV{OGRE_HOME})
 	SET(OGRESOURCE $ENV{OGRE_SRC})
