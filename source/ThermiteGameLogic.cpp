@@ -162,7 +162,7 @@ namespace Thermite
 			(*iter)->update(timeElapsedInSeconds);
 			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
 
-			if(mMap->volumeResource->volume->containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
+			if(mMap->volumeResource->volume->getEnclosingRegion().containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
 			{
 				if(mMap->volumeResource->volume->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
 				{
