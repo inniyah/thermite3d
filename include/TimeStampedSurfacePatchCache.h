@@ -37,7 +37,7 @@ private:
 
 public:
 	static TimeStampedSurfacePatchCache* getInstance();
-	PolyVox::IndexedSurfacePatch* getIndexedSurfacePatch(PolyVox::Vector3DInt32 position, PolyVox::uint8 lod);
+	PolyVox::IndexedSurfacePatch* getIndexedSurfacePatch(PolyVox::Vector3DInt32 position, PolyVox::uint8_t lod);
 
 public:
 	std::map<PolyVox::Vector3DInt32, PolyVox::IndexedSurfacePatch*> m_mapIsps[3];

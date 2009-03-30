@@ -41,7 +41,7 @@ public:
 		Ogre::ManualResourceLoader *loader = 0);
 	~VolumeResource();
 
-	PolyVox::Volume<PolyVox::uint8>* volume;
+	PolyVox::Volume<PolyVox::uint8_t>* volume;
 
 protected:
 

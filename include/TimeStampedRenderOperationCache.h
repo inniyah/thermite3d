@@ -39,7 +39,7 @@ private:
 
 public:
 	static TimeStampedRenderOperationCache* getInstance();
-	TimeStampedRenderOperation* getRenderOperation(PolyVox::Vector3DInt32 position, PolyVox::uint8 lod);
+	TimeStampedRenderOperation* getRenderOperation(PolyVox::Vector3DInt32 position, PolyVox::uint8_t lod);
 
 public:
 	std::map<PolyVox::Vector3DInt32, TimeStampedRenderOperation*> m_mapRenderOps[3];

@@ -100,22 +100,22 @@ void Map::updatePolyVoxGeometry()
 		timer->reset();
 
 		//Iterate over each region in the VolumeChangeTracker
-		for(PolyVox::uint16 regionZ = 0; regionZ < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionZ)
+		for(PolyVox::uint16_t regionZ = 0; regionZ < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionZ)
 		{		
-			for(PolyVox::uint16 regionY = 0; regionY < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionY)
+			for(PolyVox::uint16_t regionY = 0; regionY < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionY)
 			{
-				for(PolyVox::uint16 regionX = 0; regionX < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionX)
+				for(PolyVox::uint16_t regionX = 0; regionX < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionX)
 				{
 					//If the region has changed then we may need to add or remove WorldRegion to/from the scene graph
 					if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
 					{
 						//Convert to a real PolyVox::Region
-						const PolyVox::uint16 firstX = regionX * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16 firstY = regionY * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16 firstZ = regionZ * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16 lastX = firstX + THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16 lastY = firstY + THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16 lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t firstX = regionX * THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t firstY = regionY * THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t firstZ = regionZ * THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t lastX = firstX + THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t lastY = firstY + THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
 
 						Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
 						Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);

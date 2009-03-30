@@ -31,7 +31,7 @@ class TimeStampedRenderOperation
 public:
 	TimeStampedRenderOperation();
 	Ogre::RenderOperation* m_renderOperation;
-	PolyVox::int32 m_iTimeStamp;
+	PolyVox::int32_t m_iTimeStamp;
 };
 
 #endif

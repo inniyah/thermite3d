@@ -35,7 +35,7 @@ public:
 	virtual ~VolumeSerializer ();
 
 	//void exportVolume (const Volume *pText, const Ogre::String &fileName);
-	void importVolume (Ogre::DataStreamPtr &stream, PolyVox::Volume<PolyVox::uint8> **pDest);
+	void importVolume (Ogre::DataStreamPtr &stream, PolyVox::Volume<PolyVox::uint8_t> **pDest);
 };
 
 #endif

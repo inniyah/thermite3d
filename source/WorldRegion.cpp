@@ -171,12 +171,12 @@ void WorldRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp,
 {
 	btVector3    vecBulletVertices[3];
 
-	std::vector<PolyVox::uint32>::const_iterator indicesIter = isp.getIndices().begin();
+	std::vector<PolyVox::uint32_t>::const_iterator indicesIter = isp.getIndices().begin();
 	while(indicesIter != isp.getIndices().end())
 	{
 		for (unsigned int v = 0; v < 3; ++v)
 		{
-			PolyVox::uint32 uIndex = *indicesIter;
+			PolyVox::uint32_t uIndex = *indicesIter;
 			const SurfaceVertex& vertex = isp.getVertices()[uIndex];
 			const Vector3DFloat& vertexPos = vertex.getPosition();
 
@@ -231,7 +231,7 @@ void WorldRegion::updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatc
 
 	//LogManager::getSingleton().logMessage("copying indices");
 	int* indexBaseAsInt = reinterpret_cast<int*>(indexbase);
-	std::vector<PolyVox::uint32>::const_iterator indicesIter = isp.getIndices().begin();
+	std::vector<PolyVox::uint32_t>::const_iterator indicesIter = isp.getIndices().begin();
 	while(indicesIter != isp.getIndices().end())
 	{
 		*indexBaseAsInt = (int)(*indicesIter);

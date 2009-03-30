@@ -181,7 +181,7 @@ namespace Thermite
 		++mCurrentFrameNumber;
 	}
 
-	void ThermiteGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8 value)
+	void ThermiteGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value)
 {
 	int firstX = static_cast<int>(std::floor(centre.getX() - radius));
 	int firstY = static_cast<int>(std::floor(centre.getY() - radius));

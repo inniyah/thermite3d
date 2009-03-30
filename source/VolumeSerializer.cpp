@@ -49,7 +49,7 @@ VolumeSerializer::~VolumeSerializer ()
 	outFile.close ();
 }*/
 
-void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox::uint8> **pDest)
+void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox::uint8_t> **pDest)
 {
 	//pDest->setString (stream->getAsString ());
 	//Volume vol;

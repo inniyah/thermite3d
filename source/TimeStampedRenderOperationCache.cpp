@@ -26,7 +26,7 @@ TimeStampedRenderOperationCache* TimeStampedRenderOperationCache::getInstance()
 	return m_pInstance;
 }
 
-TimeStampedRenderOperation* TimeStampedRenderOperationCache::getRenderOperation(Vector3DInt32 position, PolyVox::uint8 lod)
+TimeStampedRenderOperation* TimeStampedRenderOperationCache::getRenderOperation(Vector3DInt32 position, PolyVox::uint8_t lod)
 {
 	//Get the surface patch, creating it if it doesn't exist.
 	std::map<Vector3DInt32, TimeStampedRenderOperation*>& mapRenderOps = m_mapRenderOps[lod];
@@ -44,8 +44,8 @@ TimeStampedRenderOperation* TimeStampedRenderOperationCache::getRenderOperation(
 	}
 
 	//Get the time stamps
-	int32 regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
-	int32 renderOpTimeStamp = renderOpResult->m_iTimeStamp;
+	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
+	int32_t renderOpTimeStamp = renderOpResult->m_iTimeStamp;
 
 	if(regionTimeStamp > renderOpTimeStamp) //Need to regenerate render operation
 	{
@@ -104,7 +104,7 @@ RenderOperation* TimeStampedRenderOperationCache::buildRenderOperationFrom(Index
 	decl->addElement(0, 6 * sizeof(float), VET_FLOAT2, VES_TEXTURE_COORDINATES);
 
 	const std::vector<SurfaceVertex>& vecVertices = isp.getVertices();
-	const std::vector<PolyVox::uint32>& vecIndices = isp.getIndices();
+	const std::vector<PolyVox::uint32_t>& vecIndices = isp.getIndices();
 
 	//The '9' in the following expressions comes from the fact that when we encounter a non uniform
 	//triangle we make it degenerate and add three new ones. That is an increase of nine vertices.

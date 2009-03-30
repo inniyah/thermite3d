@@ -47,7 +47,7 @@ namespace Thermite
 
 		void fireCannon(void);
 
-		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8 value);
+		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 
 	private:
 		void addResourceDirectory(const QString& directoryName);
