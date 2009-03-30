@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __ForwardDeclarations_H__
 #define __ForwardDeclarations_H__
 
-#include "PolyVoxCore/PolyVoxCStdInt.h"
+#include "PolyVoxCore/PolyVoxImpl/CPlusPlusZeroXSupport.h"
 const PolyVox::uint16 THERMITE_VOLUME_SIDE_LENGTH_POWER = 8;
 const PolyVox::uint16 THERMITE_VOLUME_SIDE_LENGTH = (0x0001 << THERMITE_VOLUME_SIDE_LENGTH_POWER);
 
