@@ -127,7 +127,7 @@ void Map::updatePolyVoxGeometry()
 						regToCheck.shiftUpperCorner(Vector3DInt32(7,7,7));
 						regToCheck.cropTo(volumeChangeTracker->getVolumeData()->getEnclosingRegion());
 						
-						//There are two situations we are concerned with. If a region has is homogenous then
+						//There are two situations we are concerned with. If a region is homogenous then
 						//we make sure it is in the scene graph (it might already be). If a region is not
 						//homogenous we make sure it is not in the scene graph (it might already not be).
 						if(volumeChangeTracker->getVolumeData()->isRegionHomogenous(regToCheck))
