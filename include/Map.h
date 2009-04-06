@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeResource.h"
 
-#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
-#include "PolyVoxUtil/VolumeChangeTracker.h"
+#include "PolyVoxForwardDeclarations.h"
+#include "VolumeChangeTracker.h"
 
 #include "OgreBulletDynamicsWorld.h"
 #include "OgreBulletDynamicsRigidBody.h"

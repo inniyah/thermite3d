@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "TimeStampedRenderOperation.h"
 #include "TimeStampedRenderOperationCache.h"
 
-#include "PolyVoxCore/SurfaceVertex.h"
+#include "SurfaceVertex.h"
 #include "OgreVertexIndexData.h"
 
 #include <QSettings>

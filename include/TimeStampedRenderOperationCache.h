@@ -22,10 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __TimeStampedRenderOperationCache_H__
 #define __TimeStampedRenderOperationCache_H__
 
-#include "PolyVoxCore/PolyVoxImpl/CPlusPlusZeroXSupport.h"
-#include "PolyVoxCore/Vector.h"
+#include "PolyVoxImpl/CPlusPlusZeroXSupport.h"
+#include "Vector.h"
 
-#include "PolyVoxUtil/VolumeChangeTracker.h"
+#include "VolumeChangeTracker.h"
 
 #include "TimeStampedRenderOperation.h"
 

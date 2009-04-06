@@ -1,9 +1,9 @@
 #include "TimeStampedSurfacePatchCache.h"
 #include "ThermiteForwardDeclarations.h"
 
-#include "PolyVoxCore/Volume.h"
-#include "PolyVoxCore/GradientEstimators.h"
-#include "PolyVoxCore/SurfaceExtractors.h"
+#include "Volume.h"
+#include "GradientEstimators.h"
+#include "SurfaceExtractors.h"
 
 using namespace PolyVox;
 using namespace std;

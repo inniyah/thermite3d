@@ -22,10 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __TimeStampedSurfacePatchCache_H__
 #define __TimeStampedSurfacePatchCache_H__
 
-#include "PolyVoxCore/IndexedSurfacePatch.h"
-#include "PolyVoxCore/Vector.h"
+#include "IndexedSurfacePatch.h"
+#include "Vector.h"
 
-#include "PolyVoxUtil/VolumeChangeTracker.h"
+#include "VolumeChangeTracker.h"
 
 #include <map>
 

@@ -1,6 +1,6 @@
 #include "Utility.h"
 
-#include "PolyVoxCore/PolyVoxImpl/CPlusPlusZeroXSupport.h"
+#include "PolyVoxImpl/CPlusPlusZeroXSupport.h"
 
 #include <iomanip>
 #include <sstream>

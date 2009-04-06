@@ -20,11 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma endregion
 
 #include "VolumeSerializer.h"
-#include "PolyVoxCore/Volume.h"
+#include "Volume.h"
 
-#include "PolyVoxCore/VolumeIterator.h"
+#include "VolumeIterator.h"
 
-#include "PolyVoxUtil/Serialization.h"
+#include "Serialization.h"
 
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"

@@ -25,11 +25,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
 
-#include "PolyVoxCore/BlockData.h"
-#include "PolyVoxCore/Constants.h"
-#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
-#include "PolyVoxCore/TypeDef.h"
-#include "PolyVoxCore/Volume.h"
+#include "PolyVoxImpl/BlockData.h"
+#include "PolyVoxForwardDeclarations.h"
+#include "PolyVoxImpl/TypeDef.h"
+#include "Volume.h"
 
 #include <OgreResourceManager.h>
 

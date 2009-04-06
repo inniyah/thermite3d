@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __WorldRegion_H__
 #define __WorldRegion_H__
 
-#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
-#include "PolyVoxCore/IndexedSurfacePatch.h"
+#include "PolyVoxForwardDeclarations.h"
+#include "IndexedSurfacePatch.h"
 
 #include "ThermiteForwardDeclarations.h"
 

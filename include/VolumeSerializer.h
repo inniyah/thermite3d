@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <OgreSerializer.h>
 
-#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
+#include "PolyVoxForwardDeclarations.h"
 
 class VolumeSerializer : public Ogre::Serializer
 {

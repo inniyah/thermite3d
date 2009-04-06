@@ -28,8 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "TimeStampedSurfacePatchCache.h"
 #include "TimeStampedRenderOperationCache.h"
 
-#include "PolyVoxUtil/VolumeChangeTracker.h"
-#include "PolyVoxCore/SurfaceExtractors.h"
+#include "VolumeChangeTracker.h"
+#include "SurfaceExtractors.h"
 
 #include "SurfacePatchRenderable.h"
 #include "WorldRegion.h"

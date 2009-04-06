@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "Ogre.h"
 #include <vector>
 
-#include "PolyVoxCore/IndexedSurfacePatch.h"
+#include "IndexedSurfacePatch.h"
 
 //IDEA - If profiling identifies this class as a bottleneck, we could implement a memory pooling system.
 //All buffers could be powers of two, and we get the smallest one which is big enough for our needs.

@@ -10,7 +10,7 @@
 #include "TimeStampedSurfacePatchCache.h"
 #include "VolumeManager.h"
 
-#include "PolyVoxUtil/VolumeChangeTracker.h"
+#include "VolumeChangeTracker.h"
 
 #include <QSettings>
 

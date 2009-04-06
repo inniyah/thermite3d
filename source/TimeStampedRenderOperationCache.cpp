@@ -4,7 +4,7 @@
 #include "TimeStampedSurfacePatchCache.h"
 #include "SurfacePatchRenderable.h"
 
-#include "PolyVoxCore/SurfaceExtractors.h"
+#include "SurfaceExtractors.h"
 
 using namespace Ogre;
 using namespace PolyVox;
