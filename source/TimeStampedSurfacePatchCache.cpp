@@ -3,6 +3,7 @@
 
 #include "Volume.h"
 #include "GradientEstimators.h"
+#include "SurfaceAdjusters.h"
 #include "SurfaceExtractors.h"
 
 using namespace PolyVox;
@@ -59,6 +60,7 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 
 		extractSurface(m_vctTracker->getVolumeData(), lod, region, ispResult);
 		computeNormalsForVertices(m_vctTracker->getVolumeData(), *ispResult, CENTRAL_DIFFERENCE_SMOOTHED);
+		//*ispResult = getSmoothedSurface(*ispResult);
 		ispResult->m_iTimeStamp = m_vctTracker->getCurrentTime();
 	}
 
