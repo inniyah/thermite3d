@@ -1,0 +1,12 @@
+Thermite 3D Engine and PolyVox Technology
+=========================================
+
+David Williams (david@thermite3d.org)
+-------------------------------------
+	- Lead developer
+
+Matt Williams (matt@thermite3d.org)
+-----------------------------------
+	- Build system
+	- Language bindings
+	- Linux maintainer
