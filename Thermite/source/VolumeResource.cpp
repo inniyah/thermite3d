@@ -90,5 +90,5 @@ size_t VolumeResource::calculateSize () const
 		//}
 	//}
 	//return uNonHomogeneousBlocks * volume->getNoOfVoxelsInBlock();
-	return volume->getSideLength() * volume->getSideLength() * volume->getSideLength();
+	return volume->getWidth() * volume->getHeight() * volume->getDepth();
 }

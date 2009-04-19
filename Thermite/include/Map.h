@@ -47,7 +47,7 @@ public:
 
 	void updatePolyVoxGeometry();	
 
-	void createAxis(unsigned int uSideLength);
+	void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
 
 public:
 	Ogre::SceneManager* m_pOgreSceneManager;

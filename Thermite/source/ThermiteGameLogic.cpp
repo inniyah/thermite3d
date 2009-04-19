@@ -77,7 +77,7 @@ namespace Thermite
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
-			mMap->createAxis(256);
+			mMap->createAxis(256, 256, 256);
 		}
 
 		//This gets the first camera which was found in the scene.
@@ -198,9 +198,9 @@ namespace Thermite
 	firstY = std::max(firstY,0);
 	firstZ = std::max(firstZ,0);
 
-	lastX = std::min(lastX,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
-	lastY = std::min(lastY,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
-	lastZ = std::min(lastZ,int(mMap->volumeChangeTracker->getVolumeData()->getSideLength()-1));
+	lastX = std::min(lastX,int(mMap->volumeChangeTracker->getVolumeData()->getWidth()-1));
+	lastY = std::min(lastY,int(mMap->volumeChangeTracker->getVolumeData()->getHeight()-1));
+	lastZ = std::min(lastZ,int(mMap->volumeChangeTracker->getVolumeData()->getDepth()-1));
 
 	mMap->volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ)));
 	for(int z = firstZ; z <= lastZ; ++z)
