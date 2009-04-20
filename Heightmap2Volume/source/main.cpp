@@ -1,6 +1,5 @@
-#include "PolyVoxCore/BlockVolume.h"
-#include "PolyVoxCore/Utility.h"
-#include "PolyVoxUtil/Serialization.h"
+#include "Volume.h"
+#include "Serialization.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -17,8 +16,8 @@ struct Arguments
 	Arguments() : outputFilename("output.volume"), undergroundMaterialID(1), surfaceMaterialID(2), surfaceThickness(5) {}
 	QString inputFilename;
 	QString outputFilename;
-	PolyVox::uint8 undergroundMaterialID;
-	PolyVox::uint8 surfaceMaterialID;
+	PolyVox::uint8_t undergroundMaterialID;
+	PolyVox::uint8_t surfaceMaterialID;
 	int surfaceThickness;
 };
 
@@ -75,7 +74,7 @@ Arguments parseCommandLine(const QStringList& commandLine)
 		uint tempMaterialID = materialAsString.toLong(&bOk);
 		if((bOk) && (tempMaterialID <= 255))
 		{
-			arguments.undergroundMaterialID = static_cast<PolyVox::uint8>(tempMaterialID);
+			arguments.undergroundMaterialID = static_cast<PolyVox::uint8_t>(tempMaterialID);
 		}
 		else
 		{
@@ -92,7 +91,7 @@ Arguments parseCommandLine(const QStringList& commandLine)
 		uint tempMaterialID = materialAsString.toLong(&bOk);
 		if((bOk) && (tempMaterialID <= 255))
 		{
-			arguments.surfaceMaterialID = static_cast<PolyVox::uint8>(tempMaterialID);
+			arguments.surfaceMaterialID = static_cast<PolyVox::uint8_t>(tempMaterialID);
 		}
 		else
 		{
@@ -109,7 +108,7 @@ Arguments parseCommandLine(const QStringList& commandLine)
 		int tempThickness = materialAsString.toInt(&bOk);
 		if((bOk) && (tempThickness <= 255))
 		{
-			arguments.surfaceThickness = static_cast<PolyVox::uint8>(tempThickness);
+			arguments.surfaceThickness = static_cast<PolyVox::uint8_t>(tempThickness);
 		}
 		else
 		{
@@ -118,6 +117,14 @@ Arguments parseCommandLine(const QStringList& commandLine)
 	}
 
 	return arguments;
+}
+
+bool testIfPowerOf2(unsigned int uInput)
+{
+	if(uInput == 0)
+		return false;
+	else
+		return ((uInput & (uInput-1)) == 0);
 }
 
 int main(int argc, char *argv[])
@@ -143,52 +150,45 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if((image.width() != 256) || (image.height() != 256))
+	if((testIfPowerOf2(image.width()) == false) || (testIfPowerOf2(image.height()) == false))
 	{
-		cout << "ERROR: In this version of the converter the input image must be 256x256 pixels. Larger images will be supported soon." << endl;
+		cout << "ERROR: Invalid image size. Both width and height must be powers of two." << endl;
 		return 1;
 	}
 
 	//Create a volume
-	unsigned int volumeSideLength = 256;
-	BlockVolume<uint8> volData(logBase2(volumeSideLength));
-
-	//Create an iterator to access data in the volume
-	BlockVolumeIterator<uint8> volIter(volData);
+	Volume<uint8_t> volData(image.width(),image.height(),256);
 
 	//Clear volume to zeros.
 	//FIXME - Add function to PolyVox for this.
-	for(unsigned int z = 0; z < volumeSideLength; ++z)
+	for(unsigned int z = 0; z < volData.getDepth(); ++z)
 	{
-		for(unsigned int y = 0; y < volumeSideLength; ++y)
+		for(unsigned int y = 0; y < volData.getHeight(); ++y)
 		{
-			for(unsigned int x = 0; x < volumeSideLength; ++x)
+			for(unsigned int x = 0; x < volData.getWidth(); ++x)
 			{
-				volIter.setPosition(x,y,z);
-				volIter.setVoxel(0);
+				volData.setVoxelAt(x,y,z,0);
 			}
 		}
 	}
 
-	for(unsigned int z = 1; z < volumeSideLength-1; ++z)
+	for(unsigned int z = 1; z < volData.getDepth()-1; ++z)
 	{
-		for(unsigned int y = 1; y < volumeSideLength-1; ++y)
+		for(unsigned int y = 1; y < volData.getHeight()-1; ++y)
 		{
-			for(unsigned int x = 1; x < volumeSideLength-1; ++x)
+			for(unsigned int x = 1; x < volData.getWidth()-1; ++x)
 			{
-				volIter.setPosition(x,y,z);
-
 				//We check the red channel, but in a greyscale image they should all be the same.
 				int height = qRed(image.pixel(x,z)); 
 
 				//Set the voxel based on the height.
 				if(y < height)
 				{
-					volIter.setVoxel(arguments.undergroundMaterialID);
+					volData.setVoxelAt(x,y,z,arguments.undergroundMaterialID);
 				}
 				else if(y < height + arguments.surfaceThickness)
 				{
-					volIter.setVoxel(arguments.surfaceMaterialID);
+					volData.setVoxelAt(x,y,z,arguments.surfaceMaterialID);
 				}
 
 				//Zero the faces
