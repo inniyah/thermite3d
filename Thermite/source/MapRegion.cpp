@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#include "WorldRegion.h"
+#include "MapRegion.h"
 
 #include "Application.h"
 #include "Map.h"
@@ -38,9 +38,9 @@ using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
 using namespace PolyVox;
 
-unsigned long WorldRegion::m_iNameGen = 0;
+unsigned long MapRegion::m_iNameGen = 0;
 
-WorldRegion::WorldRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
+MapRegion::MapRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
 :m_pOgreSceneNode(0)
 ,m_pSurfacePatchRenderable(0)
 ,m_pParentMap(pParentMap)
@@ -65,7 +65,7 @@ WorldRegion::WorldRegion(Map* pParentMap, PolyVox::Vector3DInt32 v3dPos)
 	m_pSurfacePatchRenderable->setBoundingBox(aabb);
 }
 
-WorldRegion::~WorldRegion()
+MapRegion::~MapRegion()
 {
 	if(m_pSurfacePatchRenderable != 0)
 	{
@@ -84,7 +84,7 @@ WorldRegion::~WorldRegion()
 	}
 }
 
-void WorldRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
+void MapRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
 {
 	const std::string& strName = makeUniqueName("RB");
 
@@ -139,7 +139,7 @@ void WorldRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
 	}*/
 }
 
-void WorldRegion::destroyPhysicsData(void)
+void MapRegion::destroyPhysicsData(void)
 {	
 	if(mBody != 0)
 	{
@@ -160,14 +160,14 @@ void WorldRegion::destroyPhysicsData(void)
 	}*/
 }
 
-std::string WorldRegion::makeUniqueName(const std::string& strBase)
+std::string MapRegion::makeUniqueName(const std::string& strBase)
 {
 	std::stringstream ssName;
 	ssName << strBase << " " << ++m_iNameGen;
 	return ssName.str();
 }
 
-void WorldRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
+void MapRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
 {
 	btVector3    vecBulletVertices[3];
 
@@ -191,7 +191,7 @@ void WorldRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp,
 	}
 }
 
-void WorldRegion::updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
+void MapRegion::updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
 {
 	mTriMesh->preallocateVertices(isp.getVertices().size());
 	mTriMesh->preallocateIndices(isp.getIndices().size());

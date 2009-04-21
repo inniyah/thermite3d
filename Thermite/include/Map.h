@@ -60,7 +60,7 @@ public:
 
 	Ogre::SceneNode* makeSureSceneNodeExists(bool bShouldExist, const Ogre::String strSceneNodeName);
 
-	std::map<PolyVox::Vector3DInt32, WorldRegion*> m_mapWorldRegions;
+	std::map<PolyVox::Vector3DInt32, MapRegion*> m_mapMapRegions;
 
 private:
 	Ogre::Vector3 m_vecGravity;

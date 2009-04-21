@@ -46,7 +46,7 @@ class SurfacePatchRenderable;
 //class VolumeManager;
 //class VolumeResourse;
 //class VolumeSerializer;
-class WorldRegion;
+class MapRegion;
 
 namespace Thermite
 {

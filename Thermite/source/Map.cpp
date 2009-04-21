@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SurfaceExtractors.h"
 
 #include "SurfacePatchRenderable.h"
-#include "WorldRegion.h"
+#include "MapRegion.h"
 
 #include "OgreBulletDynamicsWorld.h"
 
@@ -106,7 +106,7 @@ void Map::updatePolyVoxGeometry()
 			{
 				for(PolyVox::uint16_t regionX = 0; regionX < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionX)
 				{
-					//If the region has changed then we may need to add or remove WorldRegion to/from the scene graph
+					//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 					if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
 					{
 						//Convert to a real PolyVox::Region
@@ -133,28 +133,28 @@ void Map::updatePolyVoxGeometry()
 						if(volumeChangeTracker->getWrappedVolume()->isRegionHomogenous(regToCheck))
 						{
 							//World region should be removed if it exists.							
-							std::map<PolyVox::Vector3DInt32, WorldRegion*>::iterator worldRegionIter = m_mapWorldRegions.find(v3dLowerCorner);
-							if(worldRegionIter != m_mapWorldRegions.end())
+							std::map<PolyVox::Vector3DInt32, MapRegion*>::iterator MapRegionIter = m_mapMapRegions.find(v3dLowerCorner);
+							if(MapRegionIter != m_mapMapRegions.end())
 							{
 								//Delete the world region and remove the pointer from the map.
-								delete worldRegionIter->second;
-								m_mapWorldRegions.erase(worldRegionIter);
+								delete MapRegionIter->second;
+								m_mapMapRegions.erase(MapRegionIter);
 							}
 						}		
 						else
 						{
 							//World region should be added if it doesn't exist.
-							WorldRegion* pWorldRegion;
-							std::map<PolyVox::Vector3DInt32, WorldRegion*>::iterator worldRegionIter = m_mapWorldRegions.find(v3dLowerCorner);
-							if(worldRegionIter == m_mapWorldRegions.end())
+							MapRegion* pMapRegion;
+							std::map<PolyVox::Vector3DInt32, MapRegion*>::iterator MapRegionIter = m_mapMapRegions.find(v3dLowerCorner);
+							if(MapRegionIter == m_mapMapRegions.end())
 							{
-								pWorldRegion = new WorldRegion(this, v3dLowerCorner);				
-								//pWorldRegion->setPosition(v3dLowerCorner);
-								m_mapWorldRegions.insert(std::make_pair(v3dLowerCorner, pWorldRegion));
+								pMapRegion = new MapRegion(this, v3dLowerCorner);				
+								//pMapRegion->setPosition(v3dLowerCorner);
+								m_mapMapRegions.insert(std::make_pair(v3dLowerCorner, pMapRegion));
 							}
 							else
 							{
-								pWorldRegion = worldRegionIter->second;
+								pMapRegion = MapRegionIter->second;
 							}
 
 							//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
@@ -162,11 +162,11 @@ void Map::updatePolyVoxGeometry()
 							if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
 							{
 								IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-								pWorldRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
+								pMapRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
 							}
 						}
 
-						//The WorldRegion is now up to date. Update the time stamp to indicate this
+						//The MapRegion is now up to date. Update the time stamp to indicate this
 						m_iRegionTimeStamps[regionX][regionY][regionZ] = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 					}
 				}

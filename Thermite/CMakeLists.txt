@@ -20,6 +20,7 @@ SET(SRC_FILES
 	source/MainMenu.cpp
 	source/Map.cpp
 	source/MapHandler.cpp
+	source/MapRegion.cpp
 	source/PhysicalEntity.cpp
 	source/Shell.cpp
 	source/SurfacePatchRenderable.cpp
@@ -31,7 +32,6 @@ SET(SRC_FILES
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializer.cpp
-	source/WorldRegion.cpp
 )
 
 SET(INC_FILES
@@ -40,6 +40,7 @@ SET(INC_FILES
 	include/MainMenu.h
 	include/Map.h
 	include/MapHandler.h
+	include/MapRegion.h
 	include/PhysicalEntity.h
 	include/Shell.h
 	include/SurfacePatchRenderable.h
@@ -52,7 +53,6 @@ SET(INC_FILES
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializer.h
-	include/WorldRegion.h
 
 )
 

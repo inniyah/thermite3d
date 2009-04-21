@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __WorldRegion_H__
-#define __WorldRegion_H__
+#ifndef __MapRegion_H__
+#define __MapRegion_H__
 
 #include "PolyVoxForwardDeclarations.h"
 #include "IndexedSurfacePatch.h"
@@ -36,11 +36,11 @@ namespace OgreBulletDynamics
 	class RigidBody;
 }
 
-class WorldRegion
+class MapRegion
 {
 public:
-	WorldRegion(Map* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
-	~WorldRegion();
+	MapRegion(Map* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
+	~MapRegion();
 
 	void setPhysicsData(Ogre::Vector3 pos, PolyVox::IndexedSurfacePatch& isp);
 
