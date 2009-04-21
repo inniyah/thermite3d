@@ -56,10 +56,10 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		const uint16_t lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
 
 		Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
-		region.cropTo(m_vctTracker->getVolumeData()->getEnclosingRegion());
+		region.cropTo(m_vctTracker->getWrappedVolume()->getEnclosingRegion());
 
-		extractSurface(m_vctTracker->getVolumeData(), lod, region, ispResult);
-		computeNormalsForVertices(m_vctTracker->getVolumeData(), *ispResult, CENTRAL_DIFFERENCE_SMOOTHED);
+		extractSurface(m_vctTracker->getWrappedVolume(), lod, region, ispResult);
+		computeNormalsForVertices(m_vctTracker->getWrappedVolume(), *ispResult, CENTRAL_DIFFERENCE_SMOOTHED);
 		//*ispResult = getSmoothedSurface(*ispResult);
 		ispResult->m_iTimeStamp = m_vctTracker->getCurrentTime();
 	}

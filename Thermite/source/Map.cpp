@@ -120,17 +120,17 @@ void Map::updatePolyVoxGeometry()
 						Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
 						Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
 						Region region(v3dLowerCorner, v3dUpperCorner);
-						region.cropTo(volumeChangeTracker->getVolumeData()->getEnclosingRegion());						
+						region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());						
 
 						//Enlarging the region is required because low res meshes can cover more volume.
 						Region regToCheck = region;
 						regToCheck.shiftUpperCorner(Vector3DInt32(7,7,7));
-						regToCheck.cropTo(volumeChangeTracker->getVolumeData()->getEnclosingRegion());
+						regToCheck.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 						
 						//There are two situations we are concerned with. If a region is homogenous then
 						//we make sure it is in the scene graph (it might already be). If a region is not
 						//homogenous we make sure it is not in the scene graph (it might already not be).
-						if(volumeChangeTracker->getVolumeData()->isRegionHomogenous(regToCheck))
+						if(volumeChangeTracker->getWrappedVolume()->isRegionHomogenous(regToCheck))
 						{
 							//World region should be removed if it exists.							
 							std::map<PolyVox::Vector3DInt32, WorldRegion*>::iterator worldRegionIter = m_mapWorldRegions.find(v3dLowerCorner);
