@@ -6,6 +6,10 @@
 
 #include "SurfaceExtractors.h"
 
+#include "Application.h"
+
+#include <QSettings>
+
 using namespace Ogre;
 using namespace PolyVox;
 using namespace std;
@@ -44,7 +48,8 @@ TimeStampedRenderOperation* TimeStampedRenderOperationCache::getRenderOperation(
 	}
 
 	//Get the time stamps
-	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/regionSideLength,position.getY()/regionSideLength,position.getZ()/regionSideLength);
 	int32_t renderOpTimeStamp = renderOpResult->m_iTimeStamp;
 
 	if(regionTimeStamp > renderOpTimeStamp) //Need to regenerate render operation

@@ -83,7 +83,8 @@ void* MapHandler::handleVolume(const QXmlAttributes &attributes)
 		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 	}
 
-	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, THERMITE_REGION_SIDE_LENGTH);
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, regionSideLength);
 
 	mMap->volumeChangeTracker->setAllRegionsModified();
 

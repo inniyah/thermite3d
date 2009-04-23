@@ -6,6 +6,10 @@
 #include "SurfaceAdjusters.h"
 #include "SurfaceExtractors.h"
 
+#include "Application.h"
+
+#include <QSettings>
+
 using namespace PolyVox;
 using namespace std;
 
@@ -43,7 +47,8 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 	}
 
 	//Get the time stamps
-	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/THERMITE_REGION_SIDE_LENGTH,position.getY()/THERMITE_REGION_SIDE_LENGTH,position.getZ()/THERMITE_REGION_SIDE_LENGTH);
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/regionSideLength,position.getY()/regionSideLength,position.getZ()/regionSideLength);
 	int32_t ispTimeStamp = ispResult->m_iTimeStamp;
 
 	if(regionTimeStamp > ispTimeStamp) //Need to regenerate mesh
@@ -51,9 +56,9 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		const uint16_t firstX = position.getX();
 		const uint16_t firstY = position.getY();
 		const uint16_t firstZ = position.getZ();
-		const uint16_t lastX = firstX + THERMITE_REGION_SIDE_LENGTH;
-		const uint16_t lastY = firstY + THERMITE_REGION_SIDE_LENGTH;
-		const uint16_t lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
+		const uint16_t lastX = firstX + regionSideLength;
+		const uint16_t lastY = firstY + regionSideLength;
+		const uint16_t lastZ = firstZ + regionSideLength;
 
 		Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
 		region.cropTo(m_vctTracker->getWrappedVolume()->getEnclosingRegion());

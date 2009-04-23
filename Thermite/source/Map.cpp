@@ -55,7 +55,7 @@ Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::
 ,m_boxPhysicsBounds(boxPhysicsBounds)
 ,m_rVoxelSize(rVoxelSize)
 {
-	memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
+	//memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 
 	m_pOgreSceneManager = sceneManager;
 
@@ -90,6 +90,10 @@ bool Map::loadScene(const Ogre::String& filename)
 	QXmlInputSource xmlInputSource(&file);
     reader.parse(xmlInputSource);
 
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	int volumeSideLengthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+	m_volRegionTimeStamps = new Volume<uint32_t>(volumeSideLengthInRegions, volumeSideLengthInRegions, volumeSideLengthInRegions, volumeSideLengthInRegions);
+
 	return true;
 }
 
@@ -99,23 +103,27 @@ void Map::updatePolyVoxGeometry()
 	{
 		timer->reset();
 
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		int volumeSideLengthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+
 		//Iterate over each region in the VolumeChangeTracker
-		for(PolyVox::uint16_t regionZ = 0; regionZ < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionZ)
+		for(PolyVox::uint16_t regionZ = 0; regionZ < volumeSideLengthInRegions; ++regionZ)
 		{		
-			for(PolyVox::uint16_t regionY = 0; regionY < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionY)
+			for(PolyVox::uint16_t regionY = 0; regionY < volumeSideLengthInRegions; ++regionY)
 			{
-				for(PolyVox::uint16_t regionX = 0; regionX < THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS; ++regionX)
+				for(PolyVox::uint16_t regionX = 0; regionX < volumeSideLengthInRegions; ++regionX)
 				{
 					//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
-					if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
+					//if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
+					if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 					{
 						//Convert to a real PolyVox::Region
-						const PolyVox::uint16_t firstX = regionX * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16_t firstY = regionY * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16_t firstZ = regionZ * THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16_t lastX = firstX + THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16_t lastY = firstY + THERMITE_REGION_SIDE_LENGTH;
-						const PolyVox::uint16_t lastZ = firstZ + THERMITE_REGION_SIDE_LENGTH;
+						const PolyVox::uint16_t firstX = regionX * regionSideLength;
+						const PolyVox::uint16_t firstY = regionY * regionSideLength;
+						const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
+						const PolyVox::uint16_t lastX = firstX + regionSideLength;
+						const PolyVox::uint16_t lastY = firstY + regionSideLength;
+						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;
 
 						Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
 						Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
@@ -167,7 +175,7 @@ void Map::updatePolyVoxGeometry()
 						}
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this
-						m_iRegionTimeStamps[regionX][regionY][regionZ] = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 					}
 				}
 			}
