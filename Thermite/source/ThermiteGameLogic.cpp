@@ -77,7 +77,7 @@ namespace Thermite
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
-			mMap->createAxis(256, 256, 256);
+			mMap->createAxis(mMap->volumeResource->volume->getWidth(), mMap->volumeResource->volume->getHeight(), mMap->volumeResource->volume->getDepth());
 		}
 
 		//This gets the first camera which was found in the scene.

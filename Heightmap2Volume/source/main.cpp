@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Create a volume
-	Volume<uint8_t> volData(image.width(),image.height(),256);
+	Volume<uint8_t> volData(image.width(),256,image.height());
 
 	//Clear volume to zeros.
 	//FIXME - Add function to PolyVox for this.

@@ -91,8 +91,11 @@ bool Map::loadScene(const Ogre::String& filename)
     reader.parse(xmlInputSource);
 
 	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-	int volumeSideLengthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
-	m_volRegionTimeStamps = new Volume<uint32_t>(volumeSideLengthInRegions, volumeSideLengthInRegions, volumeSideLengthInRegions, volumeSideLengthInRegions);
+	int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+	int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
+	int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+	int volumeShortestSideLengthInRegions = (std::min)((std::min)(volumeWidthInRegions,volumeHeightInRegions),volumeDepthInRegions);
+	m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, volumeShortestSideLengthInRegions);
 
 	return true;
 }
@@ -104,14 +107,16 @@ void Map::updatePolyVoxGeometry()
 		timer->reset();
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		int volumeSideLengthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
+		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
 		//Iterate over each region in the VolumeChangeTracker
-		for(PolyVox::uint16_t regionZ = 0; regionZ < volumeSideLengthInRegions; ++regionZ)
+		for(PolyVox::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 		{		
-			for(PolyVox::uint16_t regionY = 0; regionY < volumeSideLengthInRegions; ++regionY)
+			for(PolyVox::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
 			{
-				for(PolyVox::uint16_t regionX = 0; regionX < volumeSideLengthInRegions; ++regionX)
+				for(PolyVox::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 				{
 					//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 					//if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
