@@ -54,6 +54,7 @@ Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::
 :m_vecGravity(vecGravity)
 ,m_boxPhysicsBounds(boxPhysicsBounds)
 ,m_rVoxelSize(rVoxelSize)
+,m_volMapRegions(0)
 {
 	//memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 
@@ -94,8 +95,9 @@ bool Map::loadScene(const Ogre::String& filename)
 	int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 	int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 	int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
-	int volumeShortestSideLengthInRegions = (std::min)((std::min)(volumeWidthInRegions,volumeHeightInRegions),volumeDepthInRegions);
-	m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, volumeShortestSideLengthInRegions);
+
+	m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+	m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
 	return true;
 }
@@ -145,29 +147,23 @@ void Map::updatePolyVoxGeometry()
 						//homogenous we make sure it is not in the scene graph (it might already not be).
 						if(volumeChangeTracker->getWrappedVolume()->isRegionHomogenous(regToCheck))
 						{
-							//World region should be removed if it exists.							
-							std::map<PolyVox::Vector3DInt32, MapRegion*>::iterator MapRegionIter = m_mapMapRegions.find(v3dLowerCorner);
-							if(MapRegionIter != m_mapMapRegions.end())
+							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+							//World region should be removed if it exists.
+							if(pMapRegion != 0)
 							{
 								//Delete the world region and remove the pointer from the map.
-								delete MapRegionIter->second;
-								m_mapMapRegions.erase(MapRegionIter);
+								delete pMapRegion;
+								m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, 0);
 							}
 						}		
 						else
 						{
 							//World region should be added if it doesn't exist.
-							MapRegion* pMapRegion;
-							std::map<PolyVox::Vector3DInt32, MapRegion*>::iterator MapRegionIter = m_mapMapRegions.find(v3dLowerCorner);
-							if(MapRegionIter == m_mapMapRegions.end())
+							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+							if(pMapRegion == 0)
 							{
-								pMapRegion = new MapRegion(this, v3dLowerCorner);				
-								//pMapRegion->setPosition(v3dLowerCorner);
-								m_mapMapRegions.insert(std::make_pair(v3dLowerCorner, pMapRegion));
-							}
-							else
-							{
-								pMapRegion = MapRegionIter->second;
+								pMapRegion = new MapRegion(this, v3dLowerCorner);	
+								m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 							}
 
 							//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.

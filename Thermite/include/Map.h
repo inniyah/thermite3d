@@ -60,7 +60,7 @@ public:
 
 	Ogre::SceneNode* makeSureSceneNodeExists(bool bShouldExist, const Ogre::String strSceneNodeName);
 
-	std::map<PolyVox::Vector3DInt32, MapRegion*> m_mapMapRegions;
+	PolyVox::Volume<MapRegion*>* m_volMapRegions;
 
 private:
 	Ogre::Vector3 m_vecGravity;
@@ -71,7 +71,6 @@ private:
 
 	Ogre::SceneNode* m_axisNode;
 
-	//PolyVox::int32_t m_iRegionTimeStamps[THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS][THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS][THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS];
 	PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 };
 
