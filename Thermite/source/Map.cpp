@@ -99,6 +99,38 @@ bool Map::loadScene(const Ogre::String& filename)
 	m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 	m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
+	for(PolyVox::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+	{		
+		for(PolyVox::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+		{
+			for(PolyVox::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+			{
+				//Convert to a real PolyVox::Region
+				const PolyVox::uint16_t firstX = regionX * regionSideLength;
+				const PolyVox::uint16_t firstY = regionY * regionSideLength;
+				const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
+				const PolyVox::uint16_t lastX = firstX + regionSideLength;
+				const PolyVox::uint16_t lastY = firstY + regionSideLength;
+				const PolyVox::uint16_t lastZ = firstZ + regionSideLength;
+
+				Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
+				Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
+				Region region(v3dLowerCorner, v3dUpperCorner);
+				region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
+
+				MapRegion* pMapRegion = new MapRegion(this, v3dLowerCorner);	
+				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+
+				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
+				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
+			}
+		}
+		std::stringstream ss;
+		ss << "Loading progress " << regionZ << " of " << volumeDepthInRegions;
+		Ogre::LogManager::getSingletonPtr()->logMessage(ss.str());
+	}
+
 	return true;
 }
 
@@ -141,38 +173,15 @@ void Map::updatePolyVoxGeometry()
 						Region regToCheck = region;
 						regToCheck.shiftUpperCorner(Vector3DInt32(7,7,7));
 						regToCheck.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
-						
-						//There are two situations we are concerned with. If a region is homogenous then
-						//we make sure it is in the scene graph (it might already be). If a region is not
-						//homogenous we make sure it is not in the scene graph (it might already not be).
-						if(volumeChangeTracker->getWrappedVolume()->isRegionHomogenous(regToCheck))
-						{
-							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-							//World region should be removed if it exists.
-							if(pMapRegion != 0)
-							{
-								//Delete the world region and remove the pointer from the map.
-								delete pMapRegion;
-								m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, 0);
-							}
-						}		
-						else
-						{
-							//World region should be added if it doesn't exist.
-							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-							if(pMapRegion == 0)
-							{
-								pMapRegion = new MapRegion(this, v3dLowerCorner);	
-								m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
-							}
+				
 
-							//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
-							//For the graphics geometry this is done automatically each time Ogre tries to render a SurfacePatchRenderable.
-							if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
-							{
-								IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-								pMapRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
-							}
+						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+						//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
+						//For the graphics geometry this is done automatically each time Ogre tries to render a SurfacePatchRenderable.
+						if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+						{
+							IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+							pMapRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
 						}
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this

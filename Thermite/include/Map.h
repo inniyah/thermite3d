@@ -58,8 +58,6 @@ public:
 
 	OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 
-	Ogre::SceneNode* makeSureSceneNodeExists(bool bShouldExist, const Ogre::String strSceneNodeName);
-
 	PolyVox::Volume<MapRegion*>* m_volMapRegions;
 
 private:
