@@ -85,7 +85,16 @@ MapRegion::~MapRegion()
 	}
 }
 
-void MapRegion::setPhysicsData(Ogre::Vector3 pos, IndexedSurfacePatch& isp)
+void MapRegion::update()
+{
+	if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+	{
+		IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(m_v3dPos, 0);
+		setPhysicsData(Ogre::Vector3(m_v3dPos.getX(),m_v3dPos.getY(),m_v3dPos.getZ()), *isp);
+	}
+}
+
+void MapRegion::setPhysicsData(Ogre::Vector3 pos, const IndexedSurfacePatch& isp)
 {
 	const std::string& strName = makeUniqueName("RB");
 

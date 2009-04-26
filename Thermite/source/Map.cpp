@@ -162,27 +162,16 @@ void Map::updatePolyVoxGeometry()
 						const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
 						const PolyVox::uint16_t lastX = firstX + regionSideLength;
 						const PolyVox::uint16_t lastY = firstY + regionSideLength;
-						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;
+						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;		
 
 						Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
 						Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
 						Region region(v3dLowerCorner, v3dUpperCorner);
-						region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());						
-
-						//Enlarging the region is required because low res meshes can cover more volume.
-						Region regToCheck = region;
-						regToCheck.shiftUpperCorner(Vector3DInt32(7,7,7));
-						regToCheck.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
-				
+						region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-						//Regardless of whether it has just been created, we need to make sure the physics geometry is up to date.
-						//For the graphics geometry this is done automatically each time Ogre tries to render a SurfacePatchRenderable.
-						if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
-						{
-							IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-							pMapRegion->setPhysicsData(Ogre::Vector3(v3dLowerCorner.getX(),v3dLowerCorner.getY(),v3dLowerCorner.getZ()), *isp);
-						}
+						
+						pMapRegion->update();
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));

@@ -42,7 +42,9 @@ public:
 	MapRegion(Map* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
 	~MapRegion();
 
-	void setPhysicsData(Ogre::Vector3 pos, PolyVox::IndexedSurfacePatch& isp);
+	void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
+
+	void update();
 
 	void destroyPhysicsData(void);
 
