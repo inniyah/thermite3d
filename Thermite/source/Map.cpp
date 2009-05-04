@@ -122,8 +122,8 @@ bool Map::loadScene(const Ogre::String& filename)
 				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 
 				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
-				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
+				//TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+				//TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
 			}
 		}
 		std::stringstream ss;
