@@ -43,7 +43,6 @@ public:
 	std::map<PolyVox::Vector3DInt32, PolyVox::IndexedSurfacePatch*> m_mapIsps[3];
 
 	PolyVox::VolumeChangeTracker* m_vctTracker;
-	PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
 
 	static TimeStampedSurfacePatchCache* m_pInstance;
 };

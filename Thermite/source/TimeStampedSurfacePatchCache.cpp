@@ -17,7 +17,6 @@ using namespace std;
 TimeStampedSurfacePatchCache* TimeStampedSurfacePatchCache::m_pInstance = 0;
 
 TimeStampedSurfacePatchCache::TimeStampedSurfacePatchCache()
-	:m_pSurfaceExtractor(0)
 {
 }
 
@@ -48,11 +47,6 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		ispResult = iterMapIsp->second;
 	}
 
-	if(m_pSurfaceExtractor == 0) //This is dodgy - think about lifetime issues.
-	{
-		m_pSurfaceExtractor = new SurfaceExtractor(*(m_vctTracker->getWrappedVolume()));
-	}
-
 	//Get the time stamps
 	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 	int32_t regionTimeStamp = m_vctTracker->getLastModifiedTimeForRegion(position.getX()/regionSideLength,position.getY()/regionSideLength,position.getZ()/regionSideLength);
@@ -71,9 +65,12 @@ IndexedSurfacePatch* TimeStampedSurfacePatchCache::getIndexedSurfacePatch(Vector
 		region.cropTo(m_vctTracker->getWrappedVolume()->getEnclosingRegion());
 
 		//extractSurface(m_vctTracker->getWrappedVolume(), lod, region, ispResult);
-		m_pSurfaceExtractor->setLodLevel(lod);
-		m_pSurfaceExtractor->extractSurfaceForRegion(region, ispResult);
+		//Note - very dodgy that we have to create this each time! Other wise scenery won't destroy :-S
+		SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(m_vctTracker->getWrappedVolume()));
+		pSurfaceExtractor->setLodLevel(lod);
+		pSurfaceExtractor->extractSurfaceForRegion(region, ispResult);
 		computeNormalsForVertices(m_vctTracker->getWrappedVolume(), *ispResult, CENTRAL_DIFFERENCE_SMOOTHED);
+		delete pSurfaceExtractor;
 		//*ispResult = getSmoothedSurface(*ispResult);
 		ispResult->m_iTimeStamp = m_vctTracker->getCurrentTime();
 	}
