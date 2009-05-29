@@ -6,8 +6,6 @@
 #include "Application.h"
 #include "Map.h"
 #include "PhysicalEntity.h"
-#include "TimeStampedRenderOperationCache.h"
-#include "TimeStampedSurfacePatchCache.h"
 #include "VolumeManager.h"
 
 #include "VolumeChangeTracker.h"
@@ -87,9 +85,6 @@ void* MapHandler::handleVolume(const QXmlAttributes &attributes)
 	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, regionSideLength);
 
 	mMap->volumeChangeTracker->setAllRegionsModified();
-
-	TimeStampedSurfacePatchCache::getInstance()->m_vctTracker = mMap->volumeChangeTracker;
-	TimeStampedRenderOperationCache::getInstance()->m_vctTracker = mMap->volumeChangeTracker;
 
 	return 0;
 }

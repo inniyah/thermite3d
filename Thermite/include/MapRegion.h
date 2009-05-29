@@ -44,7 +44,7 @@ public:
 
 	void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
 
-	void update();
+	void update(PolyVox::IndexedSurfacePatch* ispNew);
 
 	void destroyPhysicsData(void);
 
@@ -56,8 +56,15 @@ private:
 	void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 	void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 
-private:
+public:
+	static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
+	static Ogre::RenderOperation* buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
+
 	SurfacePatchRenderable* m_pSurfacePatchRenderable;
+
+	Ogre::RenderOperation* m_renderOperationLod0;
+	Ogre::RenderOperation* m_renderOperationLod1;
+	Ogre::RenderOperation* m_renderOperationLod2;
 
 	Map* m_pParentMap;
 

@@ -25,11 +25,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "MapHandler.h"
 #include "VolumeManager.h"
 
-#include "TimeStampedSurfacePatchCache.h"
-#include "TimeStampedRenderOperationCache.h"
-
 #include "VolumeChangeTracker.h"
 #include "SurfaceExtractors.h"
+#include "SurfaceExtractor.h"
 
 #include "SurfacePatchRenderable.h"
 #include "MapRegion.h"
@@ -121,9 +119,30 @@ bool Map::loadScene(const Ogre::String& filename)
 				MapRegion* pMapRegion = new MapRegion(this, v3dLowerCorner);	
 				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 
-				TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
-				//TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-				//TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
+				//Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
+				//region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
+
+				IndexedSurfacePatch* isp = new IndexedSurfacePatch();
+				SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
+				pSurfaceExtractor->setLodLevel(0);
+				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+
+				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
+				pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*isp);
+				pMapRegion->update(isp);
+
+				pSurfaceExtractor->setLodLevel(1);
+				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+				pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*isp);				
+
+				pSurfaceExtractor->setLodLevel(2);
+				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
+				pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*isp);
+
+				//The MapRegion is now up to date. Update the time stamp to indicate this
+				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 			}
 		}
 		std::stringstream ss;
@@ -171,7 +190,27 @@ void Map::updatePolyVoxGeometry()
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 						
-						pMapRegion->update();
+						/*IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
+						pMapRegion->update(isp);*/
+
+						IndexedSurfacePatch* isp = new IndexedSurfacePatch();
+						SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
+						pSurfaceExtractor->setLodLevel(0);
+						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+
+						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
+						pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*isp);
+						pMapRegion->update(isp);
+
+						pSurfaceExtractor->setLodLevel(1);
+						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
+						pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*isp);				
+
+						pSurfaceExtractor->setLodLevel(2);
+						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
+						pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*isp);
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));

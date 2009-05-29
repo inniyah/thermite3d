@@ -22,8 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SurfacePatchRenderable.h"
 
 #include "Application.h"
-#include "TimeStampedRenderOperation.h"
-#include "TimeStampedRenderOperationCache.h"
 
 #include "SurfaceVertex.h"
 #include "OgreVertexIndexData.h"
@@ -155,15 +153,15 @@ void SurfacePatchRenderable::_updateRenderQueue(RenderQueue* queue)
 	float dist = m_v3dPos.distance(camPos);
 	if(dist > qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble())
 	{
-		m_RenderOp = TimeStampedRenderOperationCache::getInstance()->getRenderOperation(Vector3DInt32(m_v3dPos.x+0.5,m_v3dPos.y+0.5,m_v3dPos.z+0.5), 2)->m_renderOperation;
+		m_RenderOp = pParent->m_renderOperationLod2;
 	}
 	else if(dist > qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble())
 	{
-		m_RenderOp = TimeStampedRenderOperationCache::getInstance()->getRenderOperation(Vector3DInt32(m_v3dPos.x+0.5,m_v3dPos.y+0.5,m_v3dPos.z+0.5), 1)->m_renderOperation;
+		m_RenderOp = pParent->m_renderOperationLod1;
 	}
 	else
 	{
-		m_RenderOp = TimeStampedRenderOperationCache::getInstance()->getRenderOperation(Vector3DInt32(m_v3dPos.x+0.5,m_v3dPos.y+0.5,m_v3dPos.z+0.5), 0)->m_renderOperation;
+		m_RenderOp = pParent->m_renderOperationLod0;
 	}
 
 	if(m_RenderOp)

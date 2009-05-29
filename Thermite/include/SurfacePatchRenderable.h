@@ -27,6 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "IndexedSurfacePatch.h"
 
+#include "MapRegion.h"
+
 //IDEA - If profiling identifies this class as a bottleneck, we could implement a memory pooling system.
 //All buffers could be powers of two, and we get the smallest one which is big enough for our needs.
 //See http://www.ogre3d.org/wiki/index.php/DynamicGrowingBuffers
@@ -54,6 +56,8 @@ public:
 	virtual void _notifyCurrentCamera( Ogre::Camera* cam );
 	virtual void _updateRenderQueue(Ogre::RenderQueue* queue);
 	void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
+
+	MapRegion* pParent;
 
 protected:
 	Ogre::RenderOperation* m_RenderOp;

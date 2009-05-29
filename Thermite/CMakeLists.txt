@@ -25,9 +25,6 @@ SET(SRC_FILES
 	source/Shell.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
-	source/TimeStampedRenderOperation.cpp
-	source/TimeStampedRenderOperationCache.cpp
-	source/TimeStampedSurfacePatchCache.cpp
 	source/Utility.cpp
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
@@ -46,9 +43,6 @@ SET(INC_FILES
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
-	include/TimeStampedRenderOperation.h
-	include/TimeStampedRenderOperationCache.h
-	include/TimeStampedSurfacePatchCache.h
 	include/Utility.h
 	include/VolumeManager.h
 	include/VolumeResource.h
