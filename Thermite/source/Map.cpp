@@ -122,24 +122,24 @@ bool Map::loadScene(const Ogre::String& filename)
 				//Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
 				//region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
-				IndexedSurfacePatch* isp = new IndexedSurfacePatch();
+				POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
 				SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
 				pSurfaceExtractor->setLodLevel(0);
-				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+				isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 
 				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
-				pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*isp);
-				pMapRegion->update(isp);
+				pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
+				pMapRegion->update(isp.get());
 
 				pSurfaceExtractor->setLodLevel(1);
-				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+				isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-				pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*isp);				
+				pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));				
 
 				pSurfaceExtractor->setLodLevel(2);
-				pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+				isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 				//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
-				pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*isp);
+				pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 
 				//The MapRegion is now up to date. Update the time stamp to indicate this
 				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
@@ -193,24 +193,24 @@ void Map::updatePolyVoxGeometry()
 						/*IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
 						pMapRegion->update(isp);*/
 
-						IndexedSurfacePatch* isp = new IndexedSurfacePatch();
+						POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
 						SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
 						pSurfaceExtractor->setLodLevel(0);
-						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 
 						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
-						pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*isp);
-						pMapRegion->update(isp);
+						pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
+						pMapRegion->update(isp.get());
 
 						pSurfaceExtractor->setLodLevel(1);
-						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
-						pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*isp);				
+						pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));				
 
 						pSurfaceExtractor->setLodLevel(2);
-						pSurfaceExtractor->extractSurfaceForRegion(region, isp);	
+						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
-						pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*isp);
+						pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
