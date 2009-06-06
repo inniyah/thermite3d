@@ -202,7 +202,7 @@ namespace Thermite
 	lastY = std::min(lastY,int(mMap->volumeChangeTracker->getWrappedVolume()->getHeight()-1));
 	lastZ = std::min(lastZ,int(mMap->volumeChangeTracker->getWrappedVolume()->getDepth()-1));
 
-	mMap->volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ)));
+	mMap->volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ)));
 	for(int z = firstZ; z <= lastZ; ++z)
 	{
 		for(int y = firstY; y <= lastY; ++y)

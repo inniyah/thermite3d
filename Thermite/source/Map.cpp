@@ -110,8 +110,8 @@ bool Map::loadScene(const Ogre::String& filename)
 				const PolyVox::uint16_t lastY = firstY + regionSideLength;
 				const PolyVox::uint16_t lastZ = firstZ + regionSideLength;
 
-				Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
-				Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
+				Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
+				Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 				Region region(v3dLowerCorner, v3dUpperCorner);
 				region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
@@ -182,8 +182,8 @@ void Map::updatePolyVoxGeometry()
 						const PolyVox::uint16_t lastY = firstY + regionSideLength;
 						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;		
 
-						Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
-						Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
+						Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
+						Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 						Region region(v3dLowerCorner, v3dUpperCorner);
 						region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 

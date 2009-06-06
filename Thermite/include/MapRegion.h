@@ -39,7 +39,7 @@ namespace OgreBulletDynamics
 class MapRegion
 {
 public:
-	MapRegion(Map* pParentWorld, PolyVox::Vector3DInt32 v3dPos);
+	MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
 	~MapRegion();
 
 	void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
@@ -74,7 +74,7 @@ public:
 
 	static unsigned long m_iNameGen; //Used for unique names
 
-	PolyVox::Vector3DInt32 m_v3dPos;
+	PolyVox::Vector3DInt16 m_v3dPos;
 };
 
 #endif
