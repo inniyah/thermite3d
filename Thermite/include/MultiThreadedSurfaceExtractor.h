@@ -35,8 +35,7 @@ class TaskData
 public:
 	PolyVox::uint8_t m_uLodLevel;
 	PolyVox::Region m_regToProcess;
-	//POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
-	PolyVox::IndexedSurfacePatch* m_ispResult;
+	POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
 };
 
 class MultiThreadedSurfaceExtractor
@@ -49,8 +48,6 @@ public:
 	PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
 	std::queue<TaskData> m_queuePendingTasks;
 	std::list<TaskData> m_listCompletedTasks;
-
-	std::list< POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> > m_listTemp;
 
 	SurfaceExtractorThread* m_pSurfaceExtractorThread;
 

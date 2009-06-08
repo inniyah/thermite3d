@@ -19,9 +19,7 @@ void SurfaceExtractorThread::run(void)
 
 		m_pSurfaceExtractor->setLodLevel(taskData.m_uLodLevel);
 
-		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> temp = m_pSurfaceExtractor->extractSurfaceForRegion(taskData.m_regToProcess);
-		m_pParentMTSE->m_listTemp.push_back(temp);
-		taskData.m_ispResult = temp.get();
+		taskData.m_ispResult = m_pSurfaceExtractor->extractSurfaceForRegion(taskData.m_regToProcess);
 
 		m_pParentMTSE->m_listCompletedTasks.push_back(taskData);
 	}
