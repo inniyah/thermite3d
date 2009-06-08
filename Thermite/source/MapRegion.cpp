@@ -64,6 +64,10 @@ MapRegion::MapRegion(Map* pParentMap, PolyVox::Vector3DInt16 v3dPos)
 	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 	AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(regionSideLength, regionSideLength, regionSideLength));
 	m_pSurfacePatchRenderable->setBoundingBox(aabb);
+
+	m_renderOperationLod0 = 0;
+	m_renderOperationLod1 = 0;
+	m_renderOperationLod2 = 0;
 }
 
 MapRegion::~MapRegion()

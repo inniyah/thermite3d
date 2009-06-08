@@ -175,7 +175,7 @@ bool Map::loadScene(const Ogre::String& filename)
 	m_pMTSE->m_pSurfaceExtractorThread->start();
 	m_pMTSE->m_pSurfaceExtractorThread2->start();
 
-	while(m_pMTSE->m_bFinished == false)
+	/*while(m_pMTSE->m_bFinished == false)
 	{
 		Sleep(1000);
 	}
@@ -221,14 +221,60 @@ bool Map::loadScene(const Ogre::String& filename)
 		//The MapRegion is now up to date. Update the time stamp to indicate this
 		m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 
-	}
+	}*/
 
 	return true;
 }
 
 void Map::updatePolyVoxGeometry()
 {
-	if(!volumeResource.isNull())
+	while(true)
+	{
+	m_pMTSE->m_mutexCompletedTasks->lock();
+	if(m_pMTSE->m_listCompletedTasks.empty())
+	{
+		m_pMTSE->m_mutexCompletedTasks->unlock();
+		break;
+	}
+	TaskData taskData = m_pMTSE->m_listCompletedTasks.front();
+	m_pMTSE->m_listCompletedTasks.pop_front();
+	m_pMTSE->m_mutexCompletedTasks->unlock();
+
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	PolyVox::uint16_t regionX = taskData.m_regToProcess.getLowerCorner().getX() / regionSideLength;
+	PolyVox::uint16_t regionY = taskData.m_regToProcess.getLowerCorner().getY() / regionSideLength;
+	PolyVox::uint16_t regionZ = taskData.m_regToProcess.getLowerCorner().getZ() / regionSideLength;
+
+	MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+	if(pMapRegion == 0)
+	{
+		pMapRegion = new MapRegion(this, taskData.m_regToProcess.getLowerCorner());
+		m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+	}
+
+	POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
+
+	isp = taskData.m_ispResult;
+
+	switch(taskData.m_uLodLevel)
+	{
+	case 0:
+		pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
+		pMapRegion->update(isp.get());
+		break;
+	case 1:
+		pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));
+		break;
+	case 2:
+		pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
+		break;
+	}
+
+	//The MapRegion is now up to date. Update the time stamp to indicate this
+	m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+	}
+
+	/*if(!volumeResource.isNull())
 	{
 		timer->reset();
 
@@ -285,7 +331,7 @@ void Map::updatePolyVoxGeometry()
 				}
 			}
 		}
-	}
+	}*/
 
 	/*float timeElapsed = timer->getMilliseconds();
 	if(listChangedRegionGeometry.size() > 0)
