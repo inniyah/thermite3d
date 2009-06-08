@@ -171,8 +171,9 @@ bool Map::loadScene(const Ogre::String& filename)
 		ss << "Adding tasks progress " << regionZ << " of " << volumeDepthInRegions;
 		Ogre::LogManager::getSingletonPtr()->logMessage(ss.str());
 	}
-
+ 
 	m_pMTSE->m_pSurfaceExtractorThread->start();
+	m_pMTSE->m_pSurfaceExtractorThread2->start();
 
 	while(m_pMTSE->m_bFinished == false)
 	{

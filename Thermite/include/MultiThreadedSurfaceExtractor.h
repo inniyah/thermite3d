@@ -28,6 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <list>
 #include <queue>
 
+#include <QMutex>
+
 class SurfaceExtractorThread;
 
 class TaskData
@@ -49,7 +51,11 @@ public:
 	std::queue<TaskData> m_queuePendingTasks;
 	std::list<TaskData> m_listCompletedTasks;
 
+	QMutex* m_mutexPendingTasks;
+	QMutex* m_mutexCompletedTasks;
+
 	SurfaceExtractorThread* m_pSurfaceExtractorThread;
+	SurfaceExtractorThread* m_pSurfaceExtractorThread2;
 
 	bool m_bFinished;
 };
