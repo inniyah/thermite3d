@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "MapHandler.h"
 #include "VolumeManager.h"
 
+#include "SurfaceExtractorThread.h"
+
 #include "VolumeChangeTracker.h"
 #include "SurfaceExtractor.h"
 
@@ -96,6 +98,8 @@ bool Map::loadScene(const Ogre::String& filename)
 	m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 	m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
+	m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume());
+
 	for(PolyVox::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 	{		
 		for(PolyVox::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
@@ -118,10 +122,29 @@ bool Map::loadScene(const Ogre::String& filename)
 				MapRegion* pMapRegion = new MapRegion(this, v3dLowerCorner);	
 				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 
+				TaskData taskData0;
+				taskData0.m_uLodLevel = 0;
+				taskData0.m_regToProcess = region;
+				taskData0.m_ispResult = 0;
+
+				TaskData taskData1;
+				taskData1.m_uLodLevel = 1;
+				taskData1.m_regToProcess = region;
+				taskData1.m_ispResult = 0;
+
+				TaskData taskData2;
+				taskData2.m_uLodLevel = 2;
+				taskData2.m_regToProcess = region;
+				taskData2.m_ispResult = 0;
+
+				m_pMTSE->m_queuePendingTasks.push(taskData0);
+				m_pMTSE->m_queuePendingTasks.push(taskData1);
+				m_pMTSE->m_queuePendingTasks.push(taskData2);
+
 				//Region region(Vector3DInt32(firstX, firstY, firstZ), Vector3DInt32(lastX, lastY, lastZ));
 				//region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
-				POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
+				/*POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
 				SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
 				pSurfaceExtractor->setLodLevel(0);
 				isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
@@ -141,12 +164,63 @@ bool Map::loadScene(const Ogre::String& filename)
 				pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 
 				//The MapRegion is now up to date. Update the time stamp to indicate this
-				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));*/
 			}
 		}
 		std::stringstream ss;
-		ss << "Loading progress " << regionZ << " of " << volumeDepthInRegions;
+		ss << "Adding tasks progress " << regionZ << " of " << volumeDepthInRegions;
 		Ogre::LogManager::getSingletonPtr()->logMessage(ss.str());
+	}
+
+	m_pMTSE->m_pSurfaceExtractorThread->start();
+
+	while(m_pMTSE->m_bFinished == false)
+	{
+		Sleep(1000);
+	}
+
+	while(m_pMTSE->m_listCompletedTasks.empty() == false)
+	{
+		//std::stringstream ss;
+		//ss << "Converting progress " << m_pMTSE->m_listCompletedTasks.size();
+		//Ogre::LogManager::getSingletonPtr()->logMessage(ss.str());
+
+		TaskData taskData = m_pMTSE->m_listCompletedTasks.front();
+		m_pMTSE->m_listCompletedTasks.pop_front();
+
+		PolyVox::uint16_t regionX = taskData.m_regToProcess.getLowerCorner().getX() / regionSideLength;
+		PolyVox::uint16_t regionY = taskData.m_regToProcess.getLowerCorner().getY() / regionSideLength;
+		PolyVox::uint16_t regionZ = taskData.m_regToProcess.getLowerCorner().getZ() / regionSideLength;
+
+		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+		if(pMapRegion == 0)
+		{
+			pMapRegion = new MapRegion(this, taskData.m_regToProcess.getLowerCorner());
+			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+		}
+
+		//POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
+		IndexedSurfacePatch* isp;
+
+		isp = taskData.m_ispResult;
+
+		switch(taskData.m_uLodLevel)
+		{
+		case 0:
+			pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp));
+			pMapRegion->update(isp);
+			break;
+		case 1:
+			pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp));
+			break;
+		case 2:
+			pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp));
+			break;
+		}
+
+		//The MapRegion is now up to date. Update the time stamp to indicate this
+		m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+
 	}
 
 	return true;
@@ -189,26 +263,20 @@ void Map::updatePolyVoxGeometry()
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 						
-						/*IndexedSurfacePatch* isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
-						pMapRegion->update(isp);*/
-
 						POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
 						SurfaceExtractor* pSurfaceExtractor = new SurfaceExtractor(*(volumeChangeTracker->getWrappedVolume()));
 						pSurfaceExtractor->setLodLevel(0);
 						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
 
-						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 0);
 						pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 						pMapRegion->update(isp.get());
 
 						pSurfaceExtractor->setLodLevel(1);
 						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
-						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 1);
 						pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));				
 
 						pSurfaceExtractor->setLodLevel(2);
 						isp = pSurfaceExtractor->extractSurfaceForRegion(region);	
-						//isp = TimeStampedSurfacePatchCache::getInstance()->getIndexedSurfacePatch(v3dLowerCorner, 2);
 						pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 
 						//The MapRegion is now up to date. Update the time stamp to indicate this

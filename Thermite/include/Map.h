@@ -19,11 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __World_H__
-#define __World_H__
+#ifndef __THERMITE_MAP_H__
+#define __THERMITE_MAP_H__
 
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeResource.h"
+#include "MultiThreadedSurfaceExtractor.h"
 
 #include "PolyVoxForwardDeclarations.h"
 #include "VolumeChangeTracker.h"
@@ -59,6 +60,8 @@ public:
 	OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 
 	PolyVox::Volume<MapRegion*>* m_volMapRegions;
+
+	MultiThreadedSurfaceExtractor* m_pMTSE;
 
 private:
 	Ogre::Vector3 m_vecGravity;
