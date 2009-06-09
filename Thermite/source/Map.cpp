@@ -145,24 +145,9 @@ void Map::updatePolyVoxGeometry()
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
-						TaskData taskData0;
-						taskData0.m_uLodLevel = 0;
-						taskData0.m_regToProcess = region;
-						//taskData0.m_ispResult = 0;
-
-						TaskData taskData1;
-						taskData1.m_uLodLevel = 1;
-						taskData1.m_regToProcess = region;
-						//taskData1.m_ispResult = 0;
-
-						TaskData taskData2;
-						taskData2.m_uLodLevel = 2;
-						taskData2.m_regToProcess = region;
-						//taskData2.m_ispResult = 0;
-
-						m_pMTSE->m_queuePendingTasks.push(taskData0);
-						m_pMTSE->m_queuePendingTasks.push(taskData1);
-						m_pMTSE->m_queuePendingTasks.push(taskData2);
+						m_pMTSE->addTask(region, 0);
+						m_pMTSE->addTask(region, 1);
+						m_pMTSE->addTask(region, 2);
 
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 					}

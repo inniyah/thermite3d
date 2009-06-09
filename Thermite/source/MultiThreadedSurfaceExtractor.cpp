@@ -13,6 +13,8 @@ MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uin
 
 	m_mutexPendingTasks = new QMutex();
 	m_mutexCompletedTasks = new QMutex();
+
+	m_noOfTasksAvailable = new QSemaphore();
 }
 	
 void MultiThreadedSurfaceExtractor::addTask(Region regToProcess, uint8_t uLodLevel)
@@ -24,4 +26,6 @@ void MultiThreadedSurfaceExtractor::addTask(Region regToProcess, uint8_t uLodLev
 	m_mutexPendingTasks->lock();
 	m_queuePendingTasks.push(taskData);
 	m_mutexPendingTasks->unlock();
+
+	m_noOfTasksAvailable->release();
 }

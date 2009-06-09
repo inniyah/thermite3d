@@ -29,6 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <queue>
 
 #include <QMutex>
+#include <QSemaphore>
 
 class SurfaceExtractorThread;
 
@@ -53,6 +54,8 @@ public:
 
 	QMutex* m_mutexPendingTasks;
 	QMutex* m_mutexCompletedTasks;
+
+	QSemaphore* m_noOfTasksAvailable;
 
 	SurfaceExtractorThread* m_pSurfaceExtractorThread;
 	SurfaceExtractorThread* m_pSurfaceExtractorThread2;
