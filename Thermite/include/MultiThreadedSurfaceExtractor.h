@@ -44,7 +44,7 @@ public:
 class MultiThreadedSurfaceExtractor
 {
 public:
-	MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData);
+	MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads);
 	
 	void addTask(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
 
@@ -57,8 +57,10 @@ public:
 
 	QSemaphore* m_noOfTasksAvailable;
 
-	SurfaceExtractorThread* m_pSurfaceExtractorThread;
-	SurfaceExtractorThread* m_pSurfaceExtractorThread2;
+	//SurfaceExtractorThread* m_pSurfaceExtractorThread;
+	//SurfaceExtractorThread* m_pSurfaceExtractorThread2;
+
+	std::vector<SurfaceExtractorThread*> m_vecThreads;
 
 	bool m_bFinished;
 };

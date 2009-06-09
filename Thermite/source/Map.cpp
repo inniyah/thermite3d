@@ -100,10 +100,7 @@ bool Map::loadScene(const Ogre::String& filename)
 
 	volumeChangeTracker->setAllRegionsModified();
 
-	m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume());
- 
-	m_pMTSE->m_pSurfaceExtractorThread->start();
-	m_pMTSE->m_pSurfaceExtractorThread2->start();
+	m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), 2);
 
 	return true;
 }
