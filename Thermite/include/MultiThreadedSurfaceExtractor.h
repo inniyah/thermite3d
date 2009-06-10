@@ -31,30 +31,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QMutex>
 #include <QSemaphore>
 
-class SurfaceExtractorThread;
+#include "SurfaceExtractorTaskData.h"
 
-class TaskData
-{
-public:
-	PolyVox::uint8_t m_uLodLevel;
-	PolyVox::Region m_regToProcess;
-	POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
-};
+class SurfaceExtractorThread;
 
 class MultiThreadedSurfaceExtractor
 {
 public:
 	MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads);
 	
-	void addTask(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
+	void addTask(const SurfaceExtractorTaskData& taskData);
 
 	bool isResultAvailable(void);
 
-	TaskData getResult(void);
+	SurfaceExtractorTaskData getResult(void);
 
 	PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
-	std::queue<TaskData> m_queuePendingTasks;
-	std::list<TaskData> m_listCompletedTasks;
+	std::queue<SurfaceExtractorTaskData> m_queuePendingTasks;
+	std::list<SurfaceExtractorTaskData> m_listCompletedTasks;
 
 	QMutex* m_mutexPendingTasks;
 	QMutex* m_mutexCompletedTasks;

@@ -27,12 +27,8 @@ MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uin
 	}
 }
 	
-void MultiThreadedSurfaceExtractor::addTask(Region regToProcess, uint8_t uLodLevel)
+void MultiThreadedSurfaceExtractor::addTask(const SurfaceExtractorTaskData& taskData)
 {
-	TaskData taskData;
-	taskData.m_uLodLevel = uLodLevel;
-	taskData.m_regToProcess = regToProcess;
-
 	m_mutexPendingTasks->lock();
 	m_queuePendingTasks.push(taskData);
 	m_mutexPendingTasks->unlock();
@@ -45,9 +41,9 @@ bool MultiThreadedSurfaceExtractor::isResultAvailable(void)
 	return m_noOfResultsAvailable->available() > 0;
 }
 
-TaskData MultiThreadedSurfaceExtractor::getResult(void)
+SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::getResult(void)
 {
-	TaskData result;
+	SurfaceExtractorTaskData result;
 
 	if(m_noOfResultsAvailable->tryAcquire())
 	{
@@ -62,10 +58,8 @@ TaskData MultiThreadedSurfaceExtractor::getResult(void)
 		//Maybe we should throw an exception here instead?
 		Vector3DInt16 v3dZero(0,0,0);
 		Region regZero(v3dZero, v3dZero);
-		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> pNull;
-		result.m_uLodLevel = 0;
-		result.m_regToProcess = regZero;
-		result.m_ispResult = pNull;
+		result.setLodLevel(0);
+		result.setRegion(regZero);
 	}
 
 	return result;

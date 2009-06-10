@@ -142,9 +142,9 @@ void Map::updatePolyVoxGeometry()
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
-						m_pMTSE->addTask(region, 0);
-						m_pMTSE->addTask(region, 1);
-						m_pMTSE->addTask(region, 2);
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 0));
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 1));
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 2));
 
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 					}
@@ -161,30 +161,28 @@ void Map::updatePolyVoxGeometry()
 		m_pMTSE->m_mutexCompletedTasks->unlock();
 		break;
 	}
-	TaskData taskData = m_pMTSE->m_listCompletedTasks.front();
+	SurfaceExtractorTaskData taskData = m_pMTSE->m_listCompletedTasks.front();
 	m_pMTSE->m_listCompletedTasks.pop_front();
 	m_pMTSE->m_mutexCompletedTasks->unlock();*/
 
 	while(m_pMTSE->isResultAvailable())
 	{
-		TaskData result;
+		SurfaceExtractorTaskData result;
 		result = m_pMTSE->getResult();
 
 	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-	PolyVox::uint16_t regionX = result.m_regToProcess.getLowerCorner().getX() / regionSideLength;
-	PolyVox::uint16_t regionY = result.m_regToProcess.getLowerCorner().getY() / regionSideLength;
-	PolyVox::uint16_t regionZ = result.m_regToProcess.getLowerCorner().getZ() / regionSideLength;
+	PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+	PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+	PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
 	MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 	if(pMapRegion == 0)
 	{
-		pMapRegion = new MapRegion(this, result.m_regToProcess.getLowerCorner());
+		pMapRegion = new MapRegion(this, result.getRegion().getLowerCorner());
 		m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 	}
 
-	POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp;
-
-	isp = result.m_ispResult;
+	POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp = result.getIndexedSurfacePatch();
 
 	//isp = result.second;
 
@@ -195,7 +193,7 @@ void Map::updatePolyVoxGeometry()
 
 	//pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
 
-	switch(result.m_uLodLevel)
+	switch(result.getLodLevel())
 	{
 	case 0:
 		pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));

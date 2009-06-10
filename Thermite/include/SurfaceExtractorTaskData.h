@@ -19,29 +19,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_SURFACEEXTRACTORTHREAD_H__
-#define __THERMITE_SURFACEEXTRACTORTHREAD_H__
+#ifndef __THERMITE_SURFACEEXTRACTORTASKDATA_H__
+#define __THERMITE_SURFACEEXTRACTORTASKDATA_H__
 
-#include "SurfaceExtractor.h"
+#include "SurfaceExtractorThread.h"
 
-#include "SurfaceExtractorTaskData.h"
-
-#include <QThread>
-
-class MultiThreadedSurfaceExtractor;
-
-class SurfaceExtractorThread : public QThread
+class SurfaceExtractorTaskData
 {
-	Q_OBJECT
+	friend class SurfaceExtractorThread; //For writing the result without exposing function
 
 public:
-	SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE);
+	SurfaceExtractorTaskData(void);
+	SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
 
-	MultiThreadedSurfaceExtractor* m_pParentMTSE;
-	PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
+	PolyVox::uint8_t getLodLevel(void) const;
+	PolyVox::Region getRegion(void) const;
+	POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> getIndexedSurfacePatch(void) const;
 
-protected:
-	void run(void);
+	void setLodLevel(PolyVox::uint8_t uLodLevel);
+	void setRegion(const PolyVox::Region& regToProcess);
+
+private:
+	PolyVox::uint8_t m_uLodLevel;
+	PolyVox::Region m_regToProcess;
+	POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
 };
 
 #endif
