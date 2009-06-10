@@ -116,6 +116,8 @@ void Map::updatePolyVoxGeometry()
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
+		int counter = 0;
+
 		//Iterate over each region in the VolumeChangeTracker
 		for(PolyVox::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 		{		
@@ -142,15 +144,33 @@ void Map::updatePolyVoxGeometry()
 
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
-						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 0));
-						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 1));
-						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 2));
+						Vector3DInt16 v3dStart(0,0,0);
+						Vector3DInt16 v3dCentre = region.getCentre();
+						Vector3DInt16 v3dDiff = v3dStart - v3dCentre;
+
+						//uint32_t uPriority = std::numeric_limits<uint32_t>::max() - (v3dDiff.getX() * v3dDiff.getX() + v3dDiff.getY() * v3dDiff.getY() + v3dDiff.getZ() * v3dDiff.getZ());
+
+						double distanceSquared = v3dDiff.lengthSquared();
+						distanceSquared = sqrt(distanceSquared);
+						uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceSquared);
+
+						//uint32_t uPriority = firstX + firstY + firstZ;
+						//uint32_t uPriority = v3dCentre.getX() + v3dCentre.getY() + v3dCentre.get();
+
+						//uint32_t uPriority = counter;
+						//counter++;
+
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 0, uPriority));
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 1, uPriority));
+						m_pMTSE->addTask(SurfaceExtractorTaskData(region, 2, uPriority));
 
 						m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 					}
 				}
 			}
 		}
+
+		m_pMTSE->start();
 	}
 
 	/*while(true)

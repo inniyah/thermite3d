@@ -35,6 +35,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class SurfaceExtractorThread;
 
+class SurfaceExtractorTaskDataPriorityComparison
+{
+public:
+  bool operator() (const SurfaceExtractorTaskData& lhs, const SurfaceExtractorTaskData &rhs) const
+  {
+	  return lhs.getPriority() < rhs.getPriority();
+  }
+};
+
+
 class MultiThreadedSurfaceExtractor
 {
 public:
@@ -46,8 +56,10 @@ public:
 
 	SurfaceExtractorTaskData getResult(void);
 
+	void start(void);
+
 	PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
-	std::queue<SurfaceExtractorTaskData> m_queuePendingTasks;
+	std::priority_queue<SurfaceExtractorTaskData, std::vector<SurfaceExtractorTaskData>, SurfaceExtractorTaskDataPriorityComparison> m_queuePendingTasks;
 	std::list<SurfaceExtractorTaskData> m_listCompletedTasks;
 
 	QMutex* m_mutexPendingTasks;

@@ -23,7 +23,6 @@ MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uin
 	for(int ct = 0; ct < noOfThreads; ++ct)
 	{
 		m_vecThreads[ct] = new SurfaceExtractorThread(this);
-		m_vecThreads[ct]->start();
 	}
 }
 	
@@ -63,4 +62,12 @@ SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::getResult(void)
 	}
 
 	return result;
+}
+
+void MultiThreadedSurfaceExtractor::start(void)
+{
+	for(int ct = 0; ct < m_vecThreads.size(); ++ct)
+	{
+		m_vecThreads[ct]->start();
+	}
 }

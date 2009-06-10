@@ -17,7 +17,7 @@ void SurfaceExtractorThread::run(void)
 		m_pParentMTSE->m_noOfTasksAvailable->acquire();
 
 		m_pParentMTSE->m_mutexPendingTasks->lock();
-		SurfaceExtractorTaskData taskData = m_pParentMTSE->m_queuePendingTasks.front();
+		SurfaceExtractorTaskData taskData = m_pParentMTSE->m_queuePendingTasks.top();
 		m_pParentMTSE->m_queuePendingTasks.pop();
 		m_pParentMTSE->m_mutexPendingTasks->unlock();
 
