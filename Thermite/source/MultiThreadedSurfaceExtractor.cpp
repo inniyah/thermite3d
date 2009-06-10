@@ -2,6 +2,8 @@
 
 #include "SurfaceExtractorThread.h"
 
+#include <utility>
+
 using namespace PolyVox;
 
 MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads)
@@ -15,6 +17,7 @@ MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uin
 	m_mutexCompletedTasks = new QMutex();
 
 	m_noOfTasksAvailable = new QSemaphore();
+	m_noOfResultsAvailable = new QSemaphore();
 
 	m_vecThreads.resize(noOfThreads);
 	for(int ct = 0; ct < noOfThreads; ++ct)
@@ -35,4 +38,35 @@ void MultiThreadedSurfaceExtractor::addTask(Region regToProcess, uint8_t uLodLev
 	m_mutexPendingTasks->unlock();
 
 	m_noOfTasksAvailable->release();
+}
+
+bool MultiThreadedSurfaceExtractor::isResultAvailable(void)
+{
+	return m_noOfResultsAvailable->available() > 0;
+}
+
+TaskData MultiThreadedSurfaceExtractor::getResult(void)
+{
+	TaskData result;
+
+	if(m_noOfResultsAvailable->tryAcquire())
+	{
+		m_mutexCompletedTasks->lock();
+		result = m_listCompletedTasks.front();
+		m_listCompletedTasks.pop_front();
+		m_mutexCompletedTasks->unlock();
+	}
+	else
+	{
+		//this shouldn't really happen, and the user should have called isResultAvailable() first.
+		//Maybe we should throw an exception here instead?
+		Vector3DInt16 v3dZero(0,0,0);
+		Region regZero(v3dZero, v3dZero);
+		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> pNull;
+		result.m_uLodLevel = 0;
+		result.m_regToProcess = regZero;
+		result.m_ispResult = pNull;
+	}
+
+	return result;
 }

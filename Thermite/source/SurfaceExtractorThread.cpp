@@ -28,6 +28,8 @@ void SurfaceExtractorThread::run(void)
 		m_pParentMTSE->m_mutexCompletedTasks->lock();
 		m_pParentMTSE->m_listCompletedTasks.push_back(taskData);
 		m_pParentMTSE->m_mutexCompletedTasks->unlock();
+
+		m_pParentMTSE->m_noOfResultsAvailable->release();
 	}
 
 	m_pParentMTSE->m_bFinished = true;

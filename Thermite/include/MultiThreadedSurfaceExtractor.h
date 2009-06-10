@@ -48,6 +48,10 @@ public:
 	
 	void addTask(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
 
+	bool isResultAvailable(void);
+
+	TaskData getResult(void);
+
 	PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
 	std::queue<TaskData> m_queuePendingTasks;
 	std::list<TaskData> m_listCompletedTasks;
@@ -56,6 +60,7 @@ public:
 	QMutex* m_mutexCompletedTasks;
 
 	QSemaphore* m_noOfTasksAvailable;
+	QSemaphore* m_noOfResultsAvailable;
 
 	//SurfaceExtractorThread* m_pSurfaceExtractorThread;
 	//SurfaceExtractorThread* m_pSurfaceExtractorThread2;
