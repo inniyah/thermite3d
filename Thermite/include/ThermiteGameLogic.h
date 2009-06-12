@@ -16,6 +16,9 @@
 
 #include <QTime>
 
+#include <QMovie>
+#include <QLabel>
+
 #include <list>
 #include <queue>
 
@@ -94,6 +97,9 @@ namespace Thermite
 		Ogre::SceneNode* mCannonNode;
 
 		std::list<Shell*> m_listShells;
+
+		QMovie* m_pThermiteLogoMovie;
+		QLabel* m_pThermiteLogoLabel;
 	};
 }
 

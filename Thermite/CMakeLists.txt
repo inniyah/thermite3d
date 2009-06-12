@@ -22,7 +22,6 @@ SET(SRC_FILES
 	source/Map.cpp
 	source/MapHandler.cpp
 	source/MapRegion.cpp
-	source/MoviePlayer.cpp
 	source/MultiThreadedSurfaceExtractor.cpp
 	source/PhysicalEntity.cpp
 	source/Shell.cpp
@@ -44,7 +43,6 @@ SET(INC_FILES
 	include/Map.h
 	include/MapHandler.h
 	include/MapRegion.h
-	include/MoviePlayer.h
 	include/MultiThreadedSurfaceExtractor.h
 	include/PhysicalEntity.h
 	include/Shell.h
@@ -64,7 +62,6 @@ SET(UI_FILES
 	ui/CannonController.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
-	ui/MoviePlayer.ui
 )
 
 SET(RESOURCE_FILES

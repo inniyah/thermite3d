@@ -6,8 +6,6 @@
 #include "LogManager.h"
 #include "OgreWidget.h"
 
-#include "MoviePlayer.h"
-
 #include "SurfacePatchRenderable.h"
 #include "VolumeManager.h"
 
@@ -36,6 +34,15 @@ namespace Thermite
 
 	void ThermiteGameLogic::initialise(void)
 	{
+		m_pThermiteLogoMovie = new QMovie("c:\\thermite_logo.mng");
+		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
+		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
+		m_pThermiteLogoMovie->jumpToFrame(0);
+		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
+		m_pThermiteLogoLabel->show();
+		m_pThermiteLogoMovie->start();
+
+
 		mApplication->setUpdateInterval(0);
 
 		mThermiteLog = mApplication->createLog("Thermite");
@@ -62,9 +69,7 @@ namespace Thermite
 			mSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
 			mSceneManager->setShadowCasterRenderBackFaces(true);
 			mSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}
-
-		mMainMenu = new MainMenu(qApp, qApp->mainWidget());		
+		}	
 
 		mTime = new QTime;
 		mTime->start();
@@ -77,23 +82,12 @@ namespace Thermite
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
-		
-		//loadMap("dfgsdf");
 
-		mApplication->hideLogManager();
+		//mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
+		//mMainMenu->show();
 
 		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
 		wgtLoadMap->show();
-
-		/*mMoviePlayer = new MoviePlayer(qApp->mainWidget(), Qt::Tool);
-		mMoviePlayer->thermiteGameLogic = this;
-		mMoviePlayer->show();
-
-		QMovie* movie = new QMovie();
-		QObject::connect(movie, SIGNAL(error(QImageReader::ImageReaderError)), movie, SLOT(handleError(QImageReader::ImageReaderError error)));
-		movie->setFileName("c:\\thermite_logo.mng");
-		mMoviePlayer->setMovie(movie);
-		movie->start();*/
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -290,6 +284,8 @@ namespace Thermite
 
 	void ThermiteGameLogic::loadMap(QString strMapName)
 	{
+		m_pThermiteLogoLabel->setVisible(false);
+
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->loadScene("");
 
