@@ -50,6 +50,8 @@ namespace Thermite
 
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 
+		void loadMap(QString strMapName);
+
 	public:
 		void addResourceDirectory(const QString& directoryName);
 

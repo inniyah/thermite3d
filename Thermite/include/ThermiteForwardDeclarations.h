@@ -50,8 +50,10 @@ class MapRegion;
 
 namespace Thermite
 {
+	class LoadMapWidget;
 	class MoviePlayer;
 	class Shell;
+	class ThermiteGameLogic;
 }
 
 #endif

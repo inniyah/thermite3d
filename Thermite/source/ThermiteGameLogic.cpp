@@ -1,6 +1,7 @@
 #include "ThermiteGameLogic.h"
 #include "MainMenu.h"
 #include "Shell.h"
+#include "LoadMapWidget.h"
 
 #include "LogManager.h"
 #include "OgreWidget.h"
@@ -29,6 +30,7 @@ namespace Thermite
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
+		,mMap(0)
 	{
 	}
 
@@ -75,32 +77,15 @@ namespace Thermite
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
-		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
-		mMap->loadScene("");
-
-		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
-		{
-			mMap->createAxis(mMap->volumeResource->volume->getWidth(), mMap->volumeResource->volume->getHeight(), mMap->volumeResource->volume->getDepth());
-		}
-
-		//This gets the first camera which was found in the scene.
-		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
-		mCamera = camIter.peekNextValue();
-
-		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
-
-		mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
-		mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
-		mCannonNode->attachObject(mCannon);
-		mCannonNode->setPosition(200.0f, 65.0f, 80.0f);
-		mCannonNode->setScale(3.0,3.0,3.0);
-
-		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
-		mCannonController->show();
+		
+		//loadMap("dfgsdf");
 
 		mApplication->hideLogManager();
 
-		mMoviePlayer = new MoviePlayer(qApp->mainWidget(), Qt::Tool);
+		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
+		wgtLoadMap->show();
+
+		/*mMoviePlayer = new MoviePlayer(qApp->mainWidget(), Qt::Tool);
 		mMoviePlayer->thermiteGameLogic = this;
 		mMoviePlayer->show();
 
@@ -108,11 +93,14 @@ namespace Thermite
 		QObject::connect(movie, SIGNAL(error(QImageReader::ImageReaderError)), movie, SLOT(handleError(QImageReader::ImageReaderError error)));
 		movie->setFileName("c:\\thermite_logo.mng");
 		mMoviePlayer->setMovie(movie);
-		movie->start();
+		movie->start();*/
 	}
 
 	void ThermiteGameLogic::update(void)
 	{
+		if(mMap == 0)
+			return;
+
 		mLastFrameTime = mCurrentTime;
 		mCurrentTime = mTime->elapsed();
 
@@ -298,5 +286,31 @@ namespace Thermite
 		shell->m_vecVelocity *= 100.0f;
 
 		m_listShells.push_back(shell);
+	}
+
+	void ThermiteGameLogic::loadMap(QString strMapName)
+	{
+		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
+		mMap->loadScene("");
+
+		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+		{
+			mMap->createAxis(mMap->volumeResource->volume->getWidth(), mMap->volumeResource->volume->getHeight(), mMap->volumeResource->volume->getDepth());
+		}
+
+		//This gets the first camera which was found in the scene.
+		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
+		mCamera = camIter.peekNextValue();
+
+		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+
+		mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
+		mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
+		mCannonNode->attachObject(mCannon);
+		mCannonNode->setPosition(200.0f, 65.0f, 80.0f);
+		mCannonNode->setScale(3.0,3.0,3.0);
+
+		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
+		mCannonController->show();
 	}
 }
