@@ -5,6 +5,7 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 
+
 #include "Map.h"
 #include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
@@ -49,7 +50,7 @@ namespace Thermite
 
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 
-	private:
+	public:
 		void addResourceDirectory(const QString& directoryName);
 
 		void createCube(float xPos, float zPos);
@@ -75,6 +76,7 @@ namespace Thermite
 
 		MainMenu* mMainMenu;
 		CannonController* mCannonController;
+		MoviePlayer* mMoviePlayer;
 
 		Ogre::Camera* mCamera;
 		Ogre::SceneManager* mSceneManager;

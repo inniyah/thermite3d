@@ -5,6 +5,8 @@
 #include "LogManager.h"
 #include "OgreWidget.h"
 
+#include "MoviePlayer.h"
+
 #include "SurfacePatchRenderable.h"
 #include "VolumeManager.h"
 
@@ -15,6 +17,7 @@
 
 #include <QDirIterator>
 #include <QKeyEvent>
+#include <QMovie>
 #include <QSettings>
 
 using namespace QtOgre;
@@ -96,6 +99,16 @@ namespace Thermite
 		mCannonController->show();
 
 		mApplication->hideLogManager();
+
+		mMoviePlayer = new MoviePlayer(qApp->mainWidget(), Qt::Tool);
+		mMoviePlayer->thermiteGameLogic = this;
+		mMoviePlayer->show();
+
+		QMovie* movie = new QMovie();
+		QObject::connect(movie, SIGNAL(error(QImageReader::ImageReaderError)), movie, SLOT(handleError(QImageReader::ImageReaderError error)));
+		movie->setFileName("c:\\thermite_logo.mng");
+		mMoviePlayer->setMovie(movie);
+		movie->start();
 	}
 
 	void ThermiteGameLogic::update(void)

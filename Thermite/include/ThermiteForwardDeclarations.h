@@ -50,6 +50,7 @@ class MapRegion;
 
 namespace Thermite
 {
+	class MoviePlayer;
 	class Shell;
 }
 
