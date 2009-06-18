@@ -4,6 +4,7 @@
 #include "CannonController.h"
 #include "GameLogic.h"
 #include "MainMenu.h"
+#include "LoadingProgress.h"
 
 
 #include "Map.h"
@@ -24,6 +25,9 @@
 
 namespace Thermite
 {
+	extern ThermiteGameLogic* g_thermiteGameLogic;
+	void volumeLoadProgressCallback(float fProgress);
+
 	enum KeyStates
 	{
 		KS_RELEASED,
@@ -54,6 +58,8 @@ namespace Thermite
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 
 		void loadMap(QString strMapName);
+
+		void setVolumeLoadProgress(float fProgress);
 
 	public:
 		void addResourceDirectory(const QString& directoryName);
@@ -97,6 +103,8 @@ namespace Thermite
 		Ogre::SceneNode* mCannonNode;
 
 		std::list<Shell*> m_listShells;
+
+		LoadingProgress* m_loadingProgress;
 
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;

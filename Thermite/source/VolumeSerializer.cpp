@@ -19,6 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
+#include "ThermiteGameLogic.h"
+#include "VolumeManager.h"
 #include "VolumeSerializer.h"
 #include "Volume.h"
 
@@ -57,5 +59,5 @@ void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox
 	//Ogre::DataStreamPtr file = stream;
 	std::istream stdStream(new DataStreamAdapter(stream)); 
 
-	*pDest = loadVolumeRle(stdStream);
+	*pDest = loadVolumeRle(stdStream, Thermite::volumeLoadProgressCallback);
 }

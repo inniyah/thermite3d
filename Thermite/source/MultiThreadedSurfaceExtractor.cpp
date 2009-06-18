@@ -35,9 +35,9 @@ void MultiThreadedSurfaceExtractor::addTask(const SurfaceExtractorTaskData& task
 	m_noOfTasksAvailable->release();
 }
 
-bool MultiThreadedSurfaceExtractor::isResultAvailable(void)
+int MultiThreadedSurfaceExtractor::noOfResultsAvailable(void)
 {
-	return m_noOfResultsAvailable->available() > 0;
+	return m_noOfResultsAvailable->available();
 }
 
 SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::getResult(void)

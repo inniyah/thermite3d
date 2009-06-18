@@ -52,7 +52,7 @@ public:
 	
 	void addTask(const SurfaceExtractorTaskData& taskData);
 
-	bool isResultAvailable(void);
+	int noOfResultsAvailable(void);
 
 	SurfaceExtractorTaskData getResult(void);
 

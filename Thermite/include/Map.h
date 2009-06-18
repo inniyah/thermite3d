@@ -73,6 +73,8 @@ private:
 	Ogre::SceneNode* m_axisNode;
 
 	PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
+
+	int m_iNoProcessed;
 };
 
 

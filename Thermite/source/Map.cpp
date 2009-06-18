@@ -37,6 +37,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "Shapes/OgreBulletCollisionsBoxShape.h"
 
+#include "ThermiteGameLogic.h"
+
 
 #include <OgreSceneManagerEnumerator.h>
 #include <OgreSceneManager.h>
@@ -80,6 +82,8 @@ void Map::initialisePhysics(void)
 
 bool Map::loadScene(const Ogre::String& filename)
 {
+	m_iNoProcessed = 0;
+
 	MapHandler handler(this);
 	QXmlSimpleReader reader;
 	reader.setContentHandler(&handler);
@@ -185,8 +189,18 @@ void Map::updatePolyVoxGeometry()
 	m_pMTSE->m_listCompletedTasks.pop_front();
 	m_pMTSE->m_mutexCompletedTasks->unlock();*/
 
-	while(m_pMTSE->isResultAvailable())
+	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+	int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+	int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
+	int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+	int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions;
+
+	while(m_pMTSE->noOfResultsAvailable() > 0)
 	{
+		m_iNoProcessed++;
+		float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(noOfRegions);
+		Thermite::g_thermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+
 		SurfaceExtractorTaskData result;
 		result = m_pMTSE->getResult();
 

@@ -37,6 +37,7 @@ VolumeManager &VolumeManager::getSingleton ()
 }
 
 VolumeManager::VolumeManager ()
+:pCallback(0)
 {
 	mResourceType = "Volume";
 
@@ -74,4 +75,12 @@ Ogre::Resource *VolumeManager::createImpl (const Ogre::String &name, Ogre::Resou
 											const Ogre::NameValuePairList *createParams)
 {
 	return new VolumeResource (this, name, handle, group, isManual, loader);
+}
+
+void VolumeManager::setCurrentLoadProgress(float fProgress)
+{
+	if(pCallback != 0)
+	{
+		pCallback(fProgress);
+	}
 }

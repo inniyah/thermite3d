@@ -25,11 +25,18 @@ using namespace std;
 
 namespace Thermite
 {
+	ThermiteGameLogic* g_thermiteGameLogic = 0;
+	void volumeLoadProgressCallback(float fProgress)
+	{
+		g_thermiteGameLogic->setVolumeLoadProgress(fProgress);
+	}
+
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 		,mMap(0)
 	{
+		g_thermiteGameLogic = this;
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -83,11 +90,13 @@ namespace Thermite
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
 
-		//mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
-		//mMainMenu->show();
+		mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
+		mMainMenu->show();
 
 		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
 		wgtLoadMap->show();
+
+		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -286,6 +295,8 @@ namespace Thermite
 	{
 		m_pThermiteLogoLabel->setVisible(false);
 
+		m_loadingProgress->show();
+
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->loadScene("");
 
@@ -308,5 +319,13 @@ namespace Thermite
 
 		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
 		mCannonController->show();
+
+		//m_loadingProgress->hide();
+	}
+
+	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)
+	{
+		mThermiteLog->logMessage("loading...", LL_INFO);
+		m_loadingProgress->setLoadingDataPercentageDone(fProgress*100);
 	}
 }

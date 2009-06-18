@@ -42,8 +42,12 @@ public:
 
 	virtual VolumeResourcePtr load (const Ogre::String &name, const Ogre::String &group);
 
+	void setCurrentLoadProgress(float fProgress);
+
 	static VolumeManager &getSingleton ();
 	static VolumeManager *getSingletonPtr ();
+
+	void (*pCallback)(float);
 };
 
 #endif
