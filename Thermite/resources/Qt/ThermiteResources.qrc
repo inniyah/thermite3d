@@ -1,6 +1,8 @@
 <RCC>
   <qresource>
+	<file>animations/thermite_logo.mng</file>
     <file>images/QtOgreLogo.png</file>
+	<file>images/thermite_logo.svg</file>
 	<file>icons/application-exit.svg</file>
 	<file>icons/go-previous.svg</file>
 	<file>icons/preferences-system.svg</file>

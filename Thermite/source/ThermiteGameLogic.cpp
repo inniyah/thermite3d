@@ -41,7 +41,10 @@ namespace Thermite
 
 	void ThermiteGameLogic::initialise(void)
 	{
-		m_pThermiteLogoMovie = new QMovie("c:\\thermite_logo.mng");
+		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
+		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
+
+		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
 		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
 		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
 		m_pThermiteLogoMovie->jumpToFrame(0);
