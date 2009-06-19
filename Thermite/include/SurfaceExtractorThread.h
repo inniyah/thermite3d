@@ -24,8 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "SurfaceExtractor.h"
 
-#include "SurfaceExtractorTaskData.h"
-
 #include <QThread>
 
 namespace Thermite
@@ -37,13 +35,16 @@ namespace Thermite
 		Q_OBJECT
 
 	public:
-		SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE);
-
-		MultiThreadedSurfaceExtractor* m_pParentMTSE;
-		PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
+		SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE, PolyVox::Volume<PolyVox::uint8_t>* pVolData);
+		~SurfaceExtractorThread();
 
 	protected:
 		void run(void);
+
+	private:
+		PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
+		PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
+		MultiThreadedSurfaceExtractor* m_pParentMTSE;
 	};
 }
 

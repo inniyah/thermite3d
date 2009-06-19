@@ -22,16 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __THERMITE_MULTITHREADEDSURFACEEXTRACTOR_H__
 #define __THERMITE_MULTITHREADEDSURFACEEXTRACTOR_H__
 
-#include "Region.h"
-#include "IndexedSurfacePatch.h"
-
 #include <list>
 #include <queue>
 
-#include <QMutex>
-#include <QSemaphore>
-
 #include "SurfaceExtractorTaskData.h"
+
+class QMutex;
+class QSemaphore;
 
 namespace Thermite
 {
@@ -51,16 +48,21 @@ namespace Thermite
 	{
 	public:
 		MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads);
+		~MultiThreadedSurfaceExtractor();
 		
-		void addTask(const SurfaceExtractorTaskData& taskData);
+		void pushTask(const SurfaceExtractorTaskData& taskData);
+		SurfaceExtractorTaskData popTask(void);
+
+		void pushResult(const SurfaceExtractorTaskData& taskData);
+		SurfaceExtractorTaskData popResult(void);
 
 		int noOfResultsAvailable(void);
 
-		SurfaceExtractorTaskData getResult(void);
-
 		void start(void);
 
+	private:
 		PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
+
 		std::priority_queue<SurfaceExtractorTaskData, std::vector<SurfaceExtractorTaskData>, SurfaceExtractorTaskDataPriorityComparison> m_queuePendingTasks;
 		std::list<SurfaceExtractorTaskData> m_listCompletedTasks;
 
@@ -70,12 +72,7 @@ namespace Thermite
 		QSemaphore* m_noOfTasksAvailable;
 		QSemaphore* m_noOfResultsAvailable;
 
-		//SurfaceExtractorThread* m_pSurfaceExtractorThread;
-		//SurfaceExtractorThread* m_pSurfaceExtractorThread2;
-
 		std::vector<SurfaceExtractorThread*> m_vecThreads;
-
-		bool m_bFinished;
 	};
 }
 

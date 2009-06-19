@@ -166,9 +166,9 @@ namespace Thermite
 							//uint32_t uPriority = counter;
 							//counter++;
 
-							m_pMTSE->addTask(SurfaceExtractorTaskData(region, 0, uPriority));
-							m_pMTSE->addTask(SurfaceExtractorTaskData(region, 1, uPriority));
-							m_pMTSE->addTask(SurfaceExtractorTaskData(region, 2, uPriority));
+							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
+							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 1, uPriority));
+							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 2, uPriority));
 
 							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 						}
@@ -195,7 +195,7 @@ namespace Thermite
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
-		int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions;
+		int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions * 3;
 
 		while(m_pMTSE->noOfResultsAvailable() > 0)
 		{
@@ -204,7 +204,7 @@ namespace Thermite
 			Thermite::g_thermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
 
 			SurfaceExtractorTaskData result;
-			result = m_pMTSE->getResult();
+			result = m_pMTSE->popResult();
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;

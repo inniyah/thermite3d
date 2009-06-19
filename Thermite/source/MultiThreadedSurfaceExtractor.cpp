@@ -2,6 +2,9 @@
 
 #include "SurfaceExtractorThread.h"
 
+#include <QMutex>
+#include <QSemaphore>
+
 #include <utility>
 
 using namespace PolyVox;
@@ -10,11 +13,7 @@ namespace Thermite
 {
 	MultiThreadedSurfaceExtractor::MultiThreadedSurfaceExtractor(Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads)
 	:m_pVolData(pVolData)
-	,m_bFinished(false)
 	{
-		//m_pSurfaceExtractorThread = new SurfaceExtractorThread(this);
-		//m_pSurfaceExtractorThread2 = new SurfaceExtractorThread(this);
-
 		m_mutexPendingTasks = new QMutex();
 		m_mutexCompletedTasks = new QMutex();
 
@@ -24,17 +23,49 @@ namespace Thermite
 		m_vecThreads.resize(noOfThreads);
 		for(int ct = 0; ct < noOfThreads; ++ct)
 		{
-			m_vecThreads[ct] = new SurfaceExtractorThread(this);
+			m_vecThreads[ct] = new SurfaceExtractorThread(this, pVolData);
 		}
 	}
-		
-	void MultiThreadedSurfaceExtractor::addTask(const SurfaceExtractorTaskData& taskData)
+
+	MultiThreadedSurfaceExtractor::~MultiThreadedSurfaceExtractor()
 	{
+		for(int ct = 0; ct < m_vecThreads.size(); ++ct)
+		{
+			m_vecThreads[ct]->quit();
+			delete m_vecThreads[ct];
+		}
+
+		delete m_mutexPendingTasks;
+		delete m_mutexCompletedTasks;
+
+		delete m_noOfTasksAvailable;
+		delete m_noOfResultsAvailable;
+	}
+		
+	void MultiThreadedSurfaceExtractor::pushTask(const SurfaceExtractorTaskData& taskData)
+	{
+		//Add the task to the queue
 		m_mutexPendingTasks->lock();
 		m_queuePendingTasks.push(taskData);
 		m_mutexPendingTasks->unlock();
 
+		//Increment the number of tasks available
 		m_noOfTasksAvailable->release();
+	}
+
+	SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::popTask(void)
+	{
+		//Decrement the number of tasks available
+		m_noOfTasksAvailable->acquire();
+
+		//Remove the test from the queue
+		m_mutexPendingTasks->lock();
+		SurfaceExtractorTaskData taskData = m_queuePendingTasks.top();
+		m_queuePendingTasks.pop();
+		m_mutexPendingTasks->unlock();
+
+		//Return the task
+		return taskData;
 	}
 
 	int MultiThreadedSurfaceExtractor::noOfResultsAvailable(void)
@@ -42,7 +73,18 @@ namespace Thermite
 		return m_noOfResultsAvailable->available();
 	}
 
-	SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::getResult(void)
+	void MultiThreadedSurfaceExtractor::pushResult(const SurfaceExtractorTaskData& taskData)
+	{
+		//Add the result to the list
+		m_mutexCompletedTasks->lock();
+		m_listCompletedTasks.push_back(taskData);
+		m_mutexCompletedTasks->unlock();
+
+		//Increment the number of results available
+		m_noOfResultsAvailable->release();
+	}
+
+	SurfaceExtractorTaskData MultiThreadedSurfaceExtractor::popResult(void)
 	{
 		SurfaceExtractorTaskData result;
 
