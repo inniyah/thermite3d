@@ -36,45 +36,48 @@ namespace OgreBulletDynamics
 	class RigidBody;
 }
 
-class MapRegion
+namespace Thermite
 {
-public:
-	MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
-	~MapRegion();
+	class MapRegion
+	{
+	public:
+		MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
+		~MapRegion();
 
-	void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
+		void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
 
-	void update(PolyVox::IndexedSurfacePatch* ispNew);
+		void update(PolyVox::IndexedSurfacePatch* ispNew);
 
-	void destroyPhysicsData(void);
+		void destroyPhysicsData(void);
 
-	std::string makeUniqueName(const std::string& strBase);
+		std::string makeUniqueName(const std::string& strBase);
 
-private:
-	Ogre::SceneNode* m_pOgreSceneNode;
+	private:
+		Ogre::SceneNode* m_pOgreSceneNode;
 
-	void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
-	void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
+		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
+		void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 
-public:
-	static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
-	static Ogre::RenderOperation* buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
+	public:
+		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
+		static Ogre::RenderOperation* buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
 
-	SurfacePatchRenderable* m_pSurfacePatchRenderable;
+		SurfacePatchRenderable* m_pSurfacePatchRenderable;
 
-	Ogre::RenderOperation* m_renderOperationLod0;
-	Ogre::RenderOperation* m_renderOperationLod1;
-	Ogre::RenderOperation* m_renderOperationLod2;
+		Ogre::RenderOperation* m_renderOperationLod0;
+		Ogre::RenderOperation* m_renderOperationLod1;
+		Ogre::RenderOperation* m_renderOperationLod2;
 
-	Map* m_pParentMap;
+		Map* m_pParentMap;
 
-	btTriangleMesh* mTriMesh;
-	btBvhTriangleMeshShape* mShape;
-	btRigidBody* mBody;
+		btTriangleMesh* mTriMesh;
+		btBvhTriangleMeshShape* mShape;
+		btRigidBody* mBody;
 
-	static unsigned long m_iNameGen; //Used for unique names
+		static unsigned long m_iNameGen; //Used for unique names
 
-	PolyVox::Vector3DInt16 m_v3dPos;
-};
+		PolyVox::Vector3DInt16 m_v3dPos;
+	};
+}
 
 #endif

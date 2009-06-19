@@ -33,47 +33,50 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "SurfaceExtractorTaskData.h"
 
-class SurfaceExtractorThread;
-
-class SurfaceExtractorTaskDataPriorityComparison
+namespace Thermite
 {
-public:
-  bool operator() (const SurfaceExtractorTaskData& lhs, const SurfaceExtractorTaskData &rhs) const
-  {
-	  return lhs.getPriority() < rhs.getPriority();
-  }
-};
+	class SurfaceExtractorThread;
+
+	class SurfaceExtractorTaskDataPriorityComparison
+	{
+	public:
+	  bool operator() (const SurfaceExtractorTaskData& lhs, const SurfaceExtractorTaskData &rhs) const
+	  {
+		  return lhs.getPriority() < rhs.getPriority();
+	  }
+	};
 
 
-class MultiThreadedSurfaceExtractor
-{
-public:
-	MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads);
-	
-	void addTask(const SurfaceExtractorTaskData& taskData);
+	class MultiThreadedSurfaceExtractor
+	{
+	public:
+		MultiThreadedSurfaceExtractor(PolyVox::Volume<PolyVox::uint8_t>* pVolData, unsigned int noOfThreads);
+		
+		void addTask(const SurfaceExtractorTaskData& taskData);
 
-	int noOfResultsAvailable(void);
+		int noOfResultsAvailable(void);
 
-	SurfaceExtractorTaskData getResult(void);
+		SurfaceExtractorTaskData getResult(void);
 
-	void start(void);
+		void start(void);
 
-	PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
-	std::priority_queue<SurfaceExtractorTaskData, std::vector<SurfaceExtractorTaskData>, SurfaceExtractorTaskDataPriorityComparison> m_queuePendingTasks;
-	std::list<SurfaceExtractorTaskData> m_listCompletedTasks;
+		PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
+		std::priority_queue<SurfaceExtractorTaskData, std::vector<SurfaceExtractorTaskData>, SurfaceExtractorTaskDataPriorityComparison> m_queuePendingTasks;
+		std::list<SurfaceExtractorTaskData> m_listCompletedTasks;
 
-	QMutex* m_mutexPendingTasks;
-	QMutex* m_mutexCompletedTasks;
+		QMutex* m_mutexPendingTasks;
+		QMutex* m_mutexCompletedTasks;
 
-	QSemaphore* m_noOfTasksAvailable;
-	QSemaphore* m_noOfResultsAvailable;
+		QSemaphore* m_noOfTasksAvailable;
+		QSemaphore* m_noOfResultsAvailable;
 
-	//SurfaceExtractorThread* m_pSurfaceExtractorThread;
-	//SurfaceExtractorThread* m_pSurfaceExtractorThread2;
+		//SurfaceExtractorThread* m_pSurfaceExtractorThread;
+		//SurfaceExtractorThread* m_pSurfaceExtractorThread2;
 
-	std::vector<SurfaceExtractorThread*> m_vecThreads;
+		std::vector<SurfaceExtractorThread*> m_vecThreads;
 
-	bool m_bFinished;
-};
+		bool m_bFinished;
+	};
+}
 
 #endif

@@ -28,20 +28,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <QThread>
 
-class MultiThreadedSurfaceExtractor;
-
-class SurfaceExtractorThread : public QThread
+namespace Thermite
 {
-	Q_OBJECT
+	class MultiThreadedSurfaceExtractor;
 
-public:
-	SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE);
+	class SurfaceExtractorThread : public QThread
+	{
+		Q_OBJECT
 
-	MultiThreadedSurfaceExtractor* m_pParentMTSE;
-	PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
+	public:
+		SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE);
 
-protected:
-	void run(void);
-};
+		MultiThreadedSurfaceExtractor* m_pParentMTSE;
+		PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
+
+	protected:
+		void run(void);
+	};
+}
 
 #endif

@@ -30,25 +30,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "OgreBulletDynamicsPreRequisites.h"
 
-class PhysicalEntity
+namespace Thermite
 {
-public:
-	enum CollisionShapeType
+	class PhysicalEntity
 	{
-		CST_BOX,
-		CST_SPHERE,
-		CST_CONVEX_HULL,
-		CST_EXACT
+	public:
+		enum CollisionShapeType
+		{
+			CST_BOX,
+			CST_SPHERE,
+			CST_CONVEX_HULL,
+			CST_EXACT
+		};
+
+		PhysicalEntity(Map* pParentMap , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType = CST_BOX);
+		~PhysicalEntity();
+
+		Ogre::Entity* m_pEntity;
+		Ogre::SceneNode* m_pSceneNode;
+		OgreBulletCollisions::CollisionShape* m_pCollisionShape;
+		OgreBulletDynamics::RigidBody* m_pRigidBody;
+		Map* m_pParentMap;
 	};
-
-	PhysicalEntity(Map* pParentMap , Ogre::Entity* entity, float restitution, float friction, float mass, CollisionShapeType collisionShapeType = CST_BOX);
-	~PhysicalEntity();
-
-	Ogre::Entity* m_pEntity;
-	Ogre::SceneNode* m_pSceneNode;
-	OgreBulletCollisions::CollisionShape* m_pCollisionShape;
-	OgreBulletDynamics::RigidBody* m_pRigidBody;
-	Map* m_pParentMap;
-};
+}
 
 #endif

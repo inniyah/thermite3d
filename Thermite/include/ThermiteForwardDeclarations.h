@@ -30,26 +30,28 @@ const PolyVox::uint16_t THERMITE_REGION_SIDE_LENGTH_POWER = 5;
 const PolyVox::uint16_t THERMITE_REGION_SIDE_LENGTH = (0x0001 << THERMITE_REGION_SIDE_LENGTH_POWER);
 const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS = (THERMITE_VOLUME_SIDE_LENGTH >> THERMITE_REGION_SIDE_LENGTH_POWER);
 
-//class Application;
-class GameState;
-//class IndexedSurfacePatchCollisionShape;
-class LoadSceneMenuPage;
-class MainMenuPage;
-class Map;
-class MenuPage;
-class MenuState;
-class PhysicalObject;
-class PlayState;
-class State;
-class StateManager;
-class SurfacePatchRenderable;
-//class VolumeManager;
-//class VolumeResourse;
-//class VolumeSerializer;
-class MapRegion;
+
 
 namespace Thermite
 {
+	//class Application;
+	class GameState;
+	//class IndexedSurfacePatchCollisionShape;
+	class LoadSceneMenuPage;
+	class MainMenuPage;
+	class Map;
+	class MenuPage;
+	class MenuState;
+	class PhysicalObject;
+	class PlayState;
+	class State;
+	class StateManager;
+	class SurfacePatchRenderable;
+	//class VolumeManager;
+	//class VolumeResourse;
+	//class VolumeSerializer;
+	class MapRegion;
+
 	class LoadMapWidget;
 	class MoviePlayer;
 	class Shell;

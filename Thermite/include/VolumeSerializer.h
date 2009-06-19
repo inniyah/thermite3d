@@ -28,14 +28,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PolyVoxForwardDeclarations.h"
 
-class VolumeSerializer : public Ogre::Serializer
+namespace Thermite
 {
-public:
-	VolumeSerializer ();
-	virtual ~VolumeSerializer ();
+	class VolumeSerializer : public Ogre::Serializer
+	{
+	public:
+		VolumeSerializer ();
+		virtual ~VolumeSerializer ();
 
-	//void exportVolume (const Volume *pText, const Ogre::String &fileName);
-	void importVolume (Ogre::DataStreamPtr &stream, PolyVox::Volume<PolyVox::uint8_t> **pDest);
-};
+		//void exportVolume (const Volume *pText, const Ogre::String &fileName);
+		void importVolume (Ogre::DataStreamPtr &stream, PolyVox::Volume<PolyVox::uint8_t> **pDest);
+	};
+}
 
 #endif

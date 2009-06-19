@@ -26,22 +26,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <streambuf>
 
-class DataStreamAdapter : public std::streambuf
+namespace Thermite
 {
-public:
-    DataStreamAdapter (const Ogre::DataStreamPtr &dsp);
+	class DataStreamAdapter : public std::streambuf
+	{
+	public:
+		DataStreamAdapter (const Ogre::DataStreamPtr &dsp);
 
-    std::streamsize showmanyc (void);
+		std::streamsize showmanyc (void);
 
-	//Standard versions
-    std::streamsize xsgetn(char* s, std::streamsize n);
-    std::streamsize xsputn(const char_type*, std::streamsize);
+		//Standard versions
+		std::streamsize xsgetn(char* s, std::streamsize n);
+		std::streamsize xsputn(const char_type*, std::streamsize);
 
-	//Microsoft specific version
-	std::streamsize _Xsgetn_s(char *s, size_t size, std::streamsize n);
+		//Microsoft specific version
+		std::streamsize _Xsgetn_s(char *s, size_t size, std::streamsize n);
 
-protected:
-    Ogre::DataStreamPtr m_Dsp;
-};
+	protected:
+		Ogre::DataStreamPtr m_Dsp;
+	};
+}
 
 #endif

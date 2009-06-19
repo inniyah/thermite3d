@@ -36,46 +36,49 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <map>
 
-class Map
+namespace Thermite
 {
-public:
-	Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
-	~Map(void);
+	class Map
+	{
+	public:
+		Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
+		~Map(void);
 
-	void initialisePhysics(void);
+		void initialisePhysics(void);
 
-	bool Map::loadScene(const Ogre::String& filename);
+		bool Map::loadScene(const Ogre::String& filename);
 
-	void updatePolyVoxGeometry();	
+		void updatePolyVoxGeometry();	
 
-	void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
+		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
 
-public:
-	Ogre::SceneManager* m_pOgreSceneManager;
+	public:
+		Ogre::SceneManager* m_pOgreSceneManager;
 
-	PolyVox::VolumeChangeTracker* volumeChangeTracker;
+		PolyVox::VolumeChangeTracker* volumeChangeTracker;
 
-	VolumeResourcePtr volumeResource;
+		VolumeResourcePtr volumeResource;
 
-	OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
+		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 
-	PolyVox::Volume<MapRegion*>* m_volMapRegions;
+		PolyVox::Volume<MapRegion*>* m_volMapRegions;
 
-	MultiThreadedSurfaceExtractor* m_pMTSE;
+		MultiThreadedSurfaceExtractor* m_pMTSE;
 
-private:
-	Ogre::Vector3 m_vecGravity;
-	Ogre::AxisAlignedBox m_boxPhysicsBounds;
-	Ogre::Real m_rVoxelSize;
+	private:
+		Ogre::Vector3 m_vecGravity;
+		Ogre::AxisAlignedBox m_boxPhysicsBounds;
+		Ogre::Real m_rVoxelSize;
 
-	Ogre::Timer* timer;
+		Ogre::Timer* timer;
 
-	Ogre::SceneNode* m_axisNode;
+		Ogre::SceneNode* m_axisNode;
 
-	PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
+		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 
-	int m_iNoProcessed;
-};
+		int m_iNoProcessed;
+	};
+}
 
 
 #endif

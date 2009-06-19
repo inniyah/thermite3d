@@ -2,48 +2,51 @@
 
 using namespace PolyVox;
 
-SurfaceExtractorTaskData::SurfaceExtractorTaskData()
+namespace Thermite
 {
-}
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData()
+	{
+	}
 
-SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint8_t uLodLevel, uint32_t uPriority)
-:m_uLodLevel(uLodLevel)
-,m_uPriority(uPriority)
-,m_regToProcess(regToProcess)
-{
-}
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint8_t uLodLevel, uint32_t uPriority)
+	:m_uLodLevel(uLodLevel)
+	,m_uPriority(uPriority)
+	,m_regToProcess(regToProcess)
+	{
+	}
 
-uint8_t SurfaceExtractorTaskData::getLodLevel(void) const
-{
-	return m_uLodLevel;
-}
+	uint8_t SurfaceExtractorTaskData::getLodLevel(void) const
+	{
+		return m_uLodLevel;
+	}
 
-Region SurfaceExtractorTaskData::getRegion(void) const
-{
-	return m_regToProcess;
-}
+	Region SurfaceExtractorTaskData::getRegion(void) const
+	{
+		return m_regToProcess;
+	}
 
-uint32_t SurfaceExtractorTaskData::getPriority(void) const
-{
-	return m_uPriority;
-}
+	uint32_t SurfaceExtractorTaskData::getPriority(void) const
+	{
+		return m_uPriority;
+	}
 
-POLYVOX_SHARED_PTR<IndexedSurfacePatch> SurfaceExtractorTaskData::getIndexedSurfacePatch(void) const
-{
-	return m_ispResult;
-}
+	POLYVOX_SHARED_PTR<IndexedSurfacePatch> SurfaceExtractorTaskData::getIndexedSurfacePatch(void) const
+	{
+		return m_ispResult;
+	}
 
-void SurfaceExtractorTaskData::setLodLevel(uint8_t uLodLevel)
-{
-	m_uLodLevel = uLodLevel;
-}
+	void SurfaceExtractorTaskData::setLodLevel(uint8_t uLodLevel)
+	{
+		m_uLodLevel = uLodLevel;
+	}
 
-void SurfaceExtractorTaskData::setPriority(uint32_t uPriority)
-{
-	m_uPriority = uPriority;
-}
+	void SurfaceExtractorTaskData::setPriority(uint32_t uPriority)
+	{
+		m_uPriority = uPriority;
+	}
 
-void SurfaceExtractorTaskData::setRegion(const Region& regToProcess)
-{
-	m_regToProcess = regToProcess;
+	void SurfaceExtractorTaskData::setRegion(const Region& regToProcess)
+	{
+		m_regToProcess = regToProcess;
+	}
 }

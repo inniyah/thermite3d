@@ -33,31 +33,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using namespace PolyVox;
 
-VolumeSerializer::VolumeSerializer ()
+namespace Thermite
 {
+	VolumeSerializer::VolumeSerializer ()
+	{
 
-}
+	}
 
-VolumeSerializer::~VolumeSerializer ()
-{
+	VolumeSerializer::~VolumeSerializer ()
+	{
 
-}
+	}
 
-/*void VolumeSerializer::exportVolume (const Volume *pText, const Ogre::String &fileName)
-{
-	std::ofstream outFile;
-	outFile.open (fileName.c_str(), std::ios::out);
-	outFile << pText->getString ();
-	outFile.close ();
-}*/
+	/*void VolumeSerializer::exportVolume (const Volume *pText, const Ogre::String &fileName)
+	{
+		std::ofstream outFile;
+		outFile.open (fileName.c_str(), std::ios::out);
+		outFile << pText->getString ();
+		outFile.close ();
+	}*/
 
-void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox::uint8_t> **pDest)
-{
-	//pDest->setString (stream->getAsString ());
-	//Volume vol;
+	void VolumeSerializer::importVolume (Ogre::DataStreamPtr &stream, Volume<PolyVox::uint8_t> **pDest)
+	{
+		//pDest->setString (stream->getAsString ());
+		//Volume vol;
 
-	//Ogre::DataStreamPtr file = stream;
-	std::istream stdStream(new DataStreamAdapter(stream)); 
+		//Ogre::DataStreamPtr file = stream;
+		std::istream stdStream(new DataStreamAdapter(stream)); 
 
-	*pDest = loadVolumeRle(stdStream, Thermite::volumeLoadProgressCallback);
+		*pDest = loadVolumeRle(stdStream, Thermite::volumeLoadProgressCallback);
+	}
 }

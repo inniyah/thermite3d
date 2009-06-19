@@ -14,77 +14,80 @@
 
 using namespace PolyVox;
 
-MapHandler::MapHandler(Map* map)
-:DotSceneHandler(map->m_pOgreSceneManager)
-,mMap(map)
+namespace Thermite
 {
-	//mSceneManager = sceneManager;
-}
-
-bool MapHandler::startElement(const QString& namespaceURI,
-								   const QString& localName,
-								   const QString& qName,
-								   const QXmlAttributes &attributes)
-{
-	DotSceneHandler::startElement(namespaceURI, localName, qName, attributes);
-
-	if(qName == "volume")
+	MapHandler::MapHandler(Map* map)
+	:DotSceneHandler(map->m_pOgreSceneManager)
+	,mMap(map)
 	{
-		handleVolume(attributes);
+		//mSceneManager = sceneManager;
 	}
 
-	return true;
-}
-
-Ogre::Entity* MapHandler::handleEntity(const QXmlAttributes &attributes)
-{
-	Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
-
-	if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+	bool MapHandler::startElement(const QString& namespaceURI,
+									   const QString& localName,
+									   const QString& qName,
+									   const QXmlAttributes &attributes)
 	{
-		float restitution = convertWithDefault(attributes.value("restitution"), 1.0f);
-		float friction = convertWithDefault(attributes.value("friction"), 1.0f);
-		float mass = convertWithDefault(attributes.value("mass"), 0.0f);
+		DotSceneHandler::startElement(namespaceURI, localName, qName, attributes);
 
-		QString collisionShape = convertWithDefault(attributes.value("collisionShape"), "box");
-		PhysicalEntity::CollisionShapeType collisionShapeType;
-		if(collisionShape.compare("box") == 0)
+		if(qName == "volume")
 		{
-			collisionShapeType = PhysicalEntity::CST_BOX;
-		}
-		else if(collisionShape.compare("sphere") == 0)
-		{
-			collisionShapeType = PhysicalEntity::CST_SPHERE;
-		}
-		else if(collisionShape.compare("convexHull") == 0)
-		{
-			collisionShapeType = PhysicalEntity::CST_CONVEX_HULL;
-		}
-		else if(collisionShape.compare("exact") == 0)
-		{
-			collisionShapeType = PhysicalEntity::CST_EXACT;
+			handleVolume(attributes);
 		}
 
-		PhysicalEntity* physEnt = new PhysicalEntity(mMap, entity, restitution, friction, mass, collisionShapeType);
+		return true;
 	}
 
-	return entity;
-}
-
-void* MapHandler::handleVolume(const QXmlAttributes &attributes)
-{
-	QString volumeSource = convertWithDefault(attributes.value("source"), "");
-
-	mMap->volumeResource = VolumeManager::getSingletonPtr()->load(volumeSource.toStdString(), "General");
-	if(mMap->volumeResource.isNull())
+	Ogre::Entity* MapHandler::handleEntity(const QXmlAttributes &attributes)
 	{
-		Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
+		Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
+
+		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+		{
+			float restitution = convertWithDefault(attributes.value("restitution"), 1.0f);
+			float friction = convertWithDefault(attributes.value("friction"), 1.0f);
+			float mass = convertWithDefault(attributes.value("mass"), 0.0f);
+
+			QString collisionShape = convertWithDefault(attributes.value("collisionShape"), "box");
+			PhysicalEntity::CollisionShapeType collisionShapeType;
+			if(collisionShape.compare("box") == 0)
+			{
+				collisionShapeType = PhysicalEntity::CST_BOX;
+			}
+			else if(collisionShape.compare("sphere") == 0)
+			{
+				collisionShapeType = PhysicalEntity::CST_SPHERE;
+			}
+			else if(collisionShape.compare("convexHull") == 0)
+			{
+				collisionShapeType = PhysicalEntity::CST_CONVEX_HULL;
+			}
+			else if(collisionShape.compare("exact") == 0)
+			{
+				collisionShapeType = PhysicalEntity::CST_EXACT;
+			}
+
+			PhysicalEntity* physEnt = new PhysicalEntity(mMap, entity, restitution, friction, mass, collisionShapeType);
+		}
+
+		return entity;
 	}
 
-	int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-	mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, regionSideLength);
+	void* MapHandler::handleVolume(const QXmlAttributes &attributes)
+	{
+		QString volumeSource = convertWithDefault(attributes.value("source"), "");
 
-	mMap->volumeChangeTracker->setAllRegionsModified();
+		mMap->volumeResource = VolumeManager::getSingletonPtr()->load(volumeSource.toStdString(), "General");
+		if(mMap->volumeResource.isNull())
+		{
+			Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
+		}
 
-	return 0;
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, regionSideLength);
+
+		mMap->volumeChangeTracker->setAllRegionsModified();
+
+		return 0;
+	}
 }
