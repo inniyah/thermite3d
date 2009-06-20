@@ -150,9 +150,11 @@ namespace Thermite
 		//Update the cannon
 		float directionInDegrees = mCannonController->direction();
 		float elevationInDegrees = mCannonController->elevation();
-		mCannonNode->setOrientation(Ogre::Quaternion::IDENTITY);
-		mCannonNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-		mCannonNode->rotate(Ogre::Vector3(-1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
+		mTurretNode->setOrientation(mTurretOriginalOrientation);
+		mGunNode->setOrientation(mGunOriginalOrientation);
+
+		mTurretNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
+		mGunNode->rotate(Ogre::Vector3(0.0,0.0,1.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
 
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
@@ -278,14 +280,15 @@ namespace Thermite
 
 	void ThermiteGameLogic::fireCannon(void)
 	{
-		Shell* shell = new Shell(mMap, Ogre::Vector3(200.0f, 65.0f, 80.0f), Ogre::Vector3(0.0f, 1.0f, 0.0f));
+		Shell* shell = new Shell(mMap, mGunNode->_getDerivedPosition(), Ogre::Vector3(0.0f, 1.0f, 0.0f));
 
 		//Update the shell
 		float directionInDegrees = mCannonController->direction();
 		float elevationInDegrees = mCannonController->elevation();
-		shell->m_pSceneNode->setOrientation(Ogre::Quaternion::IDENTITY);
-		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-		shell->m_pSceneNode->rotate(Ogre::Vector3(-1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
+		shell->m_pSceneNode->setOrientation(mGunOriginalOrientation);
+		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,1.0,0.0),Ogre::Radian(1.57));
+		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,-1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
+		shell->m_pSceneNode->rotate(Ogre::Vector3(1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
 
 		shell->m_vecVelocity = shell->m_pSceneNode->getLocalAxes().GetColumn(2);
 		shell->m_vecVelocity.normalise();
@@ -314,11 +317,17 @@ namespace Thermite
 
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
 
-		mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
-		mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
+		/*mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
+		Ogre::Entity* mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
 		mCannonNode->attachObject(mCannon);
 		mCannonNode->setPosition(200.0f, 65.0f, 80.0f);
-		mCannonNode->setScale(3.0,3.0,3.0);
+		mCannonNode->setScale(3.0,3.0,3.0);*/
+
+		mTurretNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
+		mGunNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
+
+		mTurretOriginalOrientation = mTurretNode->getOrientation();
+		mGunOriginalOrientation = mGunNode->getOrientation();
 
 		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
 		mCannonController->show();

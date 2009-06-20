@@ -99,8 +99,12 @@ namespace Thermite
 
 		std::queue<PhysicalObject*> m_queueObjects;
 
-		Ogre::Entity* mCannon;
-		Ogre::SceneNode* mCannonNode;
+		//Ogre::Entity* mCannon;
+		Ogre::SceneNode* mTurretNode;
+		Ogre::SceneNode* mGunNode;
+
+		Ogre::Quaternion mTurretOriginalOrientation;
+		Ogre::Quaternion mGunOriginalOrientation;
 
 		std::list<Shell*> m_listShells;
 

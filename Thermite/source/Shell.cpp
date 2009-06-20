@@ -13,6 +13,7 @@ namespace Thermite
 		m_pEntity = m_pParentMap->m_pOgreSceneManager->createEntity(generateUID("ShellEntity"), "Shell.mesh");
 		m_pSceneNode->attachObject(m_pEntity);
 		m_pSceneNode->setPosition(vecPosition);
+		m_pSceneNode->setScale(Ogre::Vector3(0.25,0.25,0.25));
 
 		//Tempoary hack so shell doesn't immediatly explode in the cannon
 		m_pSceneNode->setPosition(vecPosition + vecVelocity.normalisedCopy());
