@@ -1,0 +1,86 @@
+material NoMaterial
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.7 0.7 0.7 
+			diffuse 0.7 0.7 0.7 
+		}
+	}
+}
+
+
+material armor
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 
+			diffuse 0.266667 0.321569 0.227451 
+			specular 0.081 0.081 0.081 39
+			emissive 0 0 0 
+
+			texture_unit 
+			{
+				texture M60carc.jpg
+			}
+		}
+	}
+}
+
+
+material gun_trim
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 
+			diffuse 0.286275 0.282353 0.219608 
+			specular 0.2 0.2 0.2 30
+			emissive 0 0 0 
+			
+			texture_unit 
+			{
+				texture M60TEL.jpg
+			}
+		}
+	}
+}
+
+
+material tracks
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 
+			diffuse 0.262745 0.227451 0.196078 
+			specular 0.09 0.09 0.09 17
+			emissive 0 0 0 
+			
+			texture_unit 
+			{
+				texture M60REJI.jpg
+			}
+		}
+	}
+}
+
+
+material turrettrim
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 
+			diffuse 0.262745 0.227451 0.196078 
+			specular 0 0 0 1
+			emissive 0 0 0 
+		}
+	}
+}
