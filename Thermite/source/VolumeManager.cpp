@@ -39,7 +39,7 @@ namespace Thermite
 	}
 
 	VolumeManager::VolumeManager ()
-	:pCallback(0)
+	:m_pProgressListener(0)
 	{
 		mResourceType = "Volume";
 
@@ -77,13 +77,5 @@ namespace Thermite
 												const Ogre::NameValuePairList *createParams)
 	{
 		return new VolumeResource (this, name, handle, group, isManual, loader);
-	}
-
-	void VolumeManager::setCurrentLoadProgress(float fProgress)
-	{
-		if(pCallback != 0)
-		{
-			pCallback(fProgress);
-		}
 	}
 }

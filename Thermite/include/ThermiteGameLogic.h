@@ -6,6 +6,7 @@
 #include "MainMenu.h"
 #include "LoadingProgress.h"
 
+#include "Serialization.h"
 
 #include "Map.h"
 #include "PhysicalEntity.h"
@@ -25,9 +26,6 @@
 
 namespace Thermite
 {
-	extern ThermiteGameLogic* g_thermiteGameLogic;
-	void volumeLoadProgressCallback(float fProgress);
-
 	enum KeyStates
 	{
 		KS_RELEASED,

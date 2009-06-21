@@ -33,6 +33,7 @@ SET(SRC_FILES
 	source/Utility.cpp
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
+	source/VolumeSerializationProgressListenerImpl.cpp
 	source/VolumeSerializer.cpp
 )
 
@@ -56,6 +57,7 @@ SET(INC_FILES
 	include/Utility.h
 	include/VolumeManager.h
 	include/VolumeResource.h
+	include/VolumeSerializationProgressListenerImpl.h
 	include/VolumeSerializer.h
 
 )

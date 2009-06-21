@@ -65,6 +65,8 @@ namespace Thermite
 
 		MultiThreadedSurfaceExtractor* m_pMTSE;
 
+		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
+
 	private:
 		Ogre::Vector3 m_vecGravity;
 		Ogre::AxisAlignedBox m_boxPhysicsBounds;

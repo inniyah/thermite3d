@@ -25,18 +25,11 @@ using namespace std;
 
 namespace Thermite
 {
-	ThermiteGameLogic* g_thermiteGameLogic = 0;
-	void volumeLoadProgressCallback(float fProgress)
-	{
-		g_thermiteGameLogic->setVolumeLoadProgress(fProgress);
-	}
-
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 		,mMap(0)
 	{
-		g_thermiteGameLogic = this;
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -92,6 +85,7 @@ namespace Thermite
 		//Onto the good stuff...
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
+		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
 		mMainMenu->show();
@@ -304,6 +298,7 @@ namespace Thermite
 		m_loadingProgress->show();
 
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
+		mMap->m_pThermiteGameLogic = this;
 		mMap->loadScene("");
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())

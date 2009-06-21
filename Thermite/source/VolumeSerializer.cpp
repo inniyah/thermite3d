@@ -61,6 +61,6 @@ namespace Thermite
 		//Ogre::DataStreamPtr file = stream;
 		std::istream stdStream(new DataStreamAdapter(stream)); 
 
-		*pDest = loadVolumeRle(stdStream, Thermite::volumeLoadProgressCallback);
+		*pDest = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);
 	}
 }

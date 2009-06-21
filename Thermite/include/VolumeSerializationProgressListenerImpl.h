@@ -19,37 +19,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __VOLUMEMANAGER_H__
-#define __VOLUMEMANAGER_H__
+#ifndef __VOLUMESERIALIZATIONPROGRESSLISTENERIMPL_H__
+#define __VOLUMESERIALIZATIONPROGRESSLISTENERIMPL_H__
 
-#include <OgreResourceManager.h>
-#include "VolumeResource.h"
+#include "Serialization.h"
 
-#include "VolumeSerializationProgressListenerImpl.h"
+#include "ThermiteForwardDeclarations.h"
 
 namespace Thermite
 {
-	class VolumeManager : public Ogre::ResourceManager, public Ogre::Singleton<VolumeManager>
+	class VolumeSerializationProgressListenerImpl : public PolyVox::VolumeSerializationProgressListener
 	{
-	protected:
-
-		// must implement this from ResourceManager's interface
-		Ogre::Resource *createImpl(const Ogre::String &name, Ogre::ResourceHandle handle, 
-			const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
-			const Ogre::NameValuePairList *createParams);
-
 	public:
+		VolumeSerializationProgressListenerImpl(ThermiteGameLogic* pThermiteGameLogic);
 
-		VolumeManager ();
-		virtual ~VolumeManager ();
+		void onProgressUpdated(float fProgress);
 
-		virtual VolumeResourcePtr load (const Ogre::String &name, const Ogre::String &group);
-
-		static VolumeManager &getSingleton ();
-		static VolumeManager *getSingletonPtr ();
-
-		VolumeSerializationProgressListenerImpl* m_pProgressListener;
+		ThermiteGameLogic* m_pThermiteGameLogic;
 	};
 }
 
-#endif
+#endif //__VOLUMESERIALIZATIONPROGRESSLISTENERIMPL_H__
