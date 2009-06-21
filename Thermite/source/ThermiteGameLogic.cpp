@@ -88,7 +88,7 @@ namespace Thermite
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
 
 		mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
-		mMainMenu->show();
+		mMainMenu->exec();
 
 		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
 		wgtLoadMap->show();
