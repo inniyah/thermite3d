@@ -8,33 +8,40 @@ using namespace QtOgre;
 
 namespace Thermite
 {
-	MainMenu::MainMenu(Application* application, QWidget* mainWidget, QWidget *parent)
-	:QDialog(parent)
+	MainMenu::MainMenu(QWidget *parent, Qt::WindowFlags f)
+	:QWidget(parent, f)
 	{
 		setupUi(this);
-
-		mApplication = application;
-		mMainWidget = mainWidget;
 	}
 
 	void MainMenu::on_mQuitButton_clicked(void)
 	{
-		mMainWidget->close();
+		emit quitClicked();
 	}
 
 	void MainMenu::on_mResumeButton_clicked(void)
 	{
-		reject();
+		//hide();
+		emit resumeClicked();
 	}
 
 	void MainMenu::on_mSettingsButton_clicked(void)
 	{
-		mApplication->showSettingsDialog();
+		//mApplication->showSettingsDialog();
+		emit settingsClicked();
 	}
 
 	void MainMenu::on_mViewLogsButton_clicked(void)
 	{
-		mApplication->showLogManager();
+		emit viewLogsClicked();
+		//mApplication->showLogManager();
+		//reject();
+	}
+
+	void MainMenu::on_mLoadButton_clicked(void)
+	{
+		emit loadClicked();
+		//mApplication->showLogManager();
 		//reject();
 	}
 }

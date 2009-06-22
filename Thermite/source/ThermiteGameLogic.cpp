@@ -34,9 +34,15 @@ namespace Thermite
 
 	void ThermiteGameLogic::initialise(void)
 	{
+		//First we set up the logging system , to hopefully record any problems.
+		mThermiteLog = mApplication->createLog("Thermite");
+		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
+
+		//Set the main window icon
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
 		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
 
+		//Set up and start the thermite logo animation. This plays while we initialise.
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
 		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
 		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
@@ -45,20 +51,47 @@ namespace Thermite
 		m_pThermiteLogoLabel->show();
 		m_pThermiteLogoMovie->start();
 
-
-		mApplication->setUpdateInterval(0);
-
-		mThermiteLog = mApplication->createLog("Thermite");
-		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
-
+		//Load the Cg plugin
 		#if defined(_DEBUG)
 			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
 		#else
 			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
 		#endif
 
+		//Initialise all resources
 		addResourceDirectory("../share/thermite/");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+		//Set up various GUI components...
+		//The load map widget
+		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
+		Application::centerWidget(wgtLoadMap, qApp->mainWidget());
+
+		//Used to display loading/extraction progress
+		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
+		Application::centerWidget(m_loadingProgress, qApp->mainWidget());
+
+		//The main menu
+		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
+		Application::centerWidget(mMainMenu, qApp->mainWidget());
+		QObject::connect(mMainMenu, SIGNAL(resumeClicked(void)), mMainMenu, SLOT(hide(void)));
+		QObject::connect(mMainMenu, SIGNAL(quitClicked(void)), qApp->mainWidget(), SLOT(close(void)));
+		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
+		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
+		QObject::connect(mMainMenu, SIGNAL(loadClicked(void)), wgtLoadMap, SLOT(show(void)));
+
+		//Set the frame sate to be as high as possible
+		mApplication->setUpdateInterval(0);
+
+		//Some Ogre related stuff we need to set up
+		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
+		VolumeManager* vm = new VolumeManager;
+		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
+
+		//Show the main menu
+		mMainMenu->show();
+
+		//From here on, I'm not sure it belongs in this initialise function... maybe in Map?		
 
 		// Create the generic scene manager
 		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
@@ -80,20 +113,7 @@ namespace Thermite
 		mCurrentFrameNumber = 0;
 
 		mCameraSpeed = 50.0;
-		mCameraRotationalSpeed = 0.01;
-
-		//Onto the good stuff...
-		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
-		VolumeManager* vm = new VolumeManager;
-		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
-
-		mMainMenu = new MainMenu(qApp, qApp->mainWidget());	
-		mMainMenu->exec();
-
-		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
-		wgtLoadMap->show();
-
-		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
+		mCameraRotationalSpeed = 0.01;		
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -142,13 +162,16 @@ namespace Thermite
 		mLastFrameWheelPos = mCurrentWheelPos;
 
 		//Update the cannon
-		float directionInDegrees = mCannonController->direction();
-		float elevationInDegrees = mCannonController->elevation();
-		mTurretNode->setOrientation(mTurretOriginalOrientation);
-		mGunNode->setOrientation(mGunOriginalOrientation);
+		if(mTurretNode && mGunNode)
+		{
+			float directionInDegrees = mCannonController->direction();
+			float elevationInDegrees = mCannonController->elevation();
+			mTurretNode->setOrientation(mTurretOriginalOrientation);
+			mGunNode->setOrientation(mGunOriginalOrientation);
 
-		mTurretNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-		mGunNode->rotate(Ogre::Vector3(0.0,0.0,1.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
+			mTurretNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
+			mGunNode->rotate(Ogre::Vector3(0.0,0.0,1.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
+		}
 
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
@@ -233,7 +256,7 @@ namespace Thermite
 
 		if(event->key() == Qt::Key_Escape)
 		{
-			mMainMenu->exec();
+			mMainMenu->show();
 		}
 	}
 
@@ -299,7 +322,7 @@ namespace Thermite
 
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->m_pThermiteGameLogic = this;
-		mMap->loadScene("");
+		mMap->loadScene(strMapName.toStdString());
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
@@ -312,20 +335,22 @@ namespace Thermite
 
 		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
 
-		/*mCannonNode = mSceneManager->getRootSceneNode()->createChildSceneNode("CannonSceneNode");
-		Ogre::Entity* mCannon = mSceneManager->createEntity("CannonEntity", "Cannon.mesh");
-		mCannonNode->attachObject(mCannon);
-		mCannonNode->setPosition(200.0f, 65.0f, 80.0f);
-		mCannonNode->setScale(3.0,3.0,3.0);*/
+		try
+		{
+			mTurretNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
+			mGunNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
 
-		mTurretNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
-		mGunNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
+			mTurretOriginalOrientation = mTurretNode->getOrientation();
+			mGunOriginalOrientation = mGunNode->getOrientation();
 
-		mTurretOriginalOrientation = mTurretNode->getOrientation();
-		mGunOriginalOrientation = mGunNode->getOrientation();
-
-		mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
-		mCannonController->show();
+			mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
+			mCannonController->show();
+		}
+		catch(Ogre::ItemIdentityException&) //Thrown if the tank is not found
+		{
+			mTurretNode = 0;
+			mGunNode = 0;
+		}
 
 		//m_loadingProgress->hide();
 	}

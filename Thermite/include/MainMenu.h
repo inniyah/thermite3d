@@ -8,23 +8,26 @@
 namespace Thermite
 {
 
-	class MainMenu : public QDialog, private Ui::MainMenu
+	class MainMenu : public QWidget, private Ui::MainMenu
 	{
 		Q_OBJECT
 
 	public:
-		MainMenu(QtOgre::Application* application, QWidget* mainWidget, QWidget *parent = 0);
+		MainMenu(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
 	public slots:
 		void on_mQuitButton_clicked(void);
 		void on_mResumeButton_clicked(void);
 		void on_mSettingsButton_clicked(void);
 		void on_mViewLogsButton_clicked(void);
+		void on_mLoadButton_clicked(void);
 
-	private:
-		QtOgre::Application *mApplication;
-		QWidget* mMainWidget;
-
+	signals:
+		void quitClicked(void);
+		void resumeClicked(void);
+		void settingsClicked(void);
+		void viewLogsClicked(void);
+		void loadClicked(void);
 	};
 }
 

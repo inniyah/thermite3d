@@ -91,7 +91,7 @@ namespace Thermite
 		reader.setContentHandler(&handler);
 		reader.setErrorHandler(&handler);
 
-		QFile file("..\\share\\thermite\\Ogre\\maps\\load_me.map");
+		QFile file("..\\share\\thermite\\Ogre\\maps\\" + QString::fromStdString(filename)); //HACK - Should really use the resource system for this!
 		file.open(QFile::ReadOnly | QFile::Text);
 		QXmlInputSource xmlInputSource(&file);
 		reader.parse(xmlInputSource);
