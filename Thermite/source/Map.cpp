@@ -39,6 +39,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ThermiteGameLogic.h"
 
+#include "GradientEstimators.h"
+
 
 #include <OgreSceneManagerEnumerator.h>
 #include <OgreSceneManager.h>
@@ -106,7 +108,7 @@ namespace Thermite
 
 		volumeChangeTracker->setAllRegionsModified();
 
-		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), 2);
+		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), qApp->settings()->value("Engine/NoOfSurfaceExtractionThreads", 2).toInt());
 
 		return true;
 	}
@@ -219,6 +221,11 @@ namespace Thermite
 		}
 
 		POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp = result.getIndexedSurfacePatch();
+
+		computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
+		//*ispCurrent = getSmoothedSurface(*ispCurrent);
+		isp->smooth(0.3f);
+		//ispCurrent->generateAveragedFaceNormals(true);
 
 		//isp = result.second;
 

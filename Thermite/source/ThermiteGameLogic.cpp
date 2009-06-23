@@ -353,6 +353,8 @@ namespace Thermite
 		}
 
 		//m_loadingProgress->hide();
+
+		mApplication->showFPSCounter();
 	}
 
 	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)

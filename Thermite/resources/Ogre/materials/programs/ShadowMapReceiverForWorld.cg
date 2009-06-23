@@ -70,6 +70,8 @@ void ShadowMapReceiverForWorldFP(
 	float3 colourMapValueYZ;
 	float3 colourMapValueXZ;
 	
+	inNormal *= inNormal;
+	
 	//FIXME - For some reason, precomputing the derivatives seemed to hurt performance.
 	//But without doing it, Direct3D got wouldn't let me use more than two textures.
 	//It appeared to be a bug...
