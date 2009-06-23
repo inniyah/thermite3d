@@ -316,7 +316,8 @@ namespace Thermite
 
 	void ThermiteGameLogic::loadMap(QString strMapName)
 	{
-		m_pThermiteLogoLabel->setVisible(false);
+		m_pThermiteLogoLabel->hide();
+		mMainMenu->hide();
 
 		m_loadingProgress->show();
 
@@ -344,6 +345,7 @@ namespace Thermite
 			mGunOriginalOrientation = mGunNode->getOrientation();
 
 			mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
+			mCannonController->move(qApp->mainWidget()->geometry().left() + qApp->mainWidget()->geometry().width() - mCannonController->frameGeometry().width() - 10, qApp->mainWidget()->geometry().top() + 10);
 			mCannonController->show();
 		}
 		catch(Ogre::ItemIdentityException&) //Thrown if the tank is not found

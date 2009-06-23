@@ -20,6 +20,7 @@ namespace Thermite
 
 	public slots:
 		void on_m_btnLoad_clicked(void);
+		void on_m_btnClose_clicked(void);
 		void on_m_listMap_currentTextChanged(const QString & currentText);
 
 	private:

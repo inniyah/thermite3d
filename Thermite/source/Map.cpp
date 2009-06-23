@@ -204,6 +204,10 @@ namespace Thermite
 			m_iNoProcessed++;
 			float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(noOfRegions);
 			m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+			if(fProgress > 0.999)
+			{
+				m_pThermiteGameLogic->m_loadingProgress->hide();
+			}
 
 			SurfaceExtractorTaskData result;
 			result = m_pMTSE->popResult();
