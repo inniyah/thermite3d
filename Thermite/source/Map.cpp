@@ -87,6 +87,7 @@ namespace Thermite
 	bool Map::loadScene(const Ogre::String& filename)
 	{
 		m_iNoProcessed = 0;
+		m_iNoSubmitted = 0;
 
 		MapHandler handler(this);
 		QXmlSimpleReader reader;
@@ -169,8 +170,21 @@ namespace Thermite
 							//counter++;
 
 							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
-							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 1, uPriority));
-							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 2, uPriority));
+							m_iNoSubmitted++;
+
+							float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+							float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+							if(fLod0ToLod1Boundary > 0)
+							{
+								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 1, uPriority));
+								m_iNoSubmitted++;
+							}
+
+							if(fLod1ToLod2Boundary > 0)
+							{
+								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 2, uPriority));
+								m_iNoSubmitted++;
+							}
 
 							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 						}
@@ -193,16 +207,16 @@ namespace Thermite
 		m_pMTSE->m_listCompletedTasks.pop_front();
 		m_pMTSE->m_mutexCompletedTasks->unlock();*/
 
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		/*int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
-		int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions * 3;
+		int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions * 3;*/
 
 		while(m_pMTSE->noOfResultsAvailable() > 0)
 		{
 			m_iNoProcessed++;
-			float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(noOfRegions);
+			float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
 			m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
 			if(fProgress > 0.999)
 			{

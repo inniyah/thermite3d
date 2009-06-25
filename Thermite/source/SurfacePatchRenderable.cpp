@@ -153,11 +153,15 @@ namespace Thermite
 	{
 		Vector3 camPos = m_pCamera->getDerivedPosition();
 		float dist = m_v3dPos.distance(camPos);
-		if(dist > qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble())
+
+		float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+		float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+
+		if((dist > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
 		{
 			m_RenderOp = pParent->m_renderOperationLod2;
 		}
-		else if(dist > qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble())
+		else if((dist > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
 		{
 			m_RenderOp = pParent->m_renderOperationLod1;
 		}
