@@ -55,19 +55,15 @@ namespace Thermite
 		void setMaterial( const Ogre::String& matName );
 		void setWorldTransform( const Ogre::Matrix4& xform );
 		
-		virtual void _notifyCurrentCamera( Ogre::Camera* cam );
 		virtual void _updateRenderQueue(Ogre::RenderQueue* queue);
 		void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
 
 		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
 		void buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
 
-		MapRegion* pParent;
-
 	protected:
 		Ogre::RenderOperation* m_RenderOp;
 		Ogre::Matrix4 m_matWorldTransform;
-		Ogre::Camera *m_pCamera;
 		Ogre::AxisAlignedBox mBox;
 		Ogre::String m_strMatName;
 		Ogre::MaterialPtr m_pMaterial;

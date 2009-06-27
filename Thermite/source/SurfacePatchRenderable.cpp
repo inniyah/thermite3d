@@ -37,11 +37,9 @@ namespace Thermite
 {
 #pragma region Constructors/Destructors
 	SurfacePatchRenderable::SurfacePatchRenderable(const String& strName)
-	:m_pCamera(0)
 	{
 		mName = strName;
 		m_matWorldTransform = Ogre::Matrix4::IDENTITY;
-		m_pCamera = 0;
 		m_strMatName = "BaseWhite"; 
 		m_pMaterial = Ogre::MaterialManager::getSingleton().getByName("BaseWhite");
 		m_pParentSceneManager = NULL;
@@ -143,33 +141,9 @@ namespace Thermite
 #pragma endregion
 
 #pragma region Other
-	void SurfacePatchRenderable::_notifyCurrentCamera( Camera* cam )
-	{
-		MovableObject::_notifyCurrentCamera(cam);
-		m_pCamera = cam;
-	}
 
 	void SurfacePatchRenderable::_updateRenderQueue(RenderQueue* queue)
 	{
-		/*Vector3 camPos = m_pCamera->getDerivedPosition();
-		float dist = m_v3dPos.distance(camPos);
-
-		float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
-		float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
-
-		if((dist > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
-		{
-			m_RenderOp = pParent->m_renderOperationLod2[getMaterial()->getName()];
-		}
-		else if((dist > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
-		{
-			m_RenderOp = pParent->m_renderOperationLod1[getMaterial()->getName()];
-		}
-		else
-		{
-			m_RenderOp = pParent->m_renderOperationLod0[getMaterial()->getName()];
-		}*/
-
 		if(m_RenderOp)
 		{
 			queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 

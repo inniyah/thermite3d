@@ -245,6 +245,8 @@ namespace Thermite
 		//isp->smooth(0.3f);
 		//ispCurrent->generateAveragedFaceNormals(true);
 
+		pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+
 		for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
 		{
 			std::string materialName = iter->first;
@@ -274,7 +276,7 @@ namespace Thermite
 				}
 			}
 
-			pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset);
+			pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
 		}
 
 		//The MapRegion is now up to date. Update the time stamp to indicate this

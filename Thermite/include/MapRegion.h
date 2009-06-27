@@ -48,7 +48,8 @@ namespace Thermite
 
 		void update(PolyVox::IndexedSurfacePatch* ispNew);
 
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp);
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp, PolyVox::uint8_t uLodLevel);
+		void removeAllSurfacePatchRenderablesForLod(PolyVox::uint8_t uLodLevel);
 
 		void destroyPhysicsData(void);
 
@@ -57,16 +58,14 @@ namespace Thermite
 	private:
 		Ogre::SceneNode* m_pOgreSceneNode;
 
+		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod0;
+		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod1;
+		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod2;
+
 		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 		void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 
 	public:
-		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod0;
-		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod1;
-		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod2;
-		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod0;
-		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod1;
-		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod2;
 
 		Map* m_pParentMap;
 
