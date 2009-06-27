@@ -67,6 +67,8 @@ namespace Thermite
 
 		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
 
+		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;
+
 	private:
 		Ogre::Vector3 m_vecGravity;
 		Ogre::AxisAlignedBox m_boxPhysicsBounds;

@@ -43,7 +43,7 @@ namespace Thermite
 
 	MapRegion::MapRegion(Map* pParentMap, PolyVox::Vector3DInt16 v3dPos)
 	:m_pOgreSceneNode(0)
-	,m_pSurfacePatchRenderable(0)
+	//,m_pSurfacePatchRenderable(0)
 	,m_pParentMap(pParentMap)
 	,mBody(0)
 	,mTriMesh(0)
@@ -55,7 +55,7 @@ namespace Thermite
 		m_pOgreSceneNode = m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
 		m_pOgreSceneNode->setPosition(Ogre::Vector3(m_v3dPos.getX(),m_v3dPos.getY(),m_v3dPos.getZ()));
 
-		const std::string& strSprName = makeUniqueName("SPR");
+		/*const std::string& strSprName = makeUniqueName("SPR");
 		m_pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		m_pSurfacePatchRenderable->setMaterial("ShadowMapReceiverForWorldMaterial");
 		m_pSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
@@ -65,16 +65,16 @@ namespace Thermite
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(regionSideLength, regionSideLength, regionSideLength));
-		m_pSurfacePatchRenderable->setBoundingBox(aabb);
+		m_pSurfacePatchRenderable->setBoundingBox(aabb);*/
 
-		m_renderOperationLod0 = 0;
-		m_renderOperationLod1 = 0;
-		m_renderOperationLod2 = 0;
+		m_renderOperationLod0.clear();
+		m_renderOperationLod1.clear();
+		m_renderOperationLod2.clear();
 	}
 
 	MapRegion::~MapRegion()
 	{
-		if(m_pSurfacePatchRenderable != 0)
+		/*if(m_pSurfacePatchRenderable != 0)
 		{
 			if(m_pOgreSceneNode != 0)
 			{
@@ -82,13 +82,30 @@ namespace Thermite
 			}
 			m_pParentMap->m_pOgreSceneManager->destroyMovableObject(m_pSurfacePatchRenderable);
 			m_pSurfacePatchRenderable = 0;
-		}
+		}*/
 
 		if(m_pOgreSceneNode != 0)
 		{
 			m_pParentMap->m_pOgreSceneManager->getRootSceneNode()->removeAndDestroyChild(m_pOgreSceneNode->getName());
 			m_pOgreSceneNode = 0;
 		}
+	}
+
+	void MapRegion::addSurfacePatchRenderable(std::string materialName)
+	{
+		SurfacePatchRenderable* pSurfacePatchRenderable;
+
+		const std::string& strSprName = makeUniqueName("SPR");
+		pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pSurfacePatchRenderable->setMaterial(materialName);
+		pSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		m_pOgreSceneNode->attachObject(pSurfacePatchRenderable);
+		pSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
+		pSurfacePatchRenderable->pParent = this;
+
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(regionSideLength, regionSideLength, regionSideLength));
+		pSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 
 	void MapRegion::update(IndexedSurfacePatch* ispNew)

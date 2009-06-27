@@ -238,34 +238,43 @@ namespace Thermite
 			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 		}
 
-		POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp = result.getIndexedSurfacePatch();
+		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
 
-		computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
+		//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
 		//*ispCurrent = getSmoothedSurface(*ispCurrent);
-		isp->smooth(0.3f);
+		//isp->smooth(0.3f);
 		//ispCurrent->generateAveragedFaceNormals(true);
 
-		//isp = result.second;
-
-		//pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-		//pMapRegion->update(isp.get());
-
-		//pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-
-		//pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-
-		switch(result.getLodLevel())
+		for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
 		{
-		case 0:
-			pMapRegion->m_renderOperationLod0 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-			pMapRegion->update(isp.get());
-			break;
-		case 1:
-			pMapRegion->m_renderOperationLod1 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-			break;
-		case 2:
-			pMapRegion->m_renderOperationLod2 = MapRegion::buildRenderOperationFrom(*(isp.get()));
-			break;
+			std::string materialName = iter->first;
+			std::set<uint8_t> voxelValues = iter->second;
+
+			POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+
+			switch(result.getLodLevel())
+			{
+			case 0:
+				{
+
+				pMapRegion->m_renderOperationLod0[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+
+				pMapRegion->update(ispWhole.get()); //This shouldn't be called in the loop - using Whole not Subset.
+				break;
+				}
+			case 1:
+				{
+				pMapRegion->m_renderOperationLod1[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+				break;
+				}
+			case 2:
+				{
+				pMapRegion->m_renderOperationLod2[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+				break;
+				}
+			}
+
+			pMapRegion->addSurfacePatchRenderable(materialName);
 		}
 
 		//The MapRegion is now up to date. Update the time stamp to indicate this

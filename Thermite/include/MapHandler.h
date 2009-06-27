@@ -23,6 +23,7 @@ namespace Thermite
 	protected:
 		virtual Ogre::Entity* handleEntity(const QXmlAttributes &attributes);
 		virtual void* handleVolume(const QXmlAttributes &attributes);
+		virtual void* handleVoxel(const QXmlAttributes &attributes);
 
 	private:
 		Map* mMap;

@@ -159,15 +159,15 @@ namespace Thermite
 
 		if((dist > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
 		{
-			m_RenderOp = pParent->m_renderOperationLod2;
+			m_RenderOp = pParent->m_renderOperationLod2[getMaterial()->getName()];
 		}
 		else if((dist > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
 		{
-			m_RenderOp = pParent->m_renderOperationLod1;
+			m_RenderOp = pParent->m_renderOperationLod1[getMaterial()->getName()];
 		}
 		else
 		{
-			m_RenderOp = pParent->m_renderOperationLod0;
+			m_RenderOp = pParent->m_renderOperationLod0[getMaterial()->getName()];
 		}
 
 		if(m_RenderOp)

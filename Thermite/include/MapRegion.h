@@ -48,6 +48,8 @@ namespace Thermite
 
 		void update(PolyVox::IndexedSurfacePatch* ispNew);
 
+		void addSurfacePatchRenderable(std::string materialName);
+
 		void destroyPhysicsData(void);
 
 		std::string makeUniqueName(const std::string& strBase);
@@ -62,11 +64,12 @@ namespace Thermite
 		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
 		static Ogre::RenderOperation* buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
 
-		SurfacePatchRenderable* m_pSurfacePatchRenderable;
-
-		Ogre::RenderOperation* m_renderOperationLod0;
-		Ogre::RenderOperation* m_renderOperationLod1;
-		Ogre::RenderOperation* m_renderOperationLod2;
+		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod0;
+		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod1;
+		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod2;
+		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod0;
+		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod1;
+		std::map< std::string, Ogre::RenderOperation* > m_renderOperationLod2;
 
 		Map* m_pParentMap;
 
