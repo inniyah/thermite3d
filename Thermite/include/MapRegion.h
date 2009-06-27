@@ -48,7 +48,7 @@ namespace Thermite
 
 		void update(PolyVox::IndexedSurfacePatch* ispNew);
 
-		void addSurfacePatchRenderable(std::string materialName);
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp);
 
 		void destroyPhysicsData(void);
 
@@ -61,9 +61,6 @@ namespace Thermite
 		void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 
 	public:
-		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
-		static Ogre::RenderOperation* buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
-
 		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod0;
 		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod1;
 		//std::list< std::pair< std::string, Ogre::RenderOperation*> > m_renderOperationLod2;

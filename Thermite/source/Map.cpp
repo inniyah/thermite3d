@@ -257,24 +257,24 @@ namespace Thermite
 			case 0:
 				{
 
-				pMapRegion->m_renderOperationLod0[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+				//pMapRegion->m_renderOperationLod0[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
 
 				pMapRegion->update(ispWhole.get()); //This shouldn't be called in the loop - using Whole not Subset.
 				break;
 				}
 			case 1:
 				{
-				pMapRegion->m_renderOperationLod1[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+				//pMapRegion->m_renderOperationLod1[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
 				break;
 				}
 			case 2:
 				{
-				pMapRegion->m_renderOperationLod2[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
+				//pMapRegion->m_renderOperationLod2[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
 				break;
 				}
 			}
 
-			pMapRegion->addSurfacePatchRenderable(materialName);
+			pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset);
 		}
 
 		//The MapRegion is now up to date. Update the time stamp to indicate this

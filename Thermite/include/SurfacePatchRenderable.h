@@ -59,6 +59,9 @@ namespace Thermite
 		virtual void _updateRenderQueue(Ogre::RenderQueue* queue);
 		void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
 
+		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
+		void buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
+
 		MapRegion* pParent;
 
 	protected:
