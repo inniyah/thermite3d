@@ -110,6 +110,8 @@ namespace Thermite
 
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
+
+		bool bLoadComplete;
 	};
 }
 

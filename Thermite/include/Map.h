@@ -75,8 +75,6 @@ namespace Thermite
 		Ogre::AxisAlignedBox m_boxPhysicsBounds;
 		Ogre::Real m_rVoxelSize;
 
-		Ogre::Timer* timer;
-
 		Ogre::SceneNode* m_axisNode;
 
 		Ogre::Camera* m_pCamera;

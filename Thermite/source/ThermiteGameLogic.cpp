@@ -177,9 +177,9 @@ namespace Thermite
 		mMap->updatePolyVoxGeometry();
 
 		//Choose the right LOD for the nodes
-		mMap->updateLOD();
+		//mMap->updateLOD();
 		
-		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
+		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
 		{
 			mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 		}
@@ -319,6 +319,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::loadMap(QString strMapName)
 	{
+		bLoadComplete = false;
 		m_pThermiteLogoLabel->hide();
 		mMainMenu->hide();
 

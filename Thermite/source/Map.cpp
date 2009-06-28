@@ -44,7 +44,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <OgreSceneManagerEnumerator.h>
 #include <OgreSceneManager.h>
-#include <OgreTimer.h>
 
 #include <QSettings>
 
@@ -56,16 +55,14 @@ using namespace OgreBulletCollisions;
 namespace Thermite
 {
 	Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
-	:m_vecGravity(vecGravity)
-	,m_boxPhysicsBounds(boxPhysicsBounds)
-	,m_rVoxelSize(rVoxelSize)
-	,m_volMapRegions(0)
+		:m_vecGravity(vecGravity)
+		,m_boxPhysicsBounds(boxPhysicsBounds)
+		,m_rVoxelSize(rVoxelSize)
+		,m_volMapRegions(0)
 	{
 		//memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 
 		m_pOgreSceneManager = sceneManager;
-
-		timer = new Ogre::Timer();
 
 		initialisePhysics();
 
@@ -120,11 +117,10 @@ namespace Thermite
 
 	void Map::updatePolyVoxGeometry()
 	{
-		if(!volumeResource.isNull())
-		{
-			timer->reset();
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
-			int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		if(!volumeResource.isNull())
+		{			
 			int halfRegionSideLength = regionSideLength / 2;
 			int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 			int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
@@ -139,47 +135,54 @@ namespace Thermite
 				{
 					for(PolyVox::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 					{
+						const PolyVox::uint16_t firstX = regionX * regionSideLength;
+						const PolyVox::uint16_t firstY = regionY * regionSideLength;
+						const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
+
+						const PolyVox::uint16_t lastX = firstX + regionSideLength;
+						const PolyVox::uint16_t lastY = firstY + regionSideLength;
+						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
+
+						const float centreX = firstX + halfRegionSideLength;
+						const float centreY = firstY + halfRegionSideLength;
+						const float centreZ = firstZ + halfRegionSideLength;
+
+						Ogre::Vector3 cameraPos = m_pCamera->getPosition();
+						Ogre::Vector3 centre(centreX, centreY, centreZ);
+						double distanceFromCamera = (cameraPos - centre).length();
+
+						float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+						float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+
+						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+
+						if(pMapRegion)
+						{
+							if((distanceFromCamera > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
+							{
+								pMapRegion->setLodLevelToUse(2);
+							}
+							else if((distanceFromCamera > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
+							{
+								pMapRegion->setLodLevelToUse(1);
+							}
+							else
+							{
+								pMapRegion->setLodLevelToUse(0);
+							}
+						}
+
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						//if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
 						if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
 							//Convert to a real PolyVox::Region
-							const PolyVox::uint16_t firstX = regionX * regionSideLength;
-							const PolyVox::uint16_t firstY = regionY * regionSideLength;
-							const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
-
-							const PolyVox::uint16_t lastX = firstX + regionSideLength;
-							const PolyVox::uint16_t lastY = firstY + regionSideLength;
-							const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
-
-							const float centreX = firstX + halfRegionSideLength;
-							const float centreY = firstY + halfRegionSideLength;
-							const float centreZ = firstZ + halfRegionSideLength;
-
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 							Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
-							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-
-							Ogre::Vector3 vecStart = m_pCamera->getPosition();
-							Ogre::Vector3 vecCentre(centreX, centreY, centreZ);
-							/*Vector3DInt16 v3dStart(0,0,0);
-							Vector3DInt16 v3dCentre = region.getLowerCorner();
-							Vector3DInt16 v3dDiff = v3dStart - v3dCentre;*/
-
-							//uint32_t uPriority = std::numeric_limits<uint32_t>::max() - (v3dDiff.getX() * v3dDiff.getX() + v3dDiff.getY() * v3dDiff.getY() + v3dDiff.getZ() * v3dDiff.getZ());
-
-							double distanceSquared = (vecStart - vecCentre).length();
-							//distanceSquared = sqrt(distanceSquared);
-							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceSquared);
-
-							//uint32_t uPriority = firstX + firstY + firstZ;
-							//uint32_t uPriority = v3dCentre.getX() + v3dCentre.getY() + v3dCentre.get();
-
-							//uint32_t uPriority = counter;
-							//counter++;
+							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCamera);
 
 							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
 							m_iNoSubmitted++;
@@ -207,23 +210,6 @@ namespace Thermite
 			m_pMTSE->start();
 		}
 
-		/*while(true)
-		{
-		m_pMTSE->m_mutexCompletedTasks->lock();
-		if(m_pMTSE->m_listCompletedTasks.empty())
-		{
-			m_pMTSE->m_mutexCompletedTasks->unlock();
-			break;
-		}
-		SurfaceExtractorTaskData taskData = m_pMTSE->m_listCompletedTasks.front();
-		m_pMTSE->m_listCompletedTasks.pop_front();
-		m_pMTSE->m_mutexCompletedTasks->unlock();*/
-
-		/*int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
-		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
-		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
-		int noOfRegions = volumeWidthInRegions * volumeHeightInRegions * volumeDepthInRegions * 3;*/
 
 		while(m_pMTSE->noOfResultsAvailable() > 0)
 		{
@@ -233,148 +219,52 @@ namespace Thermite
 			if(fProgress > 0.999)
 			{
 				m_pThermiteGameLogic->m_loadingProgress->hide();
+				m_pThermiteGameLogic->bLoadComplete = true;
 			}
 
 			SurfaceExtractorTaskData result;
 			result = m_pMTSE->popResult();
 
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+			PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+			PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+			PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
-		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-		if(pMapRegion == 0)
-		{
-			pMapRegion = new MapRegion(this, result.getRegion().getLowerCorner());
-			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
-		}
-
-		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
-
-		//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
-		//*ispCurrent = getSmoothedSurface(*ispCurrent);
-		//isp->smooth(0.3f);
-		//ispCurrent->generateAveragedFaceNormals(true);
-
-		pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
-
-		for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
-		{
-			std::string materialName = iter->first;
-			std::set<uint8_t> voxelValues = iter->second;
-
-			POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
-
-			switch(result.getLodLevel())
+			MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+			if(pMapRegion == 0)
 			{
-			case 0:
-				{
-
-				//pMapRegion->m_renderOperationLod0[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
-
-				pMapRegion->update(ispWhole.get()); //This shouldn't be called in the loop - using Whole not Subset.
-				break;
-				}
-			case 1:
-				{
-				//pMapRegion->m_renderOperationLod1[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
-				break;
-				}
-			case 2:
-				{
-				//pMapRegion->m_renderOperationLod2[materialName] = MapRegion::buildRenderOperationFrom(*(ispSubset.get()));
-				break;
-				}
+				pMapRegion = new MapRegion(this, result.getRegion().getLowerCorner());
+				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 			}
 
-			pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
-		}
+			POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
 
-		//The MapRegion is now up to date. Update the time stamp to indicate this
-		m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
-		}
+			//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
+			//*ispCurrent = getSmoothedSurface(*ispCurrent);
+			//isp->smooth(0.3f);
+			//ispCurrent->generateAveragedFaceNormals(true);
 
-		/**/
+			pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
 
-		/*float timeElapsed = timer->getMilliseconds();
-		if(listChangedRegionGeometry.size() > 0)
-		{
-		std::stringstream ss;
-		ss << "Regenerated " << listChangedRegionGeometry.size() << " regions in " << timeElapsed << "ms" << std::endl;
-		ss << "Averaged " << timeElapsed/listChangedRegionGeometry.size() << "ms per block";
-		Ogre::LogManager::getSingleton().logMessage(ss.str()); 
-		}*/
-	}
-
-	void Map::updateLOD(void)
-	{
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		int halfRegionSideLength = regionSideLength / 2;
-
-		//FIXME - Roll this loop into update polyvox geometry one?
-		//FIXME - Also, no need to update all of them each frame? Spread over multiple frames?
-		for(uint16_t uZ = 0; uZ < m_volMapRegions->getDepth(); uZ++)
-		{
-			for(uint16_t uY = 0; uY < m_volMapRegions->getHeight(); uY++)
+			if(result.getLodLevel() == 0)
 			{
-				for(uint16_t uX = 0; uX < m_volMapRegions->getWidth(); uX++)
-				{
-					MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(uX, uY, uZ);
-
-					if(pMapRegion == 0) //This can happen before the surface extractor threads are finished.
-					{
-						continue;
-					}
-
-					const PolyVox::uint16_t firstX = uX * regionSideLength;
-					const PolyVox::uint16_t firstY = uY * regionSideLength;
-					const PolyVox::uint16_t firstZ = uZ * regionSideLength;
-
-					const PolyVox::uint16_t lastX = firstX + regionSideLength;
-					const PolyVox::uint16_t lastY = firstY + regionSideLength;
-					const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
-
-					const float centreX = firstX + halfRegionSideLength;
-					const float centreY = firstY + halfRegionSideLength;
-					const float centreZ = firstZ + halfRegionSideLength;
-
-					/*Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
-					Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
-					Region region(v3dLowerCorner, v3dUpperCorner);*/
-
-					/*Vector3DInt16 v3dCamera(m_pCamera->getPosition().x, m_pCamera->getPosition().y, m_pCamera->getPosition().z);
-					Vector3DInt16 v3dCentre = region.getCentre();
-					Vector3DInt16 v3dDiff = v3dCamera - v3dCentre;
-
-					double distanceSquared = v3dDiff.lengthSquared();
-					distanceSquared = sqrt(distanceSquared);*/
-
-					Ogre::Vector3 cameraPos = m_pCamera->getPosition();
-					//Vector3DInt16 v3dCentre = region.getLowerCorner();
-					Ogre::Vector3 centrePos(centreX, centreY, centreZ);
-
-					double distanceSquared = (cameraPos - centrePos).length();
-
-					float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
-					float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
-
-					if((distanceSquared > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
-					{
-						pMapRegion->setLodLevelToUse(2);
-					}
-					else if((distanceSquared > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
-					{
-						pMapRegion->setLodLevelToUse(1);
-					}
-					else
-					{
-						pMapRegion->setLodLevelToUse(0);
-					}
-				}
+				pMapRegion->update(ispWhole.get());
 			}
+
+			for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+			{
+				std::string materialName = iter->first;
+				std::set<uint8_t> voxelValues = iter->second;
+
+				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+
+				pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+			}
+
+			//The MapRegion is now up to date. Update the time stamp to indicate this
+			m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 		}
 	}
+
 
 	void Map::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
 	{
