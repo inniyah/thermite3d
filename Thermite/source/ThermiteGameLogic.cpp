@@ -175,6 +175,9 @@ namespace Thermite
 
 		//The fun stuff!
 		mMap->updatePolyVoxGeometry();
+
+		//Choose the right LOD for the nodes
+		mMap->updateLOD();
 		
 		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
 		{

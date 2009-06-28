@@ -55,6 +55,8 @@ namespace Thermite
 
 		std::string makeUniqueName(const std::string& strBase);
 
+		void setLodLevelToUse(PolyVox::uint8_t uLodLevel);
+
 	private:
 		Ogre::SceneNode* m_pOgreSceneNode;
 

@@ -134,6 +134,24 @@ namespace Thermite
 		pList->clear();
 	}
 
+	void MapRegion::setLodLevelToUse(PolyVox::uint8_t uLodLevel)
+	{
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod0.begin(); iter != m_listSurfacePatchRenderablesLod0.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 0);
+		}
+
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod1.begin(); iter != m_listSurfacePatchRenderablesLod1.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 1);
+		}
+
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod2.begin(); iter != m_listSurfacePatchRenderablesLod2.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 2);
+		}
+	}
+
 	void MapRegion::update(IndexedSurfacePatch* ispNew)
 	{
 		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())

@@ -49,6 +49,7 @@ namespace Thermite
 		bool Map::loadScene(const Ogre::String& filename);
 
 		void updatePolyVoxGeometry();	
+		void updateLOD(void);
 
 		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
 
@@ -77,6 +78,8 @@ namespace Thermite
 		Ogre::Timer* timer;
 
 		Ogre::SceneNode* m_axisNode;
+
+		Ogre::Camera* m_pCamera;
 
 		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 

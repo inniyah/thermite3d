@@ -99,6 +99,10 @@ namespace Thermite
 		QXmlInputSource xmlInputSource(&file);
 		reader.parse(xmlInputSource);
 
+		//This gets the first camera which was found in the scene.
+		Ogre::SceneManager::CameraIterator camIter = m_pOgreSceneManager->getCameraIterator();
+		m_pCamera = camIter.peekNextValue();
+
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
@@ -121,6 +125,7 @@ namespace Thermite
 			timer->reset();
 
 			int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+			int halfRegionSideLength = regionSideLength / 2;
 			int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 			int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 			int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
@@ -142,9 +147,14 @@ namespace Thermite
 							const PolyVox::uint16_t firstX = regionX * regionSideLength;
 							const PolyVox::uint16_t firstY = regionY * regionSideLength;
 							const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
+
 							const PolyVox::uint16_t lastX = firstX + regionSideLength;
 							const PolyVox::uint16_t lastY = firstY + regionSideLength;
-							const PolyVox::uint16_t lastZ = firstZ + regionSideLength;		
+							const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
+
+							const float centreX = firstX + halfRegionSideLength;
+							const float centreY = firstY + halfRegionSideLength;
+							const float centreZ = firstZ + halfRegionSideLength;
 
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
@@ -153,14 +163,16 @@ namespace Thermite
 
 							MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
-							Vector3DInt16 v3dStart(0,0,0);
-							Vector3DInt16 v3dCentre = region.getCentre();
-							Vector3DInt16 v3dDiff = v3dStart - v3dCentre;
+							Ogre::Vector3 vecStart = m_pCamera->getPosition();
+							Ogre::Vector3 vecCentre(centreX, centreY, centreZ);
+							/*Vector3DInt16 v3dStart(0,0,0);
+							Vector3DInt16 v3dCentre = region.getLowerCorner();
+							Vector3DInt16 v3dDiff = v3dStart - v3dCentre;*/
 
 							//uint32_t uPriority = std::numeric_limits<uint32_t>::max() - (v3dDiff.getX() * v3dDiff.getX() + v3dDiff.getY() * v3dDiff.getY() + v3dDiff.getZ() * v3dDiff.getZ());
 
-							double distanceSquared = v3dDiff.lengthSquared();
-							distanceSquared = sqrt(distanceSquared);
+							double distanceSquared = (vecStart - vecCentre).length();
+							//distanceSquared = sqrt(distanceSquared);
 							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceSquared);
 
 							//uint32_t uPriority = firstX + firstY + firstZ;
@@ -293,6 +305,75 @@ namespace Thermite
 		ss << "Averaged " << timeElapsed/listChangedRegionGeometry.size() << "ms per block";
 		Ogre::LogManager::getSingleton().logMessage(ss.str()); 
 		}*/
+	}
+
+	void Map::updateLOD(void)
+	{
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		int halfRegionSideLength = regionSideLength / 2;
+
+		//FIXME - Roll this loop into update polyvox geometry one?
+		//FIXME - Also, no need to update all of them each frame? Spread over multiple frames?
+		for(uint16_t uZ = 0; uZ < m_volMapRegions->getDepth(); uZ++)
+		{
+			for(uint16_t uY = 0; uY < m_volMapRegions->getHeight(); uY++)
+			{
+				for(uint16_t uX = 0; uX < m_volMapRegions->getWidth(); uX++)
+				{
+					MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(uX, uY, uZ);
+
+					if(pMapRegion == 0) //This can happen before the surface extractor threads are finished.
+					{
+						continue;
+					}
+
+					const PolyVox::uint16_t firstX = uX * regionSideLength;
+					const PolyVox::uint16_t firstY = uY * regionSideLength;
+					const PolyVox::uint16_t firstZ = uZ * regionSideLength;
+
+					const PolyVox::uint16_t lastX = firstX + regionSideLength;
+					const PolyVox::uint16_t lastY = firstY + regionSideLength;
+					const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
+
+					const float centreX = firstX + halfRegionSideLength;
+					const float centreY = firstY + halfRegionSideLength;
+					const float centreZ = firstZ + halfRegionSideLength;
+
+					/*Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
+					Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
+					Region region(v3dLowerCorner, v3dUpperCorner);*/
+
+					/*Vector3DInt16 v3dCamera(m_pCamera->getPosition().x, m_pCamera->getPosition().y, m_pCamera->getPosition().z);
+					Vector3DInt16 v3dCentre = region.getCentre();
+					Vector3DInt16 v3dDiff = v3dCamera - v3dCentre;
+
+					double distanceSquared = v3dDiff.lengthSquared();
+					distanceSquared = sqrt(distanceSquared);*/
+
+					Ogre::Vector3 cameraPos = m_pCamera->getPosition();
+					//Vector3DInt16 v3dCentre = region.getLowerCorner();
+					Ogre::Vector3 centrePos(centreX, centreY, centreZ);
+
+					double distanceSquared = (cameraPos - centrePos).length();
+
+					float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+					float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+
+					if((distanceSquared > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
+					{
+						pMapRegion->setLodLevelToUse(2);
+					}
+					else if((distanceSquared > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
+					{
+						pMapRegion->setLodLevelToUse(1);
+					}
+					else
+					{
+						pMapRegion->setLodLevelToUse(0);
+					}
+				}
+			}
+		}
 	}
 
 	void Map::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
