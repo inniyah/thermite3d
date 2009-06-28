@@ -64,6 +64,8 @@ namespace Thermite
 
 		void createCube(float xPos, float zPos);
 
+		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
+
 		QHash<int, KeyStates> mKeyStates;
 		QPoint mLastFrameMousePos;
 		QPoint mCurrentMousePos;
@@ -110,6 +112,8 @@ namespace Thermite
 
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
+
+		Ogre::SceneNode* m_axisNode;
 
 		bool bLoadComplete;
 	};

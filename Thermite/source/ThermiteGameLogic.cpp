@@ -191,9 +191,9 @@ namespace Thermite
 			(*iter)->update(timeElapsedInSeconds);
 			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
 
-			if(mMap->volumeResource->volume->getEnclosingRegion().containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
+			if(mMap->volumeResource->getVolume()->getEnclosingRegion().containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
 			{
-				if(mMap->volumeResource->volume->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
+				if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
 				{
 					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 10, 0);
 					shellsToDelete.push_back(*iter);
@@ -331,7 +331,7 @@ namespace Thermite
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
-			mMap->createAxis(mMap->volumeResource->volume->getWidth(), mMap->volumeResource->volume->getHeight(), mMap->volumeResource->volume->getDepth());
+			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
 		}
 
 		//This gets the first camera which was found in the scene.
@@ -367,5 +367,77 @@ namespace Thermite
 	{
 		mThermiteLog->logMessage("loading...", LL_INFO);
 		m_loadingProgress->setLoadingDataPercentageDone(fProgress*100);
+	}
+
+	void ThermiteGameLogic::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
+	{
+		float fWidth = static_cast<float>(uWidth);
+		float fHeight = static_cast<float>(uHeight);
+		float fDepth = static_cast<float>(uDepth);
+		float fHalfWidth = fWidth/2.0;
+		float fHalfHeight = fHeight/2.0;
+		float fHalfDepth = fDepth/2.0;
+
+		float fOriginSize = 4.0f;	
+		Ogre::Vector3 vecToUnitCube(0.01,0.01,0.01);
+
+		//Create the main node for the axes
+		m_axisNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
+
+		//Create sphere representing origin
+		Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
+		Ogre::Entity *originSphereEntity = mSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
+		originSphereEntity->setMaterialName("OriginMaterial");
+		originNode->attachObject(originSphereEntity);
+		originNode->scale(vecToUnitCube);
+		originNode->scale(fOriginSize,fOriginSize,fOriginSize);
+
+		//Create x-axis
+		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
+		Ogre::Entity *xAxisCylinderEntity = mSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
+		xAxisCylinderEntity->setMaterialName("XAxisMaterial");
+		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
+		xAxisCylinderNode->scale(vecToUnitCube);
+		xAxisCylinderNode->scale(Ogre::Vector3(fWidth,1.0,1.0));
+		xAxisCylinderNode->translate(Ogre::Vector3(fHalfWidth,0.0,0.0));
+
+		//Create y-axis
+		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
+		Ogre::Entity *yAxisCylinderEntity = mSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
+		yAxisCylinderEntity->setMaterialName("YAxisMaterial");
+		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
+		yAxisCylinderNode->scale(vecToUnitCube);
+		yAxisCylinderNode->scale(Ogre::Vector3(1.0,fHeight,1.0));
+		yAxisCylinderNode->translate(Ogre::Vector3(0.0,fHalfHeight,0.0));
+
+		//Create z-axis
+		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
+		Ogre::Entity *zAxisCylinderEntity = mSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
+		zAxisCylinderEntity->setMaterialName("ZAxisMaterial");
+		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
+		zAxisCylinderNode->scale(vecToUnitCube);
+		zAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fDepth));
+		zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfDepth));
+
+		//Create remainder of box		
+		Ogre::ManualObject* remainingBox = mSceneManager->createManualObject("Remaining Box");
+		remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
+		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		0.0,		fDepth);
+		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(0.0,		fHeight,	fDepth);
+		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	0.0,		fDepth);
+		remainingBox->position(fWidth,	fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	fDepth);
+
+		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		fHeight,	0.0);
+		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(0.0,		fHeight,	fDepth);
+		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
+		remainingBox->position(fWidth,	0.0,		fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
+
+		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(fWidth,	0.0,		0.0);
+		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(fWidth,	0.0,		fDepth);
+		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
+		remainingBox->position(0.0,		fHeight,	fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
+		remainingBox->end();
+		Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
+		remainingBoxNode->attachObject(remainingBox);
 	}
 }

@@ -51,8 +51,6 @@ namespace Thermite
 		void updatePolyVoxGeometry();	
 		void updateLOD(void);
 
-		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
-
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
 
@@ -74,8 +72,6 @@ namespace Thermite
 		Ogre::Vector3 m_vecGravity;
 		Ogre::AxisAlignedBox m_boxPhysicsBounds;
 		Ogre::Real m_rVoxelSize;
-
-		Ogre::SceneNode* m_axisNode;
 
 		Ogre::Camera* m_pCamera;
 

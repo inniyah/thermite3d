@@ -39,9 +39,9 @@ namespace Thermite
 		VolumeResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
 			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
 			Ogre::ManualResourceLoader *loader = 0);
-		~VolumeResource();
+		~VolumeResource();		
 
-		PolyVox::Volume<PolyVox::uint8_t>* volume;
+		PolyVox::Volume<PolyVox::uint8_t>* getVolume(void);
 
 	protected:
 
@@ -49,6 +49,8 @@ namespace Thermite
 		void loadImpl ();
 		void unloadImpl ();
 		size_t calculateSize () const;
+
+		PolyVox::Volume<PolyVox::uint8_t>* m_pVolume;
 	};
 
 	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 

@@ -111,58 +111,63 @@ namespace Thermite
 		volumeChangeTracker->setAllRegionsModified();
 
 		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), qApp->settings()->value("Engine/NoOfSurfaceExtractionThreads", 2).toInt());
+		m_pMTSE->start();
 
 		return true;
 	}
 
 	void Map::updatePolyVoxGeometry()
 	{
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
 		if(!volumeResource.isNull())
-		{			
-			int halfRegionSideLength = regionSideLength / 2;
-			int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
-			int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
-			int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+		{		
+			//Some values we'll need later.
+			uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+			uint16_t halfRegionSideLength = regionSideLength / 2;
+			uint16_t volumeWidthInRegions = volumeResource->getVolume()->getWidth() / regionSideLength;
+			uint16_t volumeHeightInRegions = volumeResource->getVolume()->getHeight() / regionSideLength;
+			uint16_t volumeDepthInRegions = volumeResource->getVolume()->getDepth() / regionSideLength;
 
-			int counter = 0;
+			double fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+			double fLod0ToLod1BoundarySquared = fLod0ToLod1Boundary * fLod0ToLod1Boundary;
+			double fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+			double fLod1ToLod2BoundarySquared = fLod1ToLod2Boundary * fLod1ToLod2Boundary;
 
 			//Iterate over each region in the VolumeChangeTracker
-			for(PolyVox::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+			for(uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 			{		
-				for(PolyVox::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+				for(uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
 				{
-					for(PolyVox::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+					for(uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 					{
-						const PolyVox::uint16_t firstX = regionX * regionSideLength;
-						const PolyVox::uint16_t firstY = regionY * regionSideLength;
-						const PolyVox::uint16_t firstZ = regionZ * regionSideLength;
+						//Compute the extents of the current region
+						const uint16_t firstX = regionX * regionSideLength;
+						const uint16_t firstY = regionY * regionSideLength;
+						const uint16_t firstZ = regionZ * regionSideLength;
 
-						const PolyVox::uint16_t lastX = firstX + regionSideLength;
-						const PolyVox::uint16_t lastY = firstY + regionSideLength;
-						const PolyVox::uint16_t lastZ = firstZ + regionSideLength;	
+						const uint16_t lastX = firstX + regionSideLength;
+						const uint16_t lastY = firstY + regionSideLength;
+						const uint16_t lastZ = firstZ + regionSideLength;	
 
 						const float centreX = firstX + halfRegionSideLength;
 						const float centreY = firstY + halfRegionSideLength;
 						const float centreZ = firstZ + halfRegionSideLength;
 
+						//The regions distance from the camera is used for
+						//LOD selection and prioritizing surface extraction
 						Ogre::Vector3 cameraPos = m_pCamera->getPosition();
 						Ogre::Vector3 centre(centreX, centreY, centreZ);
-						double distanceFromCamera = (cameraPos - centre).length();
+						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
 
-						float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
-						float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
-
+						//There's no guarentee that the MapRegion exists at this point...
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-
 						if(pMapRegion)
-						{
-							if((distanceFromCamera > fLod1ToLod2Boundary) && (fLod1ToLod2Boundary > 0.0f))
+						{							
+							//But if it does, we set the appropriate LOD level based on distance from the camera.
+							if((distanceFromCameraSquared > fLod1ToLod2BoundarySquared) && (fLod1ToLod2Boundary > 0.0f))
 							{
 								pMapRegion->setLodLevelToUse(2);
 							}
-							else if((distanceFromCamera > fLod0ToLod1Boundary) && (fLod0ToLod1Boundary > 0.0f))
+							else if((distanceFromCameraSquared > fLod0ToLod1BoundarySquared) && (fLod0ToLod1Boundary > 0.0f))
 							{
 								pMapRegion->setLodLevelToUse(1);
 							}
@@ -173,7 +178,6 @@ namespace Thermite
 						}
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
-						//if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_iRegionTimeStamps[regionX][regionY][regionZ])
 						if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
 							//Convert to a real PolyVox::Region
@@ -182,7 +186,7 @@ namespace Thermite
 							Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
-							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCamera);
+							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
 
 							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
 							m_iNoSubmitted++;
@@ -207,134 +211,58 @@ namespace Thermite
 				}
 			}
 
-			m_pMTSE->start();
-		}
-
-
-		while(m_pMTSE->noOfResultsAvailable() > 0)
-		{
-			m_iNoProcessed++;
-			float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
-			m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
-			if(fProgress > 0.999)
+			while(m_pMTSE->noOfResultsAvailable() > 0)
 			{
-				m_pThermiteGameLogic->m_loadingProgress->hide();
-				m_pThermiteGameLogic->bLoadComplete = true;
+				m_iNoProcessed++;
+				float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
+				m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+				if(fProgress > 0.999)
+				{
+					m_pThermiteGameLogic->m_loadingProgress->hide();
+					m_pThermiteGameLogic->bLoadComplete = true;
+				}
+
+				SurfaceExtractorTaskData result;
+				result = m_pMTSE->popResult();
+
+				PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+				PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+				PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+
+				MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+				if(pMapRegion == 0)
+				{
+					pMapRegion = new MapRegion(this, result.getRegion().getLowerCorner());
+					m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+				}
+
+				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
+
+				//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
+				//*ispCurrent = getSmoothedSurface(*ispCurrent);
+				//isp->smooth(0.3f);
+				//ispCurrent->generateAveragedFaceNormals(true);
+
+				pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+
+				if(result.getLodLevel() == 0)
+				{
+					pMapRegion->update(ispWhole.get());
+				}
+
+				for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+				{
+					std::string materialName = iter->first;
+					std::set<uint8_t> voxelValues = iter->second;
+
+					POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+
+					pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+				}
+
+				//The MapRegion is now up to date. Update the time stamp to indicate this
+				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 			}
-
-			SurfaceExtractorTaskData result;
-			result = m_pMTSE->popResult();
-
-			PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-			PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-			PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
-
-			MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-			if(pMapRegion == 0)
-			{
-				pMapRegion = new MapRegion(this, result.getRegion().getLowerCorner());
-				m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
-			}
-
-			POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
-
-			//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
-			//*ispCurrent = getSmoothedSurface(*ispCurrent);
-			//isp->smooth(0.3f);
-			//ispCurrent->generateAveragedFaceNormals(true);
-
-			pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
-
-			if(result.getLodLevel() == 0)
-			{
-				pMapRegion->update(ispWhole.get());
-			}
-
-			for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
-			{
-				std::string materialName = iter->first;
-				std::set<uint8_t> voxelValues = iter->second;
-
-				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
-
-				pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
-			}
-
-			//The MapRegion is now up to date. Update the time stamp to indicate this
-			m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
-		}
-	}
-
-
-	void Map::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
-	{
-		float fWidth = static_cast<float>(uWidth);
-		float fHeight = static_cast<float>(uHeight);
-		float fDepth = static_cast<float>(uDepth);
-		float fHalfWidth = fWidth/2.0;
-		float fHalfHeight = fHeight/2.0;
-		float fHalfDepth = fDepth/2.0;
-
-		float fOriginSize = 4.0f;	
-		Ogre::Vector3 vecToUnitCube(0.01,0.01,0.01);
-
-		//Create the main node for the axes
-		m_axisNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-
-		//Create sphere representing origin
-		Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *originSphereEntity = m_pOgreSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
-		originSphereEntity->setMaterialName("OriginMaterial");
-		originNode->attachObject(originSphereEntity);
-		originNode->scale(vecToUnitCube);
-		originNode->scale(fOriginSize,fOriginSize,fOriginSize);
-
-		//Create x-axis
-		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *xAxisCylinderEntity = m_pOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
-		xAxisCylinderEntity->setMaterialName("XAxisMaterial");
-		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
-		xAxisCylinderNode->scale(vecToUnitCube);
-		xAxisCylinderNode->scale(Ogre::Vector3(fWidth,1.0,1.0));
-		xAxisCylinderNode->translate(Ogre::Vector3(fHalfWidth,0.0,0.0));
-
-		//Create y-axis
-		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *yAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
-		yAxisCylinderEntity->setMaterialName("YAxisMaterial");
-		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
-		yAxisCylinderNode->scale(vecToUnitCube);
-		yAxisCylinderNode->scale(Ogre::Vector3(1.0,fHeight,1.0));
-		yAxisCylinderNode->translate(Ogre::Vector3(0.0,fHalfHeight,0.0));
-
-		//Create z-axis
-		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *zAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
-		zAxisCylinderEntity->setMaterialName("ZAxisMaterial");
-		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
-		zAxisCylinderNode->scale(vecToUnitCube);
-		zAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fDepth));
-		zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfDepth));
-
-		//Create remainder of box		
-		Ogre::ManualObject* remainingBox = m_pOgreSceneManager->createManualObject("Remaining Box");
-		remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		0.0,		fDepth);
-		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(0.0,		fHeight,	fDepth);
-		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	0.0,		fDepth);
-		remainingBox->position(fWidth,	fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	fDepth);
-
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		fHeight,	0.0);
-		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(0.0,		fHeight,	fDepth);
-		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
-		remainingBox->position(fWidth,	0.0,		fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
-
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(fWidth,	0.0,		0.0);
-		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(fWidth,	0.0,		fDepth);
-		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
-		remainingBox->position(0.0,		fHeight,	fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
-		remainingBox->end();
-		Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
-		remainingBoxNode->attachObject(remainingBox);
+		}		
 	}
 }

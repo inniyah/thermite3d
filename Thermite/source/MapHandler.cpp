@@ -89,7 +89,7 @@ namespace Thermite
 		}
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->volume, regionSideLength);
+		mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
 
 		mMap->volumeChangeTracker->setAllRegionsModified();
 

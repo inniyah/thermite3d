@@ -38,7 +38,7 @@ namespace Thermite
 		Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual, 
 		Ogre::ManualResourceLoader *loader) :
 		Ogre::Resource (creator, name, handle, group, isManual, loader)
-		,volume(0)
+		,m_pVolume(0)
 	{
 		/* If you were storing a pointer to an object, then you would set that pointer to NULL here.
 		*/
@@ -64,7 +64,7 @@ namespace Thermite
 
 		VolumeSerializer serializer;
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
-		serializer.importVolume (stream, &volume);
+		serializer.importVolume (stream, &m_pVolume);
 	}
 
 	void VolumeResource::unloadImpl ()
@@ -91,6 +91,11 @@ namespace Thermite
 			//}
 		//}
 		//return uNonHomogeneousBlocks * volume->getNoOfVoxelsInBlock();
-		return volume->getWidth() * volume->getHeight() * volume->getDepth();
+		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
+	}
+
+	PolyVox::Volume<PolyVox::uint8_t>* VolumeResource::getVolume(void)
+	{
+		return m_pVolume;
 	}
 }
