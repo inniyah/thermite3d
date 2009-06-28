@@ -44,9 +44,7 @@ namespace Thermite
 		MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
 		~MapRegion();
 
-		void setPhysicsData(Ogre::Vector3 pos, const PolyVox::IndexedSurfacePatch& isp);
-
-		void update(PolyVox::IndexedSurfacePatch* ispNew);
+		void setPhysicsData(const PolyVox::IndexedSurfacePatch& isp);
 
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp, PolyVox::uint8_t uLodLevel);
 		void removeAllSurfacePatchRenderablesForLod(PolyVox::uint8_t uLodLevel);

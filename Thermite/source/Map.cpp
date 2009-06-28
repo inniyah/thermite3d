@@ -186,49 +186,51 @@ namespace Thermite
 							Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
+							//The prioirty ensures that the surfaces for regions close to the
+							//camera getextracted before those which are distant from the camera.
 							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
 
+							//Extract the region with a LOD level of 0
 							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
 							m_iNoSubmitted++;
 
-							float fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
-							float fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
-							if(fLod0ToLod1Boundary > 0)
+							if(fLod0ToLod1Boundary > 0) //If the first LOD level is enabled
 							{
+								//Extract the region with a LOD level of 1
 								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 1, uPriority));
 								m_iNoSubmitted++;
 							}
 
-							if(fLod1ToLod2Boundary > 0)
+							if(fLod1ToLod2Boundary > 0) //If the second LOD level is enabled
 							{
+								//Extract the region with a LOD level of 2
 								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 2, uPriority));
 								m_iNoSubmitted++;
 							}
 
+							//Indicate that we've processed this region
 							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 						}
 					}
 				}
 			}
 
+			bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
+			int iPhysicsLOD = qApp->settings()->value("Physics/PhysicsLOD", 0).toInt();
+
+			//Process any results which have been returned by the surface extractor threads.
 			while(m_pMTSE->noOfResultsAvailable() > 0)
 			{
-				m_iNoProcessed++;
-				float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
-				m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
-				if(fProgress > 0.999)
-				{
-					m_pThermiteGameLogic->m_loadingProgress->hide();
-					m_pThermiteGameLogic->bLoadComplete = true;
-				}
-
+				//Get the next available result
 				SurfaceExtractorTaskData result;
 				result = m_pMTSE->popResult();
 
+				//Determine where it came from
 				PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
 				PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
 				PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
+				//Create a MapRegion for that location if we don't have one already
 				MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 				if(pMapRegion == 0)
 				{
@@ -236,32 +238,51 @@ namespace Thermite
 					m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 				}
 
+				//Get the IndexedSurfacePatch and check it's valid
 				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
-
-				//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
-				//*ispCurrent = getSmoothedSurface(*ispCurrent);
-				//isp->smooth(0.3f);
-				//ispCurrent->generateAveragedFaceNormals(true);
-
-				pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
-
-				if(result.getLodLevel() == 0)
+				if((ispWhole) && (ispWhole->isEmpty() == false))
 				{
-					pMapRegion->update(ispWhole.get());
+					//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(isp.get()), SOBEL);
+					//*ispCurrent = getSmoothedSurface(*ispCurrent);
+					//isp->smooth(0.3f);
+					//ispCurrent->generateAveragedFaceNormals(true);
+
+					//Clear any previous geometry
+					pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+
+					//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...
+					for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+					{
+						//Get the properties
+						std::string materialName = iter->first;
+						std::set<uint8_t> voxelValues = iter->second;
+
+						//Extract the part of the InexedSurfacePatch which corresponds to that material
+						POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+
+						//And add it to the MapRegion
+						pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+					}
+
+					//If we are simulating physics and the current LOD matches...
+					if((bSimulatePhysics) && (result.getLodLevel() == iPhysicsLOD))
+					{
+						//Update the physics geometry
+						pMapRegion->setPhysicsData(*(ispWhole.get()));
+					}
 				}
 
-				for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+				//Update the progress bar
+				m_iNoProcessed++;
+				float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
+				m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+
+				//If we've finished, the progress bar can be hidden.
+				if(fProgress > 0.999)
 				{
-					std::string materialName = iter->first;
-					std::set<uint8_t> voxelValues = iter->second;
-
-					POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
-
-					pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+					m_pThermiteGameLogic->m_loadingProgress->hide();
+					m_pThermiteGameLogic->bLoadComplete = true;
 				}
-
-				//The MapRegion is now up to date. Update the time stamp to indicate this
-				m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 			}
 		}		
 	}

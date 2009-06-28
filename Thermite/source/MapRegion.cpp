@@ -152,15 +152,7 @@ namespace Thermite
 		}
 	}
 
-	void MapRegion::update(IndexedSurfacePatch* ispNew)
-	{
-		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
-		{		
-			setPhysicsData(Ogre::Vector3(m_v3dPos.getX(),m_v3dPos.getY(),m_v3dPos.getZ()), *ispNew);
-		}
-	}
-
-	void MapRegion::setPhysicsData(Ogre::Vector3 pos, const IndexedSurfacePatch& isp)
+	void MapRegion::setPhysicsData(const IndexedSurfacePatch& isp)
 	{
 		const std::string& strName = makeUniqueName("RB");
 
@@ -205,7 +197,7 @@ namespace Thermite
 			mBody->setRestitution(gDynamicBodyRestitution);
 			mBody->setFriction(gDynamicBodyFriction);
 
-			mBody->getWorldTransform().setOrigin(btVector3(pos.x, pos.y, pos.z));
+			mBody->getWorldTransform().setOrigin(btVector3( m_v3dPos.getX(),  m_v3dPos.getY(), m_v3dPos.getZ()));
 			mBody->getWorldTransform().setRotation(btQuaternion(0, 0, 0, 1));
 
 			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
