@@ -7,7 +7,8 @@ struct v2f
     float2 Alpha : TEXCOORD2;
 };
 
-float4 main(v2f IN) : COLOR
+float4 main(v2f IN, uniform sampler1D colorMap : TEXUNIT0) : COLOR
 {
-	return float4(1.0f,0.0f,0.0f,1.0f);
+	float u = (IN.Alpha.x / 256.0f) + (1.0f / 512.0f);
+	return tex1D(colorMap, u);
 }

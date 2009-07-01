@@ -36,6 +36,11 @@ material ColorFrom1DTextureMaterial
 			
 			fragment_program_ref ColorFrom1DTextureFP
 			{
+			}	
+
+			texture_unit
+			{
+				texture ColorMap.png 1d
 			}			
 		}
 	}
