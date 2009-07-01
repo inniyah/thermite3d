@@ -28,6 +28,8 @@ material ColorFrom1DTextureMaterial
 			// to lighting pass categorisation routine
 			ambient 0 0 0 
 			
+			scene_blend add
+			
 			vertex_program_ref AssignMaterialIdVP
 			{
 				param_named_auto world world_matrix
