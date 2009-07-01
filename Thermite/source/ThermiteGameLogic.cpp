@@ -1,3 +1,9 @@
+
+//For windows, to disable min and max macros
+//which conflict with standard versions
+#define NOMINMAX
+
+
 #include "ThermiteGameLogic.h"
 #include "MainMenu.h"
 #include "Shell.h"
@@ -257,6 +263,11 @@ namespace Thermite
 	{
 		mKeyStates[event->key()] = KS_PRESSED;
 
+		if(event->key() == Qt::Key_F5)
+		{
+			reloadShaders();
+		}
+
 		if(event->key() == Qt::Key_Escape)
 		{
 			mMainMenu->show();
@@ -439,5 +450,14 @@ namespace Thermite
 		remainingBox->end();
 		Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
 		remainingBoxNode->attachObject(remainingBox);
+	}
+
+	void ThermiteGameLogic::reloadShaders(void)
+	{
+		Ogre::ResourceManager::ResourceMapIterator I = Ogre::HighLevelGpuProgramManager::getSingleton().getResourceIterator();
+		while (I.hasMoreElements()) {
+			Ogre::ResourcePtr resource = I.getNext();
+			resource->reload();
+		}
 	}
 }

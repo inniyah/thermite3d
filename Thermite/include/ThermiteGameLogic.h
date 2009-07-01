@@ -59,6 +59,8 @@ namespace Thermite
 
 		void setVolumeLoadProgress(float fProgress);
 
+		void reloadShaders(void);
+
 	public:
 		void addResourceDirectory(const QString& directoryName);
 
