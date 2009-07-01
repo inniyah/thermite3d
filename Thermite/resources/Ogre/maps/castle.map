@@ -7,12 +7,12 @@
 		</skyBox>
 	</environment>
 	<volume source="castle.volume">
-		<voxel value="1" material="RedMaterial"/>
+		<voxel value="1" material="ColorFrom1DTextureMaterial"/>
 		<voxel value="2" material="ShadowMapReceiverForWorldMaterial"/>
 		<voxel value="3" material="ShadowMapReceiverForWorldMaterial"/>
 		<voxel value="4" material="ShadowMapReceiverForWorldMaterial"/>
 		<voxel value="5" material="ShadowMapReceiverForWorldMaterial"/>
-		<voxel value="6" material="GreenMaterial"/>
+		<voxel value="6" material="ColorFrom1DTextureMaterial"/>
 		<voxel value="7" material="ShadowMapReceiverForWorldMaterial"/>
 		<voxel value="8" material="ShadowMapReceiverForWorldMaterial"/>
 		<voxel value="9" material="ShadowMapReceiverForWorldMaterial"/>
