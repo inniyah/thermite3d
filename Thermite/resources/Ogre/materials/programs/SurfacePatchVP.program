@@ -3,7 +3,7 @@ vertex_program PassThroughPositionVP cg
 	source SurfacePatchVP.cg
 	entry_point main
 	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
-	compile_arguments -DASSIGN_MATERIAL
+	compile_arguments
 }
 
 vertex_program AssignMaterialIdVP cg
@@ -12,4 +12,13 @@ vertex_program AssignMaterialIdVP cg
 	entry_point main
 	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
 	compile_arguments -DASSIGN_MATERIAL
+	
+	default_params
+    {
+        param_named_auto world world_matrix
+        param_named_auto worldIT inverse_transpose_world_matrix
+		param_named_auto viewProj viewproj_matrix
+		param_named_auto lightPosition light_position 0
+		param_named_auto lightColour light_diffuse_colour 0
+    }
 }

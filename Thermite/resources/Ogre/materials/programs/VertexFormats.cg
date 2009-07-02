@@ -1,7 +1,7 @@
 struct a2v
 {
     float4 Position : POSITION; //in object space
-    float3 Normal : NORMAL;
+    float4 Normal : NORMAL;
 	float2 Alpha : TEXCOORD0;
 };
 

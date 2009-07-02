@@ -4,6 +4,7 @@ float4 main(v2f IN, uniform sampler1D colorMap : TEXUNIT0) : COLOR
 {
 	float u = (IN.Alpha.x / 256.0f) + (1.0f / 512.0f);
 	float4 sample = tex1D(colorMap, u);
+	sample *= IN.Color;
 	sample *= IN.Alpha.y;
 	return sample;
 }
