@@ -1,18 +1,4 @@
-struct a2v
-{
-    float4 Position : POSITION; //in object space
-    float3 Normal : NORMAL;
-	float2 Alpha : TEXCOORD0;
-};
-
-struct v2f
-{
-    float4 Position : POSITION; //in projection space
-    float4 Color : COLOR;
-    float4 TexCoords : TEXCOORD0;
-    float4 Normal : TEXCOORD1;
-    float2 Alpha : TEXCOORD2;	
-};
+#include "VertexFormats.cg"
 
 v2f main(a2v IN, uniform float4x4 world, uniform float4x4 viewProj)
 {    
@@ -22,7 +8,9 @@ v2f main(a2v IN, uniform float4x4 world, uniform float4x4 viewProj)
     OUT.Position = mul(world, IN.Position);
     OUT.Position = mul(viewProj, OUT.Position);
 	
+#ifdef ASSIGN_MATERIAL
 	OUT.Alpha = IN.Alpha;
+#endif
     return OUT;
 }
 

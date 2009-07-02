@@ -1,0 +1,15 @@
+vertex_program PassThroughPositionVP cg
+{
+	source SurfacePatchVP.cg
+	entry_point main
+	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
+	compile_arguments -DASSIGN_MATERIAL
+}
+
+vertex_program AssignMaterialIdVP cg
+{
+	source SurfacePatchVP.cg
+	entry_point main
+	profiles vs_3_0 vs_2_x vs_2_0 vs_1_1 vp40 vp30 vp20 arbvp1 
+	compile_arguments -DASSIGN_MATERIAL
+}
