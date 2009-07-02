@@ -11,7 +11,7 @@ material ColorFrom1DTextureMaterial
 			ambient 1 1 1
 			diffuse 0 0 0 
 			specular 0 0 0 0 
-			vertex_program_ref PassThroughPositionVP
+			vertex_program_ref SurfacePatchVP
 			{
 				param_named_auto world world_matrix
 				param_named_auto viewProj viewproj_matrix
@@ -30,7 +30,7 @@ material ColorFrom1DTextureMaterial
 			
 			scene_blend add
 			
-			vertex_program_ref AssignMaterialIdVP
+			vertex_program_ref SurfacePatchVP
 			{
 				param_named_auto world world_matrix
 				param_named_auto viewProj viewproj_matrix

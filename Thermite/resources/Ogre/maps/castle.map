@@ -29,6 +29,7 @@
 		</node>
 		<light name="Sun" type="directional">
 			<normal x="-1" y="-1" z="-1" />
+			<colourDiffuse r="0.7" g="0.7" b="0.7" />
 		</light>
 		<node name="RobotNode">
 			<scale x="0.3" y="0.3" z="0.3" />

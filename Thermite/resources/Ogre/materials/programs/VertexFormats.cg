@@ -1,15 +1,15 @@
 struct a2v
 {
     float4 Position : POSITION; //in object space
-    float4 Normal : NORMAL;
-	float2 Alpha : TEXCOORD0;
+    float3 Normal : NORMAL;
+	float2 Material : TEXCOORD0;
 };
 
 struct v2f
 {
     float4 Position : POSITION; //in projection space
-    float4 Color : COLOR;
+    float4 DiffuseLightColor : COLOR;
     float4 TexCoords : TEXCOORD0;
-    float4 Normal : TEXCOORD1;
-    float2 Alpha : TEXCOORD2;	
+    float3 Normal : TEXCOORD1;
+    float2 Material : TEXCOORD2;	
 };

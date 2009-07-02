@@ -1,10 +1,10 @@
 #include "VertexFormats.cg"
 
-float4 main(v2f IN, uniform sampler1D colorMap : TEXUNIT0) : COLOR
+float4 main(v2f IN,  uniform float4 ambientLightColor, uniform sampler1D colorMap : TEXUNIT0) : COLOR
 {
-	float u = (IN.Alpha.x / 256.0f) + (1.0f / 512.0f);
+	float u = (IN.Material.x / 256.0f) + (1.0f / 512.0f);
 	float4 sample = tex1D(colorMap, u);
-	sample *= IN.Color;
-	sample *= IN.Alpha.y;
+	sample *= IN.DiffuseLightColor + ambientLightColor;
+	sample *= IN.Material.y;
 	return sample;
 }
