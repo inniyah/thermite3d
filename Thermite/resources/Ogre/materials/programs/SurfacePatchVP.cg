@@ -8,7 +8,9 @@ v2f main(a2v IN, uniform float4x4 world, uniform float4x4 viewProj, uniform floa
 	// Compute simple per-vertex lighting
 	OUT.Normal = IN.Normal; //Just pass this through as the world matrix is just a translation
 	float3 lightDir = lightPosition.xyz; //We're only dealing with directional lights, so we know the last component is 0.0f.
-	OUT.DiffuseLightColor = lightColour * max(dot(lightDir, OUT.Normal), 0.0);	
+	OUT.DiffuseLightColor = lightColour * max(dot(lightDir, OUT.Normal), 0.0);
+
+	OUT.TexCoords = OUT.Position;
 	
     OUT.Position = mul(viewProj, OUT.Position);
 	

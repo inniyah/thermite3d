@@ -334,7 +334,10 @@ namespace Thermite
 		}	
 
 		ibuf->unlock();
-		vbuf->unlock();	
+		vbuf->unlock();
+
+		//This function is extreamly slow.
+		//renderOperation->indexData->optimiseVertexCacheTriList();
 
 		m_RenderOp = renderOperation;
 	}

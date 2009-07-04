@@ -29,6 +29,7 @@
 		</node>
 		<light name="Sun" type="directional">
 			<normal x="-1" y="-1" z="-1" />
+      <colourDiffuse r="0.7" g="0.7" b="0.7" />
 		</light>
 		<!--node name="Water">
 			<scale x="510" y="510" z="1" />
