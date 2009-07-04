@@ -172,21 +172,21 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	for(unsigned int z = 1; z < volData.getDepth()-1; ++z)
+	for(int z = 1; z < volData.getDepth()-1; ++z)
 	{
-		for(unsigned int y = 1; y < volData.getHeight()-1; ++y)
+		for(int y = 1; y < volData.getHeight()-1; ++y)
 		{
-			for(unsigned int x = 1; x < volData.getWidth()-1; ++x)
+			for(int x = 1; x < volData.getWidth()-1; ++x)
 			{
 				//We check the red channel, but in a greyscale image they should all be the same.
 				int height = qRed(image.pixel(x,z)); 
 
 				//Set the voxel based on the height.
-				if(y < height)
+				if(y <= height - arguments.surfaceThickness)
 				{
 					volData.setVoxelAt(x,y,z,arguments.undergroundMaterialID);
 				}
-				else if(y < height + arguments.surfaceThickness)
+				else if(y <= height)
 				{
 					volData.setVoxelAt(x,y,z,arguments.surfaceMaterialID);
 				}
