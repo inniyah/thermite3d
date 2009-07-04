@@ -222,7 +222,7 @@ namespace Thermite
 
 		HardwareIndexBufferSharedPtr ibuf =
 			HardwareBufferManager::getSingleton().createIndexBuffer(
-			HardwareIndexBuffer::IT_16BIT, // type of index
+			HardwareIndexBuffer::IT_32BIT, // type of index
 			renderOperation->indexData->indexCount, // number of indexes
 			HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
 			false); // no shadow buffer	
@@ -243,8 +243,8 @@ namespace Thermite
 
 		
 		
-		unsigned short* pIdx = static_cast<unsigned short*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
-		unsigned short newVertexIndex = vecVertices.size();
+		unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
+		unsigned long newVertexIndex = vecVertices.size();
 		for(int i = 0; i < vecIndices.size() - 2; i += 3)
 		{
 			if((vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+1]].getMaterial()) && (vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+2]].getMaterial()))
