@@ -5,6 +5,6 @@ float4 main(v2f IN,  uniform float4 ambientLightColor, uniform sampler2D colorMa
 	IN.TexCoords = mul(textureMatrix, IN.TexCoords);
 	float4 sample = tex2D(colorMap, IN.TexCoords.xz);
 	sample *= IN.DiffuseLightColor + ambientLightColor;
-	sample *= IN.Material.y;
+	//sample *= IN.Material.y;
 	return sample;
 }

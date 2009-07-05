@@ -334,7 +334,7 @@ namespace Thermite
 		m_pThermiteLogoLabel->hide();
 		mMainMenu->hide();
 
-		//Temporary hack until loding new map is fixed...
+		//Temporary hack until loading new map is fixed...
 		mMainMenu->disableLoadButton();
 
 		m_loadingProgress->show();

@@ -4,7 +4,7 @@ material NoMaterial
 	{
 		pass
 		{
-			ambient 0.7 0.7 0.7 
+			ambient 0.3 0.3 0.3 
 			diffuse 0.7 0.7 0.7 
 		}
 	}
@@ -17,8 +17,8 @@ material armor
 	{
 		pass
 		{
-			ambient 0 0 0 
-			diffuse 0.266667 0.321569 0.227451 
+			ambient 0.3 0.3 0.3 
+			diffuse 0.7 0.7 0.7 
 			specular 0.081 0.081 0.081 39
 			emissive 0 0 0 
 
@@ -37,8 +37,8 @@ material gun_trim
 	{
 		pass
 		{
-			ambient 0 0 0 
-			diffuse 0.286275 0.282353 0.219608 
+			ambient 0.3 0.3 0.3 
+			diffuse 0.7 0.7 0.7 
 			specular 0.2 0.2 0.2 30
 			emissive 0 0 0 
 			
@@ -57,8 +57,8 @@ material tracks
 	{
 		pass
 		{
-			ambient 0 0 0 
-			diffuse 0.262745 0.227451 0.196078 
+			ambient 0.3 0.3 0.3 
+			diffuse 0.7 0.7 0.7 
 			specular 0.09 0.09 0.09 17
 			emissive 0 0 0 
 			
@@ -77,8 +77,8 @@ material turrettrim
 	{
 		pass
 		{
-			ambient 0 0 0 
-			diffuse 0.262745 0.227451 0.196078 
+			ambient 0.3 0.3 0.3 
+			diffuse 0.7 0.7 0.7 
 			specular 0 0 0 1
 			emissive 0 0 0 
 		}
