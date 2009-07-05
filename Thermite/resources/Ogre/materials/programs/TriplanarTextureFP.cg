@@ -1,0 +1,19 @@
+#include "VertexFormats.cg"
+
+float4 main(v2f IN,  uniform float4 ambientLightColor, uniform sampler2D colorMap : TEXUNIT0, uniform float4x4 textureMatrix) : COLOR
+{	
+	IN.TexCoords = mul(textureMatrix, IN.TexCoords);
+	
+	IN.Normal *= IN.Normal; //Makes the components sum to 1
+	
+	//Retrieve the 3 samples
+	float3 colourMapValueXY = tex2D(colorMap, IN.TexCoords.xy).rgb * abs(IN.Normal.z);
+	float3 colourMapValueYZ = tex2D(colorMap, IN.TexCoords.yz).rgb * abs(IN.Normal.x);
+	float3 colourMapValueXZ = tex2D(colorMap, IN.TexCoords.xz).rgb * abs(IN.Normal.y);
+	
+	float4 colourMapValue = float4(colourMapValueXY + colourMapValueYZ + colourMapValueXZ, 1.0);
+		
+	colourMapValue *= IN.DiffuseLightColor + ambientLightColor;
+	//colourMapValue *= IN.Material.y;
+	return colourMapValue;
+}
