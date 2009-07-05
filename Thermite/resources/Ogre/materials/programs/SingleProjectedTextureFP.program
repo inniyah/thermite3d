@@ -7,6 +7,6 @@ fragment_program SingleProjectedTextureFP cg
 	default_params
     {
 		param_named_auto ambientLightColor ambient_light_colour
-		param_named textureMatrix matrix4x4 0.0009765625 0.0 0.0 0.0 0.0 0.0009765625 0.0 0.0 0.0 0.0 0.0009765625 0.0 0.0 0.0 0.0 1.0
+		param_named textureMatrix matrix4x4 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0
 	}
 }

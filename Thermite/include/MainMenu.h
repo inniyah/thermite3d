@@ -15,6 +15,9 @@ namespace Thermite
 	public:
 		MainMenu(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
+		//Tempoary hack until reloading is fixed...
+		void disableLoadButton(void) {mLoadButton->setEnabled(false);}
+
 	public slots:
 		void on_mQuitButton_clicked(void);
 		void on_mResumeButton_clicked(void);

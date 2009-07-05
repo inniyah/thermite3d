@@ -38,12 +38,6 @@ material SingleProjectedTextureMaterial
 			
 			fragment_program_ref SingleProjectedTextureFP
 			{
-			}	
-
-			texture_unit
-			{
-				//texture logo_colourmap.jpg 2d
-				texture sand-rock-grass.png 2d
 			}			
 		}
 	}

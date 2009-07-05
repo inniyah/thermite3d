@@ -334,6 +334,9 @@ namespace Thermite
 		m_pThermiteLogoLabel->hide();
 		mMainMenu->hide();
 
+		//Temporary hack until loding new map is fixed...
+		mMainMenu->disableLoadButton();
+
 		m_loadingProgress->show();
 
 		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
