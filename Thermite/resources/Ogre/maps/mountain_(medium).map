@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <scene formatVersion="2.0">
 	<environment>
-		<colourAmbient r="0.5" g="0.5" b="0.5" />
+		<colourAmbient r="0.3" g="0.3" b="0.3" />
 		<skyBox material="SkyBox" distance="100.0" drawFirst="true">
 			<rotation qw="0" qx="0" qy="1" qz="0"/>
 		</skyBox>
@@ -14,21 +14,97 @@
 		<node name="CameraNode">			
 			<camera name="Camera" fov="1.0">
 			<clipping near="1.0" far="5000" />
-				<position x="256" y="256" z="512" />
+				<position x="30" y="200" z="512" />
 				<lookTarget>
-					<position x="256" y="0" z="256" />
+					<position x="88.0" y="190.0" z="475.0" />
 				</lookTarget>
 			</camera>
 		</node>
 		<light name="Sun" type="directional">
 			<normal x="-1" y="-1" z="-1" />
-      <colourDiffuse r="0.5" g="0.5" b="0.5" />
+      <colourDiffuse r="0.7" g="0.7" b="0.7" />
 		</light>
 		<!--node name="Water">
 			<scale x="510" y="510" z="1" />
 			<position x="511.5" y="25.33" z="511.5" />	
 			<rotation qw="0.707" qx="-0.707" qy="0" qz="0"/>					
 			<entity meshFile="water.mesh" name="WaterMesh" castShadows="True" collisionShape="exact" mass="0.0"/>
-		</node-->		
+		</node-->	
+	<node name="chassis">
+            <scale x="0.1" y="0.1" z="0.1" />
+            <position x="88.0" y="190.0" z="475.0" />
+            <rotation qx="-5.92857e-010" qy="0.707107" qz="3.15015e-008" qw="0.707107" />
+            <entity name="chassis" id="24" meshFile="chassis.mesh" castShadows="true" receiveShadows="true">
+                <subentities>
+                    <subentity index="0" materialName="armor" />
+                    <subentity index="1" materialName="tracks" />
+                    <subentity index="2" materialName="turrettrim" />
+                </subentities>
+            </entity>
+            <node name="turret_main">
+                <scale x="1.00236" y="1.00236" z="1.00237" />
+                <position x="49.1722" y="23.6477" z="-33.2728" />
+                <rotation qx="3.15015e-008" qy="0.707107" qz="5.92883e-010" qw="0.707106" />
+                <entity name="turret_main" id="23" meshFile="turret_main.mesh" castShadows="true" receiveShadows="true">
+                    <subentities>
+                        <subentity index="0" materialName="armor" />
+                        <subentity index="1" materialName="gun_trim" />
+                        <subentity index="2" materialName="turrettrim" />
+                    </subentities>
+                </entity>
+                <node name="turret_secondary">
+                    <scale x="0.0271319" y="0.0271319" z="0.0271319" />
+                    <position x="15.3195" y="22.7261" z="17.1056" />
+                    <rotation qx="5.45585e-021" qy="1" qz="4.87797e-022" qw="4.34554e-007" />
+                    <entity name="turret_secondary" id="2" meshFile="turret_secondary.mesh" castShadows="true" receiveShadows="true">
+                        <subentities>
+                            <subentity index="0" materialName="armor" />
+                            <subentity index="1" materialName="gun_trim" />
+                        </subentities>
+                    </entity>
+                    <node name="gun_secondary">
+                        <scale x="1" y="1" z="1" />
+                        <position x="-1.1488" y="11.4919" z="608.317" />
+                        <rotation qx="0" qy="0" qz="1.43465e-021" qw="1" />
+                        <entity name="gun_secondary" id="33" meshFile="gun_secondary.mesh" castShadows="true" receiveShadows="true">
+                            <subentities>
+                                <subentity index="0" materialName="armor" />
+                                <subentity index="1" materialName="tracks" />
+                            </subentities>
+                        </entity>
+                        <node name="gun_secondary_muzzle">
+                            <scale x="0.0669542" y="0.0669542" z="0.208235" />
+                            <position x="0" y="0" z="1047.18" />
+                            <rotation qx="-0.707107" qy="4.35245e-009" qz="-5.1351e-009" qw="0.707107" />
+                            <entity name="gun_secondary_muzzle" id="36" meshFile="gun_secondary_muzzle.mesh" castShadows="true" receiveShadows="true">
+                                <subentities>
+                                    <subentity index="0" materialName="NoMaterial" />
+                                </subentities>
+                            </entity>
+                        </node>
+                    </node>
+                </node>
+                <node name="gun_main">
+                    <scale x="1.00644" y="1.00644" z="1.00644" />
+                    <position x="1.95176" y="-3.7103" z="-32.2057" />
+                    <rotation qx="0.707106" qy="6.24913e-008" qz="0.707107" qw="-2.84051e-008" />
+                    <entity name="gun_main" id="5" meshFile="gun_main.mesh" castShadows="true" receiveShadows="true">
+                        <subentities>
+                            <subentity index="0" materialName="armor" />
+                        </subentities>
+                    </entity>
+                    <node name="gun_main_muzzle">
+                        <scale x="0.00561364" y="0.00561364" z="0.00561364" />
+                        <position x="-115.841" y="0.000118256" z="-0.0810547" />
+                        <rotation qx="0.5" qy="0.5" qz="-0.5" qw="0.5" />
+                        <entity name="gun_main_muzzle" id="35" meshFile="gun_main_muzzle.mesh" castShadows="true" receiveShadows="true">
+                            <subentities>
+                                <subentity index="0" materialName="NoMaterial" />
+                            </subentities>
+                        </entity>
+                    </node>
+                </node>
+            </node>
+        </node>
 	</nodes>
 </scene>
