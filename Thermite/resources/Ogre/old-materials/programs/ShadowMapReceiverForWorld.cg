@@ -150,7 +150,7 @@ void ShadowMapReceiverForWorldFP(
 
 	//float4 shadowVal = (centerdepth > shadowUV.z) ? vertexColour : float4(0,0,0,1);
 	float4 lightColour = ambientLightColour;
-	if(centerdepth > inShadowUV.z)
+	//if(centerdepth > inShadowUV.z)
 	{
 		lightColour += inDiffuseLightColour;
 	}

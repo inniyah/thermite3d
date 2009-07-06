@@ -243,20 +243,6 @@ namespace Thermite
 				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
 				if((ispWhole) && (ispWhole->isEmpty() == false))
 				{
-					//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(ispWhole.get()), SOBEL);
-					//*ispCurrent = getSmoothedSurface(*ispCurrent);
-					//ispWhole->generateAveragedFaceNormals(true);
-					//ispWhole->smooth(0.1f, 5);
-					//ispWhole->generateAveragedFaceNormals(true);
-					//ispWhole->smooth(0.1f, 5);
-					//ispWhole->generateAveragedFaceNormals(true);
-					//ispWhole->smooth(0.1f, 5);
-					//ispWhole->generateAveragedFaceNormals(true);
-
-					//ispWhole->smoothNormals();
-					//ispWhole->smoothNormals();
-					//ispWhole->smoothNormals();
-
 					//Clear any previous geometry
 					pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
 
