@@ -7,7 +7,7 @@
 		</skyBox>
 	</environment>
 	<volume source="desert.volume">
-		<voxel value="1" material="DesertUndergroundMaterial"/>
+		<voxel value="1" material="RockMaterial"/>
 		<voxel value="2" material="DesertSurfaceMaterial"/>
 	</volume>
 	<nodes>

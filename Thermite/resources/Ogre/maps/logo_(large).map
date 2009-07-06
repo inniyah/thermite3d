@@ -39,7 +39,7 @@
 		</node-->		
 		<node name="chassis">
             <scale x="0.1" y="0.1" z="0.1" />
-            <position x="110.0" y="40.0" z="240.0" />
+            <position x="531.0" y="88.0" z="740.0" />
             <rotation qx="-5.92857e-010" qy="0.707107" qz="3.15015e-008" qw="0.707107" />
             <entity name="chassis" id="24" meshFile="chassis.mesh" castShadows="true" receiveShadows="true">
                 <subentities>

@@ -1,6 +1,6 @@
 import TriplanarTextureMaterial from "TriplanarTexture.material"
 
-material MountainUndergroundMaterial : TriplanarTextureMaterial
+material RockMaterial : TriplanarTextureMaterial
 {
 	technique
 	{		

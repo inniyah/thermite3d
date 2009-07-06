@@ -1,6 +1,6 @@
 import TriplanarTextureMaterial from "TriplanarTexture.material"
 
-material DesertUndergroundMaterial : TriplanarTextureMaterial
+material GroundMaterial : TriplanarTextureMaterial
 {
 	technique
 	{		
@@ -13,7 +13,7 @@ material DesertUndergroundMaterial : TriplanarTextureMaterial
 
 			texture_unit
 			{
-				texture rock.jpg 2d
+				texture ground-small.png 2d
 			}			
 		}
 	}
