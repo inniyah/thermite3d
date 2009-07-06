@@ -48,6 +48,13 @@ namespace Thermite
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
 		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
 
+		//We have to create a scene manager and viewport here so that the screen
+		//can be cleared to black befre the Thermite logo animation is played.
+		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
+		Ogre::Camera* dummyCamera = mSceneManager->createCamera("DummyCamera");
+		mSceneManager->getRootSceneNode()->attachObject(dummyCamera);
+		mApplication->ogreRenderWindow()->addViewport(dummyCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
 		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
@@ -86,6 +93,9 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
 		QObject::connect(mMainMenu, SIGNAL(loadClicked(void)), wgtLoadMap, SLOT(show(void)));
 
+		//Show the main menu after the animation has finished
+		QTimer::singleShot(2000, mMainMenu, SLOT(show()));
+
 		//Set the frame sate to be as high as possible
 		mApplication->setUpdateInterval(0);
 
@@ -94,13 +104,7 @@ namespace Thermite
 		VolumeManager* vm = new VolumeManager;
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
 
-		//Show the main menu
-		mMainMenu->show();
-
 		//From here on, I'm not sure it belongs in this initialise function... maybe in Map?		
-
-		// Create the generic scene manager
-		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
 
 		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
 		{
@@ -336,6 +340,12 @@ namespace Thermite
 
 		//Temporary hack until loading new map is fixed...
 		mMainMenu->disableLoadButton();
+
+		//The QtOgre DotScene loading code will clear the existing scene except for cameras, as these
+		//could be used by existing viewports. Therefore we clear and viewports and cameras before
+		//calling the loading code.
+		mApplication->ogreRenderWindow()->removeAllViewports();
+		mSceneManager->destroyAllCameras();
 
 		m_loadingProgress->show();
 

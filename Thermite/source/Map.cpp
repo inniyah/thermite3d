@@ -43,9 +43,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ThermiteGameLogic.h"
 
-#include "GradientEstimators.h"
-
-
 #include <OgreSceneManagerEnumerator.h>
 #include <OgreSceneManager.h>
 
@@ -246,14 +243,14 @@ namespace Thermite
 				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
 				if((ispWhole) && (ispWhole->isEmpty() == false))
 				{
-					computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(ispWhole.get()), SOBEL);
+					//computeNormalsForVertices(volumeChangeTracker->getWrappedVolume(), *(ispWhole.get()), SOBEL);
 					//*ispCurrent = getSmoothedSurface(*ispCurrent);
 					//ispWhole->generateAveragedFaceNormals(true);
-					ispWhole->smooth(0.1f, 5);
+					//ispWhole->smooth(0.1f, 5);
 					//ispWhole->generateAveragedFaceNormals(true);
-					ispWhole->smooth(0.1f, 5);
+					//ispWhole->smooth(0.1f, 5);
 					//ispWhole->generateAveragedFaceNormals(true);
-					ispWhole->smooth(0.1f, 5);
+					//ispWhole->smooth(0.1f, 5);
 					//ispWhole->generateAveragedFaceNormals(true);
 
 					//ispWhole->smoothNormals();
