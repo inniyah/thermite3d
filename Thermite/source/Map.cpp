@@ -19,10 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-//For windows, to disable min and max macros
-//which conflict with standard versions
-#define NOMINMAX
-
 #include "Map.h"
 
 #include "Application.h"

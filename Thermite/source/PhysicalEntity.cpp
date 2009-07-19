@@ -81,7 +81,7 @@ namespace Thermite
 			}
 		case CST_EXACT:
 			{			
-				m_pCollisionShape = converter->createGImpactConcave();
+				m_pCollisionShape = converter->createConcave();
 				break;
 			}
 		}

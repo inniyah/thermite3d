@@ -30,7 +30,7 @@ IF (WIN32) #Windows
 		MESSAGE(STATUS "Using Bullet built from source")
 		SET(BULLET_INCLUDE_DIRS $ENV{BULLET_HOME}/src $ENV{BULLET_HOME}/Extras/GIMPACT/include)
 		SET(BULLET_LIBRARY_DIRS $ENV{BULLET_HOME}/out/Debug8/libs $ENV{BULLET_HOME}/out/Release8/libs)
-		SET(BULLET_LIBRARIES debug libbulletcollision_d debug libbulletdynamics_d debug libbulletmath_d optimized libbulletcollision optimized libbulletdynamics optimized libbulletmath)
+		SET(BULLET_LIBRARIES debug libbulletcollision_d debug libbulletdynamics_d debug libbulletmath_d debug libconvexdecomposition_d optimized libbulletcollision optimized libbulletdynamics optimized libbulletmath optimized libconvexdecomposition)
 	ENDIF (BULLETSOURCE)
 ELSE (WIN32) #Unix
 	CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)

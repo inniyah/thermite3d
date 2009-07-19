@@ -1,9 +1,3 @@
-
-//For windows, to disable min and max macros
-//which conflict with standard versions
-#define NOMINMAX
-
-
 #include "ThermiteGameLogic.h"
 #include "MainMenu.h"
 #include "Shell.h"
