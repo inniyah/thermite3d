@@ -32,9 +32,9 @@ namespace Thermite
 
 			//taskData.m_ispResult->generateAveragedFaceNormals(true);
 			computeNormalsForVertices(m_pVolData, *(taskData.m_ispResult.get()), SOBEL);
-			//taskData.m_ispResult->smooth(0.1f, 5);
-			//taskData.m_ispResult->smooth(0.1f, 5);
-			//taskData.m_ispResult->smooth(0.1f, 5);
+			taskData.m_ispResult->smoothPositions(0.1f);
+			taskData.m_ispResult->smoothPositions(0.1f);
+			taskData.m_ispResult->smoothPositions(0.1f);
 
 			m_pParentMTSE->pushResult(taskData);
 		}
