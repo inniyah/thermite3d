@@ -123,12 +123,6 @@ IF(WIN32)
 		MESSAGE(STATUS "Using stuff from OGRE SDK")
 		#This first bunch of install commands is called for release mode.
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/release/OgreMain.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/release/OIS.dll DESTINATION bin CONFIGURATIONS Release)
-
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/release/CEGUIBase.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/release/OgreGuiRenderer.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/release/CEGUIExpatParser.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/release/CEGUIFalagardWRBase.dll DESTINATION bin CONFIGURATIONS Release)
 
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/release/Cg.dll DESTINATION bin CONFIGURATIONS Release)
 
@@ -137,14 +131,8 @@ IF(WIN32)
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/release/Plugin_CgProgramManager.dll DESTINATION bin CONFIGURATIONS Release)
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/release/Plugin_ParticleFX.dll DESTINATION bin CONFIGURATIONS Release)
 		
-		#This second bunch of install comands is called for debug mode.
+		#This second bunch of install commands is called for debug mode.
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/OgreMain_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/OIS_d.dll DESTINATION bin CONFIGURATIONS Debug)
-
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/CEGUIBase_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/OgreGuiRenderer_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/CEGUIExpatParser_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_HOME}/bin/debug/CEGUIFalagardWRBase_d.dll DESTINATION bin CONFIGURATIONS Debug)
 
 		INSTALL(FILES $ENV{OGRE_HOME}/bin/release/Cg.dll DESTINATION bin CONFIGURATIONS Debug)
 
@@ -155,13 +143,8 @@ IF(WIN32)
 	ENDIF (OGRESDK)
 	IF (OGRESOURCE)
 		MESSAGE(STATUS "Using stuff from OGRE Source")
+		#This first bunch of install commands is called for release mode.
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/OgreMain.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/OIS.dll DESTINATION bin CONFIGURATIONS Release)
-
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/CEGUIBase.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/OgreGuiRenderer.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/CEGUIExpatParser.dll DESTINATION bin CONFIGURATIONS Release)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/CEGUIFalagardWRBase.dll DESTINATION bin CONFIGURATIONS Release)
 
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/Cg.dll DESTINATION bin CONFIGURATIONS Release)
 
@@ -170,14 +153,8 @@ IF(WIN32)
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/Plugin_CgProgramManager.dll DESTINATION bin CONFIGURATIONS Release)
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/Plugin_ParticleFX.dll DESTINATION bin CONFIGURATIONS Release)
 
-		#This second bunch of install comands is called for debug mode.
+		#This second bunch of install commands is called for debug mode.
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/OgreMain_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/OIS_d.dll DESTINATION bin CONFIGURATIONS Debug)
-
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/CEGUIBase_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/OgreGuiRenderer_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/CEGUIExpatParser_d.dll DESTINATION bin CONFIGURATIONS Debug)
-		#INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Debug/CEGUIFalagardWRBase_d.dll DESTINATION bin CONFIGURATIONS Debug)
 
 		INSTALL(FILES $ENV{OGRE_SRC}/Samples/Common/bin/Release/Cg.dll DESTINATION bin CONFIGURATIONS Debug)
 
@@ -194,11 +171,28 @@ IF(WIN32)
 	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore_d.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil_d.dll DESTINATION bin CONFIGURATIONS Debug)
 	
+	#Install the Qt .dll's
+	INSTALL(FILES ${QT_BINARY_DIR}/QtCore4.dll DESTINATION bin CONFIGURATIONS Release)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtGui4.dll DESTINATION bin CONFIGURATIONS Release)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtSvg4.dll DESTINATION bin CONFIGURATIONS Release)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtXml4.dll DESTINATION bin CONFIGURATIONS Release)
+	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qmng4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Release)
+	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qsvg4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Release)
+	
+	INSTALL(FILES ${QT_BINARY_DIR}/QtCored4.dll DESTINATION bin CONFIGURATIONS Debug)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtGuid4.dll DESTINATION bin CONFIGURATIONS Debug)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtSvgd4.dll DESTINATION bin CONFIGURATIONS Debug)
+	INSTALL(FILES ${QT_BINARY_DIR}/QtXmld4.dll DESTINATION bin CONFIGURATIONS Debug)
+	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qmngd4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Debug)
+	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qsvgd4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Debug)
+	
+	#Install the qt configuration file
+	INSTALL(FILES qt.conf DESTINATION bin CONFIGURATIONS Release)	
+	INSTALL(FILES qt.conf DESTINATION bin CONFIGURATIONS Debug)
+	
 	#Install the settings file
 	INSTALL(FILES Settings.ini DESTINATION bin CONFIGURATIONS Release)	
-	INSTALL(FILES Settings.ini DESTINATION bin CONFIGURATIONS Debug)
-
-	
+	INSTALL(FILES Settings.ini DESTINATION bin CONFIGURATIONS Debug)	
 	
 ENDIF(WIN32)
 
