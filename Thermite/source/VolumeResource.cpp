@@ -19,10 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
+#include "DataStreamWrapper.h"
+#include "VolumeManager.h"
 #include "VolumeResource.h"
 #include "VolumeSampler.h"
-
-#include "VolumeSerializer.h"
 
 #include "OgreVector3.h"
 #include "OgreLogManager.h"
@@ -62,9 +62,14 @@ namespace Thermite
 		/* If you were storing a pointer to an object, then you would create that object with 'new' here.
 		*/
 
-		VolumeSerializer serializer;
+		//VolumeSerializer serializer;
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
-		serializer.importVolume (stream, &m_pVolume);
+
+		std::istream stdStream(new DataStreamWrapper(stream)); 
+
+		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);
+
+		//serializer.importVolume (stream, &m_pVolume);
 	}
 
 	void VolumeResource::unloadImpl ()

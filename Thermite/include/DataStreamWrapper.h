@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ******************************************************************************/
 #pragma endregion
 
-#ifndef __DataStreamAdapter_H__
-#define __DataStreamAdapter_H__
+#ifndef __DataStreamWrapper_H__
+#define __DataStreamWrapper_H__
 
 #include "OgreSerializer.h"
 
@@ -28,10 +28,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Thermite
 {
-	class DataStreamAdapter : public std::streambuf
+	class DataStreamWrapper : public std::streambuf
 	{
 	public:
-		DataStreamAdapter (const Ogre::DataStreamPtr &dsp);
+		DataStreamWrapper (const Ogre::DataStreamPtr &dsp);
 
 		std::streamsize showmanyc (void);
 

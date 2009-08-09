@@ -16,7 +16,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(SRC_FILES
 	source/main.cpp
 	source/CannonController.cpp
-	source/DataStreamAdapter.cpp
+	source/DataStreamWrapper.cpp
 	source/LoadingProgress.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
@@ -34,12 +34,11 @@ SET(SRC_FILES
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
-	source/VolumeSerializer.cpp
 )
 
 SET(INC_FILES
 	include/CannonController.h
-	include/DataStreamAdapter.h
+	include/DataStreamWrapper.h
 	include/LoadingProgress.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
@@ -58,7 +57,6 @@ SET(INC_FILES
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializationProgressListenerImpl.h
-	include/VolumeSerializer.h
 
 )
 
