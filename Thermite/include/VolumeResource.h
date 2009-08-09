@@ -50,7 +50,7 @@ namespace Thermite
 		void unloadImpl ();
 		size_t calculateSize () const;
 
-		PolyVox::Volume<PolyVox::uint8_t>* m_pVolume;
+		POLYVOX_SHARED_PTR< PolyVox::Volume<PolyVox::uint8_t> > m_pVolume;
 	};
 
 	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 

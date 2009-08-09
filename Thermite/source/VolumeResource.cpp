@@ -34,20 +34,11 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	VolumeResource::VolumeResource (Ogre::ResourceManager* creator, const Ogre::String &name, 
-		Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual, 
-		Ogre::ManualResourceLoader *loader) :
-		Ogre::Resource (creator, name, handle, group, isManual, loader)
-		,m_pVolume(0)
-	{
-		/* If you were storing a pointer to an object, then you would set that pointer to NULL here.
-		*/
-
-		/* For consistency with StringInterface, but we don't add any parameters here
-		That's because the Resource implementation of StringInterface is to
-		list all the options that need to be set before loading, of which 
-		we have none as such. Full details can be set through scripts.
-		*/ 
+	VolumeResource::VolumeResource(	Ogre::ResourceManager* creator, const Ogre::String &name, 
+									Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual, 
+									Ogre::ManualResourceLoader *loader)
+		:Ogre::Resource (creator, name, handle, group, isManual, loader)
+	{		
 		createParamDictionary ("Volume");
 	}
 
@@ -56,51 +47,28 @@ namespace Thermite
 		unload ();
 	}	
 
-	// farm out to VolumeSerializer
 	void VolumeResource::loadImpl ()
 	{
-		/* If you were storing a pointer to an object, then you would create that object with 'new' here.
-		*/
-
-		//VolumeSerializer serializer;
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
-
 		std::istream stdStream(new DataStreamWrapper(stream)); 
-
 		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);
-
-		//serializer.importVolume (stream, &m_pVolume);
 	}
 
 	void VolumeResource::unloadImpl ()
 	{
-		/* If you were storing a pointer to an object, then you would check the pointer here,
-		and if it is not NULL, you would destruct the object and set its pointer to NULL again.
-		*/
-
-		//mString.clear ();
+		//Clear the pointer
+		m_pVolume = POLYVOX_SHARED_PTR< PolyVox::Volume<PolyVox::uint8_t> >();
 	}
 
 	size_t VolumeResource::calculateSize () const
 	{
 		//NOTE - I don't really know what this function is for, so am therefore
 		//a bit vague on how to implement it. But here's my best guess...
-		//ulong uNonHomogeneousBlocks = 0;
-		//for(uint i = 0; i < volume->getNoOfBlocksInVolume(); ++i)
-		//{
-			//I think this is OK... If a block is in the homogeneous array it's ref count will be greater
-			//than 1 as there will be the pointer in the volume and the pointer in the static homogeneous array.
-			//if(volume->getBlock(i).unique())
-			//{
-				//++uNonHomogeneousBlocks;
-			//}
-		//}
-		//return uNonHomogeneousBlocks * volume->getNoOfVoxelsInBlock();
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
 	PolyVox::Volume<PolyVox::uint8_t>* VolumeResource::getVolume(void)
 	{
-		return m_pVolume;
+		return m_pVolume.get();
 	}
 }

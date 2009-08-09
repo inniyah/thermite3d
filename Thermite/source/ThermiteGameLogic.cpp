@@ -199,7 +199,7 @@ namespace Thermite
 			{
 				if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
 				{
-					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 10, 0);
+					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0);
 					shellsToDelete.push_back(*iter);
 				}
 			}
