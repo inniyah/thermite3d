@@ -88,9 +88,10 @@ namespace Thermite
 		reader.setContentHandler(&handler);
 		reader.setErrorHandler(&handler);
 
-		QFile file("..\\share\\thermite\\Ogre\\maps\\" + QString::fromStdString(filename)); //HACK - Should really use the resource system for this!
-		file.open(QFile::ReadOnly | QFile::Text);
-		QXmlInputSource xmlInputSource(&file);
+		//QFile file("..\\share\\thermite\\Ogre\\maps\\" + QString::fromStdString(filename)); //HACK - Should really use the resource system for this!
+		//file.open(QFile::ReadOnly | QFile::Text);
+		QXmlInputSource xmlInputSource;
+		xmlInputSource.setData(QString::fromStdString(filename));
 		reader.parse(xmlInputSource);
 
 		//This gets the first camera which was found in the scene.

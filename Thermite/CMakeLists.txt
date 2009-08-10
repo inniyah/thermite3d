@@ -22,7 +22,9 @@ SET(SRC_FILES
 	source/MainMenu.cpp
 	source/Map.cpp
 	source/MapHandler.cpp
+	source/MapManager.cpp
 	source/MapRegion.cpp
+	source/MapResource.cpp
 	source/MultiThreadedSurfaceExtractor.cpp
 	source/PhysicalEntity.cpp
 	source/Shell.cpp
@@ -44,7 +46,9 @@ SET(INC_FILES
 	include/MainMenu.h
 	include/Map.h
 	include/MapHandler.h
+	include/MapManager.h
 	include/MapRegion.h
+	include/MapResource.h
 	include/MultiThreadedSurfaceExtractor.h
 	include/PhysicalEntity.h
 	include/Shell.h

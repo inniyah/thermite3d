@@ -7,6 +7,7 @@
 #include "OgreWidget.h"
 
 #include "SurfacePatchRenderable.h"
+#include "MapManager.h"
 #include "VolumeManager.h"
 
 #include <OgreEntity.h>
@@ -97,6 +98,10 @@ namespace Thermite
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
+
+		MapManager* mm = new MapManager;
+		mm->m_pThermiteGameLogic = this;
+		mm->m_pOgreSceneManager = mSceneManager;
 
 		//From here on, I'm not sure it belongs in this initialise function... maybe in Map?		
 
@@ -343,9 +348,17 @@ namespace Thermite
 
 		m_loadingProgress->show();
 
-		mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
+		/*mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
 		mMap->m_pThermiteGameLogic = this;
-		mMap->loadScene(strMapName.toStdString());
+		mMap->loadScene(strMapName.toStdString());*/
+
+		MapResourcePtr mapResource = MapManager::getSingletonPtr()->load(strMapName.toStdString(), "General");
+		if(mapResource.isNull())
+		{
+			Ogre::LogManager::getSingleton().logMessage("Failed to load map");
+		}
+
+		mMap = mapResource->m_pMap;
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
