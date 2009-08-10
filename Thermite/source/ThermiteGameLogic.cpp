@@ -30,6 +30,7 @@ namespace Thermite
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 		,mMap(0)
+		,m_strAppName("")
 	{
 	}
 
@@ -42,6 +43,13 @@ namespace Thermite
 		//Set the main window icon
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
 		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
+
+		//Check whether the application name was passed as a command line parameter
+		QStringList arguments = qApp->arguments();
+		if(arguments.size() >= 2)
+		{
+			m_strAppName = arguments[1];
+		}
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
@@ -67,7 +75,11 @@ namespace Thermite
 		#endif
 
 		//Initialise all resources
-		addResourceDirectory("../share/thermite/");
+		addResourceDirectory("./resources/");
+		if(m_strAppName.isEmpty() == false)
+		{
+			addResourceDirectory(QString("../share/thermite/") + m_strAppName);
+		}
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		//Set up various GUI components...

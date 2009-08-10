@@ -118,6 +118,8 @@ namespace Thermite
 		Ogre::SceneNode* m_axisNode;
 
 		bool bLoadComplete;
+
+		QString m_strAppName;
 	};
 }
 

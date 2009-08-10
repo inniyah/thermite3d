@@ -100,7 +100,7 @@ TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QTOGRE_LIBRAR
 SET_TARGET_PROPERTIES(Thermite PROPERTIES COMPILE_DEFINITIONS "NOMINMAX") #Avoid Windows macros
 #ENDIF (WIN32)
 
-#Install
+#Install the resulting binaries
 INSTALL(TARGETS Thermite
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
@@ -117,6 +117,7 @@ INSTALL(TARGETS Thermite
 #CONFIGURE_FILE(${OGRE_LIBRARY_DIRS}/RenderSystem_Direct3D9.dll ${CMAKE_CURRENT_BINARY_DIR}/release/RenderSystem_Direct3D9.dll COPYONLY)
 #ENDIF (WIN32)
 
+#On Windows, it is necessary to copy all the dependancies .dll's to the binary folder
 #Should be able to use INCLUDE(GetPrerequisites)
 IF(WIN32)
 	SET(OGRESDK $ENV{OGRE_HOME})
@@ -198,7 +199,5 @@ IF(WIN32)
 	
 ENDIF(WIN32)
 
-#INSTALL(DIRECTORY resources DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
-#INSTALL(DIRECTORY media DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
-INSTALL(DIRECTORY resources/Ogre DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
-#INSTALL(FILES resource/resources.cfg DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite)
+#Lastly, we copy both the core resources, and the tech demo specific ones.
+INSTALL(DIRECTORY resources/Ogre DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/resources PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
