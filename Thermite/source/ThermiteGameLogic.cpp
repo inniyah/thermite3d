@@ -78,7 +78,7 @@ namespace Thermite
 		addResourceDirectory("./resources/");
 		if(m_strAppName.isEmpty() == false)
 		{
-			addResourceDirectory(QString("../share/thermite/") + m_strAppName);
+			addResourceDirectory(QString("../share/thermite/apps/") + m_strAppName);
 		}
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 

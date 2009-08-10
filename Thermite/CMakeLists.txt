@@ -199,5 +199,6 @@ IF(WIN32)
 	
 ENDIF(WIN32)
 
-#Lastly, we copy both the core resources, and the tech demo specific ones.
-INSTALL(DIRECTORY resources/Ogre DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/resources PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
+#Lastly, we copy the core resources and set up the 'share' folder
+INSTALL(DIRECTORY resources/Ogre/debug DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/resources/debug PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
+INSTALL(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/thermite/apps)
