@@ -1,9 +1,0 @@
-sampler RT0 : register(s0);
-sampler RT1 : register(s1);
-
-float4 LightingAndDecalCombinerFP(float2 inUV : TEXCOORD) : COLOR
-{
-    float3 lighting = tex2D(RT0, inUV).rgb;
-	float3 decal = tex2D(RT1, inUV).rgb;
-	return float4(lighting*decal, 1.0);
-}

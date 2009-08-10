@@ -1,6 +1,0 @@
-#include "VertexFormats.cg"
-
-float4 main(v2f IN) : COLOR
-{
-	return float4(0.0f,0.0f,0.0f,1.0f);
-}
