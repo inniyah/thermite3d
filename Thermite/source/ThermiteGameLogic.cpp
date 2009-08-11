@@ -1,4 +1,5 @@
 #include "ThermiteGameLogic.h"
+
 #include "MainMenu.h"
 #include "Shell.h"
 #include "LoadMapWidget.h"
@@ -30,26 +31,22 @@ namespace Thermite
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 		,mMap(0)
-		,m_strAppName("")
 	{
 	}
 
 	void ThermiteGameLogic::initialise(void)
 	{
-		//First we set up the logging system , to hopefully record any problems.
+		//Parse the command line options
+		m_commandLineArgs.setOption("appname");
+		m_commandLineArgs.processCommandArgs(qApp->argc(), qApp->argv());
+
+		//Set up the logging system , to hopefully record any problems.
 		mThermiteLog = mApplication->createLog("Thermite");
 		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
 
 		//Set the main window icon
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
 		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
-
-		//Check whether the application name was passed as a command line parameter
-		QStringList arguments = qApp->arguments();
-		if(arguments.size() >= 2)
-		{
-			m_strAppName = arguments[1];
-		}
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
@@ -76,9 +73,10 @@ namespace Thermite
 
 		//Initialise all resources
 		addResourceDirectory("./resources/");
-		if(m_strAppName.isEmpty() == false)
+		char* strAppName = m_commandLineArgs.getValue("appname");
+		if(strAppName != 0)
 		{
-			addResourceDirectory(QString("../share/thermite/apps/") + m_strAppName);
+			addResourceDirectory(QString("../share/thermite/apps/") + QString::fromAscii(strAppName));
 		}
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 

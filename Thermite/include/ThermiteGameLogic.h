@@ -1,6 +1,7 @@
 #ifndef THERMITEGAMELOGIC_H_
 #define THERMITEGAMELOGIC_H_
 
+#include "AnyOption.h"
 #include "CannonController.h"
 #include "GameLogic.h"
 #include "MainMenu.h"
@@ -119,7 +120,7 @@ namespace Thermite
 
 		bool bLoadComplete;
 
-		QString m_strAppName;
+		AnyOption m_commandLineArgs;
 	};
 }
 
