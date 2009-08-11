@@ -62,8 +62,6 @@ namespace Thermite
 		m_pOgreSceneManager = sceneManager;
 
 		initialisePhysics();
-
-		m_pOgreSceneManager->setSkyBox(true, "SkyBox");
 	}
 
 	Map::~Map(void)

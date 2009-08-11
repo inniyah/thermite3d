@@ -317,11 +317,19 @@ namespace Thermite
 
 	void ThermiteGameLogic::addResourceDirectory(const QString& directoryName)
 	{
-		QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-		while (it.hasNext())
+		QDir appDir(directoryName);
+		if(appDir.exists())
 		{
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
-		} 
+			//Add the directory to Ogre
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toStdString(), "FileSystem");
+
+			//Add the subdirectories to Ogre
+			QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+			while (it.hasNext())
+			{
+				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
+			}
+		}
 	}
 
 	void ThermiteGameLogic::fireCannon(void)
