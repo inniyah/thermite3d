@@ -34,8 +34,8 @@ IF (WIN32) #Windows
 	ENDIF (OGREBULLETSOURCE)
 ELSE (WIN32) #Unix
 	SET(OGREBULLET_INCLUDE_DIR ${OGREBULLET_HOME}/include/OgreBullet/Collisions ${OGREBULLET_HOME}/include/OgreBullet/Dynamics)
-	SET(OGREBULLET_LIB_DIR ${OGREBULLET_HOME}/lib/Debug ${OGREBULLET_HOME}/lib/Release)
-	SET(OGREBULLET_LIBRARIES debug OgreBulletCollisions_d debug OgreBulletDynamics_d optimized OgreBulletCollisions optimized OgreBulletDynamics)
+	SET(OGREBULLET_LIB_DIR ${OGREBULLET_HOME}/lib)
+	SET(OGREBULLET_LIBRARIES debug OgreBulletCol_d debug OgreBulletDyn_d optimized OgreBulletCol optimized OgreBulletDyn)
 ENDIF (WIN32)
 
 #Do some preparation

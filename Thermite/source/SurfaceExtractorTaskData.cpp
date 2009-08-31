@@ -1,6 +1,9 @@
 #include "SurfaceExtractorTaskData.h"
 
 using namespace PolyVox;
+using PolyVox::uint8_t;
+using PolyVox::uint32_t;
+
 
 namespace Thermite
 {

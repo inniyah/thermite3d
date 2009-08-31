@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __DataStreamWrapper_H__
 #define __DataStreamWrapper_H__
 
-#include "OgreSerializer.h"
+#include <OgreSerializer.h>
 
 #include <streambuf>
 
