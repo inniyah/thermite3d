@@ -6,7 +6,7 @@
 #  OGREBULLET_LIB_DIR, the location of the libraries
 #  OGREBULLET_FOUND, If false, do not try to use Bullet
 #
-# Copyright © 2007, Matt Williams
+# Copyright 2007, Matt Williams
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -32,13 +32,10 @@ IF (WIN32) #Windows
 		SET(OGREBULLET_LIB_DIR $ENV{OGREBULLET_HOME}/lib/Debug $ENV{OGREBULLET_HOME}/lib/Release)
 		SET(OGREBULLET_LIBRARIES debug OgreBulletCollisions_d debug OgreBulletDynamics_d optimized OgreBulletCollisions optimized OgreBulletDynamics)
 	ENDIF (OGREBULLETSOURCE)
-#ELSE (WIN32) #Unix
-#	CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
-#	FIND_PACKAGE(PkgConfig)
-#	PKG_SEARCH_MODULE(OGRE OGRE)
-#	SET(OGRE_INCLUDE_DIR ${OGRE_INCLUDE_DIRS})
-#	SET(OGRE_LIB_DIR ${OGRE_LIBDIR})
-#	SET(OGRE_LIBRARIES ${OGRE_LIBRARIES} CACHE STRING "")
+ELSE (WIN32) #Unix
+	SET(OGREBULLET_INCLUDE_DIR ${OGREBULLET_HOME}/include/OgreBullet/Collisions ${OGREBULLET_HOME}/include/OgreBullet/Dynamics)
+	SET(OGREBULLET_LIB_DIR ${OGREBULLET_HOME}/lib/Debug ${OGREBULLET_HOME}/lib/Release)
+	SET(OGREBULLET_LIBRARIES debug OgreBulletCollisions_d debug OgreBulletDynamics_d optimized OgreBulletCollisions optimized OgreBulletDynamics)
 ENDIF (WIN32)
 
 #Do some preparation
