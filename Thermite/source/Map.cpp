@@ -48,6 +48,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using namespace PolyVox;
 using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
+using PolyVox::uint32_t;
+using PolyVox::uint16_t;
+using PolyVox::uint8_t;
 
 namespace Thermite
 {
@@ -179,7 +182,7 @@ namespace Thermite
 							//Convert to a real PolyVox::Region
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
-							Region region(v3dLowerCorner, v3dUpperCorner);
+							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
 							//The prioirty ensures that the surfaces for regions close to the

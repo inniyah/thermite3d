@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __THERMITE_SURFACEEXTRACTORTASKDATA_H__
 #define __THERMITE_SURFACEEXTRACTORTASKDATA_H__
 
-#include "PolyvoxForwardDeclarations.h"
-#include "Region.h"
+#include <PolyVoxForwardDeclarations.h>
+#include <Region.h>
 
 namespace Thermite
 {

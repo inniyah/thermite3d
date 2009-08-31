@@ -59,7 +59,9 @@
  * leading to exception when mixing different options types
  */
 
-#include "anyoption.h"
+#include "AnyOption.h"
+
+#include <cstring>
 
 AnyOption::AnyOption()
 {

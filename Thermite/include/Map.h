@@ -46,7 +46,7 @@ namespace Thermite
 
 		void initialisePhysics(void);
 
-		bool Map::loadScene(const Ogre::String& filename);
+		bool loadScene(const Ogre::String& filename);
 
 		void updatePolyVoxGeometry();	
 		void updateLOD(void);
