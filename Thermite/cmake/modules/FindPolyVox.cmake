@@ -17,7 +17,7 @@
 
 IF (PolyVoxCore_LIBRARIES AND PolyVoxCore_INCLUDE_DIRS AND PolyVoxUtil_LIBRARIES AND PolyVoxUtil_INCLUDE_DIRS)
 	SET(PolyVox_FIND_QUIETLY TRUE) # Already in cache, be silent
-ENDIF ()
+ENDIF (PolyVoxCore_LIBRARIES AND PolyVoxCore_INCLUDE_DIRS AND PolyVoxUtil_LIBRARIES AND PolyVoxUtil_INCLUDE_DIRS)
 
 IF (WIN32) #Windows
 	MESSAGE(STATUS "Looking for PolyVox")
@@ -25,9 +25,10 @@ IF (WIN32) #Windows
 	IF (PolyVox_HOME_EXISTS)
 		SET(PolyVoxCore_INCLUDE_DIRS $ENV{POLYVOX_HOME}/PolyVoxCore/include)
 		SET(PolyVoxCore_LIBRARY_DIRS $ENV{POLYVOX_HOME}/PolyVoxCore/lib)
-		SET(PolyVoxUtil_INCLUDE_DIR $ENV{POLYVOX_HOME}/PolyVoxUtil/include)
+		SET(PolyVoxCore_LIBRARIES debug PolyVoxCore_d optimized PolyVoxCore)
+		SET(PolyVoxUtil_INCLUDE_DIRS $ENV{POLYVOX_HOME}/PolyVoxUtil/include)
 		SET(PolyVoxUtil_LIBRARY_DIRS $ENV{POLYVOX_HOME}/PolyVoxUtil/lib)
-		SET(PolyVox_LIBRARIES debug PolyVoxCore_d debug PolyVoxUtil_d optimized PolyVoxCore optimized PolyVoxUtil)
+		SET(PolyVoxUtil_LIBRARIES debug PolyVoxUtil_d optimized PolyVoxUtil)
 	ENDIF (PolyVox_HOME_EXISTS)
 ELSE (WIN32) #Unix
 	MESSAGE(STATUS "PolyVox check not written for Unix yet")
@@ -51,9 +52,9 @@ SET(PolyVoxUtil_INCLUDE_DIRS ${PolyVoxUtil_INCLUDE_DIRS} CACHE PATH "")
 SET(PolyVoxUtil_LIBRARIES ${PolyVoxUtil_LIBRARIES} CACHE STRING "")
 SET(PolyVoxUtil_LIBRARY_DIRS ${PolyVoxUtil_LIBRARY_DIRS} CACHE PATH "")
 
-IF (PolyVoxCore_LIBRARIES AND PolyVoxCODE_INCLUDE_DIRS AND PolyVoxUtil_LIBRARIES AND PolyVoxUtil_INCLUDE_DIRS)
+IF (PolyVoxCore_LIBRARIES AND PolyVoxCore_INCLUDE_DIRS AND PolyVoxUtil_LIBRARIES AND PolyVoxUtil_INCLUDE_DIRS)
 	SET(PolyVox_FOUND TRUE)
-ENDIF ()
+ENDIF (PolyVoxCore_LIBRARIES AND PolyVoxCore_INCLUDE_DIRS AND PolyVoxUtil_LIBRARIES AND PolyVoxUtil_INCLUDE_DIRS)
 
 IF (PolyVox_FOUND)
 	IF (NOT PolyVox_FIND_QUIETLY)
