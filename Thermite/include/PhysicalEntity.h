@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __PhysicalEntity_H__
 #define __PhysicalEntity_H__
 
+#ifdef ENABLE_BULLET_PHYSICS
+
 #include "ThermiteForwardDeclarations.h"
 
 #include "OgrePrerequisites.h"
@@ -53,5 +55,7 @@ namespace Thermite
 		Map* m_pParentMap;
 	};
 }
+
+#endif //ENABLE_BULLET_PHYSICS
 
 #endif

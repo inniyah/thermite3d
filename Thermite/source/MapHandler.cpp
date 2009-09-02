@@ -47,6 +47,7 @@ namespace Thermite
 	{
 		Ogre::Entity* entity = DotSceneHandler::handleEntity(attributes);
 
+#ifdef ENABLE_BULLET_PHYSICS
 		if(qApp->settings()->value("Physics/SimulatePhysics", false).toBool())
 		{
 			float restitution = convertWithDefault(attributes.value("restitution"), 1.0f);
@@ -74,6 +75,8 @@ namespace Thermite
 
 			PhysicalEntity* physEnt = new PhysicalEntity(mMap, entity, restitution, friction, mass, collisionShapeType);
 		}
+
+#endif //ENABLE_BULLET_PHYSICS
 
 		return entity;
 	}

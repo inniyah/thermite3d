@@ -29,7 +29,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <OgrePrerequisites.h>
 
-#include "OgreBulletCollisions.h"
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletCollisions.h"
+#endif //ENABLE_BULLET_PHYSICS
 
 namespace OgreBulletDynamics
 {
@@ -62,16 +64,20 @@ namespace Thermite
 		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod1;
 		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod2;
 
+#ifdef ENABLE_BULLET_PHYSICS
 		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
 		void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
+#endif //ENABLE_BULLET_PHYSICS
 
 	public:
 
 		Map* m_pParentMap;
 
+#ifdef ENABLE_BULLET_PHYSICS
 		btTriangleMesh* mTriMesh;
 		btBvhTriangleMeshShape* mShape;
 		btRigidBody* mBody;
+#endif //ENABLE_BULLET_PHYSICS
 
 		static unsigned long m_iNameGen; //Used for unique names
 

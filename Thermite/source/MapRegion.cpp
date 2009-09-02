@@ -26,15 +26,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SurfacePatchRenderable.h"
 #include "Vector.h"
 
-#include "OgreBulletDynamicsRigidBody.h"
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletDynamicsRigidBody.h"
+#endif //ENABLE_BULLET_PHYSICS
 
 #include "OgreVector3.h"
 
 #include <QSettings>
 
 using namespace Ogre;
+#ifdef ENABLE_BULLET_PHYSICS
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
+#endif //ENABLE_BULLET_PHYSICS
 using namespace PolyVox;
 
 namespace Thermite
@@ -45,9 +49,11 @@ namespace Thermite
 	:m_pOgreSceneNode(0)
 	//,m_pSurfacePatchRenderable(0)
 	,m_pParentMap(pParentMap)
+#ifdef ENABLE_BULLET_PHYSICS
 	,mBody(0)
 	,mTriMesh(0)
 	,mShape(0)
+#endif //ENABLE_BULLET_PHYSICS
 	{
 		m_v3dPos = v3dPos;
 
@@ -154,6 +160,7 @@ namespace Thermite
 
 	void MapRegion::setPhysicsData(const IndexedSurfacePatch& isp)
 	{
+#ifdef ENABLE_BULLET_PHYSICS
 		const std::string& strName = makeUniqueName("RB");
 
 		destroyPhysicsData();
@@ -206,10 +213,12 @@ namespace Thermite
 		{
 			mBody->setCollisionShape(mShape);
 		}*/
+#endif //ENABLE_BULLET_PHYSICS
 	}
 
 	void MapRegion::destroyPhysicsData(void)
 	{	
+#ifdef ENABLE_BULLET_PHYSICS
 		if(mBody != 0)
 		{
 			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
@@ -227,6 +236,7 @@ namespace Thermite
 			delete m_pTriangleMeshCollisionShape;
 			m_pTriangleMeshCollisionShape = 0;
 		}*/
+#endif //ENABLE_BULLET_PHYSICS
 	}
 
 	std::string MapRegion::makeUniqueName(const std::string& strBase)
@@ -236,6 +246,7 @@ namespace Thermite
 		return ssName.str();
 	}
 
+#ifdef ENABLE_BULLET_PHYSICS
 	void MapRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
 	{
 		btVector3    vecBulletVertices[3];
@@ -312,4 +323,5 @@ namespace Thermite
 
 		mTriMesh->unLockVertexBase(subpart);
 	}
+#endif //ENABLE_BULLET_PHYSICS
 }

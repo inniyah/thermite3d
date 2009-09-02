@@ -3,6 +3,9 @@
 #include "Map.h"
 #include "Utility.h"
 
+#include "OgreEntity.h"
+#include "OgreSceneManager.h"
+
 namespace Thermite
 {
 	Shell::Shell(Map* pParentMap, Ogre::Vector3 vecPosition, Ogre::Vector3 vecVelocity)

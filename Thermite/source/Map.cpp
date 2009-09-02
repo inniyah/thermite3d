@@ -33,9 +33,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SurfacePatchRenderable.h"
 #include "MapRegion.h"
 
-#include "OgreBulletDynamicsWorld.h"
-
-#include "Shapes/OgreBulletCollisionsBoxShape.h"
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletDynamicsWorld.h"
+	#include "Shapes/OgreBulletCollisionsBoxShape.h"
+#endif //ENABLE_BULLET_PHYSICS
 
 #include "ThermiteGameLogic.h"
 
@@ -46,8 +47,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 //using namespace Ogre;
 using namespace PolyVox;
+#ifdef ENABLE_BULLET_PHYSICS
 using namespace OgreBulletDynamics;
 using namespace OgreBulletCollisions;
+#endif //ENABLE_BULLET_PHYSICS
 using PolyVox::uint32_t;
 using PolyVox::uint16_t;
 using PolyVox::uint8_t;
@@ -74,9 +77,11 @@ namespace Thermite
 
 	void Map::initialisePhysics(void)
 	{
+#ifdef ENABLE_BULLET_PHYSICS
 		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
 		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
 		m_pOgreBulletWorld = new DynamicsWorld(m_pOgreSceneManager, bounds, gravityVector);
+#endif //ENABLE_BULLET_PHYSICS
 	}
 
 	bool Map::loadScene(const Ogre::String& filename)

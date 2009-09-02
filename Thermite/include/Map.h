@@ -29,8 +29,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "PolyVoxForwardDeclarations.h"
 #include "VolumeChangeTracker.h"
 
-#include "OgreBulletDynamicsWorld.h"
-#include "OgreBulletDynamicsRigidBody.h"
+#include "OgreAxisAlignedBox.h"
+#include "OgreVector3.h"
+
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletDynamicsWorld.h"
+	#include "OgreBulletDynamicsRigidBody.h"
+#endif //ENABLE_BULLET_PHYSICS
 
 #include <OgrePrerequisites.h>
 
@@ -58,7 +63,9 @@ namespace Thermite
 
 		VolumeResourcePtr volumeResource;
 
+#ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
+#endif //ENABLE_BULLET_PHYSICS
 
 		PolyVox::Volume<MapRegion*>* m_volMapRegions;
 

@@ -198,10 +198,12 @@ namespace Thermite
 		//Choose the right LOD for the nodes
 		//mMap->updateLOD();
 		
+#ifdef ENABLE_BULLET_PHYSICS
 		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
 		{
 			mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 		}
+#endif //ENABLE_BULLET_PHYSICS
 
 		list<Shell*> shellsToDelete;
 
