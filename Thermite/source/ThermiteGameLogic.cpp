@@ -102,7 +102,7 @@ namespace Thermite
 		QTimer::singleShot(2000, mMainMenu, SLOT(show()));
 
 		//Set the frame sate to be as high as possible
-		mApplication->setUpdateInterval(0);
+		mApplication->setAutoUpdateInterval(0);
 
 		//Some Ogre related stuff we need to set up
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);

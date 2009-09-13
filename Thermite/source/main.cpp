@@ -10,5 +10,5 @@ using namespace Thermite;
 int main(int argc, char *argv[])
 {
 	Application app(argc, argv, new ThermiteGameLogic);
-	return app.exec(true);
+	return app.exec(DisplaySettingsDialog);
 }
