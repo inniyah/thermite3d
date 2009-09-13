@@ -46,7 +46,7 @@ namespace Thermite
 	class Map
 	{
 	public:
-		Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager);
+		Map(Ogre::SceneManager* sceneManager);
 		~Map(void);
 
 		void initialisePhysics(void);
@@ -76,10 +76,6 @@ namespace Thermite
 		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;
 
 	private:
-		Ogre::Vector3 m_vecGravity;
-		Ogre::AxisAlignedBox m_boxPhysicsBounds;
-		Ogre::Real m_rVoxelSize;
-
 		Ogre::Camera* m_pCamera;
 
 		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;

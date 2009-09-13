@@ -57,11 +57,8 @@ using PolyVox::uint8_t;
 
 namespace Thermite
 {
-	Map::Map(Ogre::Vector3 vecGravity, Ogre::AxisAlignedBox boxPhysicsBounds, Ogre::Real rVoxelSize, Ogre::SceneManager* sceneManager)
-		:m_vecGravity(vecGravity)
-		,m_boxPhysicsBounds(boxPhysicsBounds)
-		,m_rVoxelSize(rVoxelSize)
-		,m_volMapRegions(0)
+	Map::Map(Ogre::SceneManager* sceneManager)
+		:m_volMapRegions(0)
 	{
 		//memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
 

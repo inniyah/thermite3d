@@ -53,7 +53,7 @@ namespace Thermite
 		std::istream stdStream(new DataStreamWrapper(stream)); 
 		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);*/
 
-		m_pMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, m_pOgreSceneManager);
+		m_pMap = new Map(m_pOgreSceneManager);
 		m_pMap->m_pThermiteGameLogic = m_pThermiteGameLogic;
 
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
