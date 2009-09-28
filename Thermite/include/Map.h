@@ -24,10 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeResource.h"
-#include "MultiThreadedSurfaceExtractor.h"
 
 #include "PolyVoxForwardDeclarations.h"
-#include "VolumeChangeTracker.h"
 
 #include "OgreAxisAlignedBox.h"
 #include "OgreVector3.h"
@@ -46,19 +44,24 @@ namespace Thermite
 	class Map
 	{
 	public:
+#ifdef ENABLE_BULLET_PHYSICS
+		Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld);
+#else
 		Map(Ogre::SceneManager* sceneManager);
+#endif //ENABLE_BULLET_PHYSICS
 		~Map(void);
 		
 		bool loadScene(const Ogre::String& filename);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
+#ifdef ENABLE_BULLET_PHYSICS
+		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
+#endif //ENABLE_BULLET_PHYSICS
 
 		VolumeResourcePtr volumeResource;
 
-		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
-
-		
+		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;	
 
 	private:
 		Ogre::Camera* m_pCamera;

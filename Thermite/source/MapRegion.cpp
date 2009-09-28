@@ -208,7 +208,7 @@ namespace Thermite
 			mBody->getWorldTransform().setOrigin(btVector3( m_v3dPos.getX(),  m_v3dPos.getY(), m_v3dPos.getZ()));
 			mBody->getWorldTransform().setRotation(btQuaternion(0, 0, 0, 1));
 
-			m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
+			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
 		/*}
 		else
 		{
@@ -222,7 +222,7 @@ namespace Thermite
 #ifdef ENABLE_BULLET_PHYSICS
 		if(mBody != 0)
 		{
-			m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
+			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
 			delete mBody;
 			mBody = 0;
 		}

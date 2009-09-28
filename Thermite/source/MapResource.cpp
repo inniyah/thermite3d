@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "DataStreamWrapper.h"
 #include "MapManager.h"
 #include "MapResource.h"
+#include "ThermiteGameLogic.h"
 
 #include "OgreVector3.h"
 #include "OgreLogManager.h"
@@ -53,8 +54,7 @@ namespace Thermite
 		std::istream stdStream(new DataStreamWrapper(stream)); 
 		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);*/
 
-		m_pMap = new Map(m_pOgreSceneManager);
-		m_pMap->m_pThermiteGameLogic = m_pThermiteGameLogic;
+		m_pMap = new Map(m_pOgreSceneManager, m_pThermiteGameLogic->m_pOgreBulletWorld);
 
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::string contents = stream->getAsString();

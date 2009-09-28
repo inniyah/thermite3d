@@ -1,13 +1,13 @@
 #ifndef __MapHandler_H__
 #define __MapHandler_H__
 
+#include "DotSceneHandler.h"
+#include "ThermiteForwardDeclarations.h"
+
 #include <OgrePrerequisites.h>
 
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
-
-#include "DotSceneHandler.h"
-#include "ThermiteForwardDeclarations.h"
 
 namespace Thermite
 {

@@ -90,7 +90,7 @@ namespace Thermite
 		
 		//Create the rigid body and set the colision shape for it.
 		std::string name = Thermite::generateUID("PO_RB");
-		m_pRigidBody = new RigidBody(name, m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld);
+		m_pRigidBody = new RigidBody(name, m_pParentMap->m_pOgreBulletWorld);
 		m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, restitution, friction, mass, position, orientation);
 	}
 

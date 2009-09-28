@@ -49,12 +49,18 @@ using PolyVox::uint8_t;
 
 namespace Thermite
 {
+#ifdef ENABLE_BULLET_PHYSICS
+	Map::Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld)
+	{
+		m_pOgreSceneManager = sceneManager;
+		m_pOgreBulletWorld = pOgreBulletWorld;
+	}
+#else
 	Map::Map(Ogre::SceneManager* sceneManager)
 	{
-		//memset(m_iRegionTimeStamps, 0xFF, sizeof(m_iRegionTimeStamps));
-
 		m_pOgreSceneManager = sceneManager;
 	}
+#endif //ENABLE_BULLET_PHYSICS
 
 	Map::~Map(void)
 	{
@@ -68,8 +74,6 @@ namespace Thermite
 		reader.setContentHandler(&handler);
 		reader.setErrorHandler(&handler);
 
-		//QFile file("..\\share\\thermite\\Ogre\\maps\\" + QString::fromStdString(filename)); //HACK - Should really use the resource system for this!
-		//file.open(QFile::ReadOnly | QFile::Text);
 		QXmlInputSource xmlInputSource;
 		xmlInputSource.setData(QString::fromStdString(filename));
 		reader.parse(xmlInputSource);
@@ -77,8 +81,6 @@ namespace Thermite
 		//This gets the first camera which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = m_pOgreSceneManager->getCameraIterator();
 		m_pCamera = camIter.peekNextValue();
-
-		
 
 		return true;
 	}

@@ -6,8 +6,9 @@
 #include "GameLogic.h"
 #include "MainMenu.h"
 #include "LoadingProgress.h"
-
+#include "MultiThreadedSurfaceExtractor.h"
 #include "Serialization.h"
+#include "VolumeChangeTracker.h"
 
 #include "Map.h"
 #include "PhysicalEntity.h"
@@ -137,8 +138,6 @@ namespace Thermite
 		PolyVox::Volume<MapRegion*>* m_volMapRegions;
 
 		MultiThreadedSurfaceExtractor* m_pMTSE;		
-
-		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;
 
 		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 

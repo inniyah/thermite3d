@@ -1,15 +1,12 @@
 #include "MapHandler.h"
 
-#include <OgreEntity.h>
-#include <OgreSceneManager.h>
-
 #include "Application.h"
 #include "Map.h"
 #include "PhysicalEntity.h"
-#include "ThermiteGameLogic.h"
 #include "VolumeManager.h"
 
-#include "VolumeChangeTracker.h"
+#include <OgreEntity.h>
+#include <OgreSceneManager.h>
 
 #include <QSettings>
 
@@ -92,11 +89,6 @@ namespace Thermite
 			Ogre::LogManager::getSingleton().logMessage("Failed to load volume");
 		}
 
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		mMap->m_pThermiteGameLogic->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
-
-		mMap->m_pThermiteGameLogic->volumeChangeTracker->setAllRegionsModified();
-
 		return 0;
 	}
 
@@ -105,7 +97,7 @@ namespace Thermite
 		PolyVox::uint8_t voxelValue = convertWithDefault(attributes.value("value"), 0);
 		QString voxelMaterial = convertWithDefault(attributes.value("material"), "");
 
-		mMap->m_pThermiteGameLogic->m_mapMaterialIds[voxelMaterial.toStdString()].insert(voxelValue);
+		mMap->m_mapMaterialIds[voxelMaterial.toStdString()].insert(voxelValue);
 
 		return 0;
 	}

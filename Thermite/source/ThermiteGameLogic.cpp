@@ -6,7 +6,7 @@
 
 #include "LogManager.h"
 #include "OgreWidget.h"
-
+#include "MultiThreadedSurfaceExtractor.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
 #include "VolumeManager.h"
@@ -402,6 +402,7 @@ namespace Thermite
 		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
+		volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
 		volumeChangeTracker->setAllRegionsModified();
 
 		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), qApp->settings()->value("Engine/NoOfSurfaceExtractionThreads", 2).toInt());
@@ -671,7 +672,7 @@ namespace Thermite
 					pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
 
 					//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...
-					for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+					for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
 					{
 						//Get the properties
 						std::string materialName = iter->first;
@@ -695,13 +696,13 @@ namespace Thermite
 				//Update the progress bar
 				m_iNoProcessed++;
 				float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
-				mMap->m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+				m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
 
 				//If we've finished, the progress bar can be hidden.
 				if(fProgress > 0.999)
 				{
-					mMap->m_pThermiteGameLogic->m_loadingProgress->hide();
-					mMap->m_pThermiteGameLogic->bLoadComplete = true;
+					m_loadingProgress->hide();
+					bLoadComplete = true;
 				}
 			}
 		}		
