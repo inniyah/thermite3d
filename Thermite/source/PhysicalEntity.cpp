@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "Map.h"
 #include "PhysicalEntity.h"
+#include "ThermiteGameLogic.h"
 #include "Utility.h"
 
 #include "OgreEntity.h"
@@ -36,7 +37,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "Utils/OgreBulletCollisionsMeshToShapeConverter.h"
 #include "OgreBulletDynamicsRigidBody.h"
 
-using namespace Ogre;
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
 
@@ -57,10 +57,10 @@ namespace Thermite
 		//Also, note that the position and orientation are stored in variables which are passed to 'setShape()' later.
 		//Embedding m_pSceneNode->getPosition() directly into the setShape() call seems to cause problems because the position
 		//is passed by reference and then set back on the scene node within setShape(). Or something :-S
-		Matrix4 scale = Matrix4::IDENTITY;	
+		Ogre::Matrix4 scale = Ogre::Matrix4::IDENTITY;	
 		scale.setScale(m_pSceneNode->getScale());
-		Vector3 position = m_pSceneNode->getPosition();
-		Quaternion orientation = m_pSceneNode->getOrientation();	
+		Ogre::Vector3 position = m_pSceneNode->getPosition();
+		Ogre::Quaternion orientation = m_pSceneNode->getOrientation();	
 
 		//Create our desired collision shape.
 		StaticMeshToShapeConverter *converter = new StaticMeshToShapeConverter(entity, scale);
@@ -90,7 +90,7 @@ namespace Thermite
 		
 		//Create the rigid body and set the colision shape for it.
 		std::string name = Thermite::generateUID("PO_RB");
-		m_pRigidBody = new RigidBody(name, m_pParentMap->m_pOgreBulletWorld);
+		m_pRigidBody = new RigidBody(name, m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld);
 		m_pRigidBody->setShape (m_pSceneNode,  m_pCollisionShape, restitution, friction, mass, position, orientation);
 	}
 

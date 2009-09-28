@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "Application.h"
 #include "Map.h"
 #include "SurfacePatchRenderable.h"
+#include "ThermiteGameLogic.h"
 #include "Vector.h"
 
 #ifdef ENABLE_BULLET_PHYSICS
@@ -34,7 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <QSettings>
 
-using namespace Ogre;
+//using namespace Ogre;
 #ifdef ENABLE_BULLET_PHYSICS
 using namespace OgreBulletCollisions;
 using namespace OgreBulletDynamics;
@@ -95,7 +96,7 @@ namespace Thermite
 		pSurfacePatchRenderable->buildRenderOperationFrom(isp);
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		AxisAlignedBox aabb(Vector3(0.0f,0.0f,0.0f), Vector3(regionSideLength, regionSideLength, regionSideLength));
+		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
 		pSurfacePatchRenderable->setBoundingBox(aabb);
 
 		switch(uLodLevel)
@@ -207,7 +208,7 @@ namespace Thermite
 			mBody->getWorldTransform().setOrigin(btVector3( m_v3dPos.getX(),  m_v3dPos.getY(), m_v3dPos.getZ()));
 			mBody->getWorldTransform().setRotation(btQuaternion(0, 0, 0, 1));
 
-			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
+			m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld->getBulletDynamicsWorld()->addRigidBody(mBody);
 		/*}
 		else
 		{
@@ -221,7 +222,7 @@ namespace Thermite
 #ifdef ENABLE_BULLET_PHYSICS
 		if(mBody != 0)
 		{
-			m_pParentMap->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
+			m_pParentMap->m_pThermiteGameLogic->m_pOgreBulletWorld->getBulletDynamicsWorld()->removeRigidBody(mBody);
 			delete mBody;
 			mBody = 0;
 		}
@@ -287,8 +288,8 @@ namespace Thermite
 
 		mTriMesh->getLockedVertexIndexBase(&vertexbase, numverts,type,stride,&indexbase,indexstride,numfaces,indicestype,subpart);
 
-		LogManager::getSingleton().logMessage("Vertex Stride is " + Ogre::StringConverter::toString(stride));
-		LogManager::getSingleton().logMessage("Index Stride is " + Ogre::StringConverter::toString(indexstride));
+		Ogre::LogManager::getSingleton().logMessage("Vertex Stride is " + Ogre::StringConverter::toString(stride));
+		Ogre::LogManager::getSingleton().logMessage("Index Stride is " + Ogre::StringConverter::toString(indexstride));
 
 		float* vertexBaseAsFloat = reinterpret_cast<float*>(vertexbase);
 		std::vector<SurfaceVertex>::const_iterator verticesIter = isp.getVertices().begin();

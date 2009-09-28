@@ -48,40 +48,22 @@ namespace Thermite
 	public:
 		Map(Ogre::SceneManager* sceneManager);
 		~Map(void);
-
-		void initialisePhysics(void);
-
+		
 		bool loadScene(const Ogre::String& filename);
-
-		void updatePolyVoxGeometry();	
-		void updateLOD(void);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
 
-		PolyVox::VolumeChangeTracker* volumeChangeTracker;
-
 		VolumeResourcePtr volumeResource;
-
-#ifdef ENABLE_BULLET_PHYSICS
-		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
-#endif //ENABLE_BULLET_PHYSICS
-
-		PolyVox::Volume<MapRegion*>* m_volMapRegions;
-
-		MultiThreadedSurfaceExtractor* m_pMTSE;
 
 		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
 
-		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;
+		
 
 	private:
 		Ogre::Camera* m_pCamera;
 
-		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
-
-		int m_iNoProcessed;
-		int m_iNoSubmitted;
+		
 	};
 }
 

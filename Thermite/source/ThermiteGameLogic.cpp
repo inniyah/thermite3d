@@ -21,9 +21,25 @@
 #include <QMovie>
 #include <QSettings>
 
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletDynamicsWorld.h"
+	#include "Shapes/OgreBulletCollisionsBoxShape.h"
+#endif //ENABLE_BULLET_PHYSICS
+
+#ifdef ENABLE_BULLET_PHYSICS
+using namespace OgreBulletDynamics;
+using namespace OgreBulletCollisions;
+#endif //ENABLE_BULLET_PHYSICS
+
 using namespace QtOgre;
 
 using namespace std;
+
+using namespace PolyVox;
+
+using PolyVox::uint32_t;
+using PolyVox::uint16_t;
+using PolyVox::uint8_t;
 
 namespace Thermite
 {
@@ -193,15 +209,12 @@ namespace Thermite
 		}
 
 		//The fun stuff!
-		mMap->updatePolyVoxGeometry();
-
-		//Choose the right LOD for the nodes
-		//mMap->updateLOD();
+		updatePolyVoxGeometry();
 		
 #ifdef ENABLE_BULLET_PHYSICS
 		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
 		{
-			mMap->m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
+			m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
 		}
 #endif //ENABLE_BULLET_PHYSICS
 
@@ -248,11 +261,11 @@ namespace Thermite
 	firstY = std::max(firstY,0);
 	firstZ = std::max(firstZ,0);
 
-	lastX = std::min(lastX,int(mMap->volumeChangeTracker->getWrappedVolume()->getWidth()-1));
-	lastY = std::min(lastY,int(mMap->volumeChangeTracker->getWrappedVolume()->getHeight()-1));
-	lastZ = std::min(lastZ,int(mMap->volumeChangeTracker->getWrappedVolume()->getDepth()-1));
+	lastX = std::min(lastX,int(volumeChangeTracker->getWrappedVolume()->getWidth()-1));
+	lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
+	lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
 
-	mMap->volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ)));
+	volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ)));
 	for(int z = firstZ; z <= lastZ; ++z)
 	{
 		for(int y = firstY; y <= lastY; ++y)
@@ -261,12 +274,12 @@ namespace Thermite
 			{
 				if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
 				{
-					mMap->volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
+					volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
 				}
 			}
 		}
 	}
-	mMap->volumeChangeTracker->unlockRegion();
+	volumeChangeTracker->unlockRegion();
 }
 
 	void ThermiteGameLogic::shutdown(void)
@@ -372,13 +385,31 @@ namespace Thermite
 		mMap->m_pThermiteGameLogic = this;
 		mMap->loadScene(strMapName.toStdString());*/
 
+		m_iNoProcessed = 0;
+		m_iNoSubmitted = 0;
+
 		MapResourcePtr mapResource = MapManager::getSingletonPtr()->load(strMapName.toStdString(), "General");
 		if(mapResource.isNull())
 		{
 			Ogre::LogManager::getSingleton().logMessage("Failed to load map");
 		}
 
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
+		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+
+		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+
+		volumeChangeTracker->setAllRegionsModified();
+
+		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), qApp->settings()->value("Engine/NoOfSurfaceExtractionThreads", 2).toInt());
+		m_pMTSE->start();
+
 		mMap = mapResource->m_pMap;
+
+		initialisePhysics();
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
@@ -499,5 +530,180 @@ namespace Thermite
 			Ogre::ResourcePtr resource = I.getNext();
 			resource->reload();
 		}
+	}
+
+	void ThermiteGameLogic::initialisePhysics(void)
+	{
+#ifdef ENABLE_BULLET_PHYSICS
+		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
+		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
+		m_pOgreBulletWorld = new DynamicsWorld(mMap->m_pOgreSceneManager, bounds, gravityVector);
+#endif //ENABLE_BULLET_PHYSICS
+	}
+
+	void ThermiteGameLogic::updatePolyVoxGeometry()
+	{
+		if(!mMap->volumeResource.isNull())
+		{		
+			//Some values we'll need later.
+			uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+			uint16_t halfRegionSideLength = regionSideLength / 2;
+			uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
+			uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
+			uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+
+			double fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
+			double fLod0ToLod1BoundarySquared = fLod0ToLod1Boundary * fLod0ToLod1Boundary;
+			double fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
+			double fLod1ToLod2BoundarySquared = fLod1ToLod2Boundary * fLod1ToLod2Boundary;
+
+			//Iterate over each region in the VolumeChangeTracker
+			for(uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+			{		
+				for(uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+				{
+					for(uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+					{
+						//Compute the extents of the current region
+						const uint16_t firstX = regionX * regionSideLength;
+						const uint16_t firstY = regionY * regionSideLength;
+						const uint16_t firstZ = regionZ * regionSideLength;
+
+						const uint16_t lastX = firstX + regionSideLength;
+						const uint16_t lastY = firstY + regionSideLength;
+						const uint16_t lastZ = firstZ + regionSideLength;	
+
+						const float centreX = firstX + halfRegionSideLength;
+						const float centreY = firstY + halfRegionSideLength;
+						const float centreZ = firstZ + halfRegionSideLength;
+
+						//The regions distance from the camera is used for
+						//LOD selection and prioritizing surface extraction
+						Ogre::Vector3 cameraPos = mCamera->getPosition();
+						Ogre::Vector3 centre(centreX, centreY, centreZ);
+						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
+
+						//There's no guarentee that the MapRegion exists at this point...
+						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+						if(pMapRegion)
+						{							
+							//But if it does, we set the appropriate LOD level based on distance from the camera.
+							if((distanceFromCameraSquared > fLod1ToLod2BoundarySquared) && (fLod1ToLod2Boundary > 0.0f))
+							{
+								pMapRegion->setLodLevelToUse(2);
+							}
+							else if((distanceFromCameraSquared > fLod0ToLod1BoundarySquared) && (fLod0ToLod1Boundary > 0.0f))
+							{
+								pMapRegion->setLodLevelToUse(1);
+							}
+							else
+							{
+								pMapRegion->setLodLevelToUse(0);
+							}
+						}
+
+						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
+						if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
+						{
+							//Convert to a real PolyVox::Region
+							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
+							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
+							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
+							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
+
+							//The prioirty ensures that the surfaces for regions close to the
+							//camera getextracted before those which are distant from the camera.
+							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
+
+							//Extract the region with a LOD level of 0
+							m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 0, uPriority));
+							m_iNoSubmitted++;
+
+							if(fLod0ToLod1Boundary > 0) //If the first LOD level is enabled
+							{
+								//Extract the region with a LOD level of 1
+								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 1, uPriority));
+								m_iNoSubmitted++;
+							}
+
+							if(fLod1ToLod2Boundary > 0) //If the second LOD level is enabled
+							{
+								//Extract the region with a LOD level of 2
+								m_pMTSE->pushTask(SurfaceExtractorTaskData(region, 2, uPriority));
+								m_iNoSubmitted++;
+							}
+
+							//Indicate that we've processed this region
+							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+						}
+					}
+				}
+			}
+
+			bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
+			int iPhysicsLOD = qApp->settings()->value("Physics/PhysicsLOD", 0).toInt();
+
+			//Process any results which have been returned by the surface extractor threads.
+			while(m_pMTSE->noOfResultsAvailable() > 0)
+			{
+				//Get the next available result
+				SurfaceExtractorTaskData result;
+				result = m_pMTSE->popResult();
+
+				//Determine where it came from
+				PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+				PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+				PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+
+				//Create a MapRegion for that location if we don't have one already
+				MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+				if(pMapRegion == 0)
+				{
+					pMapRegion = new MapRegion(mMap, result.getRegion().getLowerCorner());
+					m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+				}
+
+				//Get the IndexedSurfacePatch and check it's valid
+				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
+				if((ispWhole) && (ispWhole->isEmpty() == false))
+				{
+					//Clear any previous geometry
+					pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+
+					//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...
+					for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
+					{
+						//Get the properties
+						std::string materialName = iter->first;
+						std::set<uint8_t> voxelValues = iter->second;
+
+						//Extract the part of the InexedSurfacePatch which corresponds to that material
+						POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+
+						//And add it to the MapRegion
+						pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+					}
+
+					//If we are simulating physics and the current LOD matches...
+					if((bSimulatePhysics) && (result.getLodLevel() == iPhysicsLOD))
+					{
+						//Update the physics geometry
+						pMapRegion->setPhysicsData(*(ispWhole.get()));
+					}
+				}
+
+				//Update the progress bar
+				m_iNoProcessed++;
+				float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
+				mMap->m_pThermiteGameLogic->m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
+
+				//If we've finished, the progress bar can be hidden.
+				if(fProgress > 0.999)
+				{
+					mMap->m_pThermiteGameLogic->m_loadingProgress->hide();
+					mMap->m_pThermiteGameLogic->bLoadComplete = true;
+				}
+			}
+		}		
 	}
 }

@@ -121,6 +121,29 @@ namespace Thermite
 		bool bLoadComplete;
 
 		AnyOption m_commandLineArgs;
+
+	public:
+
+		void initialisePhysics(void);
+
+		void updatePolyVoxGeometry();
+
+		PolyVox::VolumeChangeTracker* volumeChangeTracker;
+
+#ifdef ENABLE_BULLET_PHYSICS
+		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
+#endif //ENABLE_BULLET_PHYSICS
+
+		PolyVox::Volume<MapRegion*>* m_volMapRegions;
+
+		MultiThreadedSurfaceExtractor* m_pMTSE;		
+
+		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;
+
+		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
+
+		int m_iNoProcessed;
+		int m_iNoSubmitted;
 	};
 }
 

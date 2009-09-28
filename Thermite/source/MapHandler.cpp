@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "Map.h"
 #include "PhysicalEntity.h"
+#include "ThermiteGameLogic.h"
 #include "VolumeManager.h"
 
 #include "VolumeChangeTracker.h"
@@ -92,9 +93,9 @@ namespace Thermite
 		}
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		mMap->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
+		mMap->m_pThermiteGameLogic->volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
 
-		mMap->volumeChangeTracker->setAllRegionsModified();
+		mMap->m_pThermiteGameLogic->volumeChangeTracker->setAllRegionsModified();
 
 		return 0;
 	}
@@ -104,7 +105,7 @@ namespace Thermite
 		PolyVox::uint8_t voxelValue = convertWithDefault(attributes.value("value"), 0);
 		QString voxelMaterial = convertWithDefault(attributes.value("material"), "");
 
-		mMap->m_mapMaterialIds[voxelMaterial.toStdString()].insert(voxelValue);
+		mMap->m_pThermiteGameLogic->m_mapMaterialIds[voxelMaterial.toStdString()].insert(voxelValue);
 
 		return 0;
 	}
