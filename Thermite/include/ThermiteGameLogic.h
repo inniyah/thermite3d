@@ -87,9 +87,6 @@ namespace Thermite
 		float mCameraSpeed;
 		float mCameraRotationalSpeed;
 
-		Ogre::Entity *mJaiquaEntity;
-		Ogre::SceneNode* mJaiquaNode;
-
 		MainMenu* mMainMenu;
 		CannonController* mCannonController;
 		MoviePlayer* mMoviePlayer;
