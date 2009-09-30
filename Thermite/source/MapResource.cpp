@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma endregion
 
 #include "DataStreamWrapper.h"
+#include "MapHandler.h"
 #include "MapManager.h"
 #include "MapResource.h"
 #include "ThermiteGameLogic.h"
@@ -59,7 +60,20 @@ namespace Thermite
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::string contents = stream->getAsString();
 
-		m_pMap->loadScene(contents);
+		//m_pMap->loadScene(contents);
+
+		MapHandler handler(m_pMap);
+		QXmlSimpleReader reader;
+		reader.setContentHandler(&handler);
+		reader.setErrorHandler(&handler);
+
+		QXmlInputSource xmlInputSource;
+		xmlInputSource.setData(QString::fromStdString(contents));
+		reader.parse(xmlInputSource);
+
+		//This gets the first camera which was found in the scene.
+		Ogre::SceneManager::CameraIterator camIter = m_pOgreSceneManager->getCameraIterator();
+		m_pMap->m_pCamera = camIter.peekNextValue();
 	}
 
 	void MapResource::unloadImpl ()

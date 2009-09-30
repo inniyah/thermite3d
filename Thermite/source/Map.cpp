@@ -69,18 +69,7 @@ namespace Thermite
 
 	bool Map::loadScene(const Ogre::String& filename)
 	{
-		MapHandler handler(this);
-		QXmlSimpleReader reader;
-		reader.setContentHandler(&handler);
-		reader.setErrorHandler(&handler);
-
-		QXmlInputSource xmlInputSource;
-		xmlInputSource.setData(QString::fromStdString(filename));
-		reader.parse(xmlInputSource);
-
-		//This gets the first camera which was found in the scene.
-		Ogre::SceneManager::CameraIterator camIter = m_pOgreSceneManager->getCameraIterator();
-		m_pCamera = camIter.peekNextValue();
+		
 
 		return true;
 	}

@@ -63,7 +63,7 @@ namespace Thermite
 
 		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;	
 
-	private:
+	public:
 		Ogre::Camera* m_pCamera;
 
 		

@@ -381,10 +381,6 @@ namespace Thermite
 
 		m_loadingProgress->show();
 
-		/*mMap = new Map(Ogre::Vector3 (0,0,-98.1),Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000)), 0.1f, mSceneManager);
-		mMap->m_pThermiteGameLogic = this;
-		mMap->loadScene(strMapName.toStdString());*/
-
 		m_iNoProcessed = 0;
 		m_iNoSubmitted = 0;
 
@@ -394,16 +390,19 @@ namespace Thermite
 			Ogre::LogManager::getSingleton().logMessage("Failed to load map");
 		}
 
+		mMap = mapResource->m_pMap;
+
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
+		volumeChangeTracker->setAllRegionsModified();
+
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
 		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-
-		volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
-		volumeChangeTracker->setAllRegionsModified();
 
 		m_pMTSE = new MultiThreadedSurfaceExtractor(volumeChangeTracker->getWrappedVolume(), qApp->settings()->value("Engine/NoOfSurfaceExtractionThreads", 2).toInt());
 		m_pMTSE->start();
