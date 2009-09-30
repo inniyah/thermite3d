@@ -93,8 +93,11 @@ namespace Thermite
 		CannonController* mCannonController;
 		MoviePlayer* mMoviePlayer;
 
-		Ogre::Camera* mCamera;
-		Ogre::SceneManager* mSceneManager;
+		Ogre::Camera* mDummyCamera;
+		Ogre::Viewport* mMainViewport;
+		Ogre::Camera* mActiveCamera;
+		Ogre::SceneManager* m_pDummyOgreSceneManager;
+		Ogre::SceneManager* m_pActiveOgreSceneManager;
 		QtOgre::Log* mThermiteLog;
 
 		//Thermite stuff

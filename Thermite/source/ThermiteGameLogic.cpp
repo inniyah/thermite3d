@@ -66,10 +66,11 @@ namespace Thermite
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
-		mSceneManager = new Ogre::DefaultSceneManager("EngineSceneManager");
-		Ogre::Camera* dummyCamera = mSceneManager->createCamera("DummyCamera");
-		mSceneManager->getRootSceneNode()->attachObject(dummyCamera);
-		mApplication->ogreRenderWindow()->addViewport(dummyCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+		m_pDummyOgreSceneManager = new Ogre::DefaultSceneManager("DummySceneManager");
+		Ogre::Camera* dummyCamera = m_pDummyOgreSceneManager->createCamera("DummyCamera");
+		m_pDummyOgreSceneManager->getRootSceneNode()->attachObject(dummyCamera);
+		mMainViewport = mApplication->ogreRenderWindow()->addViewport(dummyCamera);
+		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
@@ -127,19 +128,20 @@ namespace Thermite
 
 		MapManager* mm = new MapManager;
 		mm->m_pThermiteGameLogic = this;
-		mm->m_pOgreSceneManager = mSceneManager;
+		mm->m_pOgreSceneManager = m_pDummyOgreSceneManager;
 
 		//From here on, I'm not sure it belongs in this initialise function... maybe in Map?		
 
 		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
 		{
-			mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			//NOTE - This is broken as it used the wrong scene manager (should use active!)
+			m_pDummyOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-			mSceneManager->setShadowTextureSelfShadow(true);
-			mSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-			mSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-			mSceneManager->setShadowCasterRenderBackFaces(true);
-			mSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
+			m_pDummyOgreSceneManager->setShadowTextureSelfShadow(true);
+			m_pDummyOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+			m_pDummyOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+			m_pDummyOgreSceneManager->setShadowCasterRenderBackFaces(true);
+			m_pDummyOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
 		}	
 
 		mTime = new QTime;
@@ -165,33 +167,33 @@ namespace Thermite
 
 		if(mKeyStates[Qt::Key_W] == KS_PRESSED)
 		{
-			mCamera->setPosition(mCamera->getPosition() + mCamera->getDirection() * distance);
+			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getDirection() * distance);
 		}
 		if(mKeyStates[Qt::Key_S] == KS_PRESSED)
 		{
-			mCamera->setPosition(mCamera->getPosition() - mCamera->getDirection() * distance);
+			mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getDirection() * distance);
 		}
 		if(mKeyStates[Qt::Key_A] == KS_PRESSED)
 		{
-			mCamera->setPosition(mCamera->getPosition() - mCamera->getRight() * distance);
+			mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getRight() * distance);
 		}
 		if(mKeyStates[Qt::Key_D] == KS_PRESSED)
 		{
-			mCamera->setPosition(mCamera->getPosition() + mCamera->getRight() * distance);
+			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
 		}
 
 		if(mCurrentFrameNumber != 0)
 		{
 			QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
-			mCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
-			mCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
+			mActiveCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
+			mActiveCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
 
 			int wheelDelta = mCurrentWheelPos - mLastFrameWheelPos;
-			Ogre::Radian fov = mCamera->getFOVy();
+			Ogre::Radian fov = mActiveCamera->getFOVy();
 			fov += Ogre::Radian(-wheelDelta * 0.001);
 			fov = (std::min)(fov, Ogre::Radian(2.0f));
 			fov = (std::max)(fov, Ogre::Radian(0.5f));
-			mCamera->setFOVy(fov);
+			mActiveCamera->setFOVy(fov);
 		}
 		mLastFrameMousePos = mCurrentMousePos;
 		mLastFrameWheelPos = mCurrentWheelPos;
@@ -284,7 +286,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::shutdown(void)
 	{
-		Ogre::Root::getSingleton().destroySceneManager(mSceneManager);
+		Ogre::Root::getSingleton().destroySceneManager(m_pDummyOgreSceneManager);
 	}
 
 	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)
@@ -373,12 +375,6 @@ namespace Thermite
 		//Temporary hack until loading new map is fixed...
 		mMainMenu->disableLoadButton();
 
-		//The QtOgre DotScene loading code will clear the existing scene except for cameras, as these
-		//could be used by existing viewports. Therefore we clear and viewports and cameras before
-		//calling the loading code.
-		mApplication->ogreRenderWindow()->removeAllViewports();
-		mSceneManager->destroyAllCameras();
-
 		m_loadingProgress->show();
 
 		m_iNoProcessed = 0;
@@ -391,6 +387,8 @@ namespace Thermite
 		}
 
 		mMap = mapResource->m_pMap;
+		m_pActiveOgreSceneManager = mMap->m_pOgreSceneManager;
+		m_pOgreBulletWorld = mMap->m_pOgreBulletWorld;
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
@@ -417,15 +415,15 @@ namespace Thermite
 		}
 
 		//This gets the first camera which was found in the scene.
-		Ogre::SceneManager::CameraIterator camIter = mSceneManager->getCameraIterator();
-		mCamera = camIter.peekNextValue();
+		Ogre::SceneManager::CameraIterator camIter = m_pActiveOgreSceneManager->getCameraIterator();
+		mActiveCamera = camIter.peekNextValue();
 
-		mApplication->ogreRenderWindow()->addViewport(mCamera)->setBackgroundColour(Ogre::ColourValue::Black);
+		mMainViewport->setCamera(mActiveCamera);
 
 		try
 		{
-			mTurretNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
-			mGunNode = dynamic_cast<Ogre::SceneNode*>(mSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
+			mTurretNode = dynamic_cast<Ogre::SceneNode*>(m_pActiveOgreSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
+			mGunNode = dynamic_cast<Ogre::SceneNode*>(m_pActiveOgreSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
 
 			mTurretOriginalOrientation = mTurretNode->getOrientation();
 			mGunOriginalOrientation = mGunNode->getOrientation();
@@ -464,11 +462,11 @@ namespace Thermite
 		Ogre::Vector3 vecToUnitCube(0.01,0.01,0.01);
 
 		//Create the main node for the axes
-		m_axisNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
+		m_axisNode = m_pActiveOgreSceneManager->getRootSceneNode()->createChildSceneNode();
 
 		//Create sphere representing origin
 		Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *originSphereEntity = mSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *originSphereEntity = m_pActiveOgreSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
 		originSphereEntity->setMaterialName("OriginMaterial");
 		originNode->attachObject(originSphereEntity);
 		originNode->scale(vecToUnitCube);
@@ -476,7 +474,7 @@ namespace Thermite
 
 		//Create x-axis
 		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *xAxisCylinderEntity = mSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *xAxisCylinderEntity = m_pActiveOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
 		xAxisCylinderEntity->setMaterialName("XAxisMaterial");
 		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
 		xAxisCylinderNode->scale(vecToUnitCube);
@@ -485,7 +483,7 @@ namespace Thermite
 
 		//Create y-axis
 		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *yAxisCylinderEntity = mSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *yAxisCylinderEntity = m_pActiveOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
 		yAxisCylinderEntity->setMaterialName("YAxisMaterial");
 		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
 		yAxisCylinderNode->scale(vecToUnitCube);
@@ -494,7 +492,7 @@ namespace Thermite
 
 		//Create z-axis
 		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *zAxisCylinderEntity = mSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *zAxisCylinderEntity = m_pActiveOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
 		zAxisCylinderEntity->setMaterialName("ZAxisMaterial");
 		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
 		zAxisCylinderNode->scale(vecToUnitCube);
@@ -502,7 +500,7 @@ namespace Thermite
 		zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfDepth));
 
 		//Create remainder of box		
-		Ogre::ManualObject* remainingBox = mSceneManager->createManualObject("Remaining Box");
+		Ogre::ManualObject* remainingBox = m_pActiveOgreSceneManager->createManualObject("Remaining Box");
 		remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
 		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		0.0,		fDepth);
 		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(0.0,		fHeight,	fDepth);
@@ -535,9 +533,9 @@ namespace Thermite
 	void ThermiteGameLogic::initialisePhysics(void)
 	{
 #ifdef ENABLE_BULLET_PHYSICS
-		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
-		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
-		m_pOgreBulletWorld = new DynamicsWorld(mMap->m_pOgreSceneManager, bounds, gravityVector);
+		//const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
+		//const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
+		//m_pOgreBulletWorld = new DynamicsWorld(mMap->m_pOgreSceneManager, bounds, gravityVector);
 #endif //ENABLE_BULLET_PHYSICS
 	}
 
@@ -579,7 +577,7 @@ namespace Thermite
 
 						//The regions distance from the camera is used for
 						//LOD selection and prioritizing surface extraction
-						Ogre::Vector3 cameraPos = mCamera->getPosition();
+						Ogre::Vector3 cameraPos = mActiveCamera->getPosition();
 						Ogre::Vector3 centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
 

@@ -27,9 +27,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PolyVoxForwardDeclarations.h"
 
-#include "OgreAxisAlignedBox.h"
-#include "OgreVector3.h"
-
 #ifdef ENABLE_BULLET_PHYSICS
 	#include "OgreBulletDynamicsWorld.h"
 	#include "OgreBulletDynamicsRigidBody.h"
@@ -45,13 +42,12 @@ namespace Thermite
 	{
 	public:
 #ifdef ENABLE_BULLET_PHYSICS
-		Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld);
+		//Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld);
 #else
-		Map(Ogre::SceneManager* sceneManager);
+		//Map(Ogre::SceneManager* sceneManager);
 #endif //ENABLE_BULLET_PHYSICS
+		Map();
 		~Map(void);
-		
-		bool loadScene(const Ogre::String& filename);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
@@ -62,11 +58,6 @@ namespace Thermite
 		VolumeResourcePtr volumeResource;
 
 		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;	
-
-	public:
-		Ogre::Camera* m_pCamera;
-
-		
 	};
 }
 

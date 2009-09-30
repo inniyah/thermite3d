@@ -55,7 +55,8 @@ namespace Thermite
 		std::istream stdStream(new DataStreamWrapper(stream)); 
 		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);*/
 
-		m_pMap = new Map(m_pOgreSceneManager, m_pThermiteGameLogic->m_pOgreBulletWorld);
+		//m_pMap = new Map(m_pOgreSceneManager, m_pThermiteGameLogic->m_pOgreBulletWorld);
+		m_pMap = new Map;
 
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::string contents = stream->getAsString();
@@ -70,10 +71,6 @@ namespace Thermite
 		QXmlInputSource xmlInputSource;
 		xmlInputSource.setData(QString::fromStdString(contents));
 		reader.parse(xmlInputSource);
-
-		//This gets the first camera which was found in the scene.
-		Ogre::SceneManager::CameraIterator camIter = m_pOgreSceneManager->getCameraIterator();
-		m_pMap->m_pCamera = camIter.peekNextValue();
 	}
 
 	void MapResource::unloadImpl ()

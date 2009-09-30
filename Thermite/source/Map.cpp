@@ -25,15 +25,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "MapHandler.h"
 #include "VolumeManager.h"
 
-#include "SurfaceExtractorThread.h"
-
 #include "VolumeChangeTracker.h"
-#include "SurfaceExtractor.h"
 
-#include "SurfacePatchRenderable.h"
 #include "MapRegion.h"
 
 #include "ThermiteGameLogic.h"
+
+#ifdef ENABLE_BULLET_PHYSICS
+	#include "OgreBulletDynamicsWorld.h"
+#endif //ENABLE_BULLET_PHYSICS
 
 #include <OgreSceneManagerEnumerator.h>
 #include <OgreSceneManager.h>
@@ -49,28 +49,29 @@ using PolyVox::uint8_t;
 
 namespace Thermite
 {
+	Map::Map()
+	{
+		m_pOgreSceneManager = new Ogre::DefaultSceneManager("MapSceneManager");
 #ifdef ENABLE_BULLET_PHYSICS
-	Map::Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld)
+		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
+		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
+		m_pOgreBulletWorld = new OgreBulletDynamics::DynamicsWorld(m_pOgreSceneManager, bounds, gravityVector);
+
+	/*Map::Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld)
 	{
 		m_pOgreSceneManager = sceneManager;
 		m_pOgreBulletWorld = pOgreBulletWorld;
-	}
+	}*/
 #else
-	Map::Map(Ogre::SceneManager* sceneManager)
+	/*Map::Map(Ogre::SceneManager* sceneManager)
 	{
 		m_pOgreSceneManager = sceneManager;
-	}
+	}*/
 #endif //ENABLE_BULLET_PHYSICS
+	}
 
 	Map::~Map(void)
 	{
 
-	}
-
-	bool Map::loadScene(const Ogre::String& filename)
-	{
-		
-
-		return true;
 	}
 }

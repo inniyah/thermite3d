@@ -18,7 +18,6 @@ namespace Thermite
 	:DotSceneHandler(map->m_pOgreSceneManager)
 	,mMap(map)
 	{
-		//mSceneManager = sceneManager;
 	}
 
 	bool MapHandler::startElement(const QString& namespaceURI,
