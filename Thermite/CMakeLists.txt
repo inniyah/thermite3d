@@ -27,6 +27,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
+	source/ApplicationGameLogic.cpp
 	source/CannonController.cpp
 	source/DataStreamWrapper.cpp
 	source/LoadingProgress.cpp
@@ -52,6 +53,7 @@ SET(SRC_FILES
 
 SET(INC_FILES
 	include/AnyOption.h
+	include/ApplicationGameLogic.h
 	include/CannonController.h
 	include/DataStreamWrapper.h
 	include/LoadingProgress.h

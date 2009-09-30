@@ -80,6 +80,7 @@ namespace Thermite
 
 		int mLastFrameTime;
 		int mCurrentTime;
+		float mTimeElapsedInSeconds;
 
 		unsigned int mCurrentFrameNumber;
 

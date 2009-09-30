@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "ThermiteGameLogic.h"
+#include "ApplicationGameLogic.h"
 
 #include <QPushButton>
 #include <QIcon>
@@ -9,6 +9,6 @@ using namespace Thermite;
 
 int main(int argc, char *argv[])
 {
-	Application app(argc, argv, new ThermiteGameLogic);
+	Application app(argc, argv, new ApplicationGameLogic);
 	return app.exec(DisplaySettingsDialog);
 }

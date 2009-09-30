@@ -161,9 +161,9 @@ namespace Thermite
 		mLastFrameTime = mCurrentTime;
 		mCurrentTime = mTime->elapsed();
 
-		float timeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;
+		mTimeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;
 
-		float distance = mCameraSpeed * timeElapsedInSeconds;
+		/*float distance = mCameraSpeed * timeElapsedInSeconds;
 
 		if(mKeyStates[Qt::Key_W] == KS_PRESSED)
 		{
@@ -208,7 +208,7 @@ namespace Thermite
 
 			mTurretNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
 			mGunNode->rotate(Ogre::Vector3(0.0,0.0,1.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
-		}
+		}*/
 
 		//The fun stuff!
 		updatePolyVoxGeometry();
@@ -216,11 +216,11 @@ namespace Thermite
 #ifdef ENABLE_BULLET_PHYSICS
 		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
 		{
-			m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
+			m_pOgreBulletWorld->stepSimulation(mTimeElapsedInSeconds, 10);
 		}
 #endif //ENABLE_BULLET_PHYSICS
 
-		list<Shell*> shellsToDelete;
+		/*list<Shell*> shellsToDelete;
 
 		for(list<Shell*>::iterator iter = m_listShells.begin(); iter != m_listShells.end(); iter++)
 		{
@@ -241,7 +241,7 @@ namespace Thermite
 		{
 			m_listShells.remove(*iter);
 			delete (*iter);
-		}
+		}*/
 
 		++mCurrentFrameNumber;
 	}
