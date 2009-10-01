@@ -16,7 +16,7 @@ namespace Thermite
 		Q_OBJECT
 
 	public:
-		LoadMapWidget(ThermiteGameLogic* thermiteGameLogic, QWidget* parent = 0, Qt::WindowFlags f = 0 );
+		LoadMapWidget(ApplicationGameLogic* applicationGameLogic, QWidget* parent = 0, Qt::WindowFlags f = 0 );
 
 	public slots:
 		void on_m_btnLoad_clicked(void);
@@ -25,7 +25,7 @@ namespace Thermite
 
 	private:
 		QString m_strCurrentText;
-		ThermiteGameLogic* m_thermiteGameLogic;
+		ApplicationGameLogic* m_applicationGameLogic;
 	};
 }
 

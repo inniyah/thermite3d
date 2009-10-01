@@ -29,7 +29,24 @@ namespace Thermite
 	class ApplicationGameLogic : public ThermiteGameLogic
 	{
 	public:
+		ApplicationGameLogic(void);
+
+		void initialise(void);
 		void update(void);
+
+		void onKeyPress(QKeyEvent* event);
+		void onKeyRelease(QKeyEvent* event);
+
+		void onMouseMove(QMouseEvent* event);
+		void onMousePress(QMouseEvent* event);
+
+		void onWheel(QWheelEvent* event);
+
+		void loadMapWrapper(QString strMapName);
+
+		void fireCannon(void);
+
+		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 	};
 }
 

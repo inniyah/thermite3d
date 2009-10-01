@@ -1,11 +1,11 @@
 #include "CannonController.h"
 
-#include "ThermiteGameLogic.h"
+#include "ApplicationGameLogic.h"
 
 namespace Thermite
 {
-	CannonController::CannonController(ThermiteGameLogic* pThermiteGameLogic, QWidget* parent, Qt::WindowFlags f)
-		:m_pThermiteGameLogic(pThermiteGameLogic)
+	CannonController::CannonController(ApplicationGameLogic* pApplicationGameLogic, QWidget* parent, Qt::WindowFlags f)
+		:m_pApplicationGameLogic(pApplicationGameLogic)
 		,QDialog(parent, f)
 	{
 		setupUi(this);
@@ -23,6 +23,6 @@ namespace Thermite
 
 	void CannonController::on_fireButton_pressed(void)
 	{
-		m_pThermiteGameLogic->fireCannon();
+		m_pApplicationGameLogic->fireCannon();
 	}
 }

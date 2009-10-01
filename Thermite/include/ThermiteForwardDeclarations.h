@@ -34,7 +34,7 @@ const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS = (THERMITE_VOLUM
 
 namespace Thermite
 {
-	//class Application;
+	class ApplicationGameLogic;
 	class GameState;
 	//class IndexedSurfacePatchCollisionShape;
 	class LoadSceneMenuPage;

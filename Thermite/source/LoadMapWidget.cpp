@@ -1,15 +1,15 @@
 #include "LoadMapWidget.h"
 
-#include "ThermiteGameLogic.h"
+#include "ApplicationGameLogic.h"
 
 #include <OgreResourceGroupManager.h>
 
 
 namespace Thermite
 {
-	LoadMapWidget::LoadMapWidget(ThermiteGameLogic* thermiteGameLogic, QWidget* parent, Qt::WindowFlags f)
+	LoadMapWidget::LoadMapWidget(ApplicationGameLogic* applicationGameLogic, QWidget* parent, Qt::WindowFlags f)
 		:QWidget(parent, f)
-		,m_thermiteGameLogic(thermiteGameLogic)
+		,m_applicationGameLogic(applicationGameLogic)
 	{
 		setupUi(this);
 
@@ -42,7 +42,7 @@ namespace Thermite
 		hide();
 
 		QListWidgetItem* pCurrentItem = m_listMap->currentItem();
-		m_thermiteGameLogic->loadMap(pCurrentItem->text());		
+		m_applicationGameLogic->loadMapWrapper(pCurrentItem->text());		
 	}
 
 	void LoadMapWidget::on_m_btnClose_clicked(void)

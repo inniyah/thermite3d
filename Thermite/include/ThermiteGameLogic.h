@@ -43,19 +43,7 @@ namespace Thermite
 		void update(void);
 		void shutdown(void);
 
-		void onKeyPress(QKeyEvent* event);
-		void onKeyRelease(QKeyEvent* event);
-
-		void onMouseMove(QMouseEvent* event);
-		void onMousePress(QMouseEvent* event);
-
-		void onWheel(QWheelEvent* event);
-
 		QtOgre::Log* thermiteLog(void);
-
-		void fireCannon(void);
-
-		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
 
 		void loadMap(QString strMapName);
 

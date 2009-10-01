@@ -9,19 +9,19 @@
 
 namespace Thermite
 {
-	class ThermiteGameLogic;
+	class ApplicationGameLogic;
 
 	class CannonController : public QDialog, private Ui::CannonController
 	{
 		Q_OBJECT
 
 	public:
-		CannonController(ThermiteGameLogic* pThermiteGameLogic, QWidget* parent = 0, Qt::WindowFlags f = 0);
+		CannonController(ApplicationGameLogic* pApplicationGameLogic, QWidget* parent = 0, Qt::WindowFlags f = 0);
 
 		int direction(void);
 		int elevation(void);
 
-		ThermiteGameLogic* m_pThermiteGameLogic;
+		ApplicationGameLogic* m_pApplicationGameLogic;
 
 	public slots:
 			void on_fireButton_pressed(void);
