@@ -42,7 +42,7 @@ namespace Thermite
 		hide();
 
 		QListWidgetItem* pCurrentItem = m_listMap->currentItem();
-		m_applicationGameLogic->loadMapWrapper(pCurrentItem->text());		
+		m_applicationGameLogic->onLoadMapClicked(pCurrentItem->text());		
 	}
 
 	void LoadMapWidget::on_m_btnClose_clicked(void)

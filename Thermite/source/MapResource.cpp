@@ -23,13 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "MapHandler.h"
 #include "MapManager.h"
 #include "MapResource.h"
-#include "ThermiteGameLogic.h"
-
-#include "OgreVector3.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-
-#include <iostream> //FIXME - remove this...
 
 using namespace PolyVox;
 
@@ -51,17 +44,10 @@ namespace Thermite
 
 	void MapResource::loadImpl ()
 	{
-		/*Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
-		std::istream stdStream(new DataStreamWrapper(stream)); 
-		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);*/
-
-		//m_pMap = new Map(m_pOgreSceneManager, m_pThermiteGameLogic->m_pOgreBulletWorld);
 		m_pMap = new Map;
 
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::string contents = stream->getAsString();
-
-		//m_pMap->loadScene(contents);
 
 		MapHandler handler(m_pMap);
 		QXmlSimpleReader reader;
@@ -82,14 +68,8 @@ namespace Thermite
 
 	size_t MapResource::calculateSize () const
 	{
-		//NOTE - I don't really know what this function is for, so am therefore
-		//a bit vague on how to implement it. But here's my best guess...
-		//return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
+		//NOTE - I don't really know what this function is for,
+		//so am therefore a bit vague on how to implement it.
 		return 42; //The answer...
 	}
-
-	/*PolyVox::Volume<PolyVox::uint8_t>* VolumeResource::getVolume(void)
-	{
-		return m_pVolume.get();
-	}*/
 }

@@ -52,59 +52,10 @@ namespace Thermite
 	{
 		ThermiteGameLogic::initialise();
 
-		//Parse the command line options
-		m_commandLineArgs.setOption("appname");
-		m_commandLineArgs.processCommandArgs(qApp->argc(), qApp->argv());
-
-		//Set up the logging system , to hopefully record any problems.
-		mThermiteLog = mApplication->createLog("Thermite");
-		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
-
-		//Set the main window icon
-		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
-		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
-
-		//We have to create a scene manager and viewport here so that the screen
-		//can be cleared to black befre the Thermite logo animation is played.
-		m_pDummyOgreSceneManager = new Ogre::DefaultSceneManager("DummySceneManager");
-		Ogre::Camera* dummyCamera = m_pDummyOgreSceneManager->createCamera("DummyCamera");
-		m_pDummyOgreSceneManager->getRootSceneNode()->attachObject(dummyCamera);
-		mMainViewport = mApplication->ogreRenderWindow()->addViewport(dummyCamera);
-		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
-
-		//Set up and start the thermite logo animation. This plays while we initialise.
-		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
-		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
-		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
-		m_pThermiteLogoMovie->jumpToFrame(0);
-		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
-		m_pThermiteLogoLabel->show();
-		m_pThermiteLogoMovie->start();
-
-		//Load the Cg plugin
-		#if defined(_DEBUG)
-			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
-		#else
-			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
-		#endif
-
-		//Initialise all resources
-		addResourceDirectory("./resources/");
-		char* strAppName = m_commandLineArgs.getValue("appname");
-		if(strAppName != 0)
-		{
-			addResourceDirectory(QString("../share/thermite/apps/") + QString::fromAscii(strAppName));
-		}
-		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
 		//Set up various GUI components...
 		//The load map widget
 		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
 		Application::centerWidget(wgtLoadMap, qApp->mainWidget());
-
-		//Used to display loading/extraction progress
-		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
-		Application::centerWidget(m_loadingProgress, qApp->mainWidget());
 
 		//The main menu
 		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
@@ -114,40 +65,10 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
 		QObject::connect(mMainMenu, SIGNAL(loadClicked(void)), wgtLoadMap, SLOT(show(void)));
+		mMainMenu->show();
 
 		//Show the main menu after the animation has finished
-		QTimer::singleShot(2000, mMainMenu, SLOT(show()));
-
-		//Set the frame sate to be as high as possible
-		mApplication->setAutoUpdateInterval(0);
-
-		//Some Ogre related stuff we need to set up
-		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
-		VolumeManager* vm = new VolumeManager;
-		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
-
-		MapManager* mm = new MapManager;
-		mm->m_pThermiteGameLogic = this;
-		mm->m_pOgreSceneManager = m_pDummyOgreSceneManager;
-
-		//From here on, I'm not sure it belongs in this initialise function... maybe in Map?		
-
-		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
-		{
-			//NOTE - This is broken as it used the wrong scene manager (should use active!)
-			m_pDummyOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-			m_pDummyOgreSceneManager->setShadowTextureSelfShadow(true);
-			m_pDummyOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-			m_pDummyOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-			m_pDummyOgreSceneManager->setShadowCasterRenderBackFaces(true);
-			m_pDummyOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}	
-
-		mTime = new QTime;
-		mTime->start();
-
-		mCurrentFrameNumber = 0;
+		//QTimer::singleShot(2000, mMainMenu, SLOT(show()));
 
 		mCameraSpeed = 50.0;
 		mCameraRotationalSpeed = 0.01;		
@@ -343,7 +264,7 @@ namespace Thermite
 		volumeChangeTracker->unlockRegion();
 	}
 
-	void ApplicationGameLogic::loadMapWrapper(QString strMapName)
+	void ApplicationGameLogic::onLoadMapClicked(QString strMapName)
 	{
 		loadMap(strMapName);
 
@@ -364,8 +285,6 @@ namespace Thermite
 			mTurretNode = 0;
 			mGunNode = 0;
 		}
-
-		//m_loadingProgress->hide();
 
 		mApplication->showFPSCounter();
 	}

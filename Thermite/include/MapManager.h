@@ -22,8 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __MAPMANAGER_H__
 #define __MAPMANAGER_H__
 
-#include <OgreResourceManager.h>
 #include "MapResource.h"
+
+#include <OgreResourceManager.h>
 
 namespace Thermite
 {
@@ -35,10 +36,6 @@ namespace Thermite
 		Ogre::Resource *createImpl(const Ogre::String &name, Ogre::ResourceHandle handle, 
 			const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
 			const Ogre::NameValuePairList *createParams);
-
-	public:
-		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
-		Ogre::SceneManager* m_pOgreSceneManager;
 
 	public:
 

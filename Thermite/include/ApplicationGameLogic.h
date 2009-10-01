@@ -42,7 +42,7 @@ namespace Thermite
 
 		void onWheel(QWheelEvent* event);
 
-		void loadMapWrapper(QString strMapName);
+		void onLoadMapClicked(QString strMapName);
 
 		void fireCannon(void);
 

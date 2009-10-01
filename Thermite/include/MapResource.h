@@ -27,9 +27,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
 
-#include "PolyVoxForwardDeclarations.h"
-#include "PolyVoxImpl/TypeDef.h"
-
 #include <OgreResourceManager.h>
 
 namespace Thermite
@@ -41,9 +38,6 @@ namespace Thermite
 			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
 			Ogre::ManualResourceLoader *loader = 0);
 		~MapResource();	
-
-		ThermiteGameLogic* m_pThermiteGameLogic; //Nasty hack to allow progress monitoring
-		Ogre::SceneManager* m_pOgreSceneManager;
 
 	protected:
 

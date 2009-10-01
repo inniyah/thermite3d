@@ -19,7 +19,9 @@
 #include <QDirIterator>
 #include <QKeyEvent>
 #include <QMovie>
+#include <QMutex>
 #include <QSettings>
+#include <QWaitCondition>
 
 #ifdef ENABLE_BULLET_PHYSICS
 	#include "OgreBulletDynamicsWorld.h"
@@ -52,6 +54,75 @@ namespace Thermite
 
 	void ThermiteGameLogic::initialise(void)
 	{	
+		//Parse the command line options
+		m_commandLineArgs.setOption("appname");
+		m_commandLineArgs.processCommandArgs(qApp->argc(), qApp->argv());
+
+		//Set up the logging system , to hopefully record any problems.
+		mThermiteLog = mApplication->createLog("Thermite");
+		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
+
+		//Set the main window icon
+		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
+		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
+
+		//We have to create a scene manager and viewport here so that the screen
+		//can be cleared to black befre the Thermite logo animation is played.
+		m_pDummyOgreSceneManager = new Ogre::DefaultSceneManager("DummySceneManager");
+		Ogre::Camera* dummyCamera = m_pDummyOgreSceneManager->createCamera("DummyCamera");
+		m_pDummyOgreSceneManager->getRootSceneNode()->attachObject(dummyCamera);
+		mMainViewport = mApplication->ogreRenderWindow()->addViewport(dummyCamera);
+		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
+
+		//Set up and start the thermite logo animation. This plays while we initialise.
+		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
+		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
+		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
+		m_pThermiteLogoMovie->jumpToFrame(0);
+		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
+		m_pThermiteLogoLabel->show();
+		m_pThermiteLogoMovie->start();
+
+		//Load the Cg plugin
+		#if defined(_DEBUG)
+			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
+		#else
+			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
+		#endif
+
+		//Initialise all resources
+		addResourceDirectory("./resources/");
+		char* strAppName = m_commandLineArgs.getValue("appname");
+		if(strAppName != 0)
+		{
+			addResourceDirectory(QString("../share/thermite/apps/") + QString::fromAscii(strAppName));
+		}
+		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+		//Used to display loading/extraction progress
+		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
+		Application::centerWidget(m_loadingProgress, qApp->mainWidget());
+
+		//Set the frame sate to be as high as possible
+		mApplication->setAutoUpdateInterval(0);
+
+		//Some Ogre related stuff we need to set up
+		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
+		VolumeManager* vm = new VolumeManager;
+		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
+
+		MapManager* mm = new MapManager;
+
+		mTime = new QTime;
+		mTime->start();
+
+		mCurrentFrameNumber = 0;
+
+		//Slightly hacky way of sleeping while the logo animation plays.
+		QWaitCondition sleep;
+		QMutex mutex;
+		mutex.lock();
+		sleep.wait(&mutex, 2000);
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -222,13 +293,22 @@ namespace Thermite
 			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
 		}
 
+		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
+		{
+			m_pActiveOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			//m_pActiveOgreSceneManager->setShadowFarDistance(1000.0f);
+			m_pActiveOgreSceneManager->setShadowTextureSelfShadow(true);
+			m_pActiveOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+			m_pActiveOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+			m_pActiveOgreSceneManager->setShadowCasterRenderBackFaces(true);
+			m_pActiveOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
+		}	
+
 		//This gets the first camera which was found in the scene.
 		Ogre::SceneManager::CameraIterator camIter = m_pActiveOgreSceneManager->getCameraIterator();
 		mActiveCamera = camIter.peekNextValue();
 
 		mMainViewport->setCamera(mActiveCamera);
-
-		
 	}
 
 	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)

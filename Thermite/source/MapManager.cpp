@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "MapManager.h"
 
-#include "OgreLogManager.h" //FIXME - shouldn't realy need this in this class?'
-
 template<> Thermite::MapManager *Ogre::Singleton<Thermite::MapManager>::ms_Singleton = 0;
 
 namespace Thermite
@@ -57,9 +55,7 @@ namespace Thermite
 
 	MapResourcePtr MapManager::load (const Ogre::String &name, const Ogre::String &group)
 	{
-		Ogre::LogManager::getSingleton().logMessage("DAVID - calling getByName");
 		MapResourcePtr textf = getByName (name);
-		Ogre::LogManager::getSingleton().logMessage("DAVID - done getByName");
 
 		if (textf.isNull ())
 		{
@@ -76,8 +72,6 @@ namespace Thermite
 												const Ogre::NameValuePairList *createParams)
 	{
 		MapResource* mapResource = new MapResource (this, name, handle, group, isManual, loader);
-		mapResource->m_pThermiteGameLogic = m_pThermiteGameLogic;
-		mapResource->m_pOgreSceneManager = m_pOgreSceneManager;
 		return mapResource;
 	}
 }
