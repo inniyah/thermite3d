@@ -24,8 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ThermiteGameLogic.h"
 
+#include "ThermiteForwardDeclarations.h"
+
 namespace Thermite
 {
+	class MainMenu;
+
 	class ApplicationGameLogic : public ThermiteGameLogic
 	{
 	public:
@@ -47,6 +51,30 @@ namespace Thermite
 		void fireCannon(void);
 
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value);
+
+	protected:
+		//For keyboard handling
+		QHash<int, KeyStates> mKeyStates;
+		
+		//For mouse handling
+		QPoint mLastFrameMousePos;
+		QPoint mCurrentMousePos;
+		int mLastFrameWheelPos;
+		int mCurrentWheelPos;
+
+		float mCameraSpeed;
+		float mCameraRotationalSpeed;
+
+		MainMenu* mMainMenu;
+		CannonController* mCannonController;
+
+		Ogre::SceneNode* mTurretNode;
+		Ogre::SceneNode* mGunNode;
+
+		Ogre::Quaternion mTurretOriginalOrientation;
+		Ogre::Quaternion mGunOriginalOrientation;
+
+		std::list<Shell*> m_listShells;
 	};
 }
 

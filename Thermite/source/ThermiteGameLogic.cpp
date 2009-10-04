@@ -1,15 +1,12 @@
 #include "ThermiteGameLogic.h"
 
-#include "MainMenu.h"
-#include "Shell.h"
-#include "LoadMapWidget.h"
-
-#include "LogManager.h"
-#include "OgreWidget.h"
 #include "MultiThreadedSurfaceExtractor.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
 #include "VolumeManager.h"
+
+#include "Application.h"
+#include "LogManager.h"
 
 #include <OgreEntity.h>
 #include <OgreRenderWindow.h>
@@ -17,7 +14,6 @@
 #include <OgreRoot.h>
 
 #include <QDirIterator>
-#include <QKeyEvent>
 #include <QMovie>
 #include <QMutex>
 #include <QSettings>
@@ -249,10 +245,6 @@ namespace Thermite
 	{
 		bLoadComplete = false;
 		m_pThermiteLogoLabel->hide();
-		mMainMenu->hide();
-
-		//Temporary hack until loading new map is fixed...
-		mMainMenu->disableLoadButton();
 
 		m_loadingProgress->show();
 

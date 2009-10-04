@@ -2,9 +2,7 @@
 #define THERMITEGAMELOGIC_H_
 
 #include "AnyOption.h"
-#include "CannonController.h"
 #include "GameLogic.h"
-#include "MainMenu.h"
 #include "LoadingProgress.h"
 #include "MultiThreadedSurfaceExtractor.h"
 #include "Serialization.h"
@@ -13,6 +11,8 @@
 #include "Map.h"
 #include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
+
+#include "QtOgreForwardDeclarations.h"
 
 #include <OgrePrerequisites.h>
 
@@ -54,16 +54,9 @@ namespace Thermite
 	public:
 		void addResourceDirectory(const QString& directoryName);
 
-		void createCube(float xPos, float zPos);
-
 		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
 
-		QHash<int, KeyStates> mKeyStates;
-		QPoint mLastFrameMousePos;
-		QPoint mCurrentMousePos;
-
-		int mLastFrameWheelPos;
-		int mCurrentWheelPos;
+		
 		QTime* mTime;
 
 		int mLastFrameTime;
@@ -72,11 +65,8 @@ namespace Thermite
 
 		unsigned int mCurrentFrameNumber;
 
-		float mCameraSpeed;
-		float mCameraRotationalSpeed;
+		
 
-		MainMenu* mMainMenu;
-		CannonController* mCannonController;
 		MoviePlayer* mMoviePlayer;
 
 		Ogre::Camera* mDummyCamera;
@@ -88,18 +78,11 @@ namespace Thermite
 
 		//Thermite stuff
 		Map* mMap;
-		int cubeCounter; //For unique names
 
 		std::queue<PhysicalObject*> m_queueObjects;
 
 		//Ogre::Entity* mCannon;
-		Ogre::SceneNode* mTurretNode;
-		Ogre::SceneNode* mGunNode;
-
-		Ogre::Quaternion mTurretOriginalOrientation;
-		Ogre::Quaternion mGunOriginalOrientation;
-
-		std::list<Shell*> m_listShells;
+		
 
 		LoadingProgress* m_loadingProgress;
 

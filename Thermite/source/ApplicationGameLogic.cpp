@@ -1,5 +1,6 @@
 #include "ApplicationGameLogic.h"
 
+#include "CannonController.h"
 #include "MainMenu.h"
 #include "Shell.h"
 #include "LoadMapWidget.h"
@@ -266,6 +267,10 @@ namespace Thermite
 
 	void ApplicationGameLogic::onLoadMapClicked(QString strMapName)
 	{
+		mMainMenu->hide();
+		//Temporary hack until loading new map is fixed...
+		mMainMenu->disableLoadButton();
+
 		loadMap(strMapName);
 
 		try
