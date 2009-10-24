@@ -51,6 +51,8 @@ namespace Thermite
 		const Ogre::Vector3 &getWorldPosition(void) const;
 		void getWorldTransforms( Ogre::Matrix4* xform ) const;	
 
+		bool isSingleMaterial(void);
+
 		void setBoundingBox( const Ogre::AxisAlignedBox& box );
 		void setMaterial( const Ogre::String& matName );
 		void setWorldTransform( const Ogre::Matrix4& xform );
@@ -59,7 +61,7 @@ namespace Thermite
 		void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
 
 		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
-		void buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp);
+		void buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp, bool bSingleMaterial);
 
 	protected:
 		Ogre::RenderOperation* m_RenderOp;
@@ -68,6 +70,8 @@ namespace Thermite
 		Ogre::String m_strMatName;
 		Ogre::MaterialPtr m_pMaterial;
 		Ogre::SceneManager *m_pParentSceneManager;
+
+		bool m_bIsSingleMaterial;
 
 	public:
 		Ogre::Vector3 m_v3dPos;

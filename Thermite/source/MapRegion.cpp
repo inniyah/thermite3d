@@ -84,31 +84,71 @@ namespace Thermite
 
 	void MapRegion::addSurfacePatchRenderable(std::string materialName, IndexedSurfacePatch& isp, PolyVox::uint8_t uLodLevel)
 	{
-		SurfacePatchRenderable* pSurfacePatchRenderable;
+		//Single Material
+		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
 
-		const std::string& strSprName = makeUniqueName("SPR");
-		pSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
-		pSurfacePatchRenderable->setMaterial(materialName);
-		pSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
-		m_pOgreSceneNode->attachObject(pSurfacePatchRenderable);
-		pSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
+		std::string strSprName = makeUniqueName("SPR");
+		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
+		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		m_pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
+		pSingleMaterialSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
 
-		pSurfacePatchRenderable->buildRenderOperationFrom(isp);
+		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(isp, true);
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
-		pSurfacePatchRenderable->setBoundingBox(aabb);
+		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 
 		switch(uLodLevel)
 		{
 		case 0:
-			m_listSurfacePatchRenderablesLod0.push_back(pSurfacePatchRenderable);
+			m_listSingleMaterialSurfacePatchRenderablesLod0.push_back(pSingleMaterialSurfacePatchRenderable);
 			break;
 		case 1:
-			m_listSurfacePatchRenderablesLod1.push_back(pSurfacePatchRenderable);
+			m_listSingleMaterialSurfacePatchRenderablesLod1.push_back(pSingleMaterialSurfacePatchRenderable);
 			break;
 		case 2:
-			m_listSurfacePatchRenderablesLod2.push_back(pSurfacePatchRenderable);
+			m_listSingleMaterialSurfacePatchRenderablesLod2.push_back(pSingleMaterialSurfacePatchRenderable);
+			break;
+		}
+
+		//Multi material
+		SurfacePatchRenderable* pMultiMaterialSurfacePatchRenderable;
+
+		//Create additive material
+		Ogre::String strAdditiveMaterialName = materialName + "_WITH_ADDITIVE_BLENDING";
+		Ogre::MaterialPtr additiveMaterial = Ogre::MaterialManager::getSingleton().getByName(strAdditiveMaterialName);
+		if(additiveMaterial.isNull() == true)
+		{
+			Ogre::MaterialPtr originalMaterial = Ogre::MaterialManager::getSingleton().getByName(materialName);
+			additiveMaterial = originalMaterial->clone(strAdditiveMaterialName);
+			additiveMaterial->setSceneBlending(Ogre::SBT_ADD);
+		}
+
+		/*Ogre::String*/ strSprName = makeUniqueName("SPR");
+		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
+		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		m_pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
+		pMultiMaterialSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
+
+		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(isp, false);
+
+		//int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		//Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
+		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
+
+		switch(uLodLevel)
+		{
+		case 0:
+			m_listMultiMaterialSurfacePatchRenderablesLod0.push_back(pMultiMaterialSurfacePatchRenderable);
+			break;
+		case 1:
+			m_listMultiMaterialSurfacePatchRenderablesLod1.push_back(pMultiMaterialSurfacePatchRenderable);
+			break;
+		case 2:
+			m_listMultiMaterialSurfacePatchRenderablesLod2.push_back(pMultiMaterialSurfacePatchRenderable);
 			break;
 		}
 	}
@@ -119,13 +159,38 @@ namespace Thermite
 		switch(uLodLevel)
 		{
 			case 0:
-			pList = &m_listSurfacePatchRenderablesLod0;
+			pList = &m_listSingleMaterialSurfacePatchRenderablesLod0;
 			break;
 		case 1:
-			pList = &m_listSurfacePatchRenderablesLod1;
+			pList = &m_listSingleMaterialSurfacePatchRenderablesLod1;
 			break;
 		case 2:
-			pList = &m_listSurfacePatchRenderablesLod2;
+			pList = &m_listSingleMaterialSurfacePatchRenderablesLod2;
+			break;
+		}
+
+		for(std::list<SurfacePatchRenderable*>::iterator iter = pList->begin(); iter != pList->end(); iter++)
+		{
+			if(m_pOgreSceneNode != 0)
+			{
+				m_pOgreSceneNode->detachObject(*iter);
+			}
+			m_pParentMap->m_pOgreSceneManager->destroyMovableObject(*iter);
+		}
+
+		pList->clear();
+
+		//std::list<SurfacePatchRenderable*>* pList;
+		switch(uLodLevel)
+		{
+			case 0:
+			pList = &m_listMultiMaterialSurfacePatchRenderablesLod0;
+			break;
+		case 1:
+			pList = &m_listMultiMaterialSurfacePatchRenderablesLod1;
+			break;
+		case 2:
+			pList = &m_listMultiMaterialSurfacePatchRenderablesLod2;
 			break;
 		}
 
@@ -143,17 +208,33 @@ namespace Thermite
 
 	void MapRegion::setLodLevelToUse(PolyVox::uint8_t uLodLevel)
 	{
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod0.begin(); iter != m_listSurfacePatchRenderablesLod0.end(); iter++)
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod0.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod0.end(); iter++)
 		{
 			(*iter)->setVisible(uLodLevel == 0);
 		}
 
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod1.begin(); iter != m_listSurfacePatchRenderablesLod1.end(); iter++)
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod1.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod1.end(); iter++)
 		{
 			(*iter)->setVisible(uLodLevel == 1);
 		}
 
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSurfacePatchRenderablesLod2.begin(); iter != m_listSurfacePatchRenderablesLod2.end(); iter++)
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod2.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod2.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 2);
+		}
+
+		//Multi material
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod0.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod0.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 0);
+		}
+
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod1.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod1.end(); iter++)
+		{
+			(*iter)->setVisible(uLodLevel == 1);
+		}
+
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod2.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod2.end(); iter++)
 		{
 			(*iter)->setVisible(uLodLevel == 2);
 		}

@@ -52,6 +52,8 @@ namespace Thermite
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::istream stdStream(new DataStreamWrapper(stream)); 
 		m_pVolume = loadVolumeRle(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);
+
+		m_pVolume->tidyUpMemory();
 	}
 
 	void VolumeResource::unloadImpl ()

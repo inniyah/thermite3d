@@ -146,7 +146,16 @@ namespace Thermite
 	{
 		if(m_RenderOp)
 		{
-			queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
+			//Single material patches get rendered first, so the multi material
+			//patches can be added afterwards using additive blending.
+			if(isSingleMaterial())
+			{
+				queue->addRenderable( this, mRenderQueueID, RENDER_QUEUE_MAIN); 
+			}
+			else
+			{
+				queue->addRenderable( this, mRenderQueueID, RENDER_QUEUE_6); 
+			}
 		}
 	}
 
@@ -172,13 +181,21 @@ namespace Thermite
 		return prPos;
 	}
 
-	void SurfacePatchRenderable::buildRenderOperationFrom(IndexedSurfacePatch& isp)
+	void SurfacePatchRenderable::buildRenderOperationFrom(IndexedSurfacePatch& isp, bool bSingleMaterial)
 	{
 		if(isp.isEmpty())
 		{
 			m_RenderOp = 0;
 			return;
 		}
+
+		if((!bSingleMaterial) && (isp.getNoOfNonUniformTrianges() == 0))
+		{
+			m_RenderOp = 0;
+			return;
+		}
+
+		m_bIsSingleMaterial = bSingleMaterial;
 
 		RenderOperation* renderOperation = new RenderOperation();
 
@@ -204,10 +221,18 @@ namespace Thermite
 		const std::vector<SurfaceVertex>& vecVertices = isp.getVertices();
 		const std::vector<PolyVox::uint32_t>& vecIndices = isp.getIndices();
 
-		//The '9' in the following expressions comes from the fact that when we encounter a non uniform
+		//The '3 * 3' in the following expressions comes from the fact that when we encounter a non uniform
 		//triangle we make it degenerate and add three new ones. That is an increase of nine vertices.
-		renderOperation->vertexData->vertexCount = (vecVertices.size()) + (isp.getNoOfNonUniformTrianges() * 9);		
-		renderOperation->indexData->indexCount = (vecIndices.size()) + (isp.getNoOfNonUniformTrianges() * 9);	
+		if(bSingleMaterial)
+		{
+			renderOperation->vertexData->vertexCount = (vecVertices.size()) + (isp.getNoOfNonUniformTrianges() * 3);		
+			renderOperation->indexData->indexCount = vecIndices.size();	
+		}
+		else
+		{
+			renderOperation->vertexData->vertexCount = (isp.getNoOfNonUniformTrianges() * 3 * 3);		
+			renderOperation->indexData->indexCount = (isp.getNoOfNonUniformTrianges() * 3 * 3);	
+		}
 		
 		VertexBufferBinding *bind = renderOperation->vertexData->vertexBufferBinding;
 
@@ -235,103 +260,224 @@ namespace Thermite
 		
 		Real *prPos = static_cast<Real*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
 
-		for(std::vector<SurfaceVertex>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
-		{			
-			prPos = addVertex(*vertexIter, 1.0f, prPos);	
-			
-		}			
-
-		
-		
-		unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
-		unsigned long newVertexIndex = vecVertices.size();
-		for(int i = 0; i < vecIndices.size() - 2; i += 3)
+		if(bSingleMaterial)
 		{
-			if((vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+1]].getMaterial()) && (vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+2]].getMaterial()))
-			{
-				*pIdx = vecIndices[i];
-				pIdx++;
-				*pIdx = vecIndices[i+1];
-				pIdx++;
-				*pIdx = vecIndices[i+2];
-				pIdx++;
-			}	
-			else
-			{
-				//Make the non uniform triangle degenerate
-				*pIdx = 0;
-				pIdx++;
-				*pIdx = 0;
-				pIdx++;
-				*pIdx = 0;
-				pIdx++;
-
-				//Construct new vertices
-				SurfaceVertex vert0 = vecVertices[vecIndices[i+0]];
-				SurfaceVertex vert1 = vecVertices[vecIndices[i+1]];
-				SurfaceVertex vert2 = vecVertices[vecIndices[i+2]];
-
-				float mat0 = vert0.getMaterial();
-				float mat1 = vert1.getMaterial();
-				float mat2 = vert2.getMaterial();
-
-				vert0.setMaterial(mat0);
-				vert1.setMaterial(mat0);
-				vert2.setMaterial(mat0);
-
-				prPos = addVertex(vert0, 1.0, prPos);
-				prPos = addVertex(vert1, 0.0, prPos);
-				prPos = addVertex(vert2, 0.0, prPos);
-
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-
-				//Construct new vertices
-				vert0.setMaterial(mat1);
-				vert1.setMaterial(mat1);
-				vert2.setMaterial(mat1);
-
-				prPos = addVertex(vert0, 0.0, prPos);
-				prPos = addVertex(vert1, 1.0, prPos);
-				prPos = addVertex(vert2, 0.0, prPos);
-
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-
-				//Construct new vertices
-				vert0.setMaterial(mat2);
-				vert1.setMaterial(mat2);
-				vert2.setMaterial(mat2);
-
-				prPos = addVertex(vert0, 0.0, prPos);
-				prPos = addVertex(vert1, 0.0, prPos);
-				prPos = addVertex(vert2, 1.0, prPos);
-
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
-				*pIdx = newVertexIndex;
-				pIdx++;
-				newVertexIndex++;
+			for(std::vector<SurfaceVertex>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
+			{			
+				prPos = addVertex(*vertexIter, 1.0f, prPos);	
+				
 			}
-		}	
+		}
+
+		if(bSingleMaterial)
+		{
+			unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
+			unsigned long newVertexIndex = vecVertices.size();
+			for(int i = 0; i < vecIndices.size() - 2; i += 3)
+			{
+				if((vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+1]].getMaterial()) && (vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+2]].getMaterial()))
+				{
+					*pIdx = vecIndices[i];
+					pIdx++;
+					*pIdx = vecIndices[i+1];
+					pIdx++;
+					*pIdx = vecIndices[i+2];
+					pIdx++;
+				}	
+				else
+				{
+					//Make the non uniform triangle degenerate
+					/**pIdx = 0;
+					pIdx++;
+					*pIdx = 0;
+					pIdx++;
+					*pIdx = 0;
+					pIdx++;*/
+
+					//Construct new vertices
+					SurfaceVertex vert0 = vecVertices[vecIndices[i+0]];
+					SurfaceVertex vert1 = vecVertices[vecIndices[i+1]];
+					SurfaceVertex vert2 = vecVertices[vecIndices[i+2]];
+
+					/*float mat0 = vert0.getMaterial();
+					float mat1 = vert1.getMaterial();
+					float mat2 = vert2.getMaterial();*/
+
+					vert0.setMaterial(0);
+					vert1.setMaterial(0);
+					vert2.setMaterial(0);
+
+					/*prPos = addVertex(vert0, 1.0, prPos);
+					prPos = addVertex(vert1, 0.0, prPos);
+					prPos = addVertex(vert2, 0.0, prPos);*/
+
+					prPos = addVertex(vert0, 1.0, prPos);
+					prPos = addVertex(vert1, 1.0, prPos);
+					prPos = addVertex(vert2, 1.0, prPos);
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+
+					//Construct new vertices
+					/*vert0.setMaterial(mat1);
+					vert1.setMaterial(mat1);
+					vert2.setMaterial(mat1);
+
+					prPos = addVertex(vert0, 0.0, prPos);
+					prPos = addVertex(vert1, 1.0, prPos);
+					prPos = addVertex(vert2, 0.0, prPos);
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+
+					//Construct new vertices
+					vert0.setMaterial(mat2);
+					vert1.setMaterial(mat2);
+					vert2.setMaterial(mat2);
+
+					prPos = addVertex(vert0, 0.0, prPos);
+					prPos = addVertex(vert1, 0.0, prPos);
+					prPos = addVertex(vert2, 1.0, prPos);
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;*/
+				}
+			}
+		}
+		else
+		{
+			unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
+			unsigned long newVertexIndex = 0; //vecVertices.size();
+			for(int i = 0; i < vecIndices.size() - 2; i += 3)
+			{
+				if((vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+1]].getMaterial()) && (vecVertices[vecIndices[i]].getMaterial() == vecVertices[vecIndices[i+2]].getMaterial()))
+				{
+					/**pIdx = vecIndices[i];
+					pIdx++;
+					*pIdx = vecIndices[i+1];
+					pIdx++;
+					*pIdx = vecIndices[i+2];
+					pIdx++;*/
+				}	
+				else
+				{
+					//Make the non uniform triangle degenerate
+					/**pIdx = 0;
+					pIdx++;
+					*pIdx = 0;
+					pIdx++;
+					*pIdx = 0;
+					pIdx++;*/
+
+					//Construct new vertices
+					SurfaceVertex vert0 = vecVertices[vecIndices[i+0]];
+					SurfaceVertex vert1 = vecVertices[vecIndices[i+1]];
+					SurfaceVertex vert2 = vecVertices[vecIndices[i+2]];
+
+					float mat0 = vert0.getMaterial();
+					float mat1 = vert1.getMaterial();
+					float mat2 = vert2.getMaterial();
+
+					vert0.setMaterial(mat0);
+					vert1.setMaterial(mat0);
+					vert2.setMaterial(mat0);
+
+					if(isp.m_mapUsedMaterials.find(mat0) != isp.m_mapUsedMaterials.end())
+					{
+						prPos = addVertex(vert0, 1.0, prPos);
+					}
+					else
+					{
+						prPos = addVertex(vert0, 0.0, prPos);
+					}
+					prPos = addVertex(vert1, 0.0, prPos);
+					prPos = addVertex(vert2, 0.0, prPos);
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+
+					//Construct new vertices
+					vert0.setMaterial(mat1);
+					vert1.setMaterial(mat1);
+					vert2.setMaterial(mat1);
+
+					prPos = addVertex(vert0, 0.0, prPos);
+					if(isp.m_mapUsedMaterials.find(mat1) != isp.m_mapUsedMaterials.end())
+					{
+						prPos = addVertex(vert1, 1.0, prPos);
+					}
+					else
+					{
+						prPos = addVertex(vert1, 0.0, prPos);
+					}
+					prPos = addVertex(vert2, 0.0, prPos);
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+
+					//Construct new vertices
+					vert0.setMaterial(mat2);
+					vert1.setMaterial(mat2);
+					vert2.setMaterial(mat2);
+
+					prPos = addVertex(vert0, 0.0, prPos);
+					prPos = addVertex(vert1, 0.0, prPos);
+					if(isp.m_mapUsedMaterials.find(mat2) != isp.m_mapUsedMaterials.end())
+					{
+						prPos = addVertex(vert2, 1.0, prPos);
+					}
+					else
+					{
+						prPos = addVertex(vert2, 0.0, prPos);
+					}
+
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+					*pIdx = newVertexIndex;
+					pIdx++;
+					newVertexIndex++;
+				}
+			}
+		}
 
 		ibuf->unlock();
 		vbuf->unlock();
@@ -340,6 +486,11 @@ namespace Thermite
 		//renderOperation->indexData->optimiseVertexCacheTriList();
 
 		m_RenderOp = renderOperation;
+	}
+
+	bool SurfacePatchRenderable::isSingleMaterial(void)
+	{
+		return m_bIsSingleMaterial;
 	}
 
 #pragma endregion

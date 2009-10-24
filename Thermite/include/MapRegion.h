@@ -60,9 +60,13 @@ namespace Thermite
 	private:
 		Ogre::SceneNode* m_pOgreSceneNode;
 
-		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod0;
-		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod1;
-		std::list<SurfacePatchRenderable*> m_listSurfacePatchRenderablesLod2;
+		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod0;
+		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod1;
+		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod2;
+
+		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod0;
+		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod1;
+		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod2;
 
 #ifdef ENABLE_BULLET_PHYSICS
 		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
