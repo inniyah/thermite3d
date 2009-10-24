@@ -521,13 +521,13 @@ namespace Thermite
 					m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 				}
 
+				//Clear any previous geometry
+				pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+
 				//Get the IndexedSurfacePatch and check it's valid
 				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
 				if((ispWhole) && (ispWhole->isEmpty() == false))
-				{
-					//Clear any previous geometry
-					pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
-
+				{			
 					//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...
 					for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
 					{
