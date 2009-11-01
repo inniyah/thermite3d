@@ -92,6 +92,7 @@ namespace Thermite
 			mSphereBrushNode = m_pActiveOgreSceneManager->getRootSceneNode()->createChildSceneNode("Sphere Brush Node");
 			mSphereBrushNode->attachObject(mSphereBrush);
 			mSphereBrushNode->setScale(10.0,10.0,10.0);
+			mSphereBrush->setMaterial(Ogre::MaterialManager::getSingleton().getByName("YellowMaterial"));
 		}
 
 		//FIXME: This shold really be called at the end, so that it calls 

@@ -581,14 +581,12 @@ namespace Thermite
 			return result;
 		}
 
-		bool inside = false;
 		Ogre::Real dist = 0.0f;
-		PolyVox::Region enclosingRegion = pVolume->getEnclosingRegion();
-		do
+		for(int steps = 0; steps < 1000; steps++)
 		{
 			Ogre::Vector3 point = ray.getPoint(dist);
 			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
-			inside = enclosingRegion.containsPoint(static_cast<Vector3DInt16>(v3dPoint), 2);
+			bool inside = pVolume->getEnclosingRegion().containsPoint(static_cast<Vector3DInt16>(v3dPoint), 2);
 				
 			if((inside) && (pVolume->getVoxelAt(v3dPoint) != 0))
 			{
@@ -598,7 +596,7 @@ namespace Thermite
 			}
 
 			dist += 1.0f;			
-		}while(inside);
+		}
 
 		return result;
 	}
