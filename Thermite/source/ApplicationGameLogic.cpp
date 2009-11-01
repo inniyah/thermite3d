@@ -46,6 +46,8 @@ namespace Thermite
 {
 	ApplicationGameLogic::ApplicationGameLogic(void)
 		:ThermiteGameLogic()
+		,mSphereBrushScale(5.0f)
+		,mSphereBrushMaterial(1)
 	{
 	}
 
@@ -123,6 +125,22 @@ namespace Thermite
 			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
 		}
 
+		/*if(mMouseButtonStates.testFlag(Qt::LeftButton))
+		{
+			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
+			createSphereAt(pos, 10, 1, false);
+		}*/
+
+		if(mCurrentWheelPos > mLastFrameWheelPos)
+		{
+			mSphereBrushScale += 1.0f;
+		}
+
+		if(mCurrentWheelPos < mLastFrameWheelPos)
+		{
+			mSphereBrushScale -= 1.0f;
+		}
+		
 		if(mMouseButtonStates.testFlag(Qt::RightButton))
 		{
 			if(mCurrentFrameNumber != 0)
@@ -194,7 +212,7 @@ namespace Thermite
 			{
 				if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
 				{
-					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0);
+					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0, false);
 					shellsToDelete.push_back(*iter);
 				}
 			}
@@ -208,11 +226,18 @@ namespace Thermite
 
 		//Update the brush position
 		mSphereBrushNode->setPosition(mCurrentMousePosInWorldSpace);
+		mSphereBrushNode->setScale(mSphereBrushScale, mSphereBrushScale, mSphereBrushScale);
 	}
 
 	void ApplicationGameLogic::onKeyPress(QKeyEvent* event)
 	{
 		mKeyStates[event->key()] = KS_PRESSED;
+
+		if((event->key() >= Qt::Key_0) && (event->key() <= Qt::Key_9))
+		{
+			//Converts key code to correct number
+			mSphereBrushMaterial = event->key() - Qt::Key_0;
+		}
 
 		if(event->key() == Qt::Key_F5)
 		{
@@ -236,11 +261,16 @@ namespace Thermite
 		mLastFrameMousePos = mCurrentMousePos;
 
 		mMouseButtonStates = event->buttons();
+
+		if(event->button() == Qt::LeftButton)
+		{
+			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
+			createSphereAt(pos, mSphereBrushScale, mSphereBrushMaterial, false);
+		}
 	}
 
 	void ApplicationGameLogic::onMouseRelease(QMouseEvent* event)
 	{
-		//mCurrentMousePos = event->pos();
 		mLastFrameMousePos = mCurrentMousePos;
 
 		mMouseButtonStates = event->buttons();
@@ -275,7 +305,7 @@ namespace Thermite
 		m_listShells.push_back(shell);
 	}
 
-	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value)
+	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.getX() - radius));
 		int firstY = static_cast<int>(std::floor(centre.getY() - radius));
@@ -305,7 +335,21 @@ namespace Thermite
 				{
 					if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
+						PolyVox::uint8_t currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
+						if(currentValue != value)
+						{
+							if(bPaintMode)
+							{
+								if(currentValue != 0)
+								{
+									volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
+								}
+							}
+							else
+							{
+								volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
+							}
+						}
 					}
 				}
 			}
