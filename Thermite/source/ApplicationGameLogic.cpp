@@ -92,7 +92,12 @@ namespace Thermite
 			mSphereBrushNode = m_pActiveOgreSceneManager->getRootSceneNode()->createChildSceneNode("Sphere Brush Node");
 			mSphereBrushNode->attachObject(mSphereBrush);
 			mSphereBrushNode->setScale(10.0,10.0,10.0);
-			mSphereBrush->setMaterial(Ogre::MaterialManager::getSingleton().getByName("YellowMaterial"));
+
+			Ogre::MaterialPtr sphereBrushMaterial = Ogre::MaterialManager::getSingleton().create("Sphere Brush Material", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			sphereBrushMaterial->setAmbient(Ogre::ColourValue(1.0,1.0,0.0,0.5));
+			sphereBrushMaterial->setDiffuse(Ogre::ColourValue(1.0,1.0,0.0,0.5));
+			sphereBrushMaterial->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+			mSphereBrush->setMaterial(sphereBrushMaterial);
 		}
 
 		//FIXME: This shold really be called at the end, so that it calls 
