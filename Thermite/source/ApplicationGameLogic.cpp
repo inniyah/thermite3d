@@ -72,11 +72,26 @@ namespace Thermite
 		//QTimer::singleShot(2000, mMainMenu, SLOT(show()));
 
 		mCameraSpeed = 50.0;
-		mCameraRotationalSpeed = 0.01;		
+		mCameraRotationalSpeed = 0.01;	
+
+		//The sphere brush.
+		mSphereBrush = 0;
+		mSphereBrushNode = 0;
+
+		qApp->mainWidget()->setMouseTracking(true);
 	}
 
 	void ApplicationGameLogic::update(void)
 	{
+		//The sphere brush.
+		if((mSphereBrush == 0) && (m_pActiveOgreSceneManager != 0))
+		{
+			mSphereBrush = m_pActiveOgreSceneManager->createEntity("Sphere Brush", "Sphere.mesh");
+			mSphereBrushNode = m_pActiveOgreSceneManager->getRootSceneNode()->createChildSceneNode("Sphere Brush Node");
+			mSphereBrushNode->attachObject(mSphereBrush);
+			mSphereBrushNode->setScale(10.0,10.0,10.0);
+		}
+
 		//FIXME: This shold really be called at the end, so that it calls 
 		//updatePolyVoxGeometry() after we've actually changed something!
 		ThermiteGameLogic::update();
@@ -108,19 +123,41 @@ namespace Thermite
 			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
 		}
 
-		if(mCurrentFrameNumber != 0)
+		if(mMouseButtonStates.testFlag(Qt::RightButton))
 		{
-			QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
-			mActiveCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
-			mActiveCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
+			if(mCurrentFrameNumber != 0)
+			{
+				QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
+				mActiveCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
+				mActiveCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
 
-			int wheelDelta = mCurrentWheelPos - mLastFrameWheelPos;
-			Ogre::Radian fov = mActiveCamera->getFOVy();
-			fov += Ogre::Radian(-wheelDelta * 0.001);
-			fov = (std::min)(fov, Ogre::Radian(2.0f));
-			fov = (std::max)(fov, Ogre::Radian(0.5f));
-			mActiveCamera->setFOVy(fov);
+				int wheelDelta = mCurrentWheelPos - mLastFrameWheelPos;
+				Ogre::Radian fov = mActiveCamera->getFOVy();
+				fov += Ogre::Radian(-wheelDelta * 0.001);
+				fov = (std::min)(fov, Ogre::Radian(2.0f));
+				fov = (std::max)(fov, Ogre::Radian(0.5f));
+				mActiveCamera->setFOVy(fov);
+			}
 		}
+		else
+		{
+			if((mSphereBrush != 0) && (m_pActiveOgreSceneManager != 0))
+			{
+				float actualWidth = mActiveCamera->getViewport()->getActualWidth();
+				float actualHeight = mActiveCamera->getViewport()->getActualHeight();
+
+				float fNormalisedX = mCurrentMousePos.x() / actualWidth;
+				float fNormalisedY = mCurrentMousePos.y() / actualHeight;
+
+				Ogre::Ray pickingRay = mActiveCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
+				std::pair<bool, Ogre::Vector3> pickingResult = getRayVolumeIntersection(pickingRay);
+				if(pickingResult.first)
+				{
+					mCurrentMousePosInWorldSpace = pickingResult.second;
+				}
+			}
+		}
+
 		mLastFrameMousePos = mCurrentMousePos;
 		mLastFrameWheelPos = mCurrentWheelPos;
 
@@ -169,7 +206,8 @@ namespace Thermite
 			delete (*iter);
 		}
 
-		//++mCurrentFrameNumber;
+		//Update the brush position
+		mSphereBrushNode->setPosition(mCurrentMousePosInWorldSpace);
 	}
 
 	void ApplicationGameLogic::onKeyPress(QKeyEvent* event)
@@ -194,8 +232,18 @@ namespace Thermite
 
 	void ApplicationGameLogic::onMousePress(QMouseEvent* event)
 	{
-		mCurrentMousePos = event->pos();
+		//mCurrentMousePos = event->pos();
 		mLastFrameMousePos = mCurrentMousePos;
+
+		mMouseButtonStates = event->buttons();
+	}
+
+	void ApplicationGameLogic::onMouseRelease(QMouseEvent* event)
+	{
+		//mCurrentMousePos = event->pos();
+		mLastFrameMousePos = mCurrentMousePos;
+
+		mMouseButtonStates = event->buttons();
 	}
 
 	void ApplicationGameLogic::onMouseMove(QMouseEvent* event)

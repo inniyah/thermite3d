@@ -45,6 +45,8 @@ namespace Thermite
 		:GameLogic()
 		,mCurrentFrameNumber(0)
 		,mMap(0)
+		,m_pActiveOgreSceneManager(0)
+		,m_pDummyOgreSceneManager(0)
 	{
 	}
 
@@ -556,12 +558,48 @@ namespace Thermite
 				m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
 
 				//If we've finished, the progress bar can be hidden.
-				if(fProgress > 0.999)
+				if((bLoadComplete == false) && (fProgress > 0.999))
 				{
 					m_loadingProgress->hide();
 					bLoadComplete = true;
 				}
 			}
 		}		
+	}
+
+	std::pair<bool, Ogre::Vector3> ThermiteGameLogic::getRayVolumeIntersection(const Ogre::Ray& ray)
+	{
+		//Initialise to failure
+		std::pair<bool, Ogre::Vector3> result;
+		result.first = false;
+		result.second = Ogre::Vector3::ZERO;
+
+		//Ensure the voume is valid
+		PolyVox::Volume<PolyVox::uint8_t>* pVolume = mMap->volumeResource->getVolume();
+		if(pVolume == 0)
+		{
+			return result;
+		}
+
+		bool inside = false;
+		Ogre::Real dist = 0.0f;
+		PolyVox::Region enclosingRegion = pVolume->getEnclosingRegion();
+		do
+		{
+			Ogre::Vector3 point = ray.getPoint(dist);
+			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
+			inside = enclosingRegion.containsPoint(static_cast<Vector3DInt16>(v3dPoint), 2);
+				
+			if((inside) && (pVolume->getVoxelAt(v3dPoint) != 0))
+			{
+				result.first = true;
+				result.second = point;
+				return result;
+			}
+
+			dist += 1.0f;			
+		}while(inside);
+
+		return result;
 	}
 }

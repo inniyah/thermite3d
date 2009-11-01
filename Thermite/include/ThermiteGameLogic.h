@@ -101,6 +101,8 @@ namespace Thermite
 
 		void updatePolyVoxGeometry();
 
+		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
+
 		PolyVox::VolumeChangeTracker* volumeChangeTracker;
 
 #ifdef ENABLE_BULLET_PHYSICS

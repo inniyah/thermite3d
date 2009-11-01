@@ -43,6 +43,7 @@ namespace Thermite
 
 		void onMouseMove(QMouseEvent* event);
 		void onMousePress(QMouseEvent* event);
+		void onMouseRelease(QMouseEvent* event);
 
 		void onWheel(QWheelEvent* event);
 
@@ -55,12 +56,17 @@ namespace Thermite
 	protected:
 		//For keyboard handling
 		QHash<int, KeyStates> mKeyStates;
+
+		//For mouse buttons.
+		Qt::MouseButtons mMouseButtonStates;
 		
 		//For mouse handling
 		QPoint mLastFrameMousePos;
 		QPoint mCurrentMousePos;
 		int mLastFrameWheelPos;
 		int mCurrentWheelPos;
+
+		Ogre::Vector3 mCurrentMousePosInWorldSpace;
 
 		float mCameraSpeed;
 		float mCameraRotationalSpeed;
@@ -70,6 +76,9 @@ namespace Thermite
 
 		Ogre::SceneNode* mTurretNode;
 		Ogre::SceneNode* mGunNode;
+
+		Ogre::Entity* mSphereBrush;
+		Ogre::SceneNode* mSphereBrushNode;
 
 		Ogre::Quaternion mTurretOriginalOrientation;
 		Ogre::Quaternion mGunOriginalOrientation;
