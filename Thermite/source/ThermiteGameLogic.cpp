@@ -117,10 +117,16 @@ namespace Thermite
 		mCurrentFrameNumber = 0;
 
 		//Slightly hacky way of sleeping while the logo animation plays.
-		QWaitCondition sleep;
-		QMutex mutex;
+		//FIXME - Think about using QMovie::finished() signal instead.
+		/*QWaitCondition sleep;
+		SignalableMutex mutex;
 		mutex.lock();
-		sleep.wait(&mutex, 2000);
+		sleep.wait(&mutex, 2000);*/
+
+		/*m_pThermiteLogoMovie->stop(); //Just incase we didn't stop already.
+		QPixmap lastFrameOfMovie = m_pThermiteLogoMovie->currentPixmap();
+		m_pThermiteLogoLabel->setPixmap(lastFrameOfMovie);
+		delete m_pThermiteLogoMovie;*/
 	}
 
 	void ThermiteGameLogic::update(void)
