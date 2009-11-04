@@ -37,6 +37,7 @@ namespace Thermite
 {
 #pragma region Constructors/Destructors
 	SurfacePatchRenderable::SurfacePatchRenderable(const String& strName)
+		:m_RenderOp(0)
 	{
 		mName = strName;
 		m_matWorldTransform = Ogre::Matrix4::IDENTITY;
@@ -51,6 +52,12 @@ namespace Thermite
 
 	SurfacePatchRenderable::~SurfacePatchRenderable(void)
 	{
+		if(m_RenderOp)
+		{
+			delete m_RenderOp->vertexData;
+			delete m_RenderOp->indexData;
+			delete m_RenderOp;
+		}
 	}
 #pragma endregion
 
