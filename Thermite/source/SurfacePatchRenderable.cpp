@@ -157,6 +157,11 @@ namespace Thermite
 			//patches can be added afterwards using additive blending.
 			if(isSingleMaterial())
 			{
+				//PolyVox::LodRecord lodRecord = m_vecLodRecords[m_vecLodRecords.size() - 1];
+				PolyVox::LodRecord lodRecord = m_vecLodRecords[0];
+				m_RenderOp->indexData->indexStart = lodRecord.beginIndex;
+				m_RenderOp->indexData->indexCount = lodRecord.endIndex - lodRecord.beginIndex;
+
 				queue->addRenderable( this, mRenderQueueID, RENDER_QUEUE_MAIN); 
 			}
 			else
@@ -201,6 +206,8 @@ namespace Thermite
 			m_RenderOp = 0;
 			return;
 		}
+
+		m_vecLodRecords = isp.m_vecLodRecords;
 
 		m_bIsSingleMaterial = bSingleMaterial;
 

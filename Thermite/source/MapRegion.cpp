@@ -126,7 +126,7 @@ namespace Thermite
 			additiveMaterial->setSceneBlending(Ogre::SBT_ADD);
 		}
 
-		/*Ogre::String*/ strSprName = makeUniqueName("SPR");
+		strSprName = makeUniqueName("SPR");
 		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pParentMap->m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
 		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());

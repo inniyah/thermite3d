@@ -546,6 +546,8 @@ namespace Thermite
 						//Extract the part of the InexedSurfacePatch which corresponds to that material
 						POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
 
+						//ispSubset->makeProgressiveMesh();
+
 						//And add it to the MapRegion
 						pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
 					}
