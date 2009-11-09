@@ -309,6 +309,20 @@ namespace Thermite
 		mActiveCamera = camIter.peekNextValue();
 
 		mMainViewport->setCamera(mActiveCamera);
+
+		//We've loaded a scene so let's free some memory by deleting the movie.
+		//Later on we should handle this properly by replacing it with it's last
+		//frame once it has finished playing.
+		if(m_pThermiteLogoLabel != 0)
+		{
+			delete m_pThermiteLogoLabel;
+			m_pThermiteLogoLabel = 0;
+		}
+		if(m_pThermiteLogoMovie != 0)
+		{
+			delete m_pThermiteLogoMovie;
+			m_pThermiteLogoMovie = 0;
+		}
 	}
 
 	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)

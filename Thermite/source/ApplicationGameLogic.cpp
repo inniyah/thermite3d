@@ -177,7 +177,12 @@ namespace Thermite
 				std::pair<bool, Ogre::Vector3> pickingResult = getRayVolumeIntersection(pickingRay);
 				if(pickingResult.first)
 				{
+					mSphereBrushNode->setVisible(true);
 					mCurrentMousePosInWorldSpace = pickingResult.second;
+				}
+				else
+				{
+					mSphereBrushNode->setVisible(false);
 				}
 			}
 		}
