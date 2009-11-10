@@ -70,7 +70,7 @@ namespace Thermite
 	ApplicationGameLogic::ApplicationGameLogic(void)
 		:ThermiteGameLogic()
 		,mSphereBrushScale(5.0f)
-		,mSphereBrushMaterial(1)
+		,mSphereBrushMaterial(0)
 	{
 	}
 
