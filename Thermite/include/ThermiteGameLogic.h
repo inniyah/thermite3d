@@ -27,8 +27,9 @@ freely, subject to the following restrictions:
 #include "AnyOption.h"
 #include "GameLogic.h"
 #include "LoadingProgress.h"
-#include "MultiThreadedSurfaceExtractor.h"
 #include "Serialization.h"
+#include "SurfaceExtractorTaskData.h"
+#include "ThreadSafeQueue.h"
 #include "VolumeChangeTracker.h"
 
 #include "Map.h"
@@ -124,6 +125,8 @@ namespace Thermite
 
 		void updatePolyVoxGeometry();
 
+		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
+
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 
 		PolyVox::VolumeChangeTracker* volumeChangeTracker;
@@ -132,14 +135,14 @@ namespace Thermite
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS
 
-		PolyVox::Volume<MapRegion*>* m_volMapRegions;
-
-		MultiThreadedSurfaceExtractor* m_pMTSE;		
+		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
 
 		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
+
+		ThreadSafeQueue<SurfaceExtractorTaskData> m_completedSurfaceExtractorTaskQueue;
 	};
 }
 

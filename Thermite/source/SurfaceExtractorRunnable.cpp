@@ -1,3 +1,4 @@
+#pragma region License
 /*******************************************************************************
 Copyright (c) 2005-2009 David Williams
 
@@ -20,46 +21,35 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution. 	
 *******************************************************************************/
+#pragma endregion
 
-#include "SurfaceExtractorThread.h"
+#include "SurfaceExtractorRunnable.h"
 
-#include "MultiThreadedSurfaceExtractor.h"
-#include "SurfaceExtractorTaskData.h"
+#include "ThermiteGameLogic.h"
 
-#include "GradientEstimators.h"
 #include "IndexedSurfacePatch.h"
+#include "SurfaceExtractor.h"
 
-using namespace PolyVox;
+#include <QMutex>
 
 namespace Thermite
 {
-	SurfaceExtractorThread::SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE, PolyVox::Volume<PolyVox::uint8_t>* pVolData)
-	:m_pParentMTSE(pParentMTSE)
-	,m_pVolData(pVolData)
+	SurfaceExtractorRunnable::SurfaceExtractorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
+		:m_taskData(taskData)
+		,m_pGameLogic(pGameLogic)
 	{
-		m_pSurfaceExtractor = new SurfaceExtractor(*(pVolData));
 	}
 
-	SurfaceExtractorThread::~SurfaceExtractorThread()
+	void SurfaceExtractorRunnable::run(void)
 	{
-		delete m_pSurfaceExtractor;
-	}
+		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
+		//Or at least not use 'new'
+		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
 
-	void SurfaceExtractorThread::run(void)
-	{
-		while(true)
-		{
-			SurfaceExtractorTaskData taskData = m_pParentMTSE->popTask();
-			m_pSurfaceExtractor->setLodLevel(taskData.m_uLodLevel);
-			taskData.m_ispResult = m_pSurfaceExtractor->extractSurfaceForRegion(taskData.m_regToProcess);
+		pSurfaceExtractor->setLodLevel(m_taskData.m_uLodLevel);
+		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
-			//taskData.m_ispResult->generateAveragedFaceNormals(true);
-			computeNormalsForVertices(m_pVolData, *(taskData.m_ispResult.get()), SOBEL);
-			taskData.m_ispResult->smoothPositions(0.1f);
-			taskData.m_ispResult->smoothPositions(0.1f);
-			taskData.m_ispResult->smoothPositions(0.1f);
-
-			m_pParentMTSE->pushResult(taskData);
-		}
+		//m_taskData.m_ispResult->decimate();
+		m_pGameLogic->m_completedSurfaceExtractorTaskQueue.push(m_taskData);
 	}
 }

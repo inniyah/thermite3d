@@ -30,7 +30,6 @@ freely, subject to the following restrictions:
 
 #include "LogManager.h"
 #include "OgreWidget.h"
-#include "MultiThreadedSurfaceExtractor.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
 #include "VolumeManager.h"

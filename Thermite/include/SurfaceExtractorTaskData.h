@@ -33,25 +33,19 @@ namespace Thermite
 {
 	class SurfaceExtractorTaskData
 	{
-		//For writing the result and reading the priority without exposing function
-		friend class SurfaceExtractorThread;
-
 	public:
 		SurfaceExtractorTaskData(void);
-		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel, PolyVox::uint32_t uPriority = 0);
+		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
 
 		PolyVox::uint8_t getLodLevel(void) const;
 		PolyVox::Region getRegion(void) const;
-		PolyVox::uint32_t getPriority(void) const;
 		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> getIndexedSurfacePatch(void) const;
 
 		void setLodLevel(PolyVox::uint8_t uLodLevel);
-		void setPriority(PolyVox::uint32_t uPriority);
 		void setRegion(const PolyVox::Region& regToProcess);
 
-	private:
+	public:
 		PolyVox::uint8_t m_uLodLevel;
-		PolyVox::uint32_t m_uPriority;
 		PolyVox::Region m_regToProcess;
 		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
 	};

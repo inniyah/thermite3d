@@ -23,33 +23,28 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_SURFACEEXTRACTORTHREAD_H__
-#define __THERMITE_SURFACEEXTRACTORTHREAD_H__
+#ifndef __THERMITE_SURFACEEXTRACTORRUNNABLE_H__
+#define __THERMITE_SURFACEEXTRACTORRUNNABLE_H__
 
-#include "SurfaceExtractor.h"
+#include "SurfaceExtractorTaskData.h"
 
-#include <QThread>
+#include <QRunnable>
 
 namespace Thermite
 {
-	class MultiThreadedSurfaceExtractor;
+	class ThermiteGameLogic;
 
-	class SurfaceExtractorThread : public QThread
+	class SurfaceExtractorRunnable : public QRunnable
 	{
-		Q_OBJECT
-
 	public:
-		SurfaceExtractorThread(MultiThreadedSurfaceExtractor* pParentMTSE, PolyVox::Volume<PolyVox::uint8_t>* pVolData);
-		~SurfaceExtractorThread();
+		SurfaceExtractorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
 
-	protected:
 		void run(void);
 
-	private:
-		PolyVox::Volume<PolyVox::uint8_t>* m_pVolData;
-		PolyVox::SurfaceExtractor* m_pSurfaceExtractor;
-		MultiThreadedSurfaceExtractor* m_pParentMTSE;
+	protected:
+		SurfaceExtractorTaskData m_taskData;
+		ThermiteGameLogic* m_pGameLogic;
 	};
 }
 
-#endif
+#endif //__THERMITE_SURFACEEXTRACTORRUNNABLE_H__
