@@ -139,6 +139,8 @@ namespace Thermite
 
 		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
 
+		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
+
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
 

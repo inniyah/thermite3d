@@ -304,6 +304,7 @@ namespace Thermite
 
 		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
 		mMap = mapResource->m_pMap;
 
@@ -506,6 +507,15 @@ namespace Thermite
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
+							if(m_volRegionBeingProcessed->getVoxelAt(regionX,regionY,regionZ))
+							{
+								//We get here if the region is modified again before the result of the previous
+								//modification is returned. We need to find a better way to handle this really...
+								mThermiteLog->logMessage("Region already being processed", LL_INFO);
+								continue;
+							}
+							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
+
 							//Convert to a real PolyVox::Region
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
@@ -627,6 +637,8 @@ namespace Thermite
 			m_loadingProgress->hide();
 			bLoadComplete = true;
 		}
+
+		m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 	}
 
 	std::pair<bool, Ogre::Vector3> ThermiteGameLogic::getRayVolumeIntersection(const Ogre::Ray& ray)

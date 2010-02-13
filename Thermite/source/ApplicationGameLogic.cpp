@@ -153,12 +153,6 @@ namespace Thermite
 			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
 		}
 
-		/*if(mMouseButtonStates.testFlag(Qt::LeftButton))
-		{
-			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
-			createSphereAt(pos, 10, 1, false);
-		}*/
-
 		if(mCurrentWheelPos > mLastFrameWheelPos)
 		{
 			mSphereBrushScale += 1.0f;
@@ -167,6 +161,12 @@ namespace Thermite
 		if(mCurrentWheelPos < mLastFrameWheelPos)
 		{
 			mSphereBrushScale -= 1.0f;
+		}
+
+		if(mMouseButtonStates.testFlag(Qt::LeftButton))
+		{
+			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
+			createSphereAt(pos, mSphereBrushScale, mSphereBrushMaterial, false);
 		}
 		
 		if(mMouseButtonStates.testFlag(Qt::RightButton))
@@ -185,27 +185,25 @@ namespace Thermite
 				mActiveCamera->setFOVy(fov);
 			}
 		}
-		else
+			
+		if((mSphereBrush != 0) && (m_pActiveOgreSceneManager != 0))
 		{
-			if((mSphereBrush != 0) && (m_pActiveOgreSceneManager != 0))
+			float actualWidth = mActiveCamera->getViewport()->getActualWidth();
+			float actualHeight = mActiveCamera->getViewport()->getActualHeight();
+
+			float fNormalisedX = mCurrentMousePos.x() / actualWidth;
+			float fNormalisedY = mCurrentMousePos.y() / actualHeight;
+
+			Ogre::Ray pickingRay = mActiveCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
+			std::pair<bool, Ogre::Vector3> pickingResult = getRayVolumeIntersection(pickingRay);
+			if(pickingResult.first)
 			{
-				float actualWidth = mActiveCamera->getViewport()->getActualWidth();
-				float actualHeight = mActiveCamera->getViewport()->getActualHeight();
-
-				float fNormalisedX = mCurrentMousePos.x() / actualWidth;
-				float fNormalisedY = mCurrentMousePos.y() / actualHeight;
-
-				Ogre::Ray pickingRay = mActiveCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
-				std::pair<bool, Ogre::Vector3> pickingResult = getRayVolumeIntersection(pickingRay);
-				if(pickingResult.first)
-				{
-					mSphereBrushNode->setVisible(true);
-					mCurrentMousePosInWorldSpace = pickingResult.second;
-				}
-				else
-				{
-					mSphereBrushNode->setVisible(false);
-				}
+				mSphereBrushNode->setVisible(true);
+				mCurrentMousePosInWorldSpace = pickingResult.second;
+			}
+			else
+			{
+				mSphereBrushNode->setVisible(false);
 			}
 		}
 
@@ -294,12 +292,6 @@ namespace Thermite
 		mLastFrameMousePos = mCurrentMousePos;
 
 		mMouseButtonStates = event->buttons();
-
-		if(event->button() == Qt::LeftButton)
-		{
-			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
-			createSphereAt(pos, mSphereBrushScale, mSphereBrushMaterial, false);
-		}
 	}
 
 	void ApplicationGameLogic::onMouseRelease(QMouseEvent* event)
