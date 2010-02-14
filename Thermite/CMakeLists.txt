@@ -39,7 +39,9 @@ SET(SRC_FILES
 	source/MapRegion.cpp
 	source/MapResource.cpp
 	source/PhysicalEntity.cpp
+	source/RunnerThread.cpp
 	source/Shell.cpp
+	source/SurfaceDecimatorRunnable.cpp
 	source/SurfaceExtractorRunnable.cpp
 	source/SurfaceExtractorTaskData.cpp
 	source/SurfacePatchRenderable.cpp
@@ -64,11 +66,13 @@ SET(INC_FILES
 	include/MapRegion.h
 	include/MapResource.h
 	include/PhysicalEntity.h
-	include/ThreadSafeQueue.h
+	include/RunnerThread.h
 	include/Shell.h
+	include/SurfaceDecimatorRunnable.h
 	include/SurfaceExtractorRunnable.h
 	include/SurfaceExtractorTaskData.h
 	include/SurfacePatchRenderable.h
+	include/ThreadSafeQueue.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
 	include/Utility.h

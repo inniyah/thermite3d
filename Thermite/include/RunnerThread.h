@@ -23,28 +23,35 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
-#define __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#ifndef __THERMITE_RUNNER_THREAD_H__
+#define __THERMITE_RUNNER_THREAD_H__
 
-#include "SurfaceExtractorTaskData.h"
+#include <QThread>
 
-#include <QRunnable>
+#include <queue>
+
+class QMutex;
+class QRunnable;
+class QSemaphore;
 
 namespace Thermite
 {
-	class ThermiteGameLogic;
-
-	class SurfaceExtractorRunnable : public QRunnable
+	class RunnerThread : public QThread
 	{
 	public:
-		SurfaceExtractorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
+		RunnerThread(QObject* parent=0);
+		~RunnerThread(void);
 
 		void run(void);
 
+		void startRunnable(QRunnable* runnable, int priority);
+
 	protected:
-		SurfaceExtractorTaskData m_taskData;
-		ThermiteGameLogic* m_pGameLogic;
+		std::queue<QRunnable*> m_runnableQueue;
+
+		QSemaphore* m_noOfRunnables;
+		QMutex* m_runnableQueueMutex;
 	};
 }
 
-#endif //__THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#endif //__THERMITE_RUNNER_THREAD_H__

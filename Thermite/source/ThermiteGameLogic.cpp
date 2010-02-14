@@ -23,6 +23,8 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "RunnerThread.h"
+#include "SurfaceDecimatorRunnable.h"
 #include "SurfaceExtractorRunnable.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
@@ -139,6 +141,10 @@ namespace Thermite
 		mTime->start();
 
 		mCurrentFrameNumber = 0;
+
+		m_backgroundThread = new RunnerThread;
+		//m_backgroundThread->setPriority(QThread::LowPriority);
+		m_backgroundThread->start();
 
 		//Slightly hacky way of sleeping while the logo animation plays.
 		//FIXME - Think about using QMovie::finished() signal instead.
@@ -571,7 +577,25 @@ namespace Thermite
 				m_completedSurfaceExtractorTaskQueue.pop();
 				noOfCompletedTasks--;
 
-				uploadSurfaceExtractorResult(result);				
+				uploadSurfaceExtractorResult(result);	
+
+				//Now decimate the mesh in the background
+				//SurfaceExtractorTaskData taskData(region, 1);
+				SurfaceDecimatorRunnable* surfaceDecimatorRunnable = new SurfaceDecimatorRunnable(result, this);
+				//QThreadPool::globalInstance()->start(surfaceDecimatorRunnable, 0);
+				m_backgroundThread->startRunnable(surfaceDecimatorRunnable, 0);
+			}
+
+			noOfCompletedTasks = m_completedSurfaceDecimatorTaskQueue.size();
+			while(noOfCompletedTasks > 0)
+			{
+				//Get the next available result
+				SurfaceExtractorTaskData result;
+				result = m_completedSurfaceDecimatorTaskQueue.front();
+				m_completedSurfaceDecimatorTaskQueue.pop();
+				noOfCompletedTasks--;
+
+				uploadSurfaceExtractorResult(result);
 			}
 		}		
 	}

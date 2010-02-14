@@ -49,6 +49,7 @@ namespace Thermite
 	class MenuState;
 	class PhysicalObject;
 	class PlayState;
+	class RunnerThread;
 	class State;
 	class StateManager;
 	class SurfacePatchRenderable;

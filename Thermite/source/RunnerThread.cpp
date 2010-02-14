@@ -23,28 +23,53 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
-#define __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#include "RunnerThread.h"
 
-#include "SurfaceExtractorTaskData.h"
-
+#include <QMutex>
 #include <QRunnable>
+#include <QSemaphore>
 
 namespace Thermite
 {
-	class ThermiteGameLogic;
-
-	class SurfaceExtractorRunnable : public QRunnable
+	RunnerThread::RunnerThread(QObject* parent)
+		:QThread(parent)
 	{
-	public:
-		SurfaceExtractorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
+		m_runnableQueueMutex = new QMutex;
+		m_noOfRunnables = new QSemaphore;
+	}
 
-		void run(void);
+	RunnerThread::~RunnerThread(void)
+	{
+		delete m_runnableQueueMutex;
+		delete m_noOfRunnables;
+	}
 
-	protected:
-		SurfaceExtractorTaskData m_taskData;
-		ThermiteGameLogic* m_pGameLogic;
-	};
+	void RunnerThread::run(void)
+	{
+		while(true)
+		{
+			m_noOfRunnables->acquire();
+
+			m_runnableQueueMutex->lock();
+			QRunnable* runnable = m_runnableQueue.front();
+			m_runnableQueue.pop();
+			m_runnableQueueMutex->unlock();
+
+			runnable->run();
+
+			if(runnable->autoDelete())
+			{
+				delete runnable;
+			}
+		}
+	}
+
+	void RunnerThread::startRunnable(QRunnable* runnable, int /*priority*/)
+	{
+		m_runnableQueueMutex->lock();
+		m_runnableQueue.push(runnable);
+		m_runnableQueueMutex->unlock();
+
+		m_noOfRunnables->release();
+	}
 }
-
-#endif //__THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__

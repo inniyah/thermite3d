@@ -145,6 +145,9 @@ namespace Thermite
 		int m_iNoSubmitted;
 
 		ThreadSafeQueue<SurfaceExtractorTaskData> m_completedSurfaceExtractorTaskQueue;
+		ThreadSafeQueue<SurfaceExtractorTaskData> m_completedSurfaceDecimatorTaskQueue;
+
+		RunnerThread* m_backgroundThread;
 	};
 }
 
