@@ -34,9 +34,10 @@ namespace Thermite
 	{
 	}
 
-	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint8_t uLodLevel)
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint8_t uLodLevel, PolyVox::uint32_t uTimeStamp)
 	:m_uLodLevel(uLodLevel)
 	,m_regToProcess(regToProcess)
+	,m_uTimeStamp(uTimeStamp)
 	{
 	}
 

@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 
 #include <QThread>
 
-#include <queue>
+#include <list>
 
 class QMutex;
 class QRunnable;
@@ -44,13 +44,14 @@ namespace Thermite
 
 		void run(void);
 
-		void startRunnable(QRunnable* runnable, int priority);
+		void addRunnable(QRunnable* runnable);
+		bool removeRunnable(QRunnable* runnable);
 
 	protected:
-		std::queue<QRunnable*> m_runnableQueue;
+		std::list<QRunnable*> m_runnableContainer;
 
 		QSemaphore* m_noOfRunnables;
-		QMutex* m_runnableQueueMutex;
+		QMutex* m_runnableContainerMutex;
 	};
 }
 

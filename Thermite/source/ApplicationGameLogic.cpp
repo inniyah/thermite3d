@@ -351,7 +351,45 @@ namespace Thermite
 		lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
 		lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
 
-		volumeChangeTracker->lockRegion(PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ)));
+		Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
+		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
+		//the same region, only to have them rejected because the time stamp has changed again since they were issued.
+
+		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
+		//handle these checks as well.
+
+		//Longer term, it might be interesting to introduce a 'ModyfyVolumeCommand' which can be issued to runn on seperate threads.
+		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
+		//for that region.
+		const uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+
+		const uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+
+		for(uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		{
+			for(uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			{
+				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				{
+					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
+					if(m_volRegionBeingProcessed->getVoxelAt(xCt,yCt,zCt))
+					{
+						return;
+					}
+				}
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////
+
+		volumeChangeTracker->lockRegion(regionToLock);
 		for(int z = firstZ; z <= lastZ; ++z)
 		{
 			for(int y = firstY; y <= lastY; ++y)

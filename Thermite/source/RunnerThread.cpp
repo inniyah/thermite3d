@@ -29,18 +29,20 @@ freely, subject to the following restrictions:
 #include <QRunnable>
 #include <QSemaphore>
 
+#include <algorithm>
+
 namespace Thermite
 {
 	RunnerThread::RunnerThread(QObject* parent)
 		:QThread(parent)
 	{
-		m_runnableQueueMutex = new QMutex;
+		m_runnableContainerMutex = new QMutex;
 		m_noOfRunnables = new QSemaphore;
 	}
 
 	RunnerThread::~RunnerThread(void)
 	{
-		delete m_runnableQueueMutex;
+		delete m_runnableContainerMutex;
 		delete m_noOfRunnables;
 	}
 
@@ -48,12 +50,14 @@ namespace Thermite
 	{
 		while(true)
 		{
+			msleep(100);
+
 			m_noOfRunnables->acquire();
 
-			m_runnableQueueMutex->lock();
-			QRunnable* runnable = m_runnableQueue.front();
-			m_runnableQueue.pop();
-			m_runnableQueueMutex->unlock();
+			m_runnableContainerMutex->lock();
+			QRunnable* runnable = m_runnableContainer.front();
+			m_runnableContainer.pop_front();
+			m_runnableContainerMutex->unlock();
 
 			runnable->run();
 
@@ -64,12 +68,30 @@ namespace Thermite
 		}
 	}
 
-	void RunnerThread::startRunnable(QRunnable* runnable, int /*priority*/)
+	void RunnerThread::addRunnable(QRunnable* runnable)
 	{
-		m_runnableQueueMutex->lock();
-		m_runnableQueue.push(runnable);
-		m_runnableQueueMutex->unlock();
-
+		m_runnableContainerMutex->lock();
+		m_runnableContainer.push_back(runnable);
 		m_noOfRunnables->release();
+		m_runnableContainerMutex->unlock();
+	}
+
+	bool RunnerThread::removeRunnable(QRunnable* runnable)
+	{
+		bool bRemoved = false;
+
+		m_runnableContainerMutex->lock();
+
+		std::list<QRunnable*>::iterator iterRunnable = std::find(m_runnableContainer.begin(), m_runnableContainer.end(), runnable);
+		if(iterRunnable != m_runnableContainer.end())
+		{
+			m_runnableContainer.erase(iterRunnable);
+			m_noOfRunnables->acquire();
+			bRemoved = true;
+		}
+
+		m_runnableContainerMutex->unlock();
+
+		return bRemoved;
 	}
 }

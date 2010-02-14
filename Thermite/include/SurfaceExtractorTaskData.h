@@ -35,7 +35,7 @@ namespace Thermite
 	{
 	public:
 		SurfaceExtractorTaskData(void);
-		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel);
+		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint8_t uLodLevel, PolyVox::uint32_t uTimeStamp);
 
 		PolyVox::uint8_t getLodLevel(void) const;
 		PolyVox::Region getRegion(void) const;
@@ -48,6 +48,7 @@ namespace Thermite
 		PolyVox::uint8_t m_uLodLevel;
 		PolyVox::Region m_regToProcess;
 		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
+		PolyVox::uint32_t m_uTimeStamp;
 	};
 }
 

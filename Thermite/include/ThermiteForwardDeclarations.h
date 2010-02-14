@@ -52,6 +52,7 @@ namespace Thermite
 	class RunnerThread;
 	class State;
 	class StateManager;
+	class SurfaceDecimatorRunnable;
 	class SurfacePatchRenderable;
 	//class VolumeManager;
 	//class VolumeResourse;

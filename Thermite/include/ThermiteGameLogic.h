@@ -141,6 +141,8 @@ namespace Thermite
 
 		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
 
+		PolyVox::Volume<SurfaceDecimatorRunnable*>* m_volSurfaceDecimators;
+
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
 

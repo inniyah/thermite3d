@@ -143,7 +143,7 @@ namespace Thermite
 		mCurrentFrameNumber = 0;
 
 		m_backgroundThread = new RunnerThread;
-		//m_backgroundThread->setPriority(QThread::LowPriority);
+		m_backgroundThread->setPriority(QThread::LowestPriority);
 		m_backgroundThread->start();
 
 		//Slightly hacky way of sleeping while the logo animation plays.
@@ -311,6 +311,7 @@ namespace Thermite
 		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volSurfaceDecimators = new Volume<SurfaceDecimatorRunnable*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
 		mMap = mapResource->m_pMap;
 
@@ -511,15 +512,16 @@ namespace Thermite
 						}
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
-						if(volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ) > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
+						uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
-							if(m_volRegionBeingProcessed->getVoxelAt(regionX,regionY,regionZ))
+							/*if(m_volRegionBeingProcessed->getVoxelAt(regionX,regionY,regionZ))
 							{
 								//We get here if the region is modified again before the result of the previous
 								//modification is returned. We need to find a better way to handle this really...
 								mThermiteLog->logMessage("Region already being processed", LL_INFO);
 								continue;
-							}
+							}*/
 							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
 
 							//Convert to a real PolyVox::Region
@@ -533,7 +535,7 @@ namespace Thermite
 							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region with a LOD level of 0
-							SurfaceExtractorTaskData taskData(region, 0);
+							SurfaceExtractorTaskData taskData(region, 0, uRegionTimeStamp);
 							SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
 							QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
 							m_iNoSubmitted++;
@@ -541,7 +543,7 @@ namespace Thermite
 							if(fLod0ToLod1Boundary > 0) //If the first LOD level is enabled
 							{
 								//Extract the region with a LOD level of 1
-								SurfaceExtractorTaskData taskData(region, 1);
+								SurfaceExtractorTaskData taskData(region, 1, uRegionTimeStamp);
 								SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
 								QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
 								m_iNoSubmitted++;
@@ -550,7 +552,7 @@ namespace Thermite
 							if(fLod1ToLod2Boundary > 0) //If the second LOD level is enabled
 							{
 								//Extract the region with a LOD level of 2
-								SurfaceExtractorTaskData taskData(region, 2);
+								SurfaceExtractorTaskData taskData(region, 2, uRegionTimeStamp);
 								SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
 								QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
 								m_iNoSubmitted++;
@@ -580,10 +582,18 @@ namespace Thermite
 				uploadSurfaceExtractorResult(result);	
 
 				//Now decimate the mesh in the background
-				//SurfaceExtractorTaskData taskData(region, 1);
+				PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+				PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+				PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+				SurfaceDecimatorRunnable* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
+
+				m_backgroundThread->removeRunnable(pOldSurfaceDecimator);
+
 				SurfaceDecimatorRunnable* surfaceDecimatorRunnable = new SurfaceDecimatorRunnable(result, this);
-				//QThreadPool::globalInstance()->start(surfaceDecimatorRunnable, 0);
-				m_backgroundThread->startRunnable(surfaceDecimatorRunnable, 0);
+
+				m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceDecimatorRunnable);
+
+				m_backgroundThread->addRunnable(surfaceDecimatorRunnable);
 			}
 
 			noOfCompletedTasks = m_completedSurfaceDecimatorTaskQueue.size();
@@ -610,6 +620,14 @@ namespace Thermite
 		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
 		PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
 		PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+
+		uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		if(uRegionTimeStamp > result.m_uTimeStamp)
+		{
+			// The volume has changed since the command to generate this mesh was issued.
+			// Just ignore it, and a correct version should be along soon...
+			return;
+		}
 
 		//Create a MapRegion for that location if we don't have one already
 		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
