@@ -86,7 +86,7 @@ namespace Thermite
 		}
 	}
 
-	void MapRegion::addSurfacePatchRenderable(std::string materialName, IndexedSurfacePatch& isp, PolyVox::uint8_t uLodLevel)
+	void MapRegion::addSurfacePatchRenderable(std::string materialName, IndexedSurfacePatch& isp)
 	{
 		//Single Material
 		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
@@ -104,18 +104,8 @@ namespace Thermite
 		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
 		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 
-		switch(uLodLevel)
-		{
-		case 0:
-			m_listSingleMaterialSurfacePatchRenderablesLod0.push_back(pSingleMaterialSurfacePatchRenderable);
-			break;
-		case 1:
-			m_listSingleMaterialSurfacePatchRenderablesLod1.push_back(pSingleMaterialSurfacePatchRenderable);
-			break;
-		case 2:
-			m_listSingleMaterialSurfacePatchRenderablesLod2.push_back(pSingleMaterialSurfacePatchRenderable);
-			break;
-		}
+		
+		m_listSingleMaterialSurfacePatchRenderables.push_back(pSingleMaterialSurfacePatchRenderable);
 
 		//Multi material
 		SurfacePatchRenderable* pMultiMaterialSurfacePatchRenderable;
@@ -143,37 +133,12 @@ namespace Thermite
 		//Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
 		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 
-		switch(uLodLevel)
-		{
-		case 0:
-			m_listMultiMaterialSurfacePatchRenderablesLod0.push_back(pMultiMaterialSurfacePatchRenderable);
-			break;
-		case 1:
-			m_listMultiMaterialSurfacePatchRenderablesLod1.push_back(pMultiMaterialSurfacePatchRenderable);
-			break;
-		case 2:
-			m_listMultiMaterialSurfacePatchRenderablesLod2.push_back(pMultiMaterialSurfacePatchRenderable);
-			break;
-		}
+		m_listMultiMaterialSurfacePatchRenderables.push_back(pMultiMaterialSurfacePatchRenderable);
 	}
 
-	void MapRegion::removeAllSurfacePatchRenderablesForLod(PolyVox::uint8_t uLodLevel)
+	void MapRegion::removeAllSurfacePatchRenderables(void)
 	{
-		std::list<SurfacePatchRenderable*>* pList;
-		switch(uLodLevel)
-		{
-			case 0:
-			pList = &m_listSingleMaterialSurfacePatchRenderablesLod0;
-			break;
-		case 1:
-			pList = &m_listSingleMaterialSurfacePatchRenderablesLod1;
-			break;
-		case 2:
-			pList = &m_listSingleMaterialSurfacePatchRenderablesLod2;
-			break;
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = pList->begin(); iter != pList->end(); iter++)
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderables.begin(); iter != m_listSingleMaterialSurfacePatchRenderables.end(); iter++)
 		{
 			if(m_pOgreSceneNode != 0)
 			{
@@ -182,23 +147,9 @@ namespace Thermite
 			m_pParentMap->m_pOgreSceneManager->destroyMovableObject(*iter);
 		}
 
-		pList->clear();
+		m_listSingleMaterialSurfacePatchRenderables.clear();
 
-		//std::list<SurfacePatchRenderable*>* pList;
-		switch(uLodLevel)
-		{
-			case 0:
-			pList = &m_listMultiMaterialSurfacePatchRenderablesLod0;
-			break;
-		case 1:
-			pList = &m_listMultiMaterialSurfacePatchRenderablesLod1;
-			break;
-		case 2:
-			pList = &m_listMultiMaterialSurfacePatchRenderablesLod2;
-			break;
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = pList->begin(); iter != pList->end(); iter++)
+		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderables.begin(); iter != m_listMultiMaterialSurfacePatchRenderables.end(); iter++)
 		{
 			if(m_pOgreSceneNode != 0)
 			{
@@ -207,41 +158,7 @@ namespace Thermite
 			m_pParentMap->m_pOgreSceneManager->destroyMovableObject(*iter);
 		}
 
-		pList->clear();
-	}
-
-	void MapRegion::setLodLevelToUse(PolyVox::uint8_t uLodLevel)
-	{
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod0.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod0.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 0);
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod1.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod1.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 1);
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listSingleMaterialSurfacePatchRenderablesLod2.begin(); iter != m_listSingleMaterialSurfacePatchRenderablesLod2.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 2);
-		}
-
-		//Multi material
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod0.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod0.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 0);
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod1.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod1.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 1);
-		}
-
-		for(std::list<SurfacePatchRenderable*>::iterator iter = m_listMultiMaterialSurfacePatchRenderablesLod2.begin(); iter != m_listMultiMaterialSurfacePatchRenderablesLod2.end(); iter++)
-		{
-			(*iter)->setVisible(uLodLevel == 2);
-		}
+		m_listMultiMaterialSurfacePatchRenderables.clear();
 	}
 
 	void MapRegion::setPhysicsData(const IndexedSurfacePatch& isp)

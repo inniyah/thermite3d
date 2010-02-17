@@ -52,25 +52,19 @@ namespace Thermite
 
 		void setPhysicsData(const PolyVox::IndexedSurfacePatch& isp);
 
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp, PolyVox::uint8_t uLodLevel);
-		void removeAllSurfacePatchRenderablesForLod(PolyVox::uint8_t uLodLevel);
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp);
+		void removeAllSurfacePatchRenderables();
 
 		void destroyPhysicsData(void);
 
 		std::string makeUniqueName(const std::string& strBase);
 
-		void setLodLevelToUse(PolyVox::uint8_t uLodLevel);
-
 	private:
 		Ogre::SceneNode* m_pOgreSceneNode;
 
-		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod0;
-		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod1;
-		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderablesLod2;
+		std::list<SurfacePatchRenderable*> m_listSingleMaterialSurfacePatchRenderables;
 
-		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod0;
-		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod1;
-		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderablesLod2;
+		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderables;
 
 #ifdef ENABLE_BULLET_PHYSICS
 		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);

@@ -461,11 +461,6 @@ namespace Thermite
 			uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
 			uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
 
-			double fLod0ToLod1Boundary = qApp->settings()->value("Engine/Lod0ToLod1Boundary", 256.0f).toDouble();
-			double fLod0ToLod1BoundarySquared = fLod0ToLod1Boundary * fLod0ToLod1Boundary;
-			double fLod1ToLod2Boundary = qApp->settings()->value("Engine/Lod1ToLod2Boundary", 512.0f).toDouble();
-			double fLod1ToLod2BoundarySquared = fLod1ToLod2Boundary * fLod1ToLod2Boundary;
-
 			//Iterate over each region in the VolumeChangeTracker
 			for(uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 			{		
@@ -486,42 +481,18 @@ namespace Thermite
 						const float centreY = firstY + halfRegionSideLength;
 						const float centreZ = firstZ + halfRegionSideLength;
 
-						//The regions distance from the camera is used for
-						//LOD selection and prioritizing surface extraction
+						//The regions distance from the camera is used for prioritizing surface extraction
 						Ogre::Vector3 cameraPos = mActiveCamera->getPosition();
 						Ogre::Vector3 centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
 
 						//There's no guarentee that the MapRegion exists at this point...
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-						if(pMapRegion)
-						{							
-							//But if it does, we set the appropriate LOD level based on distance from the camera.
-							if((distanceFromCameraSquared > fLod1ToLod2BoundarySquared) && (fLod1ToLod2Boundary > 0.0f))
-							{
-								pMapRegion->setLodLevelToUse(2);
-							}
-							else if((distanceFromCameraSquared > fLod0ToLod1BoundarySquared) && (fLod0ToLod1Boundary > 0.0f))
-							{
-								pMapRegion->setLodLevelToUse(1);
-							}
-							else
-							{
-								pMapRegion->setLodLevelToUse(0);
-							}
-						}
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
-							/*if(m_volRegionBeingProcessed->getVoxelAt(regionX,regionY,regionZ))
-							{
-								//We get here if the region is modified again before the result of the previous
-								//modification is returned. We need to find a better way to handle this really...
-								mThermiteLog->logMessage("Region already being processed", LL_INFO);
-								continue;
-							}*/
 							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
 
 							//Convert to a real PolyVox::Region
@@ -534,29 +505,11 @@ namespace Thermite
 							//camera get extracted before those which are distant from the camera.
 							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
 
-							//Extract the region with a LOD level of 0
-							SurfaceExtractorTaskData taskData(region, 0, uRegionTimeStamp);
+							//Extract the region
+							SurfaceExtractorTaskData taskData(region, uRegionTimeStamp);
 							SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
 							QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
 							m_iNoSubmitted++;
-
-							if(fLod0ToLod1Boundary > 0) //If the first LOD level is enabled
-							{
-								//Extract the region with a LOD level of 1
-								SurfaceExtractorTaskData taskData(region, 1, uRegionTimeStamp);
-								SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
-								QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
-								m_iNoSubmitted++;
-							}
-
-							if(fLod1ToLod2Boundary > 0) //If the second LOD level is enabled
-							{
-								//Extract the region with a LOD level of 2
-								SurfaceExtractorTaskData taskData(region, 2, uRegionTimeStamp);
-								SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
-								QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
-								m_iNoSubmitted++;
-							}
 
 							//Indicate that we've processed this region
 							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
@@ -613,7 +566,6 @@ namespace Thermite
 	void ThermiteGameLogic::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-		int iPhysicsLOD = qApp->settings()->value("Physics/PhysicsLOD", 0).toInt();
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
@@ -638,7 +590,7 @@ namespace Thermite
 		}
 
 		//Clear any previous geometry
-		pMapRegion->removeAllSurfacePatchRenderablesForLod(result.getLodLevel());
+		pMapRegion->removeAllSurfacePatchRenderables();
 
 		//Get the IndexedSurfacePatch and check it's valid
 		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
@@ -654,14 +606,12 @@ namespace Thermite
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
 				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
 
-				//ispSubset->makeProgressiveMesh();
-
 				//And add it to the MapRegion
-				pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset, result.getLodLevel());
+				pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset);
 			}
 
-			//If we are simulating physics and the current LOD matches...
-			if((bSimulatePhysics) && (result.getLodLevel() == iPhysicsLOD))
+			//If we are simulating physics...
+			if(bSimulatePhysics)
 			{
 				//Update the physics geometry
 				pMapRegion->setPhysicsData(*(ispWhole.get()));

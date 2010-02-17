@@ -34,16 +34,10 @@ namespace Thermite
 	{
 	}
 
-	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint8_t uLodLevel, PolyVox::uint32_t uTimeStamp)
-	:m_uLodLevel(uLodLevel)
-	,m_regToProcess(regToProcess)
-	,m_uTimeStamp(uTimeStamp)
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, PolyVox::uint32_t uTimeStamp)
+		:m_regToProcess(regToProcess)
+		,m_uTimeStamp(uTimeStamp)
 	{
-	}
-
-	uint8_t SurfaceExtractorTaskData::getLodLevel(void) const
-	{
-		return m_uLodLevel;
 	}
 
 	Region SurfaceExtractorTaskData::getRegion(void) const
@@ -54,11 +48,6 @@ namespace Thermite
 	POLYVOX_SHARED_PTR<IndexedSurfacePatch> SurfaceExtractorTaskData::getIndexedSurfacePatch(void) const
 	{
 		return m_ispResult;
-	}
-
-	void SurfaceExtractorTaskData::setLodLevel(uint8_t uLodLevel)
-	{
-		m_uLodLevel = uLodLevel;
 	}
 
 	void SurfaceExtractorTaskData::setRegion(const Region& regToProcess)
