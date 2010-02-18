@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 #include "LoadingProgress.h"
 #include "Serialization.h"
 #include "SurfaceExtractorTaskData.h"
-#include "ThreadSafeQueue.h"
 #include "VolumeChangeTracker.h"
 
 #include "Map.h"
@@ -46,6 +45,7 @@ freely, subject to the following restrictions:
 
 #include <QMovie>
 #include <QLabel>
+#include <QObject>
 
 #include <list>
 #include <queue>
@@ -58,8 +58,9 @@ namespace Thermite
 		KS_PRESSED
 	};
 
-	class ThermiteGameLogic : public QtOgre::GameLogic
+	class ThermiteGameLogic : public QObject, public QtOgre::GameLogic
 	{
+		Q_OBJECT
 	public:
 		ThermiteGameLogic(void);
 
@@ -125,7 +126,13 @@ namespace Thermite
 
 		void updatePolyVoxGeometry();
 
+	public slots:
 		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
+		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
+		
+	public:
+
+		void uploadIndexedSurfacePatch(POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> isp, PolyVox::Region region);
 
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 
@@ -145,9 +152,6 @@ namespace Thermite
 
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
-
-		ThreadSafeQueue<SurfaceExtractorTaskData> m_completedSurfaceExtractorTaskQueue;
-		ThreadSafeQueue<SurfaceExtractorTaskData> m_completedSurfaceDecimatorTaskQueue;
 
 		RunnerThread* m_backgroundThread;
 	};

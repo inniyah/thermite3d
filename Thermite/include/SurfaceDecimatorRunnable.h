@@ -28,18 +28,23 @@ freely, subject to the following restrictions:
 
 #include "SurfaceExtractorTaskData.h"
 
+#include <QObject>
 #include <QRunnable>
 
 namespace Thermite
 {
 	class ThermiteGameLogic;
 
-	class SurfaceDecimatorRunnable : public QRunnable
+	class SurfaceDecimatorRunnable : public QObject, public QRunnable
 	{
+		Q_OBJECT
 	public:
 		SurfaceDecimatorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
 
 		void run(void);
+
+	signals:
+		void finished(SurfaceExtractorTaskData taskData);
 
 	protected:
 		SurfaceExtractorTaskData m_taskData;

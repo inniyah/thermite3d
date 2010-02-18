@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #include "RunnerThread.h"
 #include "SurfaceDecimatorRunnable.h"
 #include "SurfaceExtractorRunnable.h"
+#include "SurfaceExtractorTaskData.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
 #include "VolumeManager.h"
@@ -74,6 +75,7 @@ namespace Thermite
 		,m_pActiveOgreSceneManager(0)
 		,m_pDummyOgreSceneManager(0)
 	{
+		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -508,6 +510,7 @@ namespace Thermite
 							//Extract the region
 							SurfaceExtractorTaskData taskData(region, uRegionTimeStamp);
 							SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
+							QObject::connect(surfaceExtractorRunnable, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
 							m_iNoSubmitted++;
 
@@ -517,55 +520,11 @@ namespace Thermite
 					}
 				}
 			}
-
-			//Process any results which have been returned by the surface extractor threads.
-
-			// We just get this once because it invoves locking the queue. The size could be 
-			// increased by other threads as we processed the queue, but it can't be decreased
-			int noOfCompletedTasks = m_completedSurfaceExtractorTaskQueue.size();
-
-			while(noOfCompletedTasks > 0)
-			{
-				//Get the next available result
-				SurfaceExtractorTaskData result;
-				result = m_completedSurfaceExtractorTaskQueue.front();
-				m_completedSurfaceExtractorTaskQueue.pop();
-				noOfCompletedTasks--;
-
-				uploadSurfaceExtractorResult(result);	
-
-				//Now decimate the mesh in the background
-				PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-				PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-				PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
-				SurfaceDecimatorRunnable* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
-
-				m_backgroundThread->removeRunnable(pOldSurfaceDecimator);
-
-				SurfaceDecimatorRunnable* surfaceDecimatorRunnable = new SurfaceDecimatorRunnable(result, this);
-
-				m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceDecimatorRunnable);
-
-				m_backgroundThread->addRunnable(surfaceDecimatorRunnable);
-			}
-
-			noOfCompletedTasks = m_completedSurfaceDecimatorTaskQueue.size();
-			while(noOfCompletedTasks > 0)
-			{
-				//Get the next available result
-				SurfaceExtractorTaskData result;
-				result = m_completedSurfaceDecimatorTaskQueue.front();
-				m_completedSurfaceDecimatorTaskQueue.pop();
-				noOfCompletedTasks--;
-
-				uploadSurfaceExtractorResult(result);
-			}
 		}		
 	}
 
 	void ThermiteGameLogic::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
 	{
-		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
@@ -581,11 +540,64 @@ namespace Thermite
 			return;
 		}
 
+		uploadIndexedSurfacePatch(result.getIndexedSurfacePatch(), result.getRegion());
+
+
+		SurfaceDecimatorRunnable* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
+
+		m_backgroundThread->removeRunnable(pOldSurfaceDecimator);
+
+		SurfaceDecimatorRunnable* surfaceDecimatorRunnable = new SurfaceDecimatorRunnable(result, this);
+		QObject::connect(surfaceDecimatorRunnable, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
+
+		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceDecimatorRunnable);
+
+		m_backgroundThread->addRunnable(surfaceDecimatorRunnable);
+	}
+
+	void ThermiteGameLogic::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)
+	{
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+		PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+		PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+
+		uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		if(uRegionTimeStamp > result.m_uTimeStamp)
+		{
+			// The volume has changed since the command to generate this mesh was issued.
+			// Just ignore it, and a correct version should be along soon...
+			return;
+		}
+
+		uploadIndexedSurfacePatch(result.getIndexedSurfacePatch(), result.getRegion());
+	}
+
+	void ThermiteGameLogic::uploadIndexedSurfacePatch(POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp, Region region)
+	{
+		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		PolyVox::uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
+		PolyVox::uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
+		PolyVox::uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+
+		/*uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		if(uRegionTimeStamp > result.m_uTimeStamp)
+		{
+			// The volume has changed since the command to generate this mesh was issued.
+			// Just ignore it, and a correct version should be along soon...
+			return;
+		}*/
+
 		//Create a MapRegion for that location if we don't have one already
 		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 		if(pMapRegion == 0)
 		{
-			pMapRegion = new MapRegion(mMap, result.getRegion().getLowerCorner());
+			pMapRegion = new MapRegion(mMap, region.getLowerCorner());
 			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 		}
 
@@ -593,7 +605,7 @@ namespace Thermite
 		pMapRegion->removeAllSurfacePatchRenderables();
 
 		//Get the IndexedSurfacePatch and check it's valid
-		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = result.getIndexedSurfacePatch();
+		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = isp;
 		if((ispWhole) && (ispWhole->isEmpty() == false))
 		{			
 			//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...

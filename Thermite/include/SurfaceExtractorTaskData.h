@@ -29,6 +29,8 @@ freely, subject to the following restrictions:
 #include <PolyVoxForwardDeclarations.h>
 #include <Region.h>
 
+#include <QMetaType>
+
 namespace Thermite
 {
 	class SurfaceExtractorTaskData
@@ -48,5 +50,7 @@ namespace Thermite
 		PolyVox::uint32_t m_uTimeStamp;
 	};
 }
+
+Q_DECLARE_METATYPE(Thermite::SurfaceExtractorTaskData)
 
 #endif

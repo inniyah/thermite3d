@@ -72,7 +72,6 @@ SET(INC_FILES
 	include/SurfaceExtractorRunnable.h
 	include/SurfaceExtractorTaskData.h
 	include/SurfacePatchRenderable.h
-	include/ThreadSafeQueue.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
 	include/Utility.h

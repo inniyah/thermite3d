@@ -43,6 +43,7 @@ namespace Thermite
 	void SurfaceDecimatorRunnable::run(void)
 	{
 		m_taskData.m_ispResult->decimate();
-		m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
+		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
+		emit finished(m_taskData);
 	}
 }

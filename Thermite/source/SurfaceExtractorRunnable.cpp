@@ -50,6 +50,6 @@ namespace Thermite
 		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
 		//m_taskData.m_ispResult->decimate();
-		m_pGameLogic->m_completedSurfaceExtractorTaskQueue.push(m_taskData);
+		emit finished(m_taskData);
 	}
 }
