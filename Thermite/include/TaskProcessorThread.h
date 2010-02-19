@@ -23,8 +23,10 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_RUNNER_THREAD_H__
-#define __THERMITE_RUNNER_THREAD_H__
+#ifndef __THERMITE_TASK_PROCESSOR_THREAD_H__
+#define __THERMITE_TASK_PROCESSOR_THREAD_H__
+
+#include "ThermiteForwardDeclarations.h"
 
 #include <QThread>
 
@@ -36,23 +38,23 @@ class QSemaphore;
 
 namespace Thermite
 {
-	class BackgroundTaskThread : public QThread
+	class TaskProcessorThread : public QThread
 	{
 	public:
-		BackgroundTaskThread(QObject* parent=0);
-		~BackgroundTaskThread(void);
+		TaskProcessorThread(QObject* parent=0);
+		~TaskProcessorThread(void);
 
 		void run(void);
 
-		void addRunnable(QRunnable* runnable);
-		bool removeRunnable(QRunnable* runnable);
+		void addTask(Task* task);
+		bool removeTask(Task* task);
 
 	protected:
-		std::list<QRunnable*> m_runnableContainer;
+		std::list<Task*> m_taskContainer;
 
-		QSemaphore* m_noOfRunnables;
-		QMutex* m_runnableContainerMutex;
+		QSemaphore* m_noOfTasks;
+		QMutex* m_taskContainerMutex;
 	};
 }
 
-#endif //__THERMITE_RUNNER_THREAD_H__
+#endif //__THERMITE_TASK_PROCESSOR_THREAD_H__

@@ -153,7 +153,7 @@ namespace Thermite
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
 
-		BackgroundTaskThread* m_backgroundThread;
+		TaskProcessorThread* m_backgroundThread;
 	};
 }
 

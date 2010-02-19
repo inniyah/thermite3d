@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
-#include "BackgroundTaskThread.h"
+#include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceExtractorTaskData.h"
@@ -144,7 +144,7 @@ namespace Thermite
 
 		mCurrentFrameNumber = 0;
 
-		m_backgroundThread = new BackgroundTaskThread;
+		m_backgroundThread = new TaskProcessorThread;
 		m_backgroundThread->setPriority(QThread::LowestPriority);
 		m_backgroundThread->start();
 
@@ -545,14 +545,14 @@ namespace Thermite
 
 		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
 
-		m_backgroundThread->removeRunnable(pOldSurfaceDecimator);
+		m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
 		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(result, this);
 		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 
 		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceMeshDecimationTask);
 
-		m_backgroundThread->addRunnable(surfaceMeshDecimationTask);
+		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
 	void ThermiteGameLogic::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)

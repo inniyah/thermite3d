@@ -23,74 +23,75 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "BackgroundTaskThread.h"
+#include "TaskProcessorThread.h"
+
+#include "Task.h"
 
 #include <QMutex>
-#include <QRunnable>
 #include <QSemaphore>
 
 #include <algorithm>
 
 namespace Thermite
 {
-	BackgroundTaskThread::BackgroundTaskThread(QObject* parent)
+	TaskProcessorThread::TaskProcessorThread(QObject* parent)
 		:QThread(parent)
 	{
-		m_runnableContainerMutex = new QMutex;
-		m_noOfRunnables = new QSemaphore;
+		m_taskContainerMutex = new QMutex;
+		m_noOfTasks = new QSemaphore;
 	}
 
-	BackgroundTaskThread::~BackgroundTaskThread(void)
+	TaskProcessorThread::~TaskProcessorThread(void)
 	{
-		delete m_runnableContainerMutex;
-		delete m_noOfRunnables;
+		delete m_taskContainerMutex;
+		delete m_noOfTasks;
 	}
 
-	void BackgroundTaskThread::run(void)
+	void TaskProcessorThread::run(void)
 	{
 		while(true)
 		{
 			msleep(100);
 
-			m_noOfRunnables->acquire();
+			m_noOfTasks->acquire();
 
-			m_runnableContainerMutex->lock();
-			QRunnable* runnable = m_runnableContainer.front();
-			m_runnableContainer.pop_front();
-			m_runnableContainerMutex->unlock();
+			m_taskContainerMutex->lock();
+			Task* task = m_taskContainer.front();
+			m_taskContainer.pop_front();
+			m_taskContainerMutex->unlock();
 
-			runnable->run();
+			task->run();
 
-			if(runnable->autoDelete())
+			if(task->autoDelete())
 			{
-				delete runnable;
+				delete task;
 			}
 		}
 	}
 
-	void BackgroundTaskThread::addRunnable(QRunnable* runnable)
+	void TaskProcessorThread::addTask(Task* task)
 	{
-		m_runnableContainerMutex->lock();
-		m_runnableContainer.push_back(runnable);
-		m_noOfRunnables->release();
-		m_runnableContainerMutex->unlock();
+		m_taskContainerMutex->lock();
+		m_taskContainer.push_back(task);
+		m_noOfTasks->release();
+		m_taskContainerMutex->unlock();
 	}
 
-	bool BackgroundTaskThread::removeRunnable(QRunnable* runnable)
+	bool TaskProcessorThread::removeTask(Task* task)
 	{
 		bool bRemoved = false;
 
-		m_runnableContainerMutex->lock();
+		m_taskContainerMutex->lock();
 
-		std::list<QRunnable*>::iterator iterRunnable = std::find(m_runnableContainer.begin(), m_runnableContainer.end(), runnable);
-		if(iterRunnable != m_runnableContainer.end())
+		std::list<Task*>::iterator iterTasks = std::find(m_taskContainer.begin(), m_taskContainer.end(), task);
+		if(iterTasks != m_taskContainer.end())
 		{
-			m_runnableContainer.erase(iterRunnable);
-			m_noOfRunnables->acquire();
+			m_taskContainer.erase(iterTasks);
+			m_noOfTasks->acquire();
 			bRemoved = true;
 		}
 
-		m_runnableContainerMutex->unlock();
+		m_taskContainerMutex->unlock();
 
 		return bRemoved;
 	}

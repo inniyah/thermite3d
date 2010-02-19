@@ -23,19 +23,17 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
-#define __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#ifndef __THERMITE_SURFACE_MESH_EXTRACTION_RUNNABLE_H__
+#define __THERMITE_SURFACE_MESH_EXTRACTION_RUNNABLE_H__
 
+#include "Task.h"
 #include "SurfaceExtractorTaskData.h"
-
-#include <QObject>
-#include <QRunnable>
 
 namespace Thermite
 {
 	class ThermiteGameLogic;
 
-	class SurfaceMeshExtractionTask : public QObject, public QRunnable
+	class SurfaceMeshExtractionTask : public Task
 	{
 		Q_OBJECT
 	public:
@@ -53,4 +51,4 @@ namespace Thermite
 	};
 }
 
-#endif //__THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#endif //__THERMITE_SURFACE_MESH_EXTRACTION_RUNNABLE_H__
