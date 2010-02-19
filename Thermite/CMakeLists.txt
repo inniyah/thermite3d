@@ -39,18 +39,19 @@ SET(SRC_FILES
 	source/MapRegion.cpp
 	source/MapResource.cpp
 	source/PhysicalEntity.cpp
-	source/Shell.cpp
-	source/SurfaceMeshDecimationTask.cpp
-	source/SurfaceMeshExtractionTask.cpp
-	source/SurfaceExtractorTaskData.cpp
+	source/Shell.cpp	
 	source/SurfacePatchRenderable.cpp
-	source/Task.cpp
-	source/TaskProcessorThread.cpp
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
 	source/VolumeManager.cpp
 	source/VolumeResource.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
+	
+	source/tasks/SurfaceMeshDecimationTask.cpp
+	source/tasks/SurfaceMeshExtractionTask.cpp
+	source/tasks/SurfaceExtractorTaskData.cpp
+	source/tasks/Task.cpp
+	source/tasks/TaskProcessorThread.cpp
 )
 
 SET(INC_FILES
@@ -68,18 +69,19 @@ SET(INC_FILES
 	include/MapResource.h
 	include/PhysicalEntity.h
 	include/Shell.h
-	include/SurfaceMeshDecimationTask.h
-	include/SurfaceMeshExtractionTask.h
-	include/SurfaceExtractorTaskData.h
 	include/SurfacePatchRenderable.h
-	include/Task.h
-	include/TaskProcessorThread.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
 	include/Utility.h
 	include/VolumeManager.h
 	include/VolumeResource.h
 	include/VolumeSerializationProgressListenerImpl.h
+	
+	include/tasks/SurfaceMeshDecimationTask.h
+	include/tasks/SurfaceMeshExtractionTask.h
+	include/tasks/SurfaceExtractorTaskData.h
+	include/tasks/Task.h
+	include/tasks/TaskProcessorThread.h
 
 )
 
@@ -112,12 +114,12 @@ QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 IF(ENABLE_BULLET_PHYSICS)
 	ADD_DEFINITIONS(-DENABLE_BULLET_PHYSICS)
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS} ${BULLET_LIBRARY_DIRS} ${OGREBULLET_LIB_DIR})
 	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES} ${OGREBULLET_LIBRARIES} ${BULLET_LIBRARIES})
 ELSE()
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})

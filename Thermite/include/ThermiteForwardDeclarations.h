@@ -39,33 +39,24 @@ const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS = (THERMITE_VOLUM
 namespace Thermite
 {
 	class ApplicationGameLogic;
-	class Task;
-	class TaskProcessorThread;
 	class CannonController;
-	class GameState;
-	//class IndexedSurfacePatchCollisionShape;
+	class LoadMapWidget;
 	class LoadSceneMenuPage;
 	class MainMenuPage;
 	class Map;
-	class MenuPage;
-	class MenuState;
+	class MapRegion;
+	class MoviePlayer;
 	class PhysicalObject;
-	class PlayState;
-	class TaskProcessorThread;
-	class State;
-	class StateManager;
+	class Shell;
 	class SurfaceMeshDecimationTask;
 	class SurfaceMeshExtractionTask;
 	class SurfacePatchRenderable;
-	//class VolumeManager;
-	//class VolumeResourse;
-	//class VolumeSerializer;
-	class MapRegion;
-
-	class LoadMapWidget;
-	class MoviePlayer;
-	class Shell;
+	class Task;
+	class TaskProcessorThread;
 	class ThermiteGameLogic;
+	class VolumeManager;
+	class VolumeResourse;
+	class VolumeSerializationProgressListener;
 }
 
 #endif
