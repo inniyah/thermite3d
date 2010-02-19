@@ -42,7 +42,7 @@ namespace Thermite
 
 	void SurfaceMeshDecimationTask::run(void)
 	{
-		m_taskData.m_ispResult->decimate();
+		m_taskData.m_ispResult->decimate(0.95);
 		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
 		emit finished(m_taskData);
 	}

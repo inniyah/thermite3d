@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "GradientEstimators.h"
 #include "IndexedSurfacePatch.h"
 #include "SurfaceExtractor.h"
 
@@ -48,6 +49,9 @@ namespace Thermite
 
 		pSurfaceExtractor->setLodLevel(0);
 		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
+
+		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_ispResult.get()), PolyVox::SOBEL_SMOOTHED);
+		m_taskData.m_ispResult->generateAveragedFaceNormals(true);
 
 		//m_taskData.m_ispResult->decimate();
 		emit finished(m_taskData);
