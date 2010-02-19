@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "SurfaceExtractorRunnable.h"
+#include "SurfaceMeshDecimationTask.h"
 
 #include "ThermiteGameLogic.h"
 
@@ -34,22 +34,16 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	SurfaceExtractorRunnable::SurfaceExtractorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
+	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
 		:m_taskData(taskData)
 		,m_pGameLogic(pGameLogic)
 	{
 	}
 
-	void SurfaceExtractorRunnable::run(void)
+	void SurfaceMeshDecimationTask::run(void)
 	{
-		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
-		//Or at least not use 'new'
-		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
-
-		pSurfaceExtractor->setLodLevel(0);
-		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
-
-		//m_taskData.m_ispResult->decimate();
+		m_taskData.m_ispResult->decimate();
+		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
 		emit finished(m_taskData);
 	}
 }

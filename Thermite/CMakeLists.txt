@@ -28,6 +28,8 @@ SET(SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
 	source/ApplicationGameLogic.cpp
+	source/BackgroundTask.cpp
+	source/BackgroundTaskThread.cpp
 	source/CannonController.cpp
 	source/DataStreamWrapper.cpp
 	source/LoadingProgress.cpp
@@ -39,10 +41,9 @@ SET(SRC_FILES
 	source/MapRegion.cpp
 	source/MapResource.cpp
 	source/PhysicalEntity.cpp
-	source/RunnerThread.cpp
 	source/Shell.cpp
-	source/SurfaceDecimatorRunnable.cpp
-	source/SurfaceExtractorRunnable.cpp
+	source/SurfaceMeshDecimationTask.cpp
+	source/SurfaceMeshExtractionTask.cpp
 	source/SurfaceExtractorTaskData.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
@@ -55,6 +56,8 @@ SET(SRC_FILES
 SET(INC_FILES
 	include/AnyOption.h
 	include/ApplicationGameLogic.h
+	include/BackgroundTask.h
+	include/BackgroundTaskThread.h
 	include/CannonController.h
 	include/DataStreamWrapper.h
 	include/LoadingProgress.h
@@ -66,10 +69,9 @@ SET(INC_FILES
 	include/MapRegion.h
 	include/MapResource.h
 	include/PhysicalEntity.h
-	include/RunnerThread.h
 	include/Shell.h
-	include/SurfaceDecimatorRunnable.h
-	include/SurfaceExtractorRunnable.h
+	include/SurfaceMeshDecimationTask.h
+	include/SurfaceMeshExtractionTask.h
 	include/SurfaceExtractorTaskData.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h

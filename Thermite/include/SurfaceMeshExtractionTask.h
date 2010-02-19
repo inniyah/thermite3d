@@ -23,27 +23,34 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "SurfaceDecimatorRunnable.h"
+#ifndef __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
+#define __THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__
 
-#include "ThermiteGameLogic.h"
+#include "SurfaceExtractorTaskData.h"
 
-#include "IndexedSurfacePatch.h"
-#include "SurfaceExtractor.h"
-
-#include <QMutex>
+#include <QObject>
+#include <QRunnable>
 
 namespace Thermite
 {
-	SurfaceDecimatorRunnable::SurfaceDecimatorRunnable(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
-		:m_taskData(taskData)
-		,m_pGameLogic(pGameLogic)
-	{
-	}
+	class ThermiteGameLogic;
 
-	void SurfaceDecimatorRunnable::run(void)
+	class SurfaceMeshExtractionTask : public QObject, public QRunnable
 	{
-		m_taskData.m_ispResult->decimate();
-		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
-		emit finished(m_taskData);
-	}
+		Q_OBJECT
+	public:
+		SurfaceMeshExtractionTask(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
+
+		void run(void);
+
+	signals:
+		void finished(SurfaceExtractorTaskData taskData);
+
+
+	protected:
+		SurfaceExtractorTaskData m_taskData;
+		ThermiteGameLogic* m_pGameLogic;
+	};
 }
+
+#endif //__THERMITE_SURFACE_EXTRACTOR_RUNNABLE_H__

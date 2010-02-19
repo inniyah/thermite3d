@@ -23,36 +23,33 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_RUNNER_THREAD_H__
-#define __THERMITE_RUNNER_THREAD_H__
+#include "SurfaceMeshExtractionTask.h"
 
-#include <QThread>
+#include "ThermiteGameLogic.h"
 
-#include <list>
+#include "IndexedSurfacePatch.h"
+#include "SurfaceExtractor.h"
 
-class QMutex;
-class QRunnable;
-class QSemaphore;
+#include <QMutex>
 
 namespace Thermite
 {
-	class RunnerThread : public QThread
+	SurfaceMeshExtractionTask::SurfaceMeshExtractionTask(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
+		:m_taskData(taskData)
+		,m_pGameLogic(pGameLogic)
 	{
-	public:
-		RunnerThread(QObject* parent=0);
-		~RunnerThread(void);
+	}
 
-		void run(void);
+	void SurfaceMeshExtractionTask::run(void)
+	{
+		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
+		//Or at least not use 'new'
+		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
 
-		void addRunnable(QRunnable* runnable);
-		bool removeRunnable(QRunnable* runnable);
+		pSurfaceExtractor->setLodLevel(0);
+		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
-	protected:
-		std::list<QRunnable*> m_runnableContainer;
-
-		QSemaphore* m_noOfRunnables;
-		QMutex* m_runnableContainerMutex;
-	};
+		//m_taskData.m_ispResult->decimate();
+		emit finished(m_taskData);
+	}
 }
-
-#endif //__THERMITE_RUNNER_THREAD_H__

@@ -49,10 +49,11 @@ namespace Thermite
 	class MenuState;
 	class PhysicalObject;
 	class PlayState;
-	class RunnerThread;
+	class BackgroundTaskThread;
 	class State;
 	class StateManager;
-	class SurfaceDecimatorRunnable;
+	class SurfaceMeshDecimationTask;
+	class SurfaceMeshExtractionTask;
 	class SurfacePatchRenderable;
 	//class VolumeManager;
 	//class VolumeResourse;

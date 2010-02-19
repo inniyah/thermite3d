@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "RunnerThread.h"
+#include "BackgroundTaskThread.h"
 
 #include <QMutex>
 #include <QRunnable>
@@ -33,20 +33,20 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	RunnerThread::RunnerThread(QObject* parent)
+	BackgroundTaskThread::BackgroundTaskThread(QObject* parent)
 		:QThread(parent)
 	{
 		m_runnableContainerMutex = new QMutex;
 		m_noOfRunnables = new QSemaphore;
 	}
 
-	RunnerThread::~RunnerThread(void)
+	BackgroundTaskThread::~BackgroundTaskThread(void)
 	{
 		delete m_runnableContainerMutex;
 		delete m_noOfRunnables;
 	}
 
-	void RunnerThread::run(void)
+	void BackgroundTaskThread::run(void)
 	{
 		while(true)
 		{
@@ -68,7 +68,7 @@ namespace Thermite
 		}
 	}
 
-	void RunnerThread::addRunnable(QRunnable* runnable)
+	void BackgroundTaskThread::addRunnable(QRunnable* runnable)
 	{
 		m_runnableContainerMutex->lock();
 		m_runnableContainer.push_back(runnable);
@@ -76,7 +76,7 @@ namespace Thermite
 		m_runnableContainerMutex->unlock();
 	}
 
-	bool RunnerThread::removeRunnable(QRunnable* runnable)
+	bool BackgroundTaskThread::removeRunnable(QRunnable* runnable)
 	{
 		bool bRemoved = false;
 

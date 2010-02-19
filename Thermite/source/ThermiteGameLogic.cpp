@@ -23,9 +23,9 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
-#include "RunnerThread.h"
-#include "SurfaceDecimatorRunnable.h"
-#include "SurfaceExtractorRunnable.h"
+#include "BackgroundTaskThread.h"
+#include "SurfaceMeshDecimationTask.h"
+#include "SurfaceMeshExtractionTask.h"
 #include "SurfaceExtractorTaskData.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
@@ -144,7 +144,7 @@ namespace Thermite
 
 		mCurrentFrameNumber = 0;
 
-		m_backgroundThread = new RunnerThread;
+		m_backgroundThread = new BackgroundTaskThread;
 		m_backgroundThread->setPriority(QThread::LowestPriority);
 		m_backgroundThread->start();
 
@@ -313,7 +313,7 @@ namespace Thermite
 		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volSurfaceDecimators = new Volume<SurfaceDecimatorRunnable*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
 		mMap = mapResource->m_pMap;
 
@@ -509,9 +509,9 @@ namespace Thermite
 
 							//Extract the region
 							SurfaceExtractorTaskData taskData(region, uRegionTimeStamp);
-							SurfaceExtractorRunnable* surfaceExtractorRunnable = new SurfaceExtractorRunnable(taskData, this);
-							QObject::connect(surfaceExtractorRunnable, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
-							QThreadPool::globalInstance()->start(surfaceExtractorRunnable, uPriority);
+							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(taskData, this);
+							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
+							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
 							m_iNoSubmitted++;
 
 							//Indicate that we've processed this region
@@ -543,16 +543,16 @@ namespace Thermite
 		uploadIndexedSurfacePatch(result.getIndexedSurfacePatch(), result.getRegion());
 
 
-		SurfaceDecimatorRunnable* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
+		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
 
 		m_backgroundThread->removeRunnable(pOldSurfaceDecimator);
 
-		SurfaceDecimatorRunnable* surfaceDecimatorRunnable = new SurfaceDecimatorRunnable(result, this);
-		QObject::connect(surfaceDecimatorRunnable, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
+		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(result, this);
+		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 
-		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceDecimatorRunnable);
+		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceMeshDecimationTask);
 
-		m_backgroundThread->addRunnable(surfaceDecimatorRunnable);
+		m_backgroundThread->addRunnable(surfaceMeshDecimationTask);
 	}
 
 	void ThermiteGameLogic::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)

@@ -148,12 +148,12 @@ namespace Thermite
 
 		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
 
-		PolyVox::Volume<SurfaceDecimatorRunnable*>* m_volSurfaceDecimators;
+		PolyVox::Volume<SurfaceMeshDecimationTask*>* m_volSurfaceDecimators;
 
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
 
-		RunnerThread* m_backgroundThread;
+		BackgroundTaskThread* m_backgroundThread;
 	};
 }
 
