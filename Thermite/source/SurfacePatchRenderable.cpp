@@ -196,21 +196,21 @@ namespace Thermite
 		return prPos;
 	}
 
-	void SurfacePatchRenderable::buildRenderOperationFrom(IndexedSurfacePatch& isp, bool bSingleMaterial)
+	void SurfacePatchRenderable::buildRenderOperationFrom(SurfaceMesh& mesh, bool bSingleMaterial)
 	{
-		if(isp.isEmpty())
+		if(mesh.isEmpty())
 		{
 			m_RenderOp = 0;
 			return;
 		}
 
-		if((!bSingleMaterial) && (isp.getNoOfNonUniformTrianges() == 0))
+		if((!bSingleMaterial) && (mesh.getNoOfNonUniformTrianges() == 0))
 		{
 			m_RenderOp = 0;
 			return;
 		}
 
-		m_vecLodRecords = isp.m_vecLodRecords;
+		m_vecLodRecords = mesh.m_vecLodRecords;
 
 		m_bIsSingleMaterial = bSingleMaterial;
 
@@ -235,20 +235,20 @@ namespace Thermite
 		decl->addElement(0, 3 * sizeof(float), VET_FLOAT3, VES_NORMAL);
 		decl->addElement(0, 6 * sizeof(float), VET_FLOAT2, VES_TEXTURE_COORDINATES);
 
-		const std::vector<SurfaceVertex>& vecVertices = isp.getVertices();
-		const std::vector<PolyVox::uint32_t>& vecIndices = isp.getIndices();
+		const std::vector<SurfaceVertex>& vecVertices = mesh.getVertices();
+		const std::vector<PolyVox::uint32_t>& vecIndices = mesh.getIndices();
 
 		//The '3 * 3' in the following expressions comes from the fact that when we encounter a non uniform
 		//triangle we make it degenerate and add three new ones. That is an increase of nine vertices.
 		if(bSingleMaterial)
 		{
-			renderOperation->vertexData->vertexCount = (vecVertices.size()) + (isp.getNoOfNonUniformTrianges() * 3);		
+			renderOperation->vertexData->vertexCount = (vecVertices.size()) + (mesh.getNoOfNonUniformTrianges() * 3);		
 			renderOperation->indexData->indexCount = vecIndices.size();	
 		}
 		else
 		{
-			renderOperation->vertexData->vertexCount = (isp.getNoOfNonUniformTrianges() * 3 * 3);		
-			renderOperation->indexData->indexCount = (isp.getNoOfNonUniformTrianges() * 3 * 3);	
+			renderOperation->vertexData->vertexCount = (mesh.getNoOfNonUniformTrianges() * 3 * 3);		
+			renderOperation->indexData->indexCount = (mesh.getNoOfNonUniformTrianges() * 3 * 3);	
 		}
 		
 		VertexBufferBinding *bind = renderOperation->vertexData->vertexBufferBinding;
@@ -420,7 +420,7 @@ namespace Thermite
 					vert1.setMaterial(mat0);
 					vert2.setMaterial(mat0);
 
-					if(isp.m_mapUsedMaterials.find(mat0) != isp.m_mapUsedMaterials.end())
+					if(mesh.m_mapUsedMaterials.find(mat0) != mesh.m_mapUsedMaterials.end())
 					{
 						prPos = addVertex(vert0, 1.0, prPos);
 					}
@@ -447,7 +447,7 @@ namespace Thermite
 					vert2.setMaterial(mat1);
 
 					prPos = addVertex(vert0, 0.0, prPos);
-					if(isp.m_mapUsedMaterials.find(mat1) != isp.m_mapUsedMaterials.end())
+					if(mesh.m_mapUsedMaterials.find(mat1) != mesh.m_mapUsedMaterials.end())
 					{
 						prPos = addVertex(vert1, 1.0, prPos);
 					}
@@ -474,7 +474,7 @@ namespace Thermite
 
 					prPos = addVertex(vert0, 0.0, prPos);
 					prPos = addVertex(vert1, 0.0, prPos);
-					if(isp.m_mapUsedMaterials.find(mat2) != isp.m_mapUsedMaterials.end())
+					if(mesh.m_mapUsedMaterials.find(mat2) != mesh.m_mapUsedMaterials.end())
 					{
 						prPos = addVertex(vert2, 1.0, prPos);
 					}

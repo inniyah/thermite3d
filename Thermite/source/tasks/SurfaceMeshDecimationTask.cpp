@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
-#include "IndexedSurfacePatch.h"
+#include "SurfaceMesh.h"
 #include "SurfaceExtractor.h"
 
 #include <QMutex>
@@ -42,7 +42,7 @@ namespace Thermite
 
 	void SurfaceMeshDecimationTask::run(void)
 	{
-		m_taskData.m_ispResult->decimate(0.95);
+		m_taskData.m_meshResult->decimate(0.95);
 		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
 		emit finished(m_taskData);
 	}

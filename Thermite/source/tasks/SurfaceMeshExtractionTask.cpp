@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include "ThermiteGameLogic.h"
 
 #include "GradientEstimators.h"
-#include "IndexedSurfacePatch.h"
+#include "SurfaceMesh.h"
 #include "SurfaceExtractor.h"
 
 #include <QMutex>
@@ -48,12 +48,12 @@ namespace Thermite
 		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
 
 		pSurfaceExtractor->setLodLevel(0);
-		m_taskData.m_ispResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
+		m_taskData.m_meshResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
-		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_ispResult.get()), PolyVox::SOBEL_SMOOTHED);
-		m_taskData.m_ispResult->generateAveragedFaceNormals(true);
+		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_meshResult.get()), PolyVox::SOBEL_SMOOTHED);
+		m_taskData.m_meshResult->generateAveragedFaceNormals(true);
 
-		//m_taskData.m_ispResult->decimate();
+		//m_taskData.m_meshResult->decimate();
 		emit finished(m_taskData);
 	}
 }

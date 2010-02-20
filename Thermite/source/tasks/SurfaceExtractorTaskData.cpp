@@ -45,9 +45,9 @@ namespace Thermite
 		return m_regToProcess;
 	}
 
-	POLYVOX_SHARED_PTR<IndexedSurfacePatch> SurfaceExtractorTaskData::getIndexedSurfacePatch(void) const
+	POLYVOX_SHARED_PTR<SurfaceMesh> SurfaceExtractorTaskData::getSurfaceMesh(void) const
 	{
-		return m_ispResult;
+		return m_meshResult;
 	}
 
 	void SurfaceExtractorTaskData::setRegion(const Region& regToProcess)

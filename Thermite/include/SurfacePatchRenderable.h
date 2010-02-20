@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #include "Ogre.h"
 #include <vector>
 
-#include "IndexedSurfacePatch.h"
+#include "SurfaceMesh.h"
 
 #include "MapRegion.h"
 
@@ -65,7 +65,7 @@ namespace Thermite
 		void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
 
 		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
-		void buildRenderOperationFrom(PolyVox::IndexedSurfacePatch& isp, bool bSingleMaterial);
+		void buildRenderOperationFrom(PolyVox::SurfaceMesh& mesh, bool bSingleMaterial);
 
 	protected:
 		Ogre::RenderOperation* m_RenderOp;

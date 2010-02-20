@@ -86,7 +86,7 @@ namespace Thermite
 		}
 	}
 
-	void MapRegion::addSurfacePatchRenderable(std::string materialName, IndexedSurfacePatch& isp)
+	void MapRegion::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh)
 	{
 		//Single Material
 		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
@@ -98,7 +98,7 @@ namespace Thermite
 		m_pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
 		pSingleMaterialSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
 
-		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(isp, true);
+		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, true);
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
@@ -127,7 +127,7 @@ namespace Thermite
 		m_pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
 		pMultiMaterialSurfacePatchRenderable->m_v3dPos = m_pOgreSceneNode->getPosition();
 
-		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(isp, false);
+		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, false);
 
 		//int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		//Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
@@ -161,14 +161,14 @@ namespace Thermite
 		m_listMultiMaterialSurfacePatchRenderables.clear();
 	}
 
-	void MapRegion::setPhysicsData(const IndexedSurfacePatch& isp)
+	void MapRegion::setPhysicsData(const SurfaceMesh& mesh)
 	{
 #ifdef ENABLE_BULLET_PHYSICS
 		const std::string& strName = makeUniqueName("RB");
 
 		destroyPhysicsData();
 
-		if(isp.isEmpty())
+		if(mesh.isEmpty())
 		{
 			return;
 		}
@@ -180,11 +180,11 @@ namespace Thermite
 		/*if(mTriMesh == 0)
 		{*/
 			mTriMesh = new btTriangleMesh();
-			copyISPToTriangleMesh(isp, mTriMesh);   
+			copyMeshToTriangleMesh(mesh, mTriMesh);   
 		/*}
 		else
 		{
-			updateTriangleMeshWithNewISP(isp, mTriMesh);
+			updateTriangleMeshWithNewMesh(mesh, mTriMesh);
 		}*/
 
 		const btVector3 minAabb(0,0,0);
@@ -250,17 +250,17 @@ namespace Thermite
 	}
 
 #ifdef ENABLE_BULLET_PHYSICS
-	void MapRegion::copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
+	void MapRegion::copyMeshToTriangleMesh(const PolyVox::SurfaceMesh& mesh, btTriangleMesh* triMesh)
 	{
 		btVector3    vecBulletVertices[3];
 
-		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = isp.getIndices().begin();
-		while(indicesIter != isp.getIndices().end())
+		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
+		while(indicesIter != mesh.getIndices().end())
 		{
 			for (unsigned int v = 0; v < 3; ++v)
 			{
 				PolyVox::uint32_t uIndex = *indicesIter;
-				const SurfaceVertex& vertex = isp.getVertices()[uIndex];
+				const SurfaceVertex& vertex = mesh.getVertices()[uIndex];
 				const Vector3DFloat& vertexPos = vertex.getPosition();
 
 				vecBulletVertices[v][0] = vertex.getPosition().getX();
@@ -274,10 +274,10 @@ namespace Thermite
 		}
 	}
 
-	void MapRegion::updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh)
+	void MapRegion::updateTriangleMeshWithNewMesh(const PolyVox::SurfaceMesh& mesh, btTriangleMesh* triMesh)
 	{
-		mTriMesh->preallocateVertices(isp.getVertices().size());
-		mTriMesh->preallocateIndices(isp.getIndices().size());
+		mTriMesh->preallocateVertices(mesh.getVertices().size());
+		mTriMesh->preallocateIndices(mesh.getIndices().size());
 		unsigned char *vertexbase;
 		int numverts;
 		PHY_ScalarType type;
@@ -294,10 +294,10 @@ namespace Thermite
 		Ogre::LogManager::getSingleton().logMessage("Index Stride is " + Ogre::StringConverter::toString(indexstride));
 
 		float* vertexBaseAsFloat = reinterpret_cast<float*>(vertexbase);
-		std::vector<SurfaceVertex>::const_iterator verticesIter = isp.getVertices().begin();
+		std::vector<SurfaceVertex>::const_iterator verticesIter = mesh.getVertices().begin();
 		//LogManager::getSingleton().logMessage("copying vertices");
 		int ct = 0;
-		while(verticesIter != isp.getVertices().end())
+		while(verticesIter != mesh.getVertices().end())
 		{
 			//LogManager::getSingleton().logMessage("copying vertex " + StringConverter::toString(ct));
 			*vertexBaseAsFloat = (float)(verticesIter->getPosition().getX());
@@ -314,8 +314,8 @@ namespace Thermite
 
 		//LogManager::getSingleton().logMessage("copying indices");
 		int* indexBaseAsInt = reinterpret_cast<int*>(indexbase);
-		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = isp.getIndices().begin();
-		while(indicesIter != isp.getIndices().end())
+		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
+		while(indicesIter != mesh.getIndices().end())
 		{
 			*indexBaseAsInt = (int)(*indicesIter);
 			++indexBaseAsInt;

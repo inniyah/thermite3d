@@ -40,13 +40,13 @@ namespace Thermite
 		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint32_t uTimeStamp);
 
 		PolyVox::Region getRegion(void) const;
-		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> getIndexedSurfacePatch(void) const;
+		POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> getSurfaceMesh(void) const;
 
 		void setRegion(const PolyVox::Region& regToProcess);
 
 	public:
 		PolyVox::Region m_regToProcess;
-		POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> m_ispResult;
+		POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> m_meshResult;
 		PolyVox::uint32_t m_uTimeStamp;
 	};
 }

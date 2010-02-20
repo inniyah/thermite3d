@@ -132,7 +132,7 @@ namespace Thermite
 		
 	public:
 
-		void uploadIndexedSurfacePatch(POLYVOX_SHARED_PTR<PolyVox::IndexedSurfacePatch> isp, PolyVox::Region region);
+		void uploadSurfaceMesh(POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> mesh, PolyVox::Region region);
 
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 

@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #define __MapRegion_H__
 
 #include "PolyVoxForwardDeclarations.h"
-#include "IndexedSurfacePatch.h"
+#include "SurfaceMesh.h"
 
 #include "ThermiteForwardDeclarations.h"
 
@@ -50,9 +50,9 @@ namespace Thermite
 		MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
 		~MapRegion();
 
-		void setPhysicsData(const PolyVox::IndexedSurfacePatch& isp);
+		void setPhysicsData(const PolyVox::SurfaceMesh& mesh);
 
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::IndexedSurfacePatch& isp);
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh& mesh);
 		void removeAllSurfacePatchRenderables();
 
 		void destroyPhysicsData(void);
@@ -67,8 +67,8 @@ namespace Thermite
 		std::list<SurfacePatchRenderable*> m_listMultiMaterialSurfacePatchRenderables;
 
 #ifdef ENABLE_BULLET_PHYSICS
-		void copyISPToTriangleMesh(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
-		void updateTriangleMeshWithNewISP(const PolyVox::IndexedSurfacePatch& isp, btTriangleMesh* triMesh);
+		void copyMeshToTriangleMesh(const PolyVox::SurfaceMesh& mesh, btTriangleMesh* triMesh);
+		void updateTriangleMeshWithNewMesh(const PolyVox::SurfaceMesh& mesh, btTriangleMesh* triMesh);
 #endif //ENABLE_BULLET_PHYSICS
 
 	public:

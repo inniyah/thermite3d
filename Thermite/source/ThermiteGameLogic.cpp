@@ -540,7 +540,7 @@ namespace Thermite
 			return;
 		}
 
-		uploadIndexedSurfacePatch(result.getIndexedSurfacePatch(), result.getRegion());
+		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 
 
 		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
@@ -572,10 +572,10 @@ namespace Thermite
 			return;
 		}
 
-		uploadIndexedSurfacePatch(result.getIndexedSurfacePatch(), result.getRegion());
+		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}
 
-	void ThermiteGameLogic::uploadIndexedSurfacePatch(POLYVOX_SHARED_PTR<IndexedSurfacePatch> isp, Region region)
+	void ThermiteGameLogic::uploadSurfaceMesh(POLYVOX_SHARED_PTR<SurfaceMesh> mesh, Region region)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -604,11 +604,11 @@ namespace Thermite
 		//Clear any previous geometry
 		pMapRegion->removeAllSurfacePatchRenderables();
 
-		//Get the IndexedSurfacePatch and check it's valid
-		POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispWhole = isp;
-		if((ispWhole) && (ispWhole->isEmpty() == false))
+		//Get the SurfaceMesh and check it's valid
+		POLYVOX_SHARED_PTR<SurfaceMesh> meshWhole = mesh;
+		if((meshWhole) && (meshWhole->isEmpty() == false))
 		{			
-			//The IndexedSurfacePatch needs to be broken into pieces - one for each material. Iterate over the mateials...
+			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
 			for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
 			{
 				//Get the properties
@@ -616,17 +616,17 @@ namespace Thermite
 				std::set<uint8_t> voxelValues = iter->second;
 
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				POLYVOX_SHARED_PTR<IndexedSurfacePatch> ispSubset = ispWhole->extractSubset(voxelValues);
+				POLYVOX_SHARED_PTR<SurfaceMesh> meshSubset = meshWhole->extractSubset(voxelValues);
 
 				//And add it to the MapRegion
-				pMapRegion->addSurfacePatchRenderable(materialName, *ispSubset);
+				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
 			}
 
 			//If we are simulating physics...
 			if(bSimulatePhysics)
 			{
 				//Update the physics geometry
-				pMapRegion->setPhysicsData(*(ispWhole.get()));
+				pMapRegion->setPhysicsData(*(meshWhole.get()));
 			}
 		}
 
