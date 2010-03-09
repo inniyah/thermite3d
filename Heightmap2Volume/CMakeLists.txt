@@ -55,11 +55,8 @@ INSTALL(TARGETS Heightmap2Volume
 
 IF(WIN32)	
 	#Install the PolyVox .dll's
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore.dll DESTINATION bin CONFIGURATIONS Release)
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil.dll DESTINATION bin CONFIGURATIONS Release)
-	
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore_d.dll DESTINATION bin CONFIGURATIONS Debug)
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil_d.dll DESTINATION bin CONFIGURATIONS Debug)	
+	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore.dll DESTINATION bin)
+	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil.dll DESTINATION bin)	
 ENDIF(WIN32)
 
 #INSTALL(DIRECTORY resources DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PATTERN "*.svn*" EXCLUDE) #this will exclude the .svn files
