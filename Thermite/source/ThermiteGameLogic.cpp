@@ -110,11 +110,19 @@ namespace Thermite
 		m_pThermiteLogoMovie->start();
 
 		//Load the Cg plugin
-		#if defined(_DEBUG)
-			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager_d");
-		#else
-			Ogre::Root::getSingletonPtr()->loadPlugin("Plugin_CgProgramManager");
-		#endif
+		//FIXME - We should do this through plugins.cfg
+		try
+		{
+			#if defined(_DEBUG)
+				Ogre::Root::getSingletonPtr()->loadPlugin("c:\\ogrenew\\lib\\Plugin_CgProgramManager_d");
+			#else
+				Ogre::Root::getSingletonPtr()->loadPlugin("c:\\ogrenew\\lib\\Plugin_CgProgramManager");
+			#endif
+		}
+		catch(Ogre::Exception& e)
+		{
+			mThermiteLog->logMessage("Failed to load Cg plugin.", LL_WARNING);
+		}
 
 		//Initialise all resources
 		addResourceDirectory("./resources/");
