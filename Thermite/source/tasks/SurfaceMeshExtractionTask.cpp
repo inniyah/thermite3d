@@ -47,7 +47,6 @@ namespace Thermite
 		//Or at least not use 'new'
 		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
 
-		pSurfaceExtractor->setLodLevel(0);
 		m_taskData.m_meshResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
 		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_meshResult.get()), PolyVox::SOBEL_SMOOTHED);
