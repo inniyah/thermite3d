@@ -30,6 +30,9 @@ freely, subject to the following restrictions:
 
 #include "ThermiteForwardDeclarations.h"
 
+#include "OgreVector3.h"
+#include "OgreQuaternion.h"
+
 namespace Thermite
 {
 	class MainMenu;

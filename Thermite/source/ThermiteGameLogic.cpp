@@ -307,7 +307,10 @@ namespace Thermite
 
 		mMap = mapResource->m_pMap;
 		m_pActiveOgreSceneManager = mMap->m_pOgreSceneManager;
+
+#ifdef ENABLE_BULLET_PHYSICS
 		m_pOgreBulletWorld = mMap->m_pOgreBulletWorld;
+#endif //ENABLE_BULLET_PHYSICS
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
