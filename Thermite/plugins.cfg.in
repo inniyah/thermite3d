@@ -6,3 +6,4 @@ PluginFolder=${OGRESDK}/bin/release
 # Define plugins
 Plugin=RenderSystem_GL
 Plugin=RenderSystem_Direct3D9
+Plugin=Plugin_CgProgramManager
