@@ -62,11 +62,15 @@ namespace Thermite
 		MapResourcePtr (const MapResourcePtr &r) : Ogre::SharedPtr<MapResource> (r) {} 
 		MapResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<MapResource> ()
 		{
+			if(r.isNull())
+				return;
+
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
 				pRep = static_cast<MapResource*> (r.getPointer ());
 			pUseCount = r.useCountPointer ();
+			useFreeMethod = r.freeMethod();
 			if (pUseCount)
 			{
 				++ (*pUseCount);
@@ -79,11 +83,16 @@ namespace Thermite
 			if (pRep == static_cast<MapResource*> (r.getPointer ()))
 				return *this;
 			release ();
+
+			if(r.isNull())
+				return *this;
+
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
 				pRep = static_cast<MapResource*> (r.getPointer());
 			pUseCount = r.useCountPointer ();
+			useFreeMethod = r.freeMethod();
 			if (pUseCount)
 			{
 				++ (*pUseCount);

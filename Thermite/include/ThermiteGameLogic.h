@@ -132,7 +132,7 @@ namespace Thermite
 		
 	public:
 
-		void uploadSurfaceMesh(POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> mesh, PolyVox::Region region);
+		void uploadSurfaceMesh(std::shared_ptr<PolyVox::SurfaceMesh> mesh, PolyVox::Region region);
 
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 
@@ -144,7 +144,7 @@ namespace Thermite
 
 		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
 
-		PolyVox::Volume<PolyVox::uint32_t>* m_volRegionTimeStamps;
+		PolyVox::Volume<uint32_t>* m_volRegionTimeStamps;
 
 		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
 

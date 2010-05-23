@@ -254,12 +254,12 @@ namespace Thermite
 	{
 		btVector3    vecBulletVertices[3];
 
-		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
+		std::vector<uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
 		while(indicesIter != mesh.getIndices().end())
 		{
 			for (unsigned int v = 0; v < 3; ++v)
 			{
-				PolyVox::uint32_t uIndex = *indicesIter;
+				uint32_t uIndex = *indicesIter;
 				const SurfaceVertex& vertex = mesh.getVertices()[uIndex];
 				const Vector3DFloat& vertexPos = vertex.getPosition();
 
@@ -314,7 +314,7 @@ namespace Thermite
 
 		//LogManager::getSingleton().logMessage("copying indices");
 		int* indexBaseAsInt = reinterpret_cast<int*>(indexbase);
-		std::vector<PolyVox::uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
+		std::vector<uint32_t>::const_iterator indicesIter = mesh.getIndices().begin();
 		while(indicesIter != mesh.getIndices().end())
 		{
 			*indexBaseAsInt = (int)(*indicesIter);

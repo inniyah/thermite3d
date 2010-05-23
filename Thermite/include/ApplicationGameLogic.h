@@ -58,7 +58,7 @@ namespace Thermite
 
 		void fireCannon(void);
 
-		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value, bool bPaintMode);
+		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode);
 
 	protected:
 		//For keyboard handling
@@ -87,7 +87,7 @@ namespace Thermite
 		Ogre::Entity* mSphereBrush;
 		Ogre::SceneNode* mSphereBrushNode;
 		float mSphereBrushScale;
-		PolyVox::uint8_t mSphereBrushMaterial;
+		uint8_t mSphereBrushMaterial;
 
 		Ogre::Quaternion mTurretOriginalOrientation;
 		Ogre::Quaternion mGunOriginalOrientation;

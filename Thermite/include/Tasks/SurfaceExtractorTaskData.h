@@ -37,17 +37,17 @@ namespace Thermite
 	{
 	public:
 		SurfaceExtractorTaskData(void);
-		SurfaceExtractorTaskData(PolyVox::Region regToProcess, PolyVox::uint32_t uTimeStamp);
+		SurfaceExtractorTaskData(PolyVox::Region regToProcess, uint32_t uTimeStamp);
 
 		PolyVox::Region getRegion(void) const;
-		POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> getSurfaceMesh(void) const;
+		std::shared_ptr<PolyVox::SurfaceMesh> getSurfaceMesh(void) const;
 
 		void setRegion(const PolyVox::Region& regToProcess);
 
 	public:
 		PolyVox::Region m_regToProcess;
-		POLYVOX_SHARED_PTR<PolyVox::SurfaceMesh> m_meshResult;
-		PolyVox::uint32_t m_uTimeStamp;
+		std::shared_ptr<PolyVox::SurfaceMesh> m_meshResult;
+		uint32_t m_uTimeStamp;
 	};
 }
 

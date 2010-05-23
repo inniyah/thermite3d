@@ -45,7 +45,7 @@ namespace Thermite
 			Ogre::ManualResourceLoader *loader = 0);
 		~VolumeResource();		
 
-		PolyVox::Volume<PolyVox::uint8_t>* getVolume(void);
+		PolyVox::Volume<uint8_t>* getVolume(void);
 
 	protected:
 
@@ -54,7 +54,7 @@ namespace Thermite
 		void unloadImpl ();
 		size_t calculateSize () const;
 
-		POLYVOX_SHARED_PTR< PolyVox::Volume<PolyVox::uint8_t> > m_pVolume;
+		std::shared_ptr< PolyVox::Volume<uint8_t> > m_pVolume;
 	};
 
 	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 
@@ -65,11 +65,15 @@ namespace Thermite
 		VolumeResourcePtr (const VolumeResourcePtr &r) : Ogre::SharedPtr<VolumeResource> (r) {} 
 		VolumeResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<VolumeResource> ()
 		{
+			if(r.isNull())
+				return;
+
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
 				pRep = static_cast<VolumeResource*> (r.getPointer ());
 			pUseCount = r.useCountPointer ();
+			useFreeMethod = r.freeMethod();
 			if (pUseCount)
 			{
 				++ (*pUseCount);
@@ -82,11 +86,16 @@ namespace Thermite
 			if (pRep == static_cast<VolumeResource*> (r.getPointer ()))
 				return *this;
 			release ();
+
+			if(r.isNull())
+				return *this;
+
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
 				pRep = static_cast<VolumeResource*> (r.getPointer());
 			pUseCount = r.useCountPointer ();
+			useFreeMethod = r.freeMethod();
 			if (pUseCount)
 			{
 				++ (*pUseCount);

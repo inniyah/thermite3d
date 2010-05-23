@@ -62,10 +62,6 @@ using namespace std;
 
 using namespace PolyVox;
 
-using PolyVox::uint32_t;
-using PolyVox::uint16_t;
-using PolyVox::uint8_t;
-
 namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
@@ -306,7 +302,7 @@ namespace Thermite
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
-		m_volRegionTimeStamps = new Volume<uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volRegionTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
@@ -453,27 +449,27 @@ namespace Thermite
 		if(!mMap->volumeResource.isNull())
 		{		
 			//Some values we'll need later.
-			uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-			uint16_t halfRegionSideLength = regionSideLength / 2;
-			uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
-			uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
-			uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+			std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+			std::uint16_t halfRegionSideLength = regionSideLength / 2;
+			std::uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
+			std::uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
+			std::uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
 
 			//Iterate over each region in the VolumeChangeTracker
-			for(uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+			for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 			{		
-				for(uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+				for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
 				{
-					for(uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+					for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 					{
 						//Compute the extents of the current region
-						const uint16_t firstX = regionX * regionSideLength;
-						const uint16_t firstY = regionY * regionSideLength;
-						const uint16_t firstZ = regionZ * regionSideLength;
+						const std::uint16_t firstX = regionX * regionSideLength;
+						const std::uint16_t firstY = regionY * regionSideLength;
+						const std::uint16_t firstZ = regionZ * regionSideLength;
 
-						const uint16_t lastX = firstX + regionSideLength;
-						const uint16_t lastY = firstY + regionSideLength;
-						const uint16_t lastZ = firstZ + regionSideLength;	
+						const std::uint16_t lastX = firstX + regionSideLength;
+						const std::uint16_t lastY = firstY + regionSideLength;
+						const std::uint16_t lastZ = firstZ + regionSideLength;	
 
 						const float centreX = firstX + halfRegionSideLength;
 						const float centreY = firstY + halfRegionSideLength;
@@ -488,7 +484,7 @@ namespace Thermite
 						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
-						uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
 							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
@@ -501,7 +497,7 @@ namespace Thermite
 
 							//The prioirty ensures that the surfaces for regions close to the
 							//camera get extracted before those which are distant from the camera.
-							uint32_t uPriority = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(distanceFromCameraSquared);
+							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
 							SurfaceExtractorTaskData taskData(region, uRegionTimeStamp);
@@ -521,14 +517,14 @@ namespace Thermite
 
 	void ThermiteGameLogic::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
 	{
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
-		uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 		if(uRegionTimeStamp > result.m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -553,14 +549,14 @@ namespace Thermite
 
 	void ThermiteGameLogic::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)
 	{
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		PolyVox::uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		PolyVox::uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		PolyVox::uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
-		uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 		if(uRegionTimeStamp > result.m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -571,15 +567,15 @@ namespace Thermite
 		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(POLYVOX_SHARED_PTR<SurfaceMesh> mesh, Region region)
+	void ThermiteGameLogic::uploadSurfaceMesh(shared_ptr<SurfaceMesh> mesh, Region region)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		PolyVox::uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
-		PolyVox::uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
-		PolyVox::uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
 
 		/*uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 		if(uRegionTimeStamp > result.m_uTimeStamp)
@@ -601,18 +597,18 @@ namespace Thermite
 		pMapRegion->removeAllSurfacePatchRenderables();
 
 		//Get the SurfaceMesh and check it's valid
-		POLYVOX_SHARED_PTR<SurfaceMesh> meshWhole = mesh;
+		shared_ptr<SurfaceMesh> meshWhole = mesh;
 		if((meshWhole) && (meshWhole->isEmpty() == false))
 		{			
 			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
-			for(std::map< std::string, std::set<PolyVox::uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
+			for(std::map< std::string, std::set<uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
 			{
 				//Get the properties
 				std::string materialName = iter->first;
-				std::set<uint8_t> voxelValues = iter->second;
+				std::set<std::uint8_t> voxelValues = iter->second;
 
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				POLYVOX_SHARED_PTR<SurfaceMesh> meshSubset = meshWhole->extractSubset(voxelValues);
+				shared_ptr<SurfaceMesh> meshSubset = meshWhole->extractSubset(voxelValues);
 
 				//And add it to the MapRegion
 				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
@@ -649,7 +645,7 @@ namespace Thermite
 		result.second = Ogre::Vector3::ZERO;
 
 		//Ensure the voume is valid
-		PolyVox::Volume<PolyVox::uint8_t>* pVolume = mMap->volumeResource->getVolume();
+		PolyVox::Volume<uint8_t>* pVolume = mMap->volumeResource->getVolume();
 		if(pVolume == 0)
 		{
 			return result;

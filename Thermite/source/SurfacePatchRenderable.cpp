@@ -236,7 +236,7 @@ namespace Thermite
 		decl->addElement(0, 6 * sizeof(float), VET_FLOAT2, VES_TEXTURE_COORDINATES);
 
 		const std::vector<SurfaceVertex>& vecVertices = mesh.getVertices();
-		const std::vector<PolyVox::uint32_t>& vecIndices = mesh.getIndices();
+		const std::vector<uint32_t>& vecIndices = mesh.getIndices();
 
 		//The '3 * 3' in the following expressions comes from the fact that when we encounter a non uniform
 		//triangle we make it degenerate and add three new ones. That is an increase of nine vertices.

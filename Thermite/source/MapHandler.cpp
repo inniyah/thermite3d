@@ -116,7 +116,7 @@ namespace Thermite
 
 	void* MapHandler::handleVoxel(const QXmlAttributes &attributes)
 	{
-		PolyVox::uint8_t voxelValue = convertWithDefault(attributes.value("value"), 0);
+		uint8_t voxelValue = convertWithDefault(attributes.value("value"), 0);
 		QString voxelMaterial = convertWithDefault(attributes.value("material"), "");
 
 		mMap->m_mapMaterialIds[voxelMaterial.toStdString()].insert(voxelValue);

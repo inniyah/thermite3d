@@ -60,10 +60,6 @@ using namespace std;
 
 using namespace PolyVox;
 
-using PolyVox::uint32_t;
-using PolyVox::uint16_t;
-using PolyVox::uint8_t;
-
 namespace Thermite
 {
 	ApplicationGameLogic::ApplicationGameLogic(void)
@@ -330,7 +326,7 @@ namespace Thermite
 		m_listShells.push_back(shell);
 	}
 
-	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, PolyVox::uint8_t value, bool bPaintMode)
+	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.getX() - radius));
 		int firstY = static_cast<int>(std::floor(centre.getY() - radius));
@@ -365,19 +361,19 @@ namespace Thermite
 		//Longer term, it might be interesting to introduce a 'ModyfyVolumeCommand' which can be issued to runn on seperate threads.
 		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
 		//for that region.
-		const uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
 
-		const uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
 
-		for(uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
 		{
-			for(uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			for(std::uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
 			{
-				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
 					if(m_volRegionBeingProcessed->getVoxelAt(xCt,yCt,zCt))
@@ -398,7 +394,7 @@ namespace Thermite
 				{
 					if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						PolyVox::uint8_t currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
+						uint8_t currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
 						if(currentValue != value)
 						{
 							if(bPaintMode)

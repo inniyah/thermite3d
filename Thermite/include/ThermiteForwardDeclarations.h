@@ -26,16 +26,6 @@ freely, subject to the following restrictions:
 #ifndef __ForwardDeclarations_H__
 #define __ForwardDeclarations_H__
 
-#include "PolyVoxImpl/CPlusPlusZeroXSupport.h"
-const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH_POWER = 8;
-const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH = (0x0001 << THERMITE_VOLUME_SIDE_LENGTH_POWER);
-
-const PolyVox::uint16_t THERMITE_REGION_SIDE_LENGTH_POWER = 5;
-const PolyVox::uint16_t THERMITE_REGION_SIDE_LENGTH = (0x0001 << THERMITE_REGION_SIDE_LENGTH_POWER);
-const PolyVox::uint16_t THERMITE_VOLUME_SIDE_LENGTH_IN_REGIONS = (THERMITE_VOLUME_SIDE_LENGTH >> THERMITE_REGION_SIDE_LENGTH_POWER);
-
-
-
 namespace Thermite
 {
 	class ApplicationGameLogic;

@@ -61,7 +61,7 @@ namespace Thermite
 
 		VolumeResourcePtr volumeResource;
 
-		std::map< std::string, std::set<PolyVox::uint8_t> > m_mapMaterialIds;	
+		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 	};
 }
 

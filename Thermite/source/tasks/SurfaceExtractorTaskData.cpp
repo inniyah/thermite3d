@@ -24,9 +24,7 @@ freely, subject to the following restrictions:
 #include "SurfaceExtractorTaskData.h"
 
 using namespace PolyVox;
-using PolyVox::uint8_t;
-using PolyVox::uint32_t;
-
+using namespace std;
 
 namespace Thermite
 {
@@ -34,7 +32,7 @@ namespace Thermite
 	{
 	}
 
-	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, PolyVox::uint32_t uTimeStamp)
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint32_t uTimeStamp)
 		:m_regToProcess(regToProcess)
 		,m_uTimeStamp(uTimeStamp)
 	{
@@ -45,7 +43,7 @@ namespace Thermite
 		return m_regToProcess;
 	}
 
-	POLYVOX_SHARED_PTR<SurfaceMesh> SurfaceExtractorTaskData::getSurfaceMesh(void) const
+	shared_ptr<SurfaceMesh> SurfaceExtractorTaskData::getSurfaceMesh(void) const
 	{
 		return m_meshResult;
 	}

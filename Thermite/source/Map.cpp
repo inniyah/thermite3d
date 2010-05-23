@@ -47,10 +47,6 @@ freely, subject to the following restrictions:
 //using namespace Ogre;
 using namespace PolyVox;
 
-using PolyVox::uint32_t;
-using PolyVox::uint16_t;
-using PolyVox::uint8_t;
-
 namespace Thermite
 {
 	Map::Map()

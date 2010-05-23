@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
 #include <iostream> //FIXME - remove this...
 
 using namespace PolyVox;
+using namespace std;
 
 namespace Thermite
 {
@@ -63,7 +64,7 @@ namespace Thermite
 	void VolumeResource::unloadImpl ()
 	{
 		//Clear the pointer
-		m_pVolume = POLYVOX_SHARED_PTR< PolyVox::Volume<PolyVox::uint8_t> >();
+		m_pVolume = shared_ptr< PolyVox::Volume<uint8_t> >();
 	}
 
 	size_t VolumeResource::calculateSize () const
@@ -73,7 +74,7 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	PolyVox::Volume<PolyVox::uint8_t>* VolumeResource::getVolume(void)
+	PolyVox::Volume<uint8_t>* VolumeResource::getVolume(void)
 	{
 		return m_pVolume.get();
 	}
