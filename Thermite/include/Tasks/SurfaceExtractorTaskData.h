@@ -31,6 +31,8 @@ freely, subject to the following restrictions:
 
 #include <QMetaType>
 
+#include <memory>
+
 namespace Thermite
 {
 	class SurfaceExtractorTaskData

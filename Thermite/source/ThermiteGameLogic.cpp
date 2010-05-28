@@ -567,7 +567,7 @@ namespace Thermite
 		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(shared_ptr<SurfaceMesh> mesh, Region region)
+	void ThermiteGameLogic::uploadSurfaceMesh(shared_ptr<SurfaceMesh> mesh, PolyVox::Region region)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();

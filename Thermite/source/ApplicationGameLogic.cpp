@@ -347,7 +347,7 @@ namespace Thermite
 		lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
 		lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
 
-		Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
 
 		////////////////////////////////////////////////////////////////////////////////
 
