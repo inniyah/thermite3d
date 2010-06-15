@@ -234,14 +234,10 @@ namespace Thermite
 		{
 			(*iter)->update(mTimeElapsedInSeconds);
 			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
-
-			if(mMap->volumeResource->getVolume()->getEnclosingRegion().containsPoint(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 1.0))
+			if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
 			{
-				if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
-				{
-					createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0, false);
-					shellsToDelete.push_back(*iter);
-				}
+				createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0, false);
+				shellsToDelete.push_back(*iter);
 			}
 		}
 

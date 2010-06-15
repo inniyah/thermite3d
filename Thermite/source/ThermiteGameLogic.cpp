@@ -656,9 +656,8 @@ namespace Thermite
 		{
 			Ogre::Vector3 point = ray.getPoint(dist);
 			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
-			bool inside = pVolume->getEnclosingRegion().containsPoint(static_cast<Vector3DInt16>(v3dPoint), 2);
-				
-			if((inside) && (pVolume->getVoxelAt(v3dPoint) != 0))
+
+			if(pVolume->getVoxelAt(v3dPoint) != 0)
 			{
 				result.first = true;
 				result.second = point;
