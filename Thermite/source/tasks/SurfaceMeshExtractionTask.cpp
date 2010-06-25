@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 
 #include "SurfaceMeshExtractionTask.h"
 
+#include "MaterialDensityPair.h"
 #include "ThermiteGameLogic.h"
 
 #include "GradientEstimators.h"
@@ -32,6 +33,8 @@ freely, subject to the following restrictions:
 #include "SurfaceExtractor.h"
 
 #include <QMutex>
+
+using namespace PolyVox;
 
 namespace Thermite
 {
@@ -45,12 +48,12 @@ namespace Thermite
 	{
 		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
 		//Or at least not use 'new'
-		PolyVox::SurfaceExtractor* pSurfaceExtractor = new PolyVox::SurfaceExtractor(*(m_pGameLogic->mMap->volumeResource->getVolume()));
+		PolyVox::SurfaceExtractor<MaterialDensityPair44>* pSurfaceExtractor = new PolyVox::SurfaceExtractor<MaterialDensityPair44>(*(m_pGameLogic->mMap->volumeResource->getVolume()));
 
 		m_taskData.m_meshResult = pSurfaceExtractor->extractSurfaceForRegion(m_taskData.m_regToProcess);
 
 		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_meshResult.get()), PolyVox::SOBEL_SMOOTHED);
-		m_taskData.m_meshResult->generateAveragedFaceNormals(true);
+		//m_taskData.m_meshResult->generateAveragedFaceNormals(true);
 
 		//m_taskData.m_meshResult->decimate();
 		emit finished(m_taskData);

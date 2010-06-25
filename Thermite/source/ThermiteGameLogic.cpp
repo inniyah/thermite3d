@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "SurfaceExtractorTaskData.h"
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
+#include "MaterialDensityPair.h"
 #include "VolumeManager.h"
 
 #include "Application.h"
@@ -295,7 +296,7 @@ namespace Thermite
 
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
-		volumeChangeTracker = new VolumeChangeTracker(mMap->volumeResource->getVolume(), regionSideLength);
+		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(mMap->volumeResource->getVolume(), regionSideLength);
 		volumeChangeTracker->setAllRegionsModified();
 
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
@@ -645,7 +646,7 @@ namespace Thermite
 		result.second = Ogre::Vector3::ZERO;
 
 		//Ensure the voume is valid
-		PolyVox::Volume<uint8_t>* pVolume = mMap->volumeResource->getVolume();
+		PolyVox::Volume<MaterialDensityPair44>* pVolume = mMap->volumeResource->getVolume();
 		if(pVolume == 0)
 		{
 			return result;
@@ -657,7 +658,7 @@ namespace Thermite
 			Ogre::Vector3 point = ray.getPoint(dist);
 			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
 
-			if(pVolume->getVoxelAt(v3dPoint) != 0)
+			if(pVolume->getVoxelAt(v3dPoint).getDensity() >= MaterialDensityPair44::getMidDensity())
 			{
 				result.first = true;
 				result.second = point;

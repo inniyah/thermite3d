@@ -34,6 +34,8 @@ freely, subject to the following restrictions:
 #include "MapManager.h"
 #include "VolumeManager.h"
 
+#include "MaterialDensityPair.h"
+
 #include <OgreEntity.h>
 #include <OgreRenderWindow.h>
 #include <OgreResourceGroupManager.h>
@@ -234,7 +236,7 @@ namespace Thermite
 		{
 			(*iter)->update(mTimeElapsedInSeconds);
 			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
-			if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z) != 0)
+			if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z).getDensity() >= MaterialDensityPair44::getMidDensity())
 			{
 				createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0, false);
 				shellsToDelete.push_back(*iter);
@@ -390,21 +392,9 @@ namespace Thermite
 				{
 					if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						uint8_t currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
-						if(currentValue != value)
-						{
-							if(bPaintMode)
-							{
-								if(currentValue != 0)
-								{
-									volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
-								}
-							}
-							else
-							{
-								volumeChangeTracker->setLockedVoxelAt(x,y,z,value);
-							}
-						}
+						MaterialDensityPair44 currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
+						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
+						volumeChangeTracker->setLockedVoxelAt(x,y,z,currentValue);
 					}
 				}
 			}

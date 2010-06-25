@@ -136,7 +136,7 @@ namespace Thermite
 
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 
-		PolyVox::VolumeChangeTracker* volumeChangeTracker;
+		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
 
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
