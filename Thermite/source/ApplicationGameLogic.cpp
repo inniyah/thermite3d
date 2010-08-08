@@ -23,9 +23,7 @@ freely, subject to the following restrictions:
 
 #include "ApplicationGameLogic.h"
 
-#include "CannonController.h"
 #include "MainMenu.h"
-#include "Shell.h"
 #include "LoadMapWidget.h"
 
 #include "LogManager.h"
@@ -46,16 +44,6 @@ freely, subject to the following restrictions:
 #include <QMovie>
 #include <QSettings>
 
-#ifdef ENABLE_BULLET_PHYSICS
-	#include "OgreBulletDynamicsWorld.h"
-	#include "Shapes/OgreBulletCollisionsBoxShape.h"
-#endif //ENABLE_BULLET_PHYSICS
-
-#ifdef ENABLE_BULLET_PHYSICS
-using namespace OgreBulletDynamics;
-using namespace OgreBulletCollisions;
-#endif //ENABLE_BULLET_PHYSICS
-
 using namespace QtOgre;
 
 using namespace std;
@@ -66,8 +54,6 @@ namespace Thermite
 {
 	ApplicationGameLogic::ApplicationGameLogic(void)
 		:ThermiteGameLogic()
-		,mSphereBrushScale(5.0f)
-		,mSphereBrushMaterial(0)
 	{
 	}
 
@@ -96,41 +82,17 @@ namespace Thermite
 		mCameraSpeed = 50.0;
 		mCameraRotationalSpeed = 0.01;	
 
-		//The sphere brush.
-		mSphereBrush = 0;
-		mSphereBrushNode = 0;
-
 		qApp->mainWidget()->setMouseTracking(true);
 	}
 
 	void ApplicationGameLogic::update(void)
 	{
-		//The sphere brush.
-		if((mSphereBrush == 0) && (m_pActiveOgreSceneManager != 0))
-		{
-			mSphereBrush = m_pActiveOgreSceneManager->createEntity("Sphere Brush", "Sphere.mesh");
-			mSphereBrushNode = m_pActiveOgreSceneManager->getRootSceneNode()->createChildSceneNode("Sphere Brush Node");
-			mSphereBrushNode->attachObject(mSphereBrush);
-			mSphereBrushNode->setScale(10.0,10.0,10.0);
-
-			Ogre::MaterialPtr sphereBrushMaterial = Ogre::MaterialManager::getSingleton().create("Sphere Brush Material", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-			sphereBrushMaterial->setAmbient(Ogre::ColourValue(1.0,1.0,0.0,0.5));
-			sphereBrushMaterial->setDiffuse(Ogre::ColourValue(1.0,1.0,0.0,0.5));
-			sphereBrushMaterial->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-			mSphereBrush->setMaterial(sphereBrushMaterial);
-		}
-
 		//FIXME: This shold really be called at the end, so that it calls 
 		//updatePolyVoxGeometry() after we've actually changed something!
 		ThermiteGameLogic::update();
 
 		if(mMap == 0)
 			return;
-
-		/*mLastFrameTime = mCurrentTime;
-		mCurrentTime = mTime->elapsed();
-
-		float timeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;*/
 
 		float distance = mCameraSpeed * mTimeElapsedInSeconds;
 
@@ -150,22 +112,6 @@ namespace Thermite
 		{
 			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
 		}
-
-		if(mCurrentWheelPos > mLastFrameWheelPos)
-		{
-			mSphereBrushScale += 1.0f;
-		}
-
-		if(mCurrentWheelPos < mLastFrameWheelPos)
-		{
-			mSphereBrushScale -= 1.0f;
-		}
-
-		if(mMouseButtonStates.testFlag(Qt::LeftButton))
-		{
-			Vector3DFloat pos(mCurrentMousePosInWorldSpace.x, mCurrentMousePosInWorldSpace.y, mCurrentMousePosInWorldSpace.z);
-			createSphereAt(pos, mSphereBrushScale, mSphereBrushMaterial, false);
-		}
 		
 		if(mMouseButtonStates.testFlag(Qt::RightButton))
 		{
@@ -174,95 +120,16 @@ namespace Thermite
 				QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
 				mActiveCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
 				mActiveCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
-
-				int wheelDelta = mCurrentWheelPos - mLastFrameWheelPos;
-				Ogre::Radian fov = mActiveCamera->getFOVy();
-				fov += Ogre::Radian(-wheelDelta * 0.001);
-				fov = (std::min)(fov, Ogre::Radian(2.0f));
-				fov = (std::max)(fov, Ogre::Radian(0.5f));
-				mActiveCamera->setFOVy(fov);
-			}
-		}
-			
-		if((mSphereBrush != 0) && (m_pActiveOgreSceneManager != 0))
-		{
-			float actualWidth = mActiveCamera->getViewport()->getActualWidth();
-			float actualHeight = mActiveCamera->getViewport()->getActualHeight();
-
-			float fNormalisedX = mCurrentMousePos.x() / actualWidth;
-			float fNormalisedY = mCurrentMousePos.y() / actualHeight;
-
-			Ogre::Ray pickingRay = mActiveCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
-			std::pair<bool, Ogre::Vector3> pickingResult = getRayVolumeIntersection(pickingRay);
-			if(pickingResult.first)
-			{
-				mSphereBrushNode->setVisible(true);
-				mCurrentMousePosInWorldSpace = pickingResult.second;
-			}
-			else
-			{
-				mSphereBrushNode->setVisible(false);
 			}
 		}
 
 		mLastFrameMousePos = mCurrentMousePos;
 		mLastFrameWheelPos = mCurrentWheelPos;
-
-		//Update the cannon
-		if(mTurretNode && mGunNode)
-		{
-			float directionInDegrees = mCannonController->direction();
-			float elevationInDegrees = mCannonController->elevation();
-			mTurretNode->setOrientation(mTurretOriginalOrientation);
-			mGunNode->setOrientation(mGunOriginalOrientation);
-
-			mTurretNode->rotate(Ogre::Vector3(0.0,1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-			mGunNode->rotate(Ogre::Vector3(0.0,0.0,1.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
-		}
-
-		//The fun stuff!
-		/*updatePolyVoxGeometry();
-		
-#ifdef ENABLE_BULLET_PHYSICS
-		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
-		{
-			m_pOgreBulletWorld->stepSimulation(timeElapsedInSeconds, 10);
-		}
-#endif //ENABLE_BULLET_PHYSICS
-*/
-		list<Shell*> shellsToDelete;
-
-		for(list<Shell*>::iterator iter = m_listShells.begin(); iter != m_listShells.end(); iter++)
-		{
-			(*iter)->update(mTimeElapsedInSeconds);
-			Ogre::Vector3 shellPos = (*iter)->m_pSceneNode->getPosition();
-			if(mMap->volumeResource->getVolume()->getVoxelAt(shellPos.x, shellPos.y, shellPos.z).getDensity() >= MaterialDensityPair44::getMidDensity())
-			{
-				createSphereAt(PolyVox::Vector3DFloat(shellPos.x, shellPos.y, shellPos.z), 50, 0, false);
-				shellsToDelete.push_back(*iter);
-			}
-		}
-
-		for(list<Shell*>::iterator iter = shellsToDelete.begin(); iter != shellsToDelete.end(); iter++)
-		{
-			m_listShells.remove(*iter);
-			delete (*iter);
-		}
-
-		//Update the brush position
-		mSphereBrushNode->setPosition(mCurrentMousePosInWorldSpace);
-		mSphereBrushNode->setScale(mSphereBrushScale, mSphereBrushScale, mSphereBrushScale);
 	}
 
 	void ApplicationGameLogic::onKeyPress(QKeyEvent* event)
 	{
 		mKeyStates[event->key()] = KS_PRESSED;
-
-		if((event->key() >= Qt::Key_0) && (event->key() <= Qt::Key_9))
-		{
-			//Converts key code to correct number
-			mSphereBrushMaterial = event->key() - Qt::Key_0;
-		}
 
 		if(event->key() == Qt::Key_F5)
 		{
@@ -282,7 +149,6 @@ namespace Thermite
 
 	void ApplicationGameLogic::onMousePress(QMouseEvent* event)
 	{
-		//mCurrentMousePos = event->pos();
 		mLastFrameMousePos = mCurrentMousePos;
 
 		mMouseButtonStates = event->buttons();
@@ -303,25 +169,6 @@ namespace Thermite
 	void ApplicationGameLogic::onWheel(QWheelEvent* event)
 	{
 		mCurrentWheelPos += event->delta();
-	}
-
-	void ApplicationGameLogic::fireCannon(void)
-	{
-		Shell* shell = new Shell(mMap, mGunNode->_getDerivedPosition(), Ogre::Vector3(0.0f, 1.0f, 0.0f));
-
-		//Update the shell
-		float directionInDegrees = mCannonController->direction();
-		float elevationInDegrees = mCannonController->elevation();
-		shell->m_pSceneNode->setOrientation(mGunOriginalOrientation);
-		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,1.0,0.0),Ogre::Radian(1.57));
-		shell->m_pSceneNode->rotate(Ogre::Vector3(0.0,-1.0,0.0), Ogre::Radian(directionInDegrees / 57.0));
-		shell->m_pSceneNode->rotate(Ogre::Vector3(1.0,0.0,0.0), Ogre::Radian(elevationInDegrees / 57.0)); //Elevation
-
-		shell->m_vecVelocity = shell->m_pSceneNode->getLocalAxes().GetColumn(2);
-		shell->m_vecVelocity.normalise();
-		shell->m_vecVelocity *= 100.0f;
-
-		m_listShells.push_back(shell);
 	}
 
 	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode)
@@ -409,24 +256,6 @@ namespace Thermite
 		mMainMenu->disableLoadButton();
 
 		loadMap(strMapName);
-
-		try
-		{
-			mTurretNode = dynamic_cast<Ogre::SceneNode*>(m_pActiveOgreSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main"));
-			mGunNode = dynamic_cast<Ogre::SceneNode*>(m_pActiveOgreSceneManager->getRootSceneNode()->getChild("chassis")->getChild("turret_main")->getChild("gun_main"));
-
-			mTurretOriginalOrientation = mTurretNode->getOrientation();
-			mGunOriginalOrientation = mGunNode->getOrientation();
-
-			mCannonController = new CannonController(this, qApp->mainWidget(), Qt::Tool);
-			mCannonController->move(qApp->mainWidget()->geometry().left() + qApp->mainWidget()->geometry().width() - mCannonController->frameGeometry().width() - 10, qApp->mainWidget()->geometry().top() + 10);
-			mCannonController->show();
-		}
-		catch(Ogre::ItemIdentityException&) //Thrown if the tank is not found
-		{
-			mTurretNode = 0;
-			mGunNode = 0;
-		}
 
 		mApplication->showFPSCounter();
 	}

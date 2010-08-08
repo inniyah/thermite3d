@@ -56,8 +56,6 @@ namespace Thermite
 
 		void onLoadMapClicked(QString strMapName);
 
-		void fireCannon(void);
-
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode);
 
 	protected:
@@ -73,26 +71,10 @@ namespace Thermite
 		int mLastFrameWheelPos;
 		int mCurrentWheelPos;
 
-		Ogre::Vector3 mCurrentMousePosInWorldSpace;
-
 		float mCameraSpeed;
 		float mCameraRotationalSpeed;
 
 		MainMenu* mMainMenu;
-		CannonController* mCannonController;
-
-		Ogre::SceneNode* mTurretNode;
-		Ogre::SceneNode* mGunNode;
-
-		Ogre::Entity* mSphereBrush;
-		Ogre::SceneNode* mSphereBrushNode;
-		float mSphereBrushScale;
-		uint8_t mSphereBrushMaterial;
-
-		Ogre::Quaternion mTurretOriginalOrientation;
-		Ogre::Quaternion mGunOriginalOrientation;
-
-		std::list<Shell*> m_listShells;
 	};
 }
 

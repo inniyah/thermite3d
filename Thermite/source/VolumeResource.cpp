@@ -67,7 +67,7 @@ namespace Thermite
 		//Clear the pointer
 		m_pVolume = shared_ptr< PolyVox::Volume<MaterialDensityPair44> >();
 	}
-
+	
 	size_t VolumeResource::calculateSize () const
 	{
 		//NOTE - I don't really know what this function is for, so am therefore

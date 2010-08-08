@@ -32,7 +32,6 @@ SET(SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
 	source/ApplicationGameLogic.cpp
-	source/CannonController.cpp
 	source/DataStreamWrapper.cpp
 	source/LoadingProgress.cpp
 	source/LoadMapWidget.cpp
@@ -43,7 +42,6 @@ SET(SRC_FILES
 	source/MapRegion.cpp
 	source/MapResource.cpp
 	source/PhysicalEntity.cpp
-	source/Shell.cpp	
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
@@ -61,7 +59,6 @@ SET(SRC_FILES
 SET(INC_FILES
 	include/AnyOption.h
 	include/ApplicationGameLogic.h
-	include/CannonController.h
 	include/DataStreamWrapper.h
 	include/LoadingProgress.h
 	include/LoadMapWidget.h
@@ -72,7 +69,6 @@ SET(INC_FILES
 	include/MapRegion.h
 	include/MapResource.h
 	include/PhysicalEntity.h
-	include/Shell.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h
@@ -90,7 +86,6 @@ SET(INC_FILES
 )
 
 SET(UI_FILES
-	ui/CannonController.ui
 	ui/LoadingProgress.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
@@ -206,12 +201,12 @@ IF(WIN32)
 	ENDIF (OGRESOURCE)
 	
 	#Install the PolyVox .dll's
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore.dll DESTINATION bin)
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil.dll DESTINATION bin)
+	#INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/bin/PolyVoxCore.dll DESTINATION bin)
+	#INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/bin/PolyVoxUtil.dll DESTINATION bin)
 	
 	#And the debug files
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/lib/PolyVoxCore.pdb DESTINATION bin CONFIGURATIONS Debug)
-	INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/lib/PolyVoxUtil.pdb DESTINATION bin CONFIGURATIONS Debug)
+	#INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxCore/lib/PolyVoxCore.pdb DESTINATION bin CONFIGURATIONS Debug)
+	#INSTALL(FILES $ENV{POLYVOX_HOME}/PolyVoxUtil/lib/PolyVoxUtil.pdb DESTINATION bin CONFIGURATIONS Debug)
 	
 	#Install the Qt .dll's
 	INSTALL(FILES ${QT_BINARY_DIR}/QtCore4.dll DESTINATION bin CONFIGURATIONS Release)
