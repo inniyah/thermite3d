@@ -54,6 +54,7 @@ namespace Thermite
 {
 	ApplicationGameLogic::ApplicationGameLogic(void)
 		:ThermiteGameLogic()
+		,m_bRunScript(true)
 	{
 	}
 
@@ -80,9 +81,22 @@ namespace Thermite
 		//QTimer::singleShot(2000, mMainMenu, SLOT(show()));
 
 		mCameraSpeed = 50.0;
-		mCameraRotationalSpeed = 0.01;	
+		mCameraRotationalSpeed = 0.1;	
 
 		qApp->mainWidget()->setMouseTracking(true);
+
+		mouse = new Mouse(this);
+		camera = new Camera(this);
+
+		initScriptEngine();	 
+
+		initScriptEnvironment();
+
+		m_pScriptEditorWidget = new ScriptEditorWidget(qApp->mainWidget());
+		m_pScriptEditorWidget->show();
+
+		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
+		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
 	}
 
 	void ApplicationGameLogic::update(void)
@@ -96,40 +110,71 @@ namespace Thermite
 
 		float distance = mCameraSpeed * mTimeElapsedInSeconds;
 
-		if(mKeyStates[Qt::Key_W] == KS_PRESSED)
+		/*QVector3D dir = camera->zAxis();
+		QVector3D right = camera->xAxis();
+
+		dir *= distance;
+		right *= distance;
+
+		if(keyboard.isPressed(Qt::Key_W))
 		{
-			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getDirection() * distance);
+			//mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getDirection() * distance);
+			camera->translate(-dir.x(), -dir.y(), -dir.z());
 		}
-		if(mKeyStates[Qt::Key_S] == KS_PRESSED)
+		if(keyboard.isPressed(Qt::Key_S))
 		{
-			mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getDirection() * distance);
+			//mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getDirection() * distance);
+			camera->translate(dir);
 		}
-		if(mKeyStates[Qt::Key_A] == KS_PRESSED)
+		if(keyboard.isPressed(Qt::Key_A))
 		{
-			mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getRight() * distance);
+			//mActiveCamera->setPosition(mActiveCamera->getPosition() - mActiveCamera->getRight() * distance);
+			camera->translate(-right.x(), -right.y(), -right.z());
 		}
-		if(mKeyStates[Qt::Key_D] == KS_PRESSED)
+		if(keyboard.isPressed(Qt::Key_D))
 		{
-			mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
+			//mActiveCamera->setPosition(mActiveCamera->getPosition() + mActiveCamera->getRight() * distance);
+			camera->translate(right);
 		}
 		
-		if(mMouseButtonStates.testFlag(Qt::RightButton))
+		if(mouse->isPressed(Qt::RightButton))
 		{
 			if(mCurrentFrameNumber != 0)
 			{
-				QPoint mouseDelta = mCurrentMousePos - mLastFrameMousePos;
-				mActiveCamera->yaw(Ogre::Radian(-mouseDelta.x() * mCameraRotationalSpeed));
-				mActiveCamera->pitch(Ogre::Radian(-mouseDelta.y() * mCameraRotationalSpeed));
+				float mouseDeltaX = mouse->position().x() - mouse->previousPosition().x();
+				camera->yaw(-mouseDeltaX * mCameraRotationalSpeed);
+				//mActiveCamera->yaw(Ogre::Radian(-mouseDeltaX * mCameraRotationalSpeed));
+
+				float mouseDeltaY = mouse->position().y() - mouse->previousPosition().y();
+				camera->pitch(-mouseDeltaY * mCameraRotationalSpeed);
+				//mActiveCamera->pitch(Ogre::Radian(-mouseDeltaY * mCameraRotationalSpeed));
+			}
+		}*/
+
+		if(m_bRunScript)
+		{
+			QScriptValue result = scriptEngine->evaluate(m_pScriptEditorWidget->getScriptCode());
+			if (scriptEngine->hasUncaughtException())
+			{
+				int line = scriptEngine->uncaughtExceptionLineNumber();
+				qCritical() << "uncaught exception at line" << line << ":" << result.toString();
 			}
 		}
 
-		mLastFrameMousePos = mCurrentMousePos;
-		mLastFrameWheelPos = mCurrentWheelPos;
+		mActiveCamera->setPosition(Ogre::Vector3(camera->position().x(), camera->position().y(), camera->position().z()));
+		mActiveCamera->setOrientation(Ogre::Quaternion(camera->orientation().scalar(), camera->orientation().x(), camera->orientation().y(), camera->orientation().z()));
+		mActiveCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
+
+		//mLastFrameMousePos = mCurrentMousePos;
+		//mLastFrameWheelPos = mCurrentWheelPos;
+
+		mouse->setPreviousPosition(mouse->position());
+		mouse->resetWheelDelta();
 	}
 
 	void ApplicationGameLogic::onKeyPress(QKeyEvent* event)
 	{
-		mKeyStates[event->key()] = KS_PRESSED;
+		keyboard.press(event->key());
 
 		if(event->key() == Qt::Key_F5)
 		{
@@ -144,31 +189,33 @@ namespace Thermite
 
 	void ApplicationGameLogic::onKeyRelease(QKeyEvent* event)
 	{
-		mKeyStates[event->key()] = KS_RELEASED;
+		keyboard.release(event->key());
 	}
 
 	void ApplicationGameLogic::onMousePress(QMouseEvent* event)
 	{
-		mLastFrameMousePos = mCurrentMousePos;
-
-		mMouseButtonStates = event->buttons();
+		mouse->press(event->button());
+	
+		//Update the mouse position as well or we get 'jumps'
+		mouse->setPosition(event->pos());
+		mouse->setPreviousPosition(mouse->position());
 	}
 
 	void ApplicationGameLogic::onMouseRelease(QMouseEvent* event)
 	{
-		mLastFrameMousePos = mCurrentMousePos;
-
-		mMouseButtonStates = event->buttons();
+		mouse->release(event->button());
 	}
 
 	void ApplicationGameLogic::onMouseMove(QMouseEvent* event)
 	{
-		mCurrentMousePos = event->pos();
+		//mCurrentMousePos = event->pos();
+		mouse->setPosition(event->pos());
 	}
 
 	void ApplicationGameLogic::onWheel(QWheelEvent* event)
 	{
-		mCurrentWheelPos += event->delta();
+		//mCurrentWheelPos += event->delta();
+		mouse->modifyWheelDelta(event->delta());
 	}
 
 	void ApplicationGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode)
@@ -258,5 +305,95 @@ namespace Thermite
 		loadMap(strMapName);
 
 		mApplication->showFPSCounter();
+	}
+
+	void ApplicationGameLogic::initScriptEngine(void)
+	{
+		scriptEngine = new QScriptEngine;
+
+		QStringList extensions;
+		extensions << "qt.core"
+				   << "qt.gui"
+				   << "qt.xml"
+				   << "qt.svg"
+				   << "qt.network"
+				   << "qt.sql"
+				   << "qt.opengl"
+				   << "qt.webkit"
+				   << "qt.xmlpatterns"
+				   << "qt.uitools";
+		QStringList failExtensions;
+		foreach (const QString &ext, extensions)
+		{
+			QScriptValue ret = scriptEngine->importExtension(ext);
+			if (ret.isError())
+			{
+				failExtensions.append(ext);
+			}
+		}
+		if (!failExtensions.isEmpty())
+		{
+			if (failExtensions.size() == extensions.size())
+			{
+				qWarning("Failed to import Qt bindings!\n"
+						 "Plugins directory searched: %s/script\n"
+						 "Make sure that the bindings have been built, "
+						 "and that this executable and the plugins are "
+						 "using compatible Qt libraries.", qPrintable(qApp->libraryPaths().join(", ")));
+			}
+			else
+			{
+				qWarning("Failed to import some Qt bindings: %s\n"
+						 "Plugins directory searched: %s/script\n"
+						 "Make sure that the bindings have been built, "
+						 "and that this executable and the plugins are "
+						 "using compatible Qt libraries.",
+						 qPrintable(failExtensions.join(", ")), qPrintable(qApp->libraryPaths().join(", ")));
+			}
+		}
+		else
+		{
+			qDebug("All Qt bindings loaded successfully.");
+		}
+	}
+
+	void ApplicationGameLogic::initScriptEnvironment(void)
+	{
+		mGlobals = new Globals(this);
+
+		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
+		scriptEngine->globalObject().setProperty("Light", lightClass);
+
+		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
+		scriptEngine->globalObject().setProperty("Entity", entityClass);
+
+		QScriptValue globalsScriptValue = scriptEngine->newQObject(mGlobals);
+		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
+
+		QScriptValue keyboardScriptValue = scriptEngine->newQObject(&keyboard);
+		scriptEngine->globalObject().setProperty("keyboard", keyboardScriptValue);
+
+		QScriptValue mouseScriptValue = scriptEngine->newQObject(mouse);
+		scriptEngine->globalObject().setProperty("mouse", mouseScriptValue);
+
+		QScriptValue cameraScriptValue = scriptEngine->newQObject(camera);
+		scriptEngine->globalObject().setProperty("camera", cameraScriptValue);
+
+		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
+		Qt.setProperty("App", scriptEngine->newQObject(qApp));
+		scriptEngine->globalObject().setProperty("Qt", Qt);
+
+		QScriptValue objectStoreScriptValue = scriptEngine->newQObject(&mObjectStore);
+		scriptEngine->globalObject().setProperty("objectStore", objectStoreScriptValue);
+	}
+
+	void ApplicationGameLogic::startScriptingEngine(void)
+	{
+		m_bRunScript = true;
+	}
+
+	void ApplicationGameLogic::stopScriptingEngine(void)
+	{
+		m_bRunScript = false;
 	}
 }

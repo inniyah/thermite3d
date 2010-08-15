@@ -49,6 +49,16 @@ SET(SRC_FILES
 	source/VolumeResource.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
 	
+	source/scriptable/Camera.cpp
+	source/scriptable/Entity.cpp
+	source/scriptable/Globals.cpp
+	source/scriptable/Keyboard.cpp
+	source/scriptable/Light.cpp
+	source/scriptable/Mouse.cpp
+	source/scriptable/Object.cpp
+	source/scriptable/ObjectStore.cpp
+	source/scriptable/ScriptEditorWidget.cpp
+	
 	source/tasks/SurfaceMeshDecimationTask.cpp
 	source/tasks/SurfaceMeshExtractionTask.cpp
 	source/tasks/SurfaceExtractorTaskData.cpp
@@ -77,6 +87,16 @@ SET(INC_FILES
 	include/VolumeResource.h
 	include/VolumeSerializationProgressListenerImpl.h
 	
+	include/scriptable/Camera.h
+	include/scriptable/Entity.h
+	include/scriptable/Globals.h
+	include/scriptable/Keyboard.h
+	include/scriptable/Light.h
+	include/scriptable/Mouse.h
+	include/scriptable/Object.h
+	include/scriptable/ObjectStore.h
+	include/scriptable/ScriptEditorWidget.h
+	
 	include/Tasks/SurfaceMeshDecimationTask.h
 	include/Tasks/SurfaceMeshExtractionTask.h
 	include/Tasks/SurfaceExtractorTaskData.h
@@ -89,6 +109,7 @@ SET(UI_FILES
 	ui/LoadingProgress.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
+	ui/ScriptEditorWidget.ui
 )
 
 SET(RESOURCE_FILES
@@ -104,6 +125,8 @@ IF (WIN32)
 	SET(QT_USE_QTMAIN 1)
 ENDIF (WIN32)
 SET(QT_USE_QTGUI 1)
+SET(QT_USE_QTSCRIPT 1)
+SET(QT_USE_QTSCRIPTTOOLS 1)
 SET(QT_USE_QTXML 1)
 INCLUDE(${QT_USE_FILE})
 
@@ -113,12 +136,12 @@ QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 IF(ENABLE_BULLET_PHYSICS)
 	ADD_DEFINITIONS(-DENABLE_BULLET_PHYSICS)
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS} ${BULLET_LIBRARY_DIRS} ${OGREBULLET_LIB_DIR})
 	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES} ${OGREBULLET_LIBRARIES} ${BULLET_LIBRARIES})
 ELSE()
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})

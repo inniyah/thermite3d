@@ -28,6 +28,18 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "Camera.h"
+#include "Entity.h"
+#include "Globals.h"
+#include "Keyboard.h"
+#include "Light.h"
+#include "Mouse.h"
+#include "ObjectStore.h"
+#include "ScriptEditorWidget.h"
+
+#include <QtScript>
+#include <QScriptEngineDebugger>
+
 #include "ThermiteForwardDeclarations.h"
 
 #include "OgreVector3.h"
@@ -39,6 +51,7 @@ namespace Thermite
 
 	class ApplicationGameLogic : public ThermiteGameLogic
 	{
+		Q_OBJECT
 	public:
 		ApplicationGameLogic(void);
 
@@ -58,9 +71,16 @@ namespace Thermite
 
 		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode);
 
+		void initScriptEngine(void);
+		void initScriptEnvironment(void);
+
+	private slots:
+		void startScriptingEngine(void);
+		void stopScriptingEngine(void);
+
 	protected:
 		//For keyboard handling
-		QHash<int, KeyStates> mKeyStates;
+		/*QHash<int, KeyStates> mKeyStates;
 
 		//For mouse buttons.
 		Qt::MouseButtons mMouseButtonStates;
@@ -69,12 +89,34 @@ namespace Thermite
 		QPoint mLastFrameMousePos;
 		QPoint mCurrentMousePos;
 		int mLastFrameWheelPos;
-		int mCurrentWheelPos;
+		int mCurrentWheelPos;*/
 
 		float mCameraSpeed;
 		float mCameraRotationalSpeed;
 
 		MainMenu* mMainMenu;
+
+		Keyboard keyboard;
+		Mouse* mouse;
+
+		//Scripting
+		QScriptEngine* scriptEngine;
+
+		Camera* camera;
+
+		QScriptEngineDebugger debugger;
+
+		ScriptEditorWidget* m_pScriptEditorWidget;
+
+		bool m_bRunScript;
+
+		QHash<QString, Light*> m_Lights;
+
+		ObjectStore mObjectStore;
+
+		QString mInitialiseScript;
+
+		Globals* mGlobals;
 	};
 }
 

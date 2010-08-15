@@ -100,11 +100,11 @@ namespace Thermite
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
 		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
-		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
+		/*m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
 		m_pThermiteLogoMovie->jumpToFrame(0);
 		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
 		m_pThermiteLogoLabel->show();
-		m_pThermiteLogoMovie->start();
+		m_pThermiteLogoMovie->start();*/
 
 		//Initialise all resources
 		addResourceDirectory("./resources/");
@@ -447,7 +447,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::updatePolyVoxGeometry()
 	{
-		if(!mMap->volumeResource.isNull())
+		/*if(!mMap->volumeResource.isNull())
 		{		
 			//Some values we'll need later.
 			std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -513,7 +513,7 @@ namespace Thermite
 					}
 				}
 			}
-		}		
+		}*/
 	}
 
 	void ThermiteGameLogic::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
@@ -658,7 +658,7 @@ namespace Thermite
 			Ogre::Vector3 point = ray.getPoint(dist);
 			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
 
-			if(pVolume->getVoxelAt(v3dPoint).getDensity() >= MaterialDensityPair44::getMidDensity())
+			if(pVolume->getVoxelAt(v3dPoint).getDensity() >= MaterialDensityPair44::getThreshold())
 			{
 				result.first = true;
 				result.second = point;
