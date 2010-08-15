@@ -202,8 +202,6 @@ namespace Thermite
 
 		Camera* camera;
 
-		QScriptEngineDebugger debugger;
-
 		ScriptEditorWidget* m_pScriptEditorWidget;
 
 		bool m_bRunScript;

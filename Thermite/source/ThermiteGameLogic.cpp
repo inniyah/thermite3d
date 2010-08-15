@@ -75,7 +75,10 @@ namespace Thermite
 		,m_pActiveOgreSceneManager(0)
 		,m_pDummyOgreSceneManager(0)
 		,mActiveCamera(0)
-		,m_bRunScript(true)
+		,m_bRunScript(false)
+		,scriptEngine(0)
+		,camera(0)
+		,m_pScriptEditorWidget(0)
 	{
 		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
 	}
@@ -498,7 +501,10 @@ namespace Thermite
 
 	void ThermiteGameLogic::updatePolyVoxGeometry()
 	{
-		/*if(!mMap->volumeResource.isNull())
+		if(mMap == 0)
+			return;
+
+		if(!mMap->volumeResource.isNull())
 		{		
 			//Some values we'll need later.
 			std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -564,7 +570,7 @@ namespace Thermite
 					}
 				}
 			}
-		}*/
+		}
 	}
 
 	void ThermiteGameLogic::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
