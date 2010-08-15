@@ -31,6 +31,18 @@ freely, subject to the following restrictions:
 #include "SurfaceExtractorTaskData.h"
 #include "VolumeChangeTracker.h"
 
+#include "Camera.h"
+#include "Entity.h"
+#include "Globals.h"
+#include "Keyboard.h"
+#include "Light.h"
+#include "Mouse.h"
+#include "ObjectStore.h"
+#include "ScriptEditorWidget.h"
+
+#include <QtScript>
+#include <QScriptEngineDebugger>
+
 #include "Map.h"
 #include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
@@ -58,6 +70,8 @@ namespace Thermite
 		KS_PRESSED
 	};
 
+	class MainMenu;
+
 	class ThermiteGameLogic : public QObject, public QtOgre::GameLogic
 	{
 		Q_OBJECT
@@ -75,6 +89,22 @@ namespace Thermite
 		void setVolumeLoadProgress(float fProgress);
 
 		void reloadShaders(void);
+
+		void onKeyPress(QKeyEvent* event);
+		void onKeyRelease(QKeyEvent* event);
+
+		void onMouseMove(QMouseEvent* event);
+		void onMousePress(QMouseEvent* event);
+		void onMouseRelease(QMouseEvent* event);
+
+		void onWheel(QWheelEvent* event);
+
+		void onLoadMapClicked(QString strMapName);
+
+		void initScriptEngine(void);
+		void initScriptEnvironment(void);
+
+		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode);
 
 	public:
 		void addResourceDirectory(const QString& directoryName);
@@ -129,6 +159,10 @@ namespace Thermite
 	public slots:
 		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
 		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
+
+	private slots:
+		void startScriptingEngine(void);
+		void stopScriptingEngine(void);
 		
 	public:
 
@@ -154,6 +188,33 @@ namespace Thermite
 		int m_iNoSubmitted;
 
 		TaskProcessorThread* m_backgroundThread;
+
+		float mCameraSpeed;
+		float mCameraRotationalSpeed;
+
+		MainMenu* mMainMenu;
+
+		Keyboard keyboard;
+		Mouse* mouse;
+
+		//Scripting
+		QScriptEngine* scriptEngine;
+
+		Camera* camera;
+
+		QScriptEngineDebugger debugger;
+
+		ScriptEditorWidget* m_pScriptEditorWidget;
+
+		bool m_bRunScript;
+
+		QHash<QString, Light*> m_Lights;
+
+		ObjectStore mObjectStore;
+
+		QString mInitialiseScript;
+
+		Globals* mGlobals;
 	};
 }
 

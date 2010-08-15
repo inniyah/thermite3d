@@ -23,16 +23,16 @@ freely, subject to the following restrictions:
 
 #include "LoadMapWidget.h"
 
-#include "ApplicationGameLogic.h"
+#include "ThermiteGameLogic.h"
 
 #include <OgreResourceGroupManager.h>
 
 
 namespace Thermite
 {
-	LoadMapWidget::LoadMapWidget(ApplicationGameLogic* applicationGameLogic, QWidget* parent, Qt::WindowFlags f)
+	LoadMapWidget::LoadMapWidget(ThermiteGameLogic* thermiteGameLogic, QWidget* parent, Qt::WindowFlags f)
 		:QWidget(parent, f)
-		,m_applicationGameLogic(applicationGameLogic)
+		,m_thermiteGameLogic(thermiteGameLogic)
 	{
 		setupUi(this);
 
@@ -65,7 +65,7 @@ namespace Thermite
 		hide();
 
 		QListWidgetItem* pCurrentItem = m_listMap->currentItem();
-		m_applicationGameLogic->onLoadMapClicked(pCurrentItem->text());		
+		m_thermiteGameLogic->onLoadMapClicked(pCurrentItem->text());		
 	}
 
 	void LoadMapWidget::on_m_btnClose_clicked(void)
