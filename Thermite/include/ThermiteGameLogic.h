@@ -78,6 +78,8 @@ namespace Thermite
 	public:
 		ThermiteGameLogic(void);
 
+		void setupScripting(void);
+
 		void initialise(void);
 		void update(void);
 		void shutdown(void);

@@ -32,6 +32,8 @@ using namespace Thermite;
 
 int main(int argc, char *argv[])
 {
-	Application app(argc, argv, new ThermiteGameLogic);
+	ThermiteGameLogic* logic = new ThermiteGameLogic;
+	Application app(argc, argv, logic);
+	logic->setupScripting();
 	return app.exec(DisplaySettingsDialog);
 }

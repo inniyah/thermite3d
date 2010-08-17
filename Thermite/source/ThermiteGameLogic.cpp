@@ -79,8 +79,84 @@ namespace Thermite
 		,scriptEngine(0)
 		,camera(0)
 		,m_pScriptEditorWidget(0)
+		,mDummyCamera(0)
 	{
 		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
+
+		mouse = new Mouse(this);
+		camera = new Camera(this);
+	}
+
+	void ThermiteGameLogic::setupScripting(void)
+	{
+		initScriptEngine();	 
+
+		initScriptEnvironment();
+
+		QString script
+		(
+		"print('In initialise');"
+		"test = new QPoint();"
+		"print(test);"
+		"print('Done initialise');"
+		);
+
+		QScriptValue result = scriptEngine->evaluate(script);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
+
+		result = scriptEngine->evaluate(script);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
+
+		result = scriptEngine->evaluate(script);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
+
+		mInitialiseScript =
+		"print('QtScript Initialisation Begin');"
+
+		"var redLight = new Light();"
+		"redLight.position = new QVector3D(100,100,100);"
+		"redLight.colour = new QColor(255,0,0);"
+		"objectStore.setObject('RedLight', redLight);"
+
+		"var greenLight = new Light();"
+		"greenLight.position = new QVector3D(100,100,100);"
+		"greenLight.colour = new QColor(0,255,0);"
+		"objectStore.setObject('GreenLight', greenLight);"
+
+		"var blueLight = new Light();"
+		"blueLight.position = new QVector3D(100,100,100);"
+		"blueLight.colour = new QColor(0,0,255);"
+		"objectStore.setObject('BlueLight', blueLight);"
+
+		"var robot = new Entity();"
+		"robot.position = new QVector3D(3,-1,0);"
+		"robot.size = new QVector3D(1.0, 1.0, 1.0);"
+		"robot.meshName = 'robot.mesh';"
+		"robot.animated = true;"
+		"robot.loopAnimation = true;"
+		"robot.animationName = 'Walk';"
+		"objectStore.setObject('Robot', robot);"
+
+		"print('QtScript Initialisation End');";
+
+		result = scriptEngine->evaluate(mInitialiseScript);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -100,9 +176,18 @@ namespace Thermite
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
 		m_pDummyOgreSceneManager = new Ogre::DefaultSceneManager("DummySceneManager");
-		Ogre::Camera* dummyCamera = m_pDummyOgreSceneManager->createCamera("DummyCamera");
-		m_pDummyOgreSceneManager->getRootSceneNode()->attachObject(dummyCamera);
-		mMainViewport = mApplication->ogreRenderWindow()->addViewport(dummyCamera);
+		mDummyCamera = m_pDummyOgreSceneManager->createCamera("DummyCamera");
+
+		mDummyCamera->setPosition(128, 128, 128);
+		mDummyCamera->lookAt(128, 0, 128);
+		mDummyCamera->setFOVy(Ogre::Radian(1.0));
+		mDummyCamera->setNearClipDistance(1.0);
+		mDummyCamera->setFarClipDistance(1000);
+
+		//mMainViewport->setCamera(mActiveCamera);
+
+		//m_pDummyOgreSceneManager->getRootSceneNode()->attachObject(mDummyCamera);
+		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mDummyCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
@@ -182,18 +267,16 @@ namespace Thermite
 
 		qApp->mainWidget()->setMouseTracking(true);
 
-		mouse = new Mouse(this);
-		camera = new Camera(this);
-
-		initScriptEngine();	 
-
-		initScriptEnvironment();
-
 		m_pScriptEditorWidget = new ScriptEditorWidget(qApp->mainWidget());
-		m_pScriptEditorWidget->show();
+		m_pScriptEditorWidget->show();		
 
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
+
+		m_pDummyOgreSceneManager->setSkyBox(true, "SkyBox", 5000, true);
+		mDummyCamera->setFOVy(Ogre::Radian(1.0f));
+
+		//test();
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -205,6 +288,9 @@ namespace Thermite
 		mCurrentTime = mTime->elapsed();
 
 		mTimeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;
+
+		mGlobals->setPreviousFrameTime(mGlobals->getCurrentFrameTime());
+		mGlobals->setCurrentFrameTime(mCurrentTime);
 
 		//The fun stuff!
 		updatePolyVoxGeometry();
@@ -230,11 +316,72 @@ namespace Thermite
 			}
 		}
 
-		if(mActiveCamera)
+		if(m_pDummyOgreSceneManager)
 		{
-			mActiveCamera->setPosition(Ogre::Vector3(camera->position().x(), camera->position().y(), camera->position().z()));
-			mActiveCamera->setOrientation(Ogre::Quaternion(camera->orientation().scalar(), camera->orientation().x(), camera->orientation().y(), camera->orientation().z()));
-			mActiveCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
+		m_pDummyOgreSceneManager->destroyAllLights();
+		QHashIterator<QString, QObject*> objectIter(mObjectStore);
+		while(objectIter.hasNext())
+		{
+			objectIter.next();
+			QObject* pObj = objectIter.value();
+
+			Light* light = dynamic_cast<Light*>(pObj);
+			if(light)
+			{
+				Ogre::Light* ogreLight = m_pDummyOgreSceneManager->createLight(objectIter.key().toStdString());
+				ogreLight->setType(Ogre::Light::LT_POINT);
+
+				QVector3D pos = light->position();
+				ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+				QColor col = light->getColour();
+				ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+			}
+
+			Entity* entity = dynamic_cast<Entity*>(pObj);
+			if(entity)
+			{
+				Ogre::Entity* ogreEntity;
+				Ogre::SceneNode* sceneNode;
+
+				if(m_pDummyOgreSceneManager->hasEntity(objectIter.key().toStdString()))
+				{
+					ogreEntity = m_pDummyOgreSceneManager->getEntity(objectIter.key().toStdString());
+					sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
+				}
+				else
+				{
+					sceneNode = m_pDummyOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+					ogreEntity = m_pDummyOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
+					sceneNode->attachObject(ogreEntity);
+				}
+
+				QVector3D pos = entity->position();
+				sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+				QQuaternion orientation = entity->orientation();
+				sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));
+
+				QVector3D scale = entity->size();
+				sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+
+				//Animation
+				Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
+				if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
+				{
+					Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
+					animationState->setEnabled(entity->animated());
+					animationState->setLoop(entity->loopAnimation());
+				}
+			}
+		}
+		}
+
+		if(mDummyCamera)
+		{
+			mDummyCamera->setPosition(Ogre::Vector3(camera->position().x(), camera->position().y(), camera->position().z()));
+			mDummyCamera->setOrientation(Ogre::Quaternion(camera->orientation().scalar(), camera->orientation().x(), camera->orientation().y(), camera->orientation().z()));
+			mDummyCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
 		}
 
 		mouse->setPreviousPosition(mouse->position());
@@ -383,8 +530,17 @@ namespace Thermite
 		}	
 
 		//This gets the first camera which was found in the scene.
-		Ogre::SceneManager::CameraIterator camIter = m_pActiveOgreSceneManager->getCameraIterator();
+		/*Ogre::SceneManager::CameraIterator camIter = m_pActiveOgreSceneManager->getCameraIterator();
 		mActiveCamera = camIter.peekNextValue();
+
+		mMainViewport->setCamera(mActiveCamera);*/
+
+		mActiveCamera = m_pActiveOgreSceneManager->createCamera("Active Camera");
+		mActiveCamera->setPosition(128, 128, 128);
+		mActiveCamera->lookAt(128, 0, 128);
+		mActiveCamera->setFOVy(Ogre::Radian(1.0));
+		mActiveCamera->setNearClipDistance(1.0);
+		mActiveCamera->setFarClipDistance(1000);
 
 		mMainViewport->setCamera(mActiveCamera);
 
