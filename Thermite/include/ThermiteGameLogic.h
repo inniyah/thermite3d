@@ -126,11 +126,9 @@ namespace Thermite
 
 		MoviePlayer* mMoviePlayer;
 
-		Ogre::Camera* mDummyCamera;
+		Ogre::Camera* mOgreCamera;
 		Ogre::Viewport* mMainViewport;
-		Ogre::Camera* mActiveCamera;
-		Ogre::SceneManager* m_pDummyOgreSceneManager;
-		Ogre::SceneManager* m_pActiveOgreSceneManager;
+		Ogre::SceneManager* m_pOgreSceneManager;
 		QtOgre::Log* mThermiteLog;
 
 		//Thermite stuff

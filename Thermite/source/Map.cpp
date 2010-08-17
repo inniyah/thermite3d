@@ -51,7 +51,8 @@ namespace Thermite
 {
 	Map::Map()
 	{
-		m_pOgreSceneManager = new Ogre::DefaultSceneManager("MapSceneManager");
+		m_pOgreSceneManager = 0;
+		//m_pOgreSceneManager = new Ogre::DefaultSceneManager("MapSceneManager");
 #ifdef ENABLE_BULLET_PHYSICS
 		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
 		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
