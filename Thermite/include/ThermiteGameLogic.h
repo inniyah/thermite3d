@@ -106,8 +106,6 @@ namespace Thermite
 		void initScriptEngine(void);
 		void initScriptEnvironment(void);
 
-		void createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode);
-
 	public:
 		void addResourceDirectory(const QString& directoryName);
 
@@ -170,19 +168,9 @@ namespace Thermite
 
 		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
 
-		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
-
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
-#endif //ENABLE_BULLET_PHYSICS
-
-		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
-
-		PolyVox::Volume<uint32_t>* m_volRegionTimeStamps;
-
-		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
-
-		PolyVox::Volume<SurfaceMeshDecimationTask*>* m_volSurfaceDecimators;
+#endif //ENABLE_BULLET_PHYSICS	
 
 		int m_iNoProcessed;
 		int m_iNoSubmitted;
@@ -213,6 +201,8 @@ namespace Thermite
 		QString mInitialiseScript;
 
 		Globals* mGlobals;
+
+		bool hasVolume;
 	};
 }
 

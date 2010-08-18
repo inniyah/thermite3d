@@ -78,6 +78,7 @@ namespace Thermite
 		,camera(0)
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
+		,hasVolume(false)
 	{
 		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
 
@@ -146,6 +147,9 @@ namespace Thermite
 		"robot.loopAnimation = true;"
 		"robot.animationName = 'Walk';"
 		"objectStore.setObject('Robot', robot);"
+
+		"var map = new Map();"
+		"objectStore.setObject('Map', map);"
 
 		"print('QtScript Initialisation End');";
 
@@ -314,63 +318,86 @@ namespace Thermite
 
 		if(m_pOgreSceneManager)
 		{
-		m_pOgreSceneManager->destroyAllLights();
-		QHashIterator<QString, QObject*> objectIter(mObjectStore);
-		while(objectIter.hasNext())
-		{
-			objectIter.next();
-			QObject* pObj = objectIter.value();
-
-			Light* light = dynamic_cast<Light*>(pObj);
-			if(light)
+			m_pOgreSceneManager->destroyAllLights();
+			QHashIterator<QString, QObject*> objectIter(mObjectStore);
+			while(objectIter.hasNext())
 			{
-				Ogre::Light* ogreLight = m_pOgreSceneManager->createLight(objectIter.key().toStdString());
-				ogreLight->setType(Ogre::Light::LT_POINT);
+				objectIter.next();
+				QObject* pObj = objectIter.value();
 
-				QVector3D pos = light->position();
-				ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+				Light* light = dynamic_cast<Light*>(pObj);
+				if(light)
+				{
+					Ogre::Light* ogreLight = m_pOgreSceneManager->createLight(objectIter.key().toStdString());
+					ogreLight->setType(Ogre::Light::LT_POINT);
 
-				QColor col = light->getColour();
-				ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+					QVector3D pos = light->position();
+					ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+					QColor col = light->getColour();
+					ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+				}
+
+				Entity* entity = dynamic_cast<Entity*>(pObj);
+				if(entity)
+				{
+					Ogre::Entity* ogreEntity;
+					Ogre::SceneNode* sceneNode;
+
+					if(m_pOgreSceneManager->hasEntity(objectIter.key().toStdString()))
+					{
+						ogreEntity = m_pOgreSceneManager->getEntity(objectIter.key().toStdString());
+						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
+					}
+					else
+					{
+						sceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+						ogreEntity = m_pOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
+						sceneNode->attachObject(ogreEntity);
+					}
+
+					QVector3D pos = entity->position();
+					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+					QQuaternion orientation = entity->orientation();
+					sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));
+
+					QVector3D scale = entity->size();
+					sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+
+					//Animation
+					Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
+					if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
+					{
+						Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
+						animationState->setEnabled(entity->animated());
+						animationState->setLoop(entity->loopAnimation());
+					}
+				}
+				Map* map = dynamic_cast<Map*>(pObj);
+				if(map)
+				{
+					if(!hasVolume)
+					{
+						mMap = map;
+
+						mMap->volumeResource = VolumeManager::getSingletonPtr()->load("castle.volume", "General");
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(3);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(4);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(5);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(6);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
+						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
+
+						mMap->initialise();
+
+						loadMap("sdfdsf");
+						hasVolume = true;
+					}
+				}
 			}
-
-			Entity* entity = dynamic_cast<Entity*>(pObj);
-			if(entity)
-			{
-				Ogre::Entity* ogreEntity;
-				Ogre::SceneNode* sceneNode;
-
-				if(m_pOgreSceneManager->hasEntity(objectIter.key().toStdString()))
-				{
-					ogreEntity = m_pOgreSceneManager->getEntity(objectIter.key().toStdString());
-					sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
-				}
-				else
-				{
-					sceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-					ogreEntity = m_pOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
-					sceneNode->attachObject(ogreEntity);
-				}
-
-				QVector3D pos = entity->position();
-				sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-
-				QQuaternion orientation = entity->orientation();
-				sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));
-
-				QVector3D scale = entity->size();
-				sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
-
-				//Animation
-				Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
-				if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
-				{
-					Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
-					animationState->setEnabled(entity->animated());
-					animationState->setLoop(entity->loopAnimation());
-				}
-			}
-		}
 		}
 
 		if(mOgreCamera)
@@ -478,44 +505,15 @@ namespace Thermite
 		m_iNoProcessed = 0;
 		m_iNoSubmitted = 0;
 
-		/*MapResourcePtr mapResource = MapManager::getSingletonPtr()->load(strMapName.toStdString(), "General");
-		if(mapResource.isNull())
-		{
-			Ogre::LogManager::getSingleton().logMessage("Failed to load map");
-		}
-
-		mMap = mapResource->m_pMap;
-		m_pActiveOgreSceneManager = mMap->m_pOgreSceneManager;*/
-
-		mMap = new Map;
+		//mMap = new Map;
 		mMap->m_pOgreSceneManager = m_pOgreSceneManager;
-		mMap->volumeResource = VolumeManager::getSingletonPtr()->load("castle.volume", "General");
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(3);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(4);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(5);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(6);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
-		mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
+		
 
 #ifdef ENABLE_BULLET_PHYSICS
 		m_pOgreBulletWorld = mMap->m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS
 
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
-		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(mMap->volumeResource->getVolume(), regionSideLength);
-		volumeChangeTracker->setAllRegionsModified();
-
-		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
-		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
-		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
-
-		m_volRegionTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		
 
 		//mMap = mapResource->m_pMap;
 
@@ -689,19 +687,19 @@ namespace Thermite
 						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
 
 						//There's no guarentee that the MapRegion exists at this point...
-						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+						MapRegion* pMapRegion = mMap->m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
-						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
+						std::uint32_t uRegionTimeStamp = mMap->volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+						if(uRegionTimeStamp > mMap->m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{
-							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
+							mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
 
 							//Convert to a real PolyVox::Region
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
-							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
+							region.cropTo(mMap->volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
 
 							//The prioirty ensures that the surfaces for regions close to the
 							//camera get extracted before those which are distant from the camera.
@@ -715,7 +713,7 @@ namespace Thermite
 							m_iNoSubmitted++;
 
 							//Indicate that we've processed this region
-							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+							mMap->m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,mMap->volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
 						}
 					}
 				}
@@ -732,7 +730,7 @@ namespace Thermite
 		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = mMap->volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 		if(uRegionTimeStamp > result.m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -743,14 +741,14 @@ namespace Thermite
 		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 
 
-		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
+		SurfaceMeshDecimationTask* pOldSurfaceDecimator = mMap->m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
 
 		m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
 		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(result, this);
 		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 
-		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceMeshDecimationTask);
+		mMap->m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceMeshDecimationTask);
 
 		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
@@ -764,7 +762,7 @@ namespace Thermite
 		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = mMap->volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 		if(uRegionTimeStamp > result.m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -794,11 +792,11 @@ namespace Thermite
 		}*/
 
 		//Create a MapRegion for that location if we don't have one already
-		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+		MapRegion* pMapRegion = mMap->m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 		if(pMapRegion == 0)
 		{
 			pMapRegion = new MapRegion(mMap, region.getLowerCorner());
-			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+			mMap->m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 		}
 
 		//Clear any previous geometry
@@ -842,7 +840,7 @@ namespace Thermite
 			bLoadComplete = true;
 		}
 
-		m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
+		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 	}
 
 	std::pair<bool, Ogre::Vector3> ThermiteGameLogic::getRayVolumeIntersection(const Ogre::Ray& ray)
@@ -938,6 +936,9 @@ namespace Thermite
 		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
 		scriptEngine->globalObject().setProperty("Entity", entityClass);
 
+		QScriptValue mapClass = scriptEngine->scriptValueFromQMetaObject<Map>();
+		scriptEngine->globalObject().setProperty("Map", mapClass);
+
 		QScriptValue globalsScriptValue = scriptEngine->newQObject(mGlobals);
 		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
 
@@ -966,83 +967,5 @@ namespace Thermite
 	void ThermiteGameLogic::stopScriptingEngine(void)
 	{
 		m_bRunScript = false;
-	}
-
-	void ThermiteGameLogic::createSphereAt(PolyVox::Vector3DFloat centre, float radius, uint8_t value, bool bPaintMode)
-	{
-		int firstX = static_cast<int>(std::floor(centre.getX() - radius));
-		int firstY = static_cast<int>(std::floor(centre.getY() - radius));
-		int firstZ = static_cast<int>(std::floor(centre.getZ() - radius));
-
-		int lastX = static_cast<int>(std::ceil(centre.getX() + radius));
-		int lastY = static_cast<int>(std::ceil(centre.getY() + radius));
-		int lastZ = static_cast<int>(std::ceil(centre.getZ() + radius));
-
-		float radiusSquared = radius * radius;
-
-		//Check bounds
-		firstX = std::max(firstX,0);
-		firstY = std::max(firstY,0);
-		firstZ = std::max(firstZ,0);
-
-		lastX = std::min(lastX,int(volumeChangeTracker->getWrappedVolume()->getWidth()-1));
-		lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
-		lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
-
-		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
-
-		////////////////////////////////////////////////////////////////////////////////
-
-		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
-		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
-		//the same region, only to have them rejected because the time stamp has changed again since they were issued.
-
-		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
-		//handle these checks as well.
-
-		//Longer term, it might be interesting to introduce a 'ModyfyVolumeCommand' which can be issued to runn on seperate threads.
-		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
-		//for that region.
-		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
-
-		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
-
-		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
-		{
-			for(std::uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
-			{
-				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
-				{
-					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					if(m_volRegionBeingProcessed->getVoxelAt(xCt,yCt,zCt))
-					{
-						return;
-					}
-				}
-			}
-		}
-		////////////////////////////////////////////////////////////////////////////////
-
-		volumeChangeTracker->lockRegion(regionToLock);
-		for(int z = firstZ; z <= lastZ; ++z)
-		{
-			for(int y = firstY; y <= lastY; ++y)
-			{
-				for(int x = firstX; x <= lastX; ++x)
-				{
-					if((centre - PolyVox::Vector3DFloat(x,y,z)).lengthSquared() <= radiusSquared)
-					{
-						MaterialDensityPair44 currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
-						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
-						volumeChangeTracker->setLockedVoxelAt(x,y,z,currentValue);
-					}
-				}
-			}
-		}
-		volumeChangeTracker->unlockRegion();
 	}
 }

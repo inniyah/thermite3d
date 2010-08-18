@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeResource.h"
+#include "VolumeChangeTracker.h"
 
 #include "PolyVoxForwardDeclarations.h"
 
@@ -40,30 +41,42 @@ freely, subject to the following restrictions:
 
 #include <map>
 
+#include "Object.h"
+
+#include <QScriptEngine>
+
 namespace Thermite
 {
-	class Map
+	class Map : public Object
 	{
+		Q_OBJECT
+
 	public:
-#ifdef ENABLE_BULLET_PHYSICS
-		//Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld);
-#else
-		//Map(Ogre::SceneManager* sceneManager);
-#endif //ENABLE_BULLET_PHYSICS
-		Map();
+		Map(QObject* parent = 0);
 		~Map(void);
+
+		void initialise(void);
+
+	public slots:
+		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
-#ifdef ENABLE_BULLET_PHYSICS
-		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
-#endif //ENABLE_BULLET_PHYSICS
 
 		VolumeResourcePtr volumeResource;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
-	};
+
+		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
+
+		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
+		PolyVox::Volume<uint32_t>* m_volRegionTimeStamps;
+		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
+		PolyVox::Volume<SurfaceMeshDecimationTask*>* m_volSurfaceDecimators;
+	};	
 }
+
+Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Map, QObject*)
 
 
 #endif

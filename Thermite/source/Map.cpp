@@ -35,6 +35,8 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "MaterialDensityPair.h"
+
 #ifdef ENABLE_BULLET_PHYSICS
 	#include "OgreBulletDynamicsWorld.h"
 #endif //ENABLE_BULLET_PHYSICS
@@ -49,30 +51,109 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	Map::Map()
+	Map::Map(QObject* parent)
+		:Object(parent)
 	{
 		m_pOgreSceneManager = 0;
-		//m_pOgreSceneManager = new Ogre::DefaultSceneManager("MapSceneManager");
-#ifdef ENABLE_BULLET_PHYSICS
-		const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
-		const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
-		m_pOgreBulletWorld = new OgreBulletDynamics::DynamicsWorld(m_pOgreSceneManager, bounds, gravityVector);
-
-	/*Map::Map(Ogre::SceneManager* sceneManager, OgreBulletDynamics::DynamicsWorld *pOgreBulletWorld)
-	{
-		m_pOgreSceneManager = sceneManager;
-		m_pOgreBulletWorld = pOgreBulletWorld;
-	}*/
-#else
-	/*Map::Map(Ogre::SceneManager* sceneManager)
-	{
-		m_pOgreSceneManager = sceneManager;
-	}*/
-#endif //ENABLE_BULLET_PHYSICS
 	}
 
 	Map::~Map(void)
 	{
 
+	}
+
+	void Map::initialise(void)
+	{
+		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(volumeResource->getVolume(), regionSideLength);
+		volumeChangeTracker->setAllRegionsModified();
+
+		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
+		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
+		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+
+		m_volRegionTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+	}
+
+	void  Map::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
+	{
+		int firstX = static_cast<int>(std::floor(centre.x() - radius));
+		int firstY = static_cast<int>(std::floor(centre.y() - radius));
+		int firstZ = static_cast<int>(std::floor(centre.z() - radius));
+
+		int lastX = static_cast<int>(std::ceil(centre.x() + radius));
+		int lastY = static_cast<int>(std::ceil(centre.y() + radius));
+		int lastZ = static_cast<int>(std::ceil(centre.z() + radius));
+
+		float radiusSquared = radius * radius;
+
+		//Check bounds
+		firstX = std::max(firstX,0);
+		firstY = std::max(firstY,0);
+		firstZ = std::max(firstZ,0);
+
+		lastX = std::min(lastX,int(volumeChangeTracker->getWrappedVolume()->getWidth()-1));
+		lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
+		lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
+
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+
+		////////////////////////////////////////////////////////////////////////////////
+
+		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
+		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
+		//the same region, only to have them rejected because the time stamp has changed again since they were issued.
+
+		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
+		//handle these checks as well.
+
+		//Longer term, it might be interesting to introduce a 'ModyfyVolumeCommand' which can be issued to runn on seperate threads.
+		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
+		//for that region.
+		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+
+		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
+		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+
+		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		{
+			for(std::uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			{
+				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				{
+					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
+					if(m_volRegionBeingProcessed->getVoxelAt(xCt,yCt,zCt))
+					{
+						return;
+					}
+				}
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////
+
+		volumeChangeTracker->lockRegion(regionToLock);
+		for(int z = firstZ; z <= lastZ; ++z)
+		{
+			for(int y = firstY; y <= lastY; ++y)
+			{
+				for(int x = firstX; x <= lastX; ++x)
+				{
+					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
+					{
+						MaterialDensityPair44 currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
+						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
+						volumeChangeTracker->setLockedVoxelAt(x,y,z,currentValue);
+					}
+				}
+			}
+		}
+		volumeChangeTracker->unlockRegion();
 	}
 }
