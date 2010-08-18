@@ -156,4 +156,39 @@ namespace Thermite
 		}
 		volumeChangeTracker->unlockRegion();
 	}
+
+	QVector3D Map::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
+	{
+		//Initialise to failure
+		/*std::pair<bool, QVector3D> result;
+		result.first = false;
+		result.second = QVector3D(0,0,0);*/
+
+		QVector3D result = QVector3D(0,0,0);
+
+		//Ensure the voume is valid
+		PolyVox::Volume<MaterialDensityPair44>* pVolume = volumeResource->getVolume();
+		if(pVolume == 0)
+		{
+			return result;
+		}
+
+		Ogre::Real dist = 0.0f;
+		for(int steps = 0; steps < 1000; steps++)
+		{
+			//Ogre::Vector3 point = ray.getPoint(dist);
+			//PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
+			rayOrigin += rayDir.normalized();
+
+			if(pVolume->getVoxelAt(rayOrigin.x(), rayOrigin.y(), rayOrigin.z()).getMaterial() > 0)
+			{
+				result = rayOrigin;
+				return result;
+			}
+
+			dist += 1.0f;			
+		}
+
+		return result;
+	}
 }

@@ -166,8 +166,6 @@ namespace Thermite
 
 		void uploadSurfaceMesh(std::shared_ptr<PolyVox::SurfaceMesh> mesh, PolyVox::Region region);
 
-		std::pair<bool, Ogre::Vector3> getRayVolumeIntersection(const Ogre::Ray& ray);
-
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS	

@@ -44,6 +44,7 @@ freely, subject to the following restrictions:
 #include "Object.h"
 
 #include <QScriptEngine>
+#include <QVector3D>
 
 namespace Thermite
 {
@@ -59,6 +60,7 @@ namespace Thermite
 
 	public slots:
 		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
+		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;

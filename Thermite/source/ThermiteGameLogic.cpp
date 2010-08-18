@@ -148,6 +148,10 @@ namespace Thermite
 		"robot.animationName = 'Walk';"
 		"objectStore.setObject('Robot', robot);"
 
+		"var sphere = new Entity();"
+		"sphere.meshName = 'sphere.mesh';"
+		"objectStore.setObject('Sphere', sphere);"
+
 		"var map = new Map();"
 		"objectStore.setObject('Map', map);"
 
@@ -519,7 +523,7 @@ namespace Thermite
 
 		initialisePhysics();
 
-		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+		//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
 			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
 		}
@@ -583,7 +587,7 @@ namespace Thermite
 		//Create x-axis
 		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
 		Ogre::Entity *xAxisCylinderEntity = m_pOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
-		xAxisCylinderEntity->setMaterialName("XAxisMaterial");
+		xAxisCylinderEntity->setMaterialName("RedMaterial");
 		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
 		xAxisCylinderNode->scale(vecToUnitCube);
 		xAxisCylinderNode->scale(Ogre::Vector3(fWidth,1.0,1.0));
@@ -592,7 +596,7 @@ namespace Thermite
 		//Create y-axis
 		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
 		Ogre::Entity *yAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
-		yAxisCylinderEntity->setMaterialName("YAxisMaterial");
+		yAxisCylinderEntity->setMaterialName("GreenMaterial");
 		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
 		yAxisCylinderNode->scale(vecToUnitCube);
 		yAxisCylinderNode->scale(Ogre::Vector3(1.0,fHeight,1.0));
@@ -601,7 +605,7 @@ namespace Thermite
 		//Create z-axis
 		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
 		Ogre::Entity *zAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
-		zAxisCylinderEntity->setMaterialName("ZAxisMaterial");
+		zAxisCylinderEntity->setMaterialName("BlueMaterial");
 		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
 		zAxisCylinderNode->scale(vecToUnitCube);
 		zAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fDepth));
@@ -841,39 +845,6 @@ namespace Thermite
 		}
 
 		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
-	}
-
-	std::pair<bool, Ogre::Vector3> ThermiteGameLogic::getRayVolumeIntersection(const Ogre::Ray& ray)
-	{
-		//Initialise to failure
-		std::pair<bool, Ogre::Vector3> result;
-		result.first = false;
-		result.second = Ogre::Vector3::ZERO;
-
-		//Ensure the voume is valid
-		PolyVox::Volume<MaterialDensityPair44>* pVolume = mMap->volumeResource->getVolume();
-		if(pVolume == 0)
-		{
-			return result;
-		}
-
-		Ogre::Real dist = 0.0f;
-		for(int steps = 0; steps < 1000; steps++)
-		{
-			Ogre::Vector3 point = ray.getPoint(dist);
-			PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
-
-			if(pVolume->getVoxelAt(v3dPoint).getDensity() >= MaterialDensityPair44::getThreshold())
-			{
-				result.first = true;
-				result.second = point;
-				return result;
-			}
-
-			dist += 1.0f;			
-		}
-
-		return result;
 	}
 
 	void ThermiteGameLogic::initScriptEngine(void)
