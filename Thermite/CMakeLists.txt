@@ -84,6 +84,8 @@ SOURCE_GROUP("UI" FILES ${MAIN_UI_FILES})
 SET(RESOURCE_SRC_FILES
 	source/Resources/MapManager.cpp
 	source/Resources/MapResource.cpp
+	source/Resources/ScriptManager.cpp
+	source/Resources/ScriptResource.cpp
 	source/Resources/VolumeManager.cpp
 	source/Resources/VolumeResource.cpp
 )
@@ -91,6 +93,8 @@ SET(RESOURCE_SRC_FILES
 SET(RESOURCE_INC_FILES
 	include/Resources/MapManager.h
 	include/Resources/MapResource.h
+	include/Resources/ScriptManager.h
+	include/Resources/ScriptResource.h
 	include/Resources/VolumeManager.h
 	include/Resources/VolumeResource.h
 )

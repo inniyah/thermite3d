@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #include "SurfacePatchRenderable.h"
 #include "MapManager.h"
 #include "MaterialDensityPair.h"
+#include "ScriptManager.h"
 #include "VolumeManager.h"
 
 #include "Application.h"
@@ -119,28 +120,7 @@ namespace Thermite
 		{
 			int line = scriptEngine->uncaughtExceptionLineNumber();
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
-
-		QFile updateScriptFile("..\\share\\thermite\\apps\\TechDemo\\scripts\\initialise.js");
-
-		if (updateScriptFile.open(QFile::ReadOnly))
-		{
-			QTextStream stream(&updateScriptFile);
-			mInitialiseScript = stream.readAll();
-			updateScriptFile.close();
-		}
-		else
-		{
-			mInitialiseScript = "//Failed to open file";
-		}
-
-
-		result = scriptEngine->evaluate(mInitialiseScript);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
+		}		
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -199,6 +179,7 @@ namespace Thermite
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
 
 		MapManager* mm = new MapManager;
+		ScriptManager* sm = new ScriptManager;
 
 		mTime = new QTime;
 		mTime->start();
@@ -250,6 +231,16 @@ namespace Thermite
 
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
+
+		ScriptResourcePtr pScriptResource = ScriptManager::getSingletonPtr()->load("initialise.js", "General");
+		mInitialiseScript = QString::fromStdString(pScriptResource->getScriptData());
+
+		QScriptValue result = scriptEngine->evaluate(mInitialiseScript);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
 	}
 
 	void ThermiteGameLogic::update(void)
