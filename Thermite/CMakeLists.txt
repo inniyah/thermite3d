@@ -28,7 +28,11 @@ ENDIF()
 FIND_PACKAGE(PolyVox REQUIRED)
 FIND_PACKAGE(QtOgre REQUIRED)
 
-SET(SRC_FILES
+################################################################################
+## Main files
+################################################################################
+
+SET(MAIN_SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
 	source/DataStreamWrapper.cpp
@@ -37,17 +41,68 @@ SET(SRC_FILES
 	source/MainMenu.cpp
 	source/Map.cpp
 	source/MapHandler.cpp
-	source/MapManager.cpp
 	source/MapRegion.cpp
-	source/MapResource.cpp
 	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
-	source/VolumeManager.cpp
-	source/VolumeResource.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
-	
+)
+
+SET(MAIN_INC_FILES
+	include/AnyOption.h
+	include/DataStreamWrapper.h
+	include/LoadingProgress.h
+	include/LoadMapWidget.h
+	include/MainMenu.h
+	include/Map.h
+	include/MapHandler.h
+	include/MapRegion.h
+	include/PhysicalEntity.h
+	include/SurfacePatchRenderable.h
+	include/ThermiteForwardDeclarations.h
+	include/ThermiteGameLogic.h
+	include/Utility.h
+	include/VolumeSerializationProgressListenerImpl.h	
+)
+
+SET(MAIN_UI_FILES
+	ui/LoadingProgress.ui
+	ui/LoadMapWidget.ui
+	ui/MainMenu.ui
+	ui/ScriptEditorWidget.ui
+)
+
+SOURCE_GROUP("Sources" FILES ${MAIN_SRC_FILES})
+SOURCE_GROUP("Headers" FILES ${MAIN_INC_FILES})
+SOURCE_GROUP("UI" FILES ${MAIN_UI_FILES})
+
+################################################################################
+## Resource files
+################################################################################
+
+SET(RESOURCE_SRC_FILES
+	source/Resources/MapManager.cpp
+	source/Resources/MapResource.cpp
+	source/Resources/VolumeManager.cpp
+	source/Resources/VolumeResource.cpp
+)
+
+SET(RESOURCE_INC_FILES
+	include/Resources/MapManager.h
+	include/Resources/MapResource.h
+	include/Resources/VolumeManager.h
+	include/Resources/VolumeResource.h
+)
+
+SOURCE_GROUP("Sources\\Resources" FILES ${RESOURCE_SRC_FILES})
+SOURCE_GROUP("Headers\\Resources" FILES ${RESOURCE_INC_FILES})
+
+################################################################################
+## Scripting files
+################################################################################
+
+SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Camera.cpp
 	source/scriptable/Entity.cpp
 	source/scriptable/Globals.cpp
@@ -57,34 +112,9 @@ SET(SRC_FILES
 	source/scriptable/Object.cpp
 	source/scriptable/ObjectStore.cpp
 	source/scriptable/ScriptEditorWidget.cpp
-	
-	source/tasks/SurfaceMeshDecimationTask.cpp
-	source/tasks/SurfaceMeshExtractionTask.cpp
-	source/tasks/SurfaceExtractorTaskData.cpp
-	source/tasks/Task.cpp
-	source/tasks/TaskProcessorThread.cpp
 )
 
-SET(INC_FILES
-	include/AnyOption.h
-	include/DataStreamWrapper.h
-	include/LoadingProgress.h
-	include/LoadMapWidget.h
-	include/MainMenu.h
-	include/Map.h
-	include/MapHandler.h
-	include/MapManager.h
-	include/MapRegion.h
-	include/MapResource.h
-	include/PhysicalEntity.h
-	include/SurfacePatchRenderable.h
-	include/ThermiteForwardDeclarations.h
-	include/ThermiteGameLogic.h
-	include/Utility.h
-	include/VolumeManager.h
-	include/VolumeResource.h
-	include/VolumeSerializationProgressListenerImpl.h
-	
+SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Camera.h
 	include/scriptable/Entity.h
 	include/scriptable/Globals.h
@@ -94,29 +124,42 @@ SET(INC_FILES
 	include/scriptable/Object.h
 	include/scriptable/ObjectStore.h
 	include/scriptable/ScriptEditorWidget.h
-	
+)
+
+SOURCE_GROUP("Sources\\Scriptable" FILES ${SCRIPTABLE_SRC_FILES})
+SOURCE_GROUP("Headers\\Scriptable" FILES ${SCRIPTABLE_INC_FILES})
+
+################################################################################
+## Tasks files
+################################################################################
+
+SET(TASKS_SRC_FILES
+	source/tasks/SurfaceMeshDecimationTask.cpp
+	source/tasks/SurfaceMeshExtractionTask.cpp
+	source/tasks/SurfaceExtractorTaskData.cpp
+	source/tasks/Task.cpp
+	source/tasks/TaskProcessorThread.cpp
+)
+
+SET(TASKS_INC_FILES
 	include/Tasks/SurfaceMeshDecimationTask.h
 	include/Tasks/SurfaceMeshExtractionTask.h
 	include/Tasks/SurfaceExtractorTaskData.h
 	include/Tasks/Task.h
 	include/Tasks/TaskProcessorThread.h
-
 )
 
-SET(UI_FILES
-	ui/LoadingProgress.ui
-	ui/LoadMapWidget.ui
-	ui/MainMenu.ui
-	ui/ScriptEditorWidget.ui
-)
+SOURCE_GROUP("Sources\\Tasks" FILES ${TASKS_SRC_FILES})
+SOURCE_GROUP("Headers\\Tasks" FILES ${TASKS_INC_FILES})
+
+#Combine all the source/include/UI files into a single list
+SET(SRC_FILES ${MAIN_SRC_FILES} ${RESOURCE_SRC_FILES} ${TASKS_SRC_FILES} ${SCRIPTABLE_SRC_FILES})
+SET(INC_FILES ${MAIN_INC_FILES} ${RESOURCE_INC_FILES} ${TASKS_INC_FILES} ${SCRIPTABLE_INC_FILES})
+SET(UI_FILES ${MAIN_UI_FILES})
 
 SET(RESOURCE_FILES
 	resources/Qt/ThermiteResources.qrc
 )
-
-#"Sources" and "Headers" are the group names in Visual Studio.
-SOURCE_GROUP("Sources" FILES ${SRC_FILES})
-SOURCE_GROUP("Headers" FILES ${INC_FILES})
 
 FIND_PACKAGE(Qt4)
 IF (WIN32)
@@ -134,14 +177,14 @@ QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 IF(ENABLE_BULLET_PHYSICS)
 	ADD_DEFINITIONS(-DENABLE_BULLET_PHYSICS)
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${BULLET_INCLUDE_DIRS} ${OGREBULLET_INCLUDE_DIR})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS} ${BULLET_LIBRARY_DIRS} ${OGREBULLET_LIB_DIR})
-	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
+	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES} ${OGREBULLET_LIBRARIES} ${BULLET_LIBRARIES})
 ELSE()
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 	LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
-	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES}  ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
+	ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 	TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})
 ENDIF()
 
