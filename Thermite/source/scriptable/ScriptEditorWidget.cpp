@@ -21,7 +21,7 @@ ScriptEditorWidget::ScriptEditorWidget(QWidget *parent)
 	}
 	else
 	{
-		m_pTextEdit->setPlainText("////Failed to open file");
+		m_pTextEdit->setPlainText("//Failed to open file");
 	}
 }
 

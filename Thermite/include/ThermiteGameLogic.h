@@ -150,8 +150,6 @@ namespace Thermite
 
 	public:
 
-		void initialisePhysics(void);
-
 		void updatePolyVoxGeometry();
 
 	public slots:

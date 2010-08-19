@@ -121,41 +121,19 @@ namespace Thermite
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
 		}
 
-		mInitialiseScript =
-		"print('QtScript Initialisation Begin');"
+		QFile updateScriptFile("..\\share\\thermite\\apps\\TechDemo\\scripts\\initialise.js");
 
-		"var redLight = new Light();"
-		"redLight.position = new QVector3D(100,100,100);"
-		"redLight.colour = new QColor(255,0,0);"
-		"objectStore.setObject('RedLight', redLight);"
+		if (updateScriptFile.open(QFile::ReadOnly))
+		{
+			QTextStream stream(&updateScriptFile);
+			mInitialiseScript = stream.readAll();
+			updateScriptFile.close();
+		}
+		else
+		{
+			mInitialiseScript = "//Failed to open file";
+		}
 
-		"var greenLight = new Light();"
-		"greenLight.position = new QVector3D(100,100,100);"
-		"greenLight.colour = new QColor(0,255,0);"
-		"objectStore.setObject('GreenLight', greenLight);"
-
-		"var blueLight = new Light();"
-		"blueLight.position = new QVector3D(100,100,100);"
-		"blueLight.colour = new QColor(0,0,255);"
-		"objectStore.setObject('BlueLight', blueLight);"
-
-		"var robot = new Entity();"
-		"robot.position = new QVector3D(3,-1,0);"
-		"robot.size = new QVector3D(1.0, 1.0, 1.0);"
-		"robot.meshName = 'robot.mesh';"
-		"robot.animated = true;"
-		"robot.loopAnimation = true;"
-		"robot.animationName = 'Walk';"
-		"objectStore.setObject('Robot', robot);"
-
-		"var sphere = new Entity();"
-		"sphere.meshName = 'sphere.mesh';"
-		"objectStore.setObject('Sphere', sphere);"
-
-		"var map = new Map();"
-		"objectStore.setObject('Map', map);"
-
-		"print('QtScript Initialisation End');";
 
 		result = scriptEngine->evaluate(mInitialiseScript);
 		if (scriptEngine->hasUncaughtException())
@@ -181,16 +159,12 @@ namespace Thermite
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
-		m_pOgreSceneManager = new Ogre::DefaultSceneManager("DummySceneManager");
-		mOgreCamera = m_pOgreSceneManager->createCamera("DummyCamera");
-
-		mOgreCamera->setPosition(128, 128, 128);
-		mOgreCamera->lookAt(128, 0, 128);
+		m_pOgreSceneManager = new Ogre::DefaultSceneManager("OgreSceneManager");
+		mOgreCamera = m_pOgreSceneManager->createCamera("OgreCamera");
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
 		mOgreCamera->setFarClipDistance(1000);
 
-		//m_pOgreSceneManager->getRootSceneNode()->attachObject(mOgreCamera);
 		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
@@ -276,17 +250,10 @@ namespace Thermite
 
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
-
-		m_pOgreSceneManager->setSkyBox(true, "SkyBox", 5000, true);
-		mOgreCamera->setFOVy(Ogre::Radian(1.0f));
-
-		//test();
 	}
 
 	void ThermiteGameLogic::update(void)
 	{
-		/*if(mMap == 0)
-			return;*/
 
 		mLastFrameTime = mCurrentTime;
 		mCurrentTime = mTime->elapsed();
@@ -298,13 +265,6 @@ namespace Thermite
 
 		//The fun stuff!
 		updatePolyVoxGeometry();
-		
-#ifdef ENABLE_BULLET_PHYSICS
-		if((qApp->settings()->value("Physics/SimulatePhysics", false).toBool()) && (bLoadComplete))
-		{
-			m_pOgreBulletWorld->stepSimulation(mTimeElapsedInSeconds, 10);
-		}
-#endif //ENABLE_BULLET_PHYSICS
 
 		++mCurrentFrameNumber;
 
@@ -451,13 +411,11 @@ namespace Thermite
 
 	void ThermiteGameLogic::onMouseMove(QMouseEvent* event)
 	{
-		//mCurrentMousePos = event->pos();
 		mouse->setPosition(event->pos());
 	}
 
 	void ThermiteGameLogic::onWheel(QWheelEvent* event)
 	{
-		//mCurrentWheelPos += event->delta();
 		mouse->modifyWheelDelta(event->delta());
 	}
 
@@ -513,15 +471,6 @@ namespace Thermite
 		mMap->m_pOgreSceneManager = m_pOgreSceneManager;
 		
 
-#ifdef ENABLE_BULLET_PHYSICS
-		m_pOgreBulletWorld = mMap->m_pOgreBulletWorld;
-#endif //ENABLE_BULLET_PHYSICS
-
-		
-
-		//mMap = mapResource->m_pMap;
-
-		initialisePhysics();
 
 		//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
@@ -640,15 +589,6 @@ namespace Thermite
 			Ogre::ResourcePtr resource = I.getNext();
 			resource->reload();
 		}
-	}
-
-	void ThermiteGameLogic::initialisePhysics(void)
-	{
-#ifdef ENABLE_BULLET_PHYSICS
-		//const Ogre::Vector3 gravityVector = Ogre::Vector3 (0,-98.1,0);
-		//const Ogre::AxisAlignedBox bounds = Ogre::AxisAlignedBox (Ogre::Vector3 (-10000, -10000, -10000),Ogre::Vector3 (10000,  10000,  10000));
-		//m_pOgreBulletWorld = new DynamicsWorld(mMap->m_pOgreSceneManager, bounds, gravityVector);
-#endif //ENABLE_BULLET_PHYSICS
 	}
 
 	void ThermiteGameLogic::updatePolyVoxGeometry()
