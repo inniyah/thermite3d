@@ -101,8 +101,6 @@ namespace Thermite
 
 		void onWheel(QWheelEvent* event);
 
-		void onLoadMapClicked(QString strMapName);
-
 		void initScriptEngine(void);
 		void initScriptEnvironment(void);
 
@@ -159,6 +157,10 @@ namespace Thermite
 	private slots:
 		void startScriptingEngine(void);
 		void stopScriptingEngine(void);
+
+		void playStartupMovie(void);
+		void showLastMovieFrame(void);
+		void deleteMovie(void);
 		
 	public:
 
@@ -197,8 +199,6 @@ namespace Thermite
 		QString mInitialiseScript;
 
 		Globals* mGlobals;
-
-		bool hasVolume;
 	};
 }
 

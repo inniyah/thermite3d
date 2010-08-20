@@ -79,7 +79,6 @@ namespace Thermite
 		,camera(0)
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
-		,hasVolume(false)
 	{
 		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
 
@@ -149,13 +148,7 @@ namespace Thermite
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
-		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
-		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
-		/*m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
-		m_pThermiteLogoMovie->jumpToFrame(0);
-		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
-		m_pThermiteLogoLabel->show();
-		m_pThermiteLogoMovie->start();*/
+		playStartupMovie();
 
 		//Initialise all resources
 		addResourceDirectory("./resources/");
@@ -195,18 +188,12 @@ namespace Thermite
 		/*QWaitCondition sleep;
 		SignalableMutex mutex;
 		mutex.lock();
-		sleep.wait(&mutex, 2000);*/
+		sleep.wait(&mutex, 2000);
 
-		/*m_pThermiteLogoMovie->stop(); //Just incase we didn't stop already.
+		m_pThermiteLogoMovie->stop(); //Just incase we didn't stop already.
 		QPixmap lastFrameOfMovie = m_pThermiteLogoMovie->currentPixmap();
 		m_pThermiteLogoLabel->setPixmap(lastFrameOfMovie);
 		delete m_pThermiteLogoMovie;*/
-
-		//Application stuff
-		//Set up various GUI components...
-		//The load map widget
-		LoadMapWidget* wgtLoadMap = new LoadMapWidget(this, qApp->mainWidget(), Qt::Tool);
-		Application::centerWidget(wgtLoadMap, qApp->mainWidget());
 
 		//The main menu
 		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
@@ -215,7 +202,6 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(quitClicked(void)), qApp->mainWidget(), SLOT(close(void)));
 		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
-		QObject::connect(mMainMenu, SIGNAL(loadClicked(void)), wgtLoadMap, SLOT(show(void)));
 		mMainMenu->show();
 
 		//Show the main menu after the animation has finished
@@ -332,7 +318,7 @@ namespace Thermite
 				Map* map = dynamic_cast<Map*>(pObj);
 				if(map)
 				{
-					if(!hasVolume)
+					if(!mMap)
 					{
 						mMap = map;
 
@@ -348,8 +334,15 @@ namespace Thermite
 
 						mMap->initialise();
 
-						loadMap("sdfdsf");
-						hasVolume = true;
+						//loadMap("sdfdsf");
+
+						m_loadingProgress->show();
+
+						m_iNoProcessed = 0;
+						m_iNoSubmitted = 0;
+
+						//mMap = new Map;
+						mMap->m_pOgreSceneManager = m_pOgreSceneManager;
 					}
 				}
 			}
@@ -410,17 +403,6 @@ namespace Thermite
 		mouse->modifyWheelDelta(event->delta());
 	}
 
-	void ThermiteGameLogic::onLoadMapClicked(QString strMapName)
-	{
-		mMainMenu->hide();
-		//Temporary hack until loading new map is fixed...
-		mMainMenu->disableLoadButton();
-
-		loadMap(strMapName);
-
-		mApplication->showFPSCounter();
-	}
-
 	void ThermiteGameLogic::shutdown(void)
 	{
 		Ogre::Root::getSingleton().destroySceneManager(m_pOgreSceneManager);
@@ -453,13 +435,7 @@ namespace Thermite
 		bLoadComplete = false;
 		m_pThermiteLogoLabel->hide();
 
-		m_loadingProgress->show();
-
-		m_iNoProcessed = 0;
-		m_iNoSubmitted = 0;
-
-		//mMap = new Map;
-		mMap->m_pOgreSceneManager = m_pOgreSceneManager;
+		
 		
 
 
@@ -478,21 +454,6 @@ namespace Thermite
 			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
 			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
 		}	
-
-
-		//We've loaded a scene so let's free some memory by deleting the movie.
-		//Later on we should handle this properly by replacing it with it's last
-		//frame once it has finished playing.
-		if(m_pThermiteLogoLabel != 0)
-		{
-			delete m_pThermiteLogoLabel;
-			m_pThermiteLogoLabel = 0;
-		}
-		if(m_pThermiteLogoMovie != 0)
-		{
-			delete m_pThermiteLogoMovie;
-			m_pThermiteLogoMovie = 0;
-		}
 	}
 
 	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)
@@ -869,5 +830,40 @@ namespace Thermite
 	void ThermiteGameLogic::stopScriptingEngine(void)
 	{
 		m_bRunScript = false;
+	}
+
+	void ThermiteGameLogic::playStartupMovie(void)
+	{
+		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
+		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
+		connect(m_pThermiteLogoMovie, SIGNAL(finished(void)), this, SLOT(showLastMovieFrame(void)));
+		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
+		m_pThermiteLogoMovie->jumpToFrame(0);
+		m_pThermiteLogoLabel->resize(m_pThermiteLogoMovie->currentImage().size());
+		m_pThermiteLogoLabel->show();
+		m_pThermiteLogoMovie->start();
+	}
+
+	void ThermiteGameLogic::showLastMovieFrame(void)
+	{
+		/*QTimer* deleteMovieTimer = new QTimer(m_pThermiteLogoLabel); //Making label the parent means timer will get deleted.
+		connect(deleteMovieTimer, SIGNAL(timeout(void)), this, SLOT(deleteMovie(void)));*/
+
+		QTimer::singleShot(1000, this, SLOT(deleteMovie()));
+	}
+
+	void ThermiteGameLogic::deleteMovie(void)
+	{
+		thermiteLog()->logMessage("Deleting startup movie", LL_DEBUG);
+		if(m_pThermiteLogoLabel != 0)
+		{
+			delete m_pThermiteLogoLabel;
+			m_pThermiteLogoLabel = 0;
+		}
+		if(m_pThermiteLogoMovie != 0)
+		{
+			delete m_pThermiteLogoMovie;
+			m_pThermiteLogoMovie = 0;
+		}
 	}
 }
