@@ -23,17 +23,14 @@ freely, subject to the following restrictions:
 
 #include "VolumeSerializationProgressListenerImpl.h"
 
-#include "ThermiteGameLogic.h"
-
 namespace Thermite
 {
-	VolumeSerializationProgressListenerImpl::VolumeSerializationProgressListenerImpl(ThermiteGameLogic* pThermiteGameLogic)
-		:m_pThermiteGameLogic(pThermiteGameLogic)
+	VolumeSerializationProgressListenerImpl::VolumeSerializationProgressListenerImpl()
 	{
 	}
 
 	void VolumeSerializationProgressListenerImpl::onProgressUpdated(float fProgress)
 	{
-		m_pThermiteGameLogic->setVolumeLoadProgress(fProgress);
+		emit progressUpdated(fProgress);
 	}
 }

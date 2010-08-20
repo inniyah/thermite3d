@@ -36,7 +36,6 @@ SET(MAIN_SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
 	source/DataStreamWrapper.cpp
-	source/LoadingProgress.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
 	source/Map.cpp
@@ -52,7 +51,6 @@ SET(MAIN_SRC_FILES
 SET(MAIN_INC_FILES
 	include/AnyOption.h
 	include/DataStreamWrapper.h
-	include/LoadingProgress.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
 	include/Map.h
@@ -67,7 +65,6 @@ SET(MAIN_INC_FILES
 )
 
 SET(MAIN_UI_FILES
-	ui/LoadingProgress.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
 	ui/ScriptEditorWidget.ui

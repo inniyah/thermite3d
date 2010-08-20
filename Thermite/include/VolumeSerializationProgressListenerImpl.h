@@ -28,18 +28,21 @@ freely, subject to the following restrictions:
 
 #include "Serialization.h"
 
-#include "ThermiteForwardDeclarations.h"
+#include <QObject>
 
 namespace Thermite
 {
-	class VolumeSerializationProgressListenerImpl : public PolyVox::VolumeSerializationProgressListener
+	class VolumeSerializationProgressListenerImpl : public QObject, public PolyVox::VolumeSerializationProgressListener
 	{
+		Q_OBJECT
 	public:
-		VolumeSerializationProgressListenerImpl(ThermiteGameLogic* pThermiteGameLogic);
+		VolumeSerializationProgressListenerImpl();
 
 		void onProgressUpdated(float fProgress);
 
-		ThermiteGameLogic* m_pThermiteGameLogic;
+	signals:
+		void progressUpdated(float);
+
 	};
 }
 

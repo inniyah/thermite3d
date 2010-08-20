@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 
 #include "AnyOption.h"
 #include "GameLogic.h"
-#include "LoadingProgress.h"
 #include "Serialization.h"
 #include "SurfaceExtractorTaskData.h"
 #include "VolumeChangeTracker.h"
@@ -88,8 +87,6 @@ namespace Thermite
 
 		void loadMap(QString strMapName);
 
-		void setVolumeLoadProgress(float fProgress);
-
 		void reloadShaders(void);
 
 		void onKeyPress(QKeyEvent* event);
@@ -132,17 +129,10 @@ namespace Thermite
 
 		std::queue<PhysicalObject*> m_queueObjects;
 
-		//Ogre::Entity* mCannon;
-		
-
-		LoadingProgress* m_loadingProgress;
-
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
 
 		Ogre::SceneNode* m_axisNode;
-
-		bool bLoadComplete;
 
 		AnyOption m_commandLineArgs;
 
@@ -169,9 +159,6 @@ namespace Thermite
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS	
-
-		int m_iNoProcessed;
-		int m_iNoSubmitted;
 
 		TaskProcessorThread* m_backgroundThread;
 

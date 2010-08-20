@@ -148,7 +148,7 @@ namespace Thermite
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
-		playStartupMovie();
+		//playStartupMovie();
 
 		//Initialise all resources
 		addResourceDirectory("./resources/");
@@ -159,17 +159,13 @@ namespace Thermite
 		}
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-		//Used to display loading/extraction progress
-		m_loadingProgress = new LoadingProgress(qApp->mainWidget(), Qt::Tool);
-		Application::centerWidget(m_loadingProgress, qApp->mainWidget());
-
 		//Set the frame sate to be as high as possible
 		mApplication->setAutoUpdateInterval(0);
 
 		//Some Ogre related stuff we need to set up
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
 		VolumeManager* vm = new VolumeManager;
-		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl(this);
+		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl();
 
 		MapManager* mm = new MapManager;
 		ScriptManager* sm = new ScriptManager;
@@ -334,13 +330,6 @@ namespace Thermite
 
 						mMap->initialise();
 
-						//loadMap("sdfdsf");
-
-						m_loadingProgress->show();
-
-						m_iNoProcessed = 0;
-						m_iNoSubmitted = 0;
-
 						//mMap = new Map;
 						mMap->m_pOgreSceneManager = m_pOgreSceneManager;
 					}
@@ -432,11 +421,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::loadMap(QString strMapName)
 	{
-		bLoadComplete = false;
-		m_pThermiteLogoLabel->hide();
-
-		
-		
+		m_pThermiteLogoLabel->hide();	
 
 
 		//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
@@ -454,12 +439,6 @@ namespace Thermite
 			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
 			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
 		}	
-	}
-
-	void ThermiteGameLogic::setVolumeLoadProgress(float fProgress)
-	{
-		mThermiteLog->logMessage("loading...", LL_INFO);
-		m_loadingProgress->setLoadingDataPercentageDone(fProgress*100);
 	}
 
 	void ThermiteGameLogic::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
@@ -606,7 +585,6 @@ namespace Thermite
 							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(taskData, this);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
-							m_iNoSubmitted++;
 
 							//Indicate that we've processed this region
 							mMap->m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,mMap->volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
@@ -724,18 +702,6 @@ namespace Thermite
 			}
 		}
 
-		//Update the progress bar
-		m_iNoProcessed++;
-		float fProgress = static_cast<float>(m_iNoProcessed) / static_cast<float>(m_iNoSubmitted);
-		m_loadingProgress->setExtractingSurfacePercentageDone(fProgress*100);
-
-		//If we've finished, the progress bar can be hidden.
-		if((bLoadComplete == false) && (fProgress > 0.999))
-		{
-			m_loadingProgress->hide();
-			bLoadComplete = true;
-		}
-
 		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 	}
 
@@ -846,9 +812,6 @@ namespace Thermite
 
 	void ThermiteGameLogic::showLastMovieFrame(void)
 	{
-		/*QTimer* deleteMovieTimer = new QTimer(m_pThermiteLogoLabel); //Making label the parent means timer will get deleted.
-		connect(deleteMovieTimer, SIGNAL(timeout(void)), this, SLOT(deleteMovie(void)));*/
-
 		QTimer::singleShot(1000, this, SLOT(deleteMovie()));
 	}
 
