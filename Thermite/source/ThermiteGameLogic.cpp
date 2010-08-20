@@ -179,18 +179,6 @@ namespace Thermite
 		m_backgroundThread->setPriority(QThread::LowestPriority);
 		m_backgroundThread->start();
 
-		//Slightly hacky way of sleeping while the logo animation plays.
-		//FIXME - Think about using QMovie::finished() signal instead.
-		/*QWaitCondition sleep;
-		SignalableMutex mutex;
-		mutex.lock();
-		sleep.wait(&mutex, 2000);
-
-		m_pThermiteLogoMovie->stop(); //Just incase we didn't stop already.
-		QPixmap lastFrameOfMovie = m_pThermiteLogoMovie->currentPixmap();
-		m_pThermiteLogoLabel->setPixmap(lastFrameOfMovie);
-		delete m_pThermiteLogoMovie;*/
-
 		//The main menu
 		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
 		Application::centerWidget(mMainMenu, qApp->mainWidget());
@@ -199,12 +187,6 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
 		mMainMenu->show();
-
-		//Show the main menu after the animation has finished
-		//QTimer::singleShot(2000, mMainMenu, SLOT(show()));
-
-		mCameraSpeed = 50.0;
-		mCameraRotationalSpeed = 0.1;	
 
 		qApp->mainWidget()->setMouseTracking(true);
 
@@ -223,6 +205,22 @@ namespace Thermite
 			int line = scriptEngine->uncaughtExceptionLineNumber();
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
 		}
+
+		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+		{
+			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
+		}
+
+		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
+		{
+			m_pOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
+			m_pOgreSceneManager->setShadowTextureSelfShadow(true);
+			m_pOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+			m_pOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
+			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
+		}	
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -231,8 +229,6 @@ namespace Thermite
 		mLastFrameTime = mCurrentTime;
 		mCurrentTime = mTime->elapsed();
 
-		mTimeElapsedInSeconds = (mCurrentTime - mLastFrameTime) / 1000.0f;
-
 		mGlobals->setPreviousFrameTime(mGlobals->getCurrentFrameTime());
 		mGlobals->setCurrentFrameTime(mCurrentTime);
 
@@ -240,8 +236,6 @@ namespace Thermite
 		updatePolyVoxGeometry();
 
 		++mCurrentFrameNumber;
-
-		float distance = mCameraSpeed * mTimeElapsedInSeconds;
 
 		if(m_bRunScript)
 		{
@@ -417,28 +411,6 @@ namespace Thermite
 				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
 			}
 		}
-	}
-
-	void ThermiteGameLogic::loadMap(QString strMapName)
-	{
-		m_pThermiteLogoLabel->hide();	
-
-
-		//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
-		{
-			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
-		}
-
-		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
-		{
-			m_pOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-			m_pOgreSceneManager->setShadowTextureSelfShadow(true);
-			m_pOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-			m_pOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
-			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}	
 	}
 
 	void ThermiteGameLogic::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)

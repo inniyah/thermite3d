@@ -6,20 +6,23 @@
 #include <QScriptEngine>
 #include <QVector3D>
 
-class Camera : public Object
+namespace Thermite
 {
-	Q_OBJECT
+	class Camera : public Object
+	{
+		Q_OBJECT
 
-public:
-	Camera(QObject* parent = 0);
+	public:
+		Camera(QObject* parent = 0);
 
-	Q_PROPERTY(float fieldOfView READ fieldOfView WRITE setFieldOfView)
+		Q_PROPERTY(float fieldOfView READ fieldOfView WRITE setFieldOfView)
 
-	float fieldOfView(void) const;
-	void setFieldOfView(float fieldOfView);
+		float fieldOfView(void) const;
+		void setFieldOfView(float fieldOfView);
 
-protected:
-	float mFieldOfView;
-};
+	protected:
+		float mFieldOfView;
+	};
+}
 
 #endif //CAMERA_H_

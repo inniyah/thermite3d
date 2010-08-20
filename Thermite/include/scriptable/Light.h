@@ -7,23 +7,26 @@
 #include <QScriptEngine>
 #include <QVector3D>
 
-class Light : public Object
+namespace Thermite
 {
-	Q_OBJECT
+	class Light : public Object
+	{
+		Q_OBJECT
 
-public:
-	Light(QObject* parent = 0);
+	public:
+		Light(QObject* parent = 0);
 
-	Q_PROPERTY(QColor colour READ getColour WRITE setColour)
+		Q_PROPERTY(QColor colour READ getColour WRITE setColour)
 
-	const QColor& getColour(void) const;
-	void setColour(const QColor& col);
+		const QColor& getColour(void) const;
+		void setColour(const QColor& col);
 
-private:
-	QColor m_colColour;
-};
+	private:
+		QColor m_colColour;
+	};
+}
 
-Q_SCRIPT_DECLARE_QMETAOBJECT(Light, QObject*)
+Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Light, QObject*)
 
 
 #endif //LIGHT_H_

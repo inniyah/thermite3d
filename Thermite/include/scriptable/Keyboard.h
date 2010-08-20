@@ -3,7 +3,9 @@
 
 #include <QHash>
 
-class Keyboard : public QObject
+namespace Thermite
+{
+	class Keyboard : public QObject
 	{
 		Q_OBJECT
 
@@ -15,5 +17,6 @@ class Keyboard : public QObject
 	private:
 		QHash<int, bool> mKeyStates;
 	};	
+}
 
 #endif //KEYBOARD_H_

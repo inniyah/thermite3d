@@ -1,49 +1,52 @@
 #include "Entity.h"
 
-Entity::Entity(QObject* parent)
-	:Object(parent)
+namespace Thermite
 {
-	mAnimated = false;
-	mLoopAnimation = false;
-	mAnimationName = "";
-}
+	Entity::Entity(QObject* parent)
+		:Object(parent)
+	{
+		mAnimated = false;
+		mLoopAnimation = false;
+		mAnimationName = "";
+	}
 
-const QString& Entity::meshName(void) const
-{
-	return mMeshName;
-}
+	const QString& Entity::meshName(void) const
+	{
+		return mMeshName;
+	}
 
-void Entity::setMeshName(const QString& name)
-{
-	mMeshName = name;
-}
+	void Entity::setMeshName(const QString& name)
+	{
+		mMeshName = name;
+	}
 
-const bool Entity::animated(void) const
-{
-	return mAnimated;
-}
+	const bool Entity::animated(void) const
+	{
+		return mAnimated;
+	}
 
-void Entity::setAnimated(bool animated)
-{
-	mAnimated = animated;
-}
+	void Entity::setAnimated(bool animated)
+	{
+		mAnimated = animated;
+	}
 
-const QString& Entity::animationName(void) const
-{
-	return mAnimationName;
-}
+	const QString& Entity::animationName(void) const
+	{
+		return mAnimationName;
+	}
 
-void Entity::setAnimationName(const QString& name)
-{
-	mAnimationName = name;
-}
+	void Entity::setAnimationName(const QString& name)
+	{
+		mAnimationName = name;
+	}
 
-const bool Entity::loopAnimation(void) const
-{
-	return mLoopAnimation;
-}
+	const bool Entity::loopAnimation(void) const
+	{
+		return mLoopAnimation;
+	}
 
-void Entity::setLoopAnimation(bool loopAnimation)
-{
-	mLoopAnimation = loopAnimation;
+	void Entity::setLoopAnimation(bool loopAnimation)
+	{
+		mLoopAnimation = loopAnimation;
+	}
 }

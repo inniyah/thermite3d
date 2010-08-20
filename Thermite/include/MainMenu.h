@@ -30,7 +30,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-
 	class MainMenu : public QWidget, private Ui::MainMenu
 	{
 		Q_OBJECT

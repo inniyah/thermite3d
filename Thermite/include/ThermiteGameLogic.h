@@ -85,8 +85,6 @@ namespace Thermite
 
 		QtOgre::Log* thermiteLog(void);
 
-		void loadMap(QString strMapName);
-
 		void reloadShaders(void);
 
 		void onKeyPress(QKeyEvent* event);
@@ -161,9 +159,6 @@ namespace Thermite
 #endif //ENABLE_BULLET_PHYSICS	
 
 		TaskProcessorThread* m_backgroundThread;
-
-		float mCameraSpeed;
-		float mCameraRotationalSpeed;
 
 		MainMenu* mMainMenu;
 
