@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 
 #include <PolyVoxForwardDeclarations.h>
 #include <Region.h>
+#include <SurfaceMesh.h>
 
 #include <QMetaType>
 
@@ -42,13 +43,13 @@ namespace Thermite
 		SurfaceExtractorTaskData(PolyVox::Region regToProcess, uint32_t uTimeStamp);
 
 		PolyVox::Region getRegion(void) const;
-		std::shared_ptr<PolyVox::SurfaceMesh> getSurfaceMesh(void) const;
+		PolyVox::SurfaceMesh getSurfaceMesh(void) const;
 
 		void setRegion(const PolyVox::Region& regToProcess);
 
 	public:
 		PolyVox::Region m_regToProcess;
-		std::shared_ptr<PolyVox::SurfaceMesh> m_meshResult;
+		PolyVox::SurfaceMesh m_meshResult;
 		uint32_t m_uTimeStamp;
 	};
 }

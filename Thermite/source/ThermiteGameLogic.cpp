@@ -619,7 +619,7 @@ namespace Thermite
 		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(shared_ptr<SurfaceMesh> mesh, PolyVox::Region region)
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -649,8 +649,8 @@ namespace Thermite
 		pMapRegion->removeAllSurfacePatchRenderables();
 
 		//Get the SurfaceMesh and check it's valid
-		shared_ptr<SurfaceMesh> meshWhole = mesh;
-		if((meshWhole) && (meshWhole->isEmpty() == false))
+		SurfaceMesh meshWhole = mesh;
+		if(meshWhole.isEmpty() == false)
 		{			
 			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
 			for(std::map< std::string, std::set<uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
@@ -660,18 +660,18 @@ namespace Thermite
 				std::set<std::uint8_t> voxelValues = iter->second;
 
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				shared_ptr<SurfaceMesh> meshSubset = meshWhole->extractSubset(voxelValues);
+				shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
 
 				//And add it to the MapRegion
 				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
 			}
 
 			//If we are simulating physics...
-			if(bSimulatePhysics)
+			/*if(bSimulatePhysics)
 			{
 				//Update the physics geometry
 				pMapRegion->setPhysicsData(*(meshWhole.get()));
-			}
+			}*/
 		}
 
 		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);

@@ -43,7 +43,7 @@ namespace Thermite
 		return m_regToProcess;
 	}
 
-	shared_ptr<SurfaceMesh> SurfaceExtractorTaskData::getSurfaceMesh(void) const
+	SurfaceMesh SurfaceExtractorTaskData::getSurfaceMesh(void) const
 	{
 		return m_meshResult;
 	}

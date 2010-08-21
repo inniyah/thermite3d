@@ -152,7 +152,7 @@ namespace Thermite
 		
 	public:
 
-		void uploadSurfaceMesh(std::shared_ptr<PolyVox::SurfaceMesh> mesh, PolyVox::Region region);
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
 
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
