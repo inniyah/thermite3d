@@ -30,6 +30,9 @@ freely, subject to the following restrictions:
 #include "VolumeResource.h"
 #include "VolumeChangeTracker.h"
 
+#include "SurfaceExtractorTaskData.h"
+#include "TaskProcessorThread.h"
+
 #include "PolyVoxForwardDeclarations.h"
 
 #ifdef ENABLE_BULLET_PHYSICS
@@ -58,12 +61,20 @@ namespace Thermite
 
 		void initialise(void);
 
+		void updatePolyVoxGeometry(Ogre::Vector3 cameraPos);
+
 	public slots:
 		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 
+		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
+		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
+
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
+
+		TaskProcessorThread* m_backgroundThread;
 
 		VolumeResourcePtr volumeResource;
 

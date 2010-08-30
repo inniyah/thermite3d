@@ -37,7 +37,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic);
+		SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData);
 
 		void run(void);
 
@@ -46,7 +46,6 @@ namespace Thermite
 
 	protected:
 		SurfaceExtractorTaskData m_taskData;
-		ThermiteGameLogic* m_pGameLogic;
 	};
 }
 

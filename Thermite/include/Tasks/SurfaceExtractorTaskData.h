@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #ifndef __THERMITE_SURFACEEXTRACTORTASKDATA_H__
 #define __THERMITE_SURFACEEXTRACTORTASKDATA_H__
 
+#include <MaterialDensityPair.h>
 #include <PolyVoxForwardDeclarations.h>
 #include <Region.h>
 #include <SurfaceMesh.h>
@@ -40,7 +41,7 @@ namespace Thermite
 	{
 	public:
 		SurfaceExtractorTaskData(void);
-		SurfaceExtractorTaskData(PolyVox::Region regToProcess, uint32_t uTimeStamp);
+		SurfaceExtractorTaskData(PolyVox::Volume<PolyVox::MaterialDensityPair44>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp);
 
 		PolyVox::Region getRegion(void) const;
 		PolyVox::SurfaceMesh getSurfaceMesh(void) const;
@@ -50,6 +51,7 @@ namespace Thermite
 	public:
 		PolyVox::Region m_regToProcess;
 		PolyVox::SurfaceMesh m_meshResult;
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* mVolume;
 		uint32_t m_uTimeStamp;
 	};
 }

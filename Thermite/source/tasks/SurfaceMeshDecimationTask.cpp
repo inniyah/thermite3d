@@ -34,9 +34,8 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData, ThermiteGameLogic* pGameLogic)
+	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData)
 		:m_taskData(taskData)
-		,m_pGameLogic(pGameLogic)
 	{
 	}
 

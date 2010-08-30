@@ -134,13 +134,10 @@ namespace Thermite
 
 		AnyOption m_commandLineArgs;
 
-	public:
-
-		void updatePolyVoxGeometry();
+	public:		
 
 	public slots:
-		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
-		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
+		
 
 	private slots:
 		void startScriptingEngine(void);
@@ -152,13 +149,11 @@ namespace Thermite
 		
 	public:
 
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
+		
 
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS	
-
-		TaskProcessorThread* m_backgroundThread;
 
 		MainMenu* mMainMenu;
 

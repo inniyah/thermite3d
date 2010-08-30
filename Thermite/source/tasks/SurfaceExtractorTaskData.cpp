@@ -32,9 +32,10 @@ namespace Thermite
 	{
 	}
 
-	SurfaceExtractorTaskData::SurfaceExtractorTaskData(Region regToProcess, uint32_t uTimeStamp)
+	SurfaceExtractorTaskData::SurfaceExtractorTaskData(PolyVox::Volume<MaterialDensityPair44>* volume, Region regToProcess, uint32_t uTimeStamp)
 		:m_regToProcess(regToProcess)
 		,m_uTimeStamp(uTimeStamp)
+		,mVolume(volume)
 	{
 	}
 
