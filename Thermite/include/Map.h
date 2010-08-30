@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "VolumeChangeTracker.h"
 
 #include "SurfaceExtractorTaskData.h"
+#include "SurfaceMesh.h"
 #include "TaskProcessorThread.h"
 
 #include "PolyVoxForwardDeclarations.h"
@@ -67,9 +68,10 @@ namespace Thermite
 		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 
+		void surfaceExtractionFinished(SurfaceExtractorTaskData result);
+
 		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
 		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
 
 	public:
 		Ogre::SceneManager* m_pOgreSceneManager;
@@ -82,8 +84,10 @@ namespace Thermite
 
 		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
 
-		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
+		
+		PolyVox::Volume<PolyVox::SurfaceMesh*>* m_volSurfaceMeshes;
 		PolyVox::Volume<uint32_t>* m_volRegionTimeStamps;
+		PolyVox::Volume<uint32_t>* m_volLatestMeshTimeStamps;
 		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
 		PolyVox::Volume<SurfaceMeshDecimationTask*>* m_volSurfaceDecimators;
 	};	

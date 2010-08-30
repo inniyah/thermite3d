@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "MaterialDensityPair.h"
 #include "ScriptManager.h"
 #include "VolumeManager.h"
+#include "Utility.h"
 
 #include "Application.h"
 #include "LogManager.h"
@@ -216,7 +217,7 @@ namespace Thermite
 			m_pOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
 			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
 			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}	
+		}			
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -325,6 +326,42 @@ namespace Thermite
 
 						//mMap = new Map;
 						mMap->m_pOgreSceneManager = m_pOgreSceneManager;
+
+						//Some values we'll need later.
+						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+						std::uint16_t halfRegionSideLength = regionSideLength / 2;
+						std::uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+
+						m_volLastUploadedTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+						m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+					}
+					else
+					{
+						//Some values we'll need later.
+						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+						std::uint16_t halfRegionSideLength = regionSideLength / 2;
+						std::uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+
+						//Iterate over each region in the VolumeChangeTracker
+						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+						{		
+							for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+							{
+								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+								{
+									uint32_t volLatestMeshTimeStamp = mMap->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
+									{
+										uploadSurfaceMesh(*(mMap->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), mMap->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -339,6 +376,58 @@ namespace Thermite
 
 		mouse->setPreviousPosition(mouse->position());
 		mouse->resetWheelDelta();
+	}
+
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region)
+	{
+		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+
+		//Create a MapRegion for that location if we don't have one already
+		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
+		if(pMapRegion == 0)
+		{
+			pMapRegion = new MapRegion(mMap, region.getLowerCorner());
+			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+		}
+
+		//Clear any previous geometry
+		pMapRegion->removeAllSurfacePatchRenderables();
+
+		//Get the SurfaceMesh and check it's valid
+		SurfaceMesh meshWhole = mesh;
+		if(meshWhole.isEmpty() == false)
+		{			
+			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
+			for(std::map< std::string, std::set<uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
+			{
+				//Get the properties
+				std::string materialName = iter->first;
+				std::set<std::uint8_t> voxelValues = iter->second;
+
+				//Extract the part of the InexedSurfacePatch which corresponds to that material
+				shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
+
+				//And add it to the MapRegion
+				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
+			}
+
+			//If we are simulating physics...
+			//if(bSimulatePhysics)
+			//{
+			//	//Update the physics geometry
+			//	pMapRegion->setPhysicsData(*(meshWhole.get()));
+			//}
+		}
+
+		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
+
+		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
 	}
 
 	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)

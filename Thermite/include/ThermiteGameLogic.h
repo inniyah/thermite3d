@@ -136,8 +136,10 @@ namespace Thermite
 
 	public:		
 
+		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
+
 	public slots:
-		
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);		
 
 	private slots:
 		void startScriptingEngine(void);
@@ -154,6 +156,8 @@ namespace Thermite
 #ifdef ENABLE_BULLET_PHYSICS
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS	
+
+		PolyVox::Volume<uint32_t>* m_volLastUploadedTimeStamps;
 
 		MainMenu* mMainMenu;
 

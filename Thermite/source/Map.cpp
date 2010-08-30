@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include "Application.h"
 #include "MapHandler.h"
 #include "VolumeManager.h"
+#include "Utility.h"
 
 #include "VolumeChangeTracker.h"
 
@@ -77,7 +78,9 @@ namespace Thermite
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
 		m_volRegionTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volLatestMeshTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		
+		m_volSurfaceMeshes = new Volume<SurfaceMesh*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
@@ -124,9 +127,6 @@ namespace Thermite
 						Ogre::Vector3 centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
 
-						//There's no guarentee that the MapRegion exists at this point...
-						MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
@@ -158,6 +158,20 @@ namespace Thermite
 		}
 	}
 
+	void Map::surfaceExtractionFinished(SurfaceExtractorTaskData result)
+	{
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+
+		SurfaceMesh* pMesh = new SurfaceMesh;
+		*pMesh = result.m_meshResult;
+		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
+	}
+
 	void Map::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
 	{
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -175,7 +189,13 @@ namespace Thermite
 			return;
 		}
 
-		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
+		SurfaceMesh* pMesh = new SurfaceMesh;
+		*pMesh = result.m_meshResult;
+		pMesh->m_Region = result.getRegion();
+		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
+		m_volLatestMeshTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
+
+		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 
 
 		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
@@ -207,66 +227,13 @@ namespace Thermite
 			return;
 		}
 
-		uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
-	}
+		SurfaceMesh* pMesh = new SurfaceMesh;
+		*pMesh = result.m_meshResult;
+		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
+		m_volLatestMeshTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
 
-	void Map::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region)
-	{
-		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
-		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
-
-		/*uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-		if(uRegionTimeStamp > result.m_uTimeStamp)
-		{
-			// The volume has changed since the command to generate this mesh was issued.
-			// Just ignore it, and a correct version should be along soon...
-			return;
-		}*/
-
-		//Create a MapRegion for that location if we don't have one already
-		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-		if(pMapRegion == 0)
-		{
-			pMapRegion = new MapRegion(this, region.getLowerCorner());
-			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
-		}
-
-		//Clear any previous geometry
-		pMapRegion->removeAllSurfacePatchRenderables();
-
-		//Get the SurfaceMesh and check it's valid
-		SurfaceMesh meshWhole = mesh;
-		if(meshWhole.isEmpty() == false)
-		{			
-			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
-			for(std::map< std::string, std::set<uint8_t> >::iterator iter = m_mapMaterialIds.begin(); iter != m_mapMaterialIds.end(); iter++)
-			{
-				//Get the properties
-				std::string materialName = iter->first;
-				std::set<std::uint8_t> voxelValues = iter->second;
-
-				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
-
-				//And add it to the MapRegion
-				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
-			}
-
-			//If we are simulating physics...
-			/*if(bSimulatePhysics)
-			{
-				//Update the physics geometry
-				pMapRegion->setPhysicsData(*(meshWhole.get()));
-			}*/
-		}
-
-		m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
-	}
+		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
+	}	
 
 	void  Map::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
 	{

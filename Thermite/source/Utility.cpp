@@ -51,4 +51,13 @@ namespace Thermite
 		++currentID;
 		return ss.str();
 	}
+
+	uint32_t getTimeStamp(void)
+	{
+		//This will be incremented each time
+		static uint32_t currentTimeStamp = 0;
+
+		//Inrement the counter and return it.
+		return ++currentTimeStamp;
+	}
 }
