@@ -75,8 +75,8 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	PolyVox::Volume<MaterialDensityPair44>* VolumeResource::getVolume(void)
+	std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > VolumeResource::getVolume(void)
 	{
-		return m_pVolume.get();
+		return m_pVolume;
 	}
 }

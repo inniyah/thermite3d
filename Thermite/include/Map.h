@@ -27,7 +27,6 @@ freely, subject to the following restrictions:
 #define __THERMITE_MAP_H__
 
 #include "ThermiteForwardDeclarations.h"
-#include "VolumeResource.h"
 #include "VolumeChangeTracker.h"
 
 #include "SurfaceExtractorTaskData.h"
@@ -35,13 +34,6 @@ freely, subject to the following restrictions:
 #include "TaskProcessorThread.h"
 
 #include "PolyVoxForwardDeclarations.h"
-
-#ifdef ENABLE_BULLET_PHYSICS
-	#include "OgreBulletDynamicsWorld.h"
-	#include "OgreBulletDynamicsRigidBody.h"
-#endif //ENABLE_BULLET_PHYSICS
-
-#include <OgrePrerequisites.h>
 
 #include <map>
 
@@ -62,11 +54,13 @@ namespace Thermite
 
 		void initialise(void);
 
-		void updatePolyVoxGeometry(Ogre::Vector3 cameraPos);
+		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
 	public slots:
 		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
+
+		bool loadFromFile(const QString& filename);
 
 		void surfaceExtractionFinished(SurfaceExtractorTaskData result);
 
@@ -74,11 +68,11 @@ namespace Thermite
 		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
 
 	public:
-		Ogre::SceneManager* m_pOgreSceneManager;
 
 		TaskProcessorThread* m_backgroundThread;
 
-		VolumeResourcePtr volumeResource;
+		//VolumeResourcePtr volumeResource;
+		std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 

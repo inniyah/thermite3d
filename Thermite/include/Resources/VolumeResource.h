@@ -45,7 +45,7 @@ namespace Thermite
 			Ogre::ManualResourceLoader *loader = 0);
 		~VolumeResource();		
 
-		PolyVox::Volume<PolyVox::MaterialDensityPair44>* getVolume(void);
+		std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > getVolume(void);
 
 	protected:
 

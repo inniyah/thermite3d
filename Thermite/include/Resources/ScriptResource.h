@@ -81,7 +81,7 @@ namespace Thermite
 			}
 		}
 
-		/// Operator used to convert a ResourcePtr to a VolumeResourcePtr
+		/// Operator used to convert a ResourcePtr to a ScriptResourcePtr
 		ScriptResourcePtr& operator=(const Ogre::ResourcePtr& r)
 		{
 			if (pRep == static_cast<ScriptResource*> (r.getPointer ()))

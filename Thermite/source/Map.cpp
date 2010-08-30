@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 #include "Map.h"
 
 #include "Application.h"
-#include "MapHandler.h"
 #include "VolumeManager.h"
 #include "Utility.h"
 
@@ -58,19 +57,25 @@ namespace Thermite
 	Map::Map(QObject* parent)
 		:Object(parent)
 	{
-		m_pOgreSceneManager = 0;
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(3);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(4);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(5);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(6);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
 	}
 
 	Map::~Map(void)
 	{
-
 	}
 
 	void Map::initialise(void)
 	{
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
-		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(volumeResource->getVolume(), regionSideLength);
+		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(m_pPolyVoxVolume.get(), regionSideLength);
 		volumeChangeTracker->setAllRegionsModified();
 
 		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
@@ -89,19 +94,16 @@ namespace Thermite
 		m_backgroundThread->start();
 	}
 
-	void Map::updatePolyVoxGeometry(Ogre::Vector3 cameraPos)
+	void Map::updatePolyVoxGeometry(const QVector3D& cameraPos)
 	{
-		/*if(mMap == 0)
-			return;*/
-
-		if(!volumeResource.isNull())
+		if(m_pPolyVoxVolume)
 		{		
 			//Some values we'll need later.
 			std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 			std::uint16_t halfRegionSideLength = regionSideLength / 2;
-			std::uint16_t volumeWidthInRegions = volumeResource->getVolume()->getWidth() / regionSideLength;
-			std::uint16_t volumeHeightInRegions = volumeResource->getVolume()->getHeight() / regionSideLength;
-			std::uint16_t volumeDepthInRegions = volumeResource->getVolume()->getDepth() / regionSideLength;
+			std::uint16_t volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
+			std::uint16_t volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
+			std::uint16_t volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 			//Iterate over each region in the VolumeChangeTracker
 			for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
@@ -124,8 +126,8 @@ namespace Thermite
 						const float centreZ = firstZ + halfRegionSideLength;
 
 						//The regions distance from the camera is used for prioritizing surface extraction
-						Ogre::Vector3 centre(centreX, centreY, centreZ);
-						double distanceFromCameraSquared = (cameraPos - centre).squaredLength();
+						QVector3D centre(centreX, centreY, centreZ);
+						double distanceFromCameraSquared = (cameraPos - centre).lengthSquared();
 
 						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
@@ -144,7 +146,7 @@ namespace Thermite
 							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
-							SurfaceExtractorTaskData taskData(volumeResource->getVolume(), region, uRegionTimeStamp);
+							SurfaceExtractorTaskData taskData(m_pPolyVoxVolume.get(), region, uRegionTimeStamp);
 							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(taskData);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
@@ -323,7 +325,7 @@ namespace Thermite
 		QVector3D result = QVector3D(0,0,0);
 
 		//Ensure the voume is valid
-		PolyVox::Volume<MaterialDensityPair44>* pVolume = volumeResource->getVolume();
+		PolyVox::Volume<MaterialDensityPair44>* pVolume = m_pPolyVoxVolume.get();
 		if(pVolume == 0)
 		{
 			return result;
@@ -346,5 +348,11 @@ namespace Thermite
 		}
 
 		return result;
+	}
+
+	bool Map::loadFromFile(const QString& filename)
+	{
+		m_pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		return true;
 	}
 }

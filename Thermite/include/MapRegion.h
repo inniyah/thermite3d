@@ -47,7 +47,7 @@ namespace Thermite
 	class MapRegion
 	{
 	public:
-		MapRegion(Map* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
+		MapRegion(ThermiteGameLogic* pParentWorld, PolyVox::Vector3DInt16 v3dPos);
 		~MapRegion();
 
 		void setPhysicsData(const PolyVox::SurfaceMesh& mesh);
@@ -73,7 +73,7 @@ namespace Thermite
 
 	public:
 
-		Map* m_pParentMap;
+		ThermiteGameLogic* m_pParentMap;
 
 #ifdef ENABLE_BULLET_PHYSICS
 		btTriangleMesh* mTriMesh;

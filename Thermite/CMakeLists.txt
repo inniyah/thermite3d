@@ -39,7 +39,6 @@ SET(MAIN_SRC_FILES
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
 	source/Map.cpp
-	source/MapHandler.cpp
 	source/MapRegion.cpp
 	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
@@ -54,7 +53,6 @@ SET(MAIN_INC_FILES
 	include/LoadMapWidget.h
 	include/MainMenu.h
 	include/Map.h
-	include/MapHandler.h
 	include/MapRegion.h
 	include/PhysicalEntity.h
 	include/SurfacePatchRenderable.h
@@ -79,8 +77,6 @@ SOURCE_GROUP("UI" FILES ${MAIN_UI_FILES})
 ################################################################################
 
 SET(RESOURCE_SRC_FILES
-	source/Resources/MapManager.cpp
-	source/Resources/MapResource.cpp
 	source/Resources/ScriptManager.cpp
 	source/Resources/ScriptResource.cpp
 	source/Resources/VolumeManager.cpp
@@ -88,8 +84,6 @@ SET(RESOURCE_SRC_FILES
 )
 
 SET(RESOURCE_INC_FILES
-	include/Resources/MapManager.h
-	include/Resources/MapResource.h
 	include/Resources/ScriptManager.h
 	include/Resources/ScriptResource.h
 	include/Resources/VolumeManager.h

@@ -28,7 +28,6 @@ freely, subject to the following restrictions:
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceExtractorTaskData.h"
 #include "SurfacePatchRenderable.h"
-#include "MapManager.h"
 #include "MaterialDensityPair.h"
 #include "ScriptManager.h"
 #include "VolumeManager.h"
@@ -168,7 +167,6 @@ namespace Thermite
 		VolumeManager* vm = new VolumeManager;
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl();
 
-		MapManager* mm = new MapManager;
 		ScriptManager* sm = new ScriptManager;
 
 		mTime = new QTime;
@@ -205,7 +203,7 @@ namespace Thermite
 
 		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
-			createAxis(mMap->volumeResource->getVolume()->getWidth(), mMap->volumeResource->getVolume()->getHeight(), mMap->volumeResource->getVolume()->getDepth());
+			createAxis(mMap->m_pPolyVoxVolume->getWidth(), mMap->m_pPolyVoxVolume->getHeight(), mMap->m_pPolyVoxVolume->getDepth());
 		}
 
 		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
@@ -232,7 +230,7 @@ namespace Thermite
 		//The fun stuff!
 		if(mMap)
 		{
-			mMap->updatePolyVoxGeometry(mOgreCamera->getPosition());
+			mMap->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
 		}
 
 		++mCurrentFrameNumber;
@@ -312,27 +310,20 @@ namespace Thermite
 					{
 						mMap = map;
 
-						mMap->volumeResource = VolumeManager::getSingletonPtr()->load("castle.volume", "General");
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(3);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(4);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(5);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(6);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
-						mMap->m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
+						mMap->loadFromFile("castle.volume");
+						
 
 						mMap->initialise();
 
 						//mMap = new Map;
-						mMap->m_pOgreSceneManager = m_pOgreSceneManager;
+						//mMap->m_pOgreSceneManager = m_pOgreSceneManager;
 
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = mMap->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = mMap->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = mMap->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						m_volLastUploadedTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 						m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
@@ -342,9 +333,9 @@ namespace Thermite
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = mMap->volumeResource->getVolume()->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = mMap->volumeResource->getVolume()->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = mMap->volumeResource->getVolume()->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = mMap->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = mMap->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = mMap->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						//Iterate over each region in the VolumeChangeTracker
 						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
@@ -392,7 +383,7 @@ namespace Thermite
 		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
 		if(pMapRegion == 0)
 		{
-			pMapRegion = new MapRegion(mMap, region.getLowerCorner());
+			pMapRegion = new MapRegion(this, region.getLowerCorner());
 			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
 		}
 

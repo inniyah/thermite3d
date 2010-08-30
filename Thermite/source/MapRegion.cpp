@@ -50,7 +50,7 @@ namespace Thermite
 {
 	unsigned long MapRegion::m_iNameGen = 0;
 
-	MapRegion::MapRegion(Map* pParentMap, PolyVox::Vector3DInt16 v3dPos)
+	MapRegion::MapRegion(ThermiteGameLogic* pParentMap, PolyVox::Vector3DInt16 v3dPos)
 	:m_pOgreSceneNode(0)
 	//,m_pSurfacePatchRenderable(0)
 	,m_pParentMap(pParentMap)
