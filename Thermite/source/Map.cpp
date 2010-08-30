@@ -31,29 +31,22 @@ freely, subject to the following restrictions:
 
 #include "VolumeChangeTracker.h"
 
-#include "MapRegion.h"
-
-#include "ThermiteGameLogic.h"
-
 #include "MaterialDensityPair.h"
 
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceMeshDecimationTask.h"
-
-#ifdef ENABLE_BULLET_PHYSICS
-	#include "OgreBulletDynamicsWorld.h"
-#endif //ENABLE_BULLET_PHYSICS
-
-#include <OgreSceneManagerEnumerator.h>
-#include <OgreSceneManager.h>
+#include "TaskProcessorThread.h"
 
 #include <QSettings>
+#include <QThreadPool>
 
 //using namespace Ogre;
 using namespace PolyVox;
 
 namespace Thermite
 {
+	TaskProcessorThread* Map::m_backgroundThread = 0;
+
 	Map::Map(QObject* parent)
 		:Object(parent)
 	{
@@ -89,9 +82,12 @@ namespace Thermite
 		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
-		m_backgroundThread = new TaskProcessorThread;
-		m_backgroundThread->setPriority(QThread::LowestPriority);
-		m_backgroundThread->start();
+		if(!m_backgroundThread)
+		{
+			m_backgroundThread = new TaskProcessorThread;
+			m_backgroundThread->setPriority(QThread::LowestPriority);
+			m_backgroundThread->start();
+		}
 	}
 
 	void Map::updatePolyVoxGeometry(const QVector3D& cameraPos)

@@ -72,13 +72,13 @@ namespace Thermite
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
 		,mCurrentFrameNumber(0)
-		,mMap(0)
 		,m_pOgreSceneManager(0)
 		,m_bRunScript(true)
 		,scriptEngine(0)
 		,camera(0)
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
+		,mFirstFind(true)
 	{
 		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
 
@@ -201,10 +201,10 @@ namespace Thermite
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
 		}
 
-		if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+		/*if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 		{
-			createAxis(mMap->m_pPolyVoxVolume->getWidth(), mMap->m_pPolyVoxVolume->getHeight(), mMap->m_pPolyVoxVolume->getDepth());
-		}
+			createAxis(map->m_pPolyVoxVolume->getWidth(), map->m_pPolyVoxVolume->getHeight(), map->m_pPolyVoxVolume->getDepth());
+		}*/
 
 		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
 		{
@@ -228,10 +228,10 @@ namespace Thermite
 		mGlobals->setCurrentFrameTime(mCurrentTime);
 
 		//The fun stuff!
-		if(mMap)
+		/*if(mMap)
 		{
 			mMap->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
-		}
+		}*/
 
 		++mCurrentFrameNumber;
 
@@ -306,14 +306,21 @@ namespace Thermite
 				Map* map = dynamic_cast<Map*>(pObj);
 				if(map)
 				{
-					if(!mMap)
+					if(mFirstFind)
 					{
-						mMap = map;
-
-						mMap->loadFromFile("castle.volume");
+						mFirstFind = false;
 						
+						map->loadFromFile("castle.volume");						
 
-						mMap->initialise();
+						map->initialise();
+
+						if(!m_axisNode)
+						{
+							if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+							{
+								createAxis(map->m_pPolyVoxVolume->getWidth(), map->m_pPolyVoxVolume->getHeight(), map->m_pPolyVoxVolume->getDepth());
+							}
+						}
 
 						//mMap = new Map;
 						//mMap->m_pOgreSceneManager = m_pOgreSceneManager;
@@ -321,21 +328,23 @@ namespace Thermite
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = mMap->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = mMap->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = mMap->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = map->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = map->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = map->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						m_volLastUploadedTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 						m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 					}
 					else
 					{
+						map->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
+
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = mMap->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = mMap->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = mMap->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = map->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = map->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = map->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						//Iterate over each region in the VolumeChangeTracker
 						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
@@ -344,11 +353,11 @@ namespace Thermite
 							{
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
-									uint32_t volLatestMeshTimeStamp = mMap->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									uint32_t volLatestMeshTimeStamp = map->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
 									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps->getVoxelAt(regionX, regionY, regionZ);
 									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
 									{
-										uploadSurfaceMesh(*(mMap->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), mMap->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region);
+										uploadSurfaceMesh(*(map->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), map->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region, *map);
 									}
 								}
 							}
@@ -369,7 +378,7 @@ namespace Thermite
 		mouse->resetWheelDelta();
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region)
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region, Map& map)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -394,8 +403,8 @@ namespace Thermite
 		SurfaceMesh meshWhole = mesh;
 		if(meshWhole.isEmpty() == false)
 		{			
-			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the mateials...
-			for(std::map< std::string, std::set<uint8_t> >::iterator iter = mMap->m_mapMaterialIds.begin(); iter != mMap->m_mapMaterialIds.end(); iter++)
+			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
+			for(std::map< std::string, std::set<uint8_t> >::iterator iter = map.m_mapMaterialIds.begin(); iter != map.m_mapMaterialIds.end(); iter++)
 			{
 				//Get the properties
 				std::string materialName = iter->first;
@@ -416,7 +425,7 @@ namespace Thermite
 			//}
 		}
 
-		mMap->m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
+		map.m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 
 		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
 	}

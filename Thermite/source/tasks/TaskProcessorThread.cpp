@@ -51,8 +51,6 @@ namespace Thermite
 	{
 		while(true)
 		{
-			msleep(100);
-
 			m_noOfTasks->acquire();
 
 			m_taskContainerMutex->lock();
@@ -66,6 +64,8 @@ namespace Thermite
 			{
 				delete task;
 			}
+
+			msleep(0);
 		}
 	}
 

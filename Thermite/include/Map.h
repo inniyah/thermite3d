@@ -30,8 +30,6 @@ freely, subject to the following restrictions:
 #include "VolumeChangeTracker.h"
 
 #include "SurfaceExtractorTaskData.h"
-#include "SurfaceMesh.h"
-#include "TaskProcessorThread.h"
 
 #include "PolyVoxForwardDeclarations.h"
 
@@ -69,9 +67,8 @@ namespace Thermite
 
 	public:
 
-		TaskProcessorThread* m_backgroundThread;
+		static TaskProcessorThread* m_backgroundThread;
 
-		//VolumeResourcePtr volumeResource;
 		std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	

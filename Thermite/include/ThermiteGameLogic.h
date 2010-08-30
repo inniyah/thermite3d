@@ -123,8 +123,6 @@ namespace Thermite
 		QtOgre::Log* mThermiteLog;
 
 		//Thermite stuff
-		Map* mMap;
-
 		std::queue<PhysicalObject*> m_queueObjects;
 
 		QMovie* m_pThermiteLogoMovie;
@@ -139,7 +137,7 @@ namespace Thermite
 		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
 
 	public slots:
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region);		
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Map& map);		
 
 	private slots:
 		void startScriptingEngine(void);
@@ -158,6 +156,8 @@ namespace Thermite
 #endif //ENABLE_BULLET_PHYSICS	
 
 		PolyVox::Volume<uint32_t>* m_volLastUploadedTimeStamps;
+
+		bool mFirstFind;
 
 		MainMenu* mMainMenu;
 
