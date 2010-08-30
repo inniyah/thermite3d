@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "Map.h"
+#include "Scriptable/Volume.h"
 
 #include "Application.h"
 #include "VolumeManager.h"
@@ -45,9 +45,9 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	TaskProcessorThread* Map::m_backgroundThread = 0;
+	TaskProcessorThread* Volume::m_backgroundThread = 0;
 
-	Map::Map(QObject* parent)
+	Volume::Volume(QObject* parent)
 		:Object(parent)
 	{
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
@@ -60,11 +60,11 @@ namespace Thermite
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
 	}
 
-	Map::~Map(void)
+	Volume::~Volume(void)
 	{
 	}
 
-	void Map::initialise(void)
+	void Volume::initialise(void)
 	{
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
@@ -75,12 +75,12 @@ namespace Thermite
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
-		m_volRegionTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volLatestMeshTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volRegionTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volLatestMeshTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 		
-		m_volSurfaceMeshes = new Volume<SurfaceMesh*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volRegionBeingProcessed = new Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volSurfaceDecimators = new Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volSurfaceMeshes = new PolyVox::Volume<SurfaceMesh*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volRegionBeingProcessed = new PolyVox::Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		m_volSurfaceDecimators = new PolyVox::Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 
 		if(!m_backgroundThread)
 		{
@@ -90,7 +90,7 @@ namespace Thermite
 		}
 	}
 
-	void Map::updatePolyVoxGeometry(const QVector3D& cameraPos)
+	void Volume::updatePolyVoxGeometry(const QVector3D& cameraPos)
 	{
 		if(m_pPolyVoxVolume)
 		{		
@@ -156,7 +156,7 @@ namespace Thermite
 		}
 	}
 
-	void Map::surfaceExtractionFinished(SurfaceExtractorTaskData result)
+	void Volume::surfaceExtractionFinished(SurfaceExtractorTaskData result)
 	{
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
@@ -170,7 +170,7 @@ namespace Thermite
 		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
 	}
 
-	void Map::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
+	void Volume::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
 	{
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
@@ -208,7 +208,7 @@ namespace Thermite
 		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
-	void Map::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)
+	void Volume::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)
 	{
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
@@ -233,7 +233,7 @@ namespace Thermite
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}	
 
-	void  Map::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
+	void  Volume::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.x() - radius));
 		int firstY = static_cast<int>(std::floor(centre.y() - radius));
@@ -311,7 +311,7 @@ namespace Thermite
 		volumeChangeTracker->unlockRegion();
 	}
 
-	QVector3D Map::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
+	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
 	{
 		//Initialise to failure
 		/*std::pair<bool, QVector3D> result;
@@ -346,7 +346,7 @@ namespace Thermite
 		return result;
 	}
 
-	bool Map::loadFromFile(const QString& filename)
+	bool Volume::loadFromFile(const QString& filename)
 	{
 		m_pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		return true;

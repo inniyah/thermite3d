@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #include "MapRegion.h"
 
 #include "Application.h"
-#include "Map.h"
+#include "Scriptable/Volume.h"
 #include "SurfacePatchRenderable.h"
 #include "ThermiteGameLogic.h"
 #include "Vector.h"

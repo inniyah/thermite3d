@@ -303,22 +303,22 @@ namespace Thermite
 						animationState->setLoop(entity->loopAnimation());
 					}
 				}
-				Map* map = dynamic_cast<Map*>(pObj);
-				if(map)
+				Volume* volume = dynamic_cast<Volume*>(pObj);
+				if(volume)
 				{
 					if(mFirstFind)
 					{
 						mFirstFind = false;
 						
-						map->loadFromFile("castle.volume");						
+						volume->loadFromFile("castle.volume");						
 
-						map->initialise();
+						volume->initialise();
 
 						if(!m_axisNode)
 						{
 							if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 							{
-								createAxis(map->m_pPolyVoxVolume->getWidth(), map->m_pPolyVoxVolume->getHeight(), map->m_pPolyVoxVolume->getDepth());
+								createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
 							}
 						}
 
@@ -328,23 +328,23 @@ namespace Thermite
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = map->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = map->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = map->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = volume->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-						m_volLastUploadedTimeStamps = new Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-						m_volMapRegions = new Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+						m_volLastUploadedTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+						m_volMapRegions = new PolyVox::Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 					}
 					else
 					{
-						map->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
+						volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
 
 						//Some values we'll need later.
 						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = map->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = map->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = map->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						std::uint16_t volumeWidthInRegions = volume->m_pPolyVoxVolume->getWidth() / regionSideLength;
+						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
+						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						//Iterate over each region in the VolumeChangeTracker
 						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
@@ -353,11 +353,11 @@ namespace Thermite
 							{
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
-									uint32_t volLatestMeshTimeStamp = map->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									uint32_t volLatestMeshTimeStamp = volume->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
 									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps->getVoxelAt(regionX, regionY, regionZ);
 									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
 									{
-										uploadSurfaceMesh(*(map->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), map->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region, *map);
+										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), volume->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region, *volume);
 									}
 								}
 							}
@@ -378,7 +378,7 @@ namespace Thermite
 		mouse->resetWheelDelta();
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region, Map& map)
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region, Volume& volume)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -404,7 +404,7 @@ namespace Thermite
 		if(meshWhole.isEmpty() == false)
 		{			
 			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
-			for(std::map< std::string, std::set<uint8_t> >::iterator iter = map.m_mapMaterialIds.begin(); iter != map.m_mapMaterialIds.end(); iter++)
+			for(std::map< std::string, std::set<uint8_t> >::iterator iter = volume.m_mapMaterialIds.begin(); iter != volume.m_mapMaterialIds.end(); iter++)
 			{
 				//Get the properties
 				std::string materialName = iter->first;
@@ -425,7 +425,7 @@ namespace Thermite
 			//}
 		}
 
-		map.m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
+		volume.m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 
 		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
 	}
@@ -642,8 +642,8 @@ namespace Thermite
 		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
 		scriptEngine->globalObject().setProperty("Entity", entityClass);
 
-		QScriptValue mapClass = scriptEngine->scriptValueFromQMetaObject<Map>();
-		scriptEngine->globalObject().setProperty("Map", mapClass);
+		QScriptValue volumeClass = scriptEngine->scriptValueFromQMetaObject<Volume>();
+		scriptEngine->globalObject().setProperty("Volume", volumeClass);
 
 		QScriptValue globalsScriptValue = scriptEngine->newQObject(mGlobals);
 		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);

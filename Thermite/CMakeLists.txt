@@ -38,7 +38,6 @@ SET(MAIN_SRC_FILES
 	source/DataStreamWrapper.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
-	source/Map.cpp
 	source/MapRegion.cpp
 	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
@@ -52,7 +51,6 @@ SET(MAIN_INC_FILES
 	include/DataStreamWrapper.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
-	include/Map.h
 	include/MapRegion.h
 	include/PhysicalEntity.h
 	include/SurfacePatchRenderable.h
@@ -107,6 +105,7 @@ SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Object.cpp
 	source/scriptable/ObjectStore.cpp
 	source/scriptable/ScriptEditorWidget.cpp
+	source/scriptable/Volume.cpp
 )
 
 SET(SCRIPTABLE_INC_FILES
@@ -119,6 +118,7 @@ SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Object.h
 	include/scriptable/ObjectStore.h
 	include/scriptable/ScriptEditorWidget.h
+	include/scriptable/Volume.h
 )
 
 SOURCE_GROUP("Sources\\Scriptable" FILES ${SCRIPTABLE_SRC_FILES})

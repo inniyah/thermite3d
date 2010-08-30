@@ -23,8 +23,8 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __THERMITE_MAP_H__
-#define __THERMITE_MAP_H__
+#ifndef __THERMITE_VOLUME_H__
+#define __THERMITE_VOLUME_H__
 
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeChangeTracker.h"
@@ -42,13 +42,13 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class Map : public Object
+	class Volume : public Object
 	{
 		Q_OBJECT
 
 	public:
-		Map(QObject* parent = 0);
-		~Map(void);
+		Volume(QObject* parent = 0);
+		~Volume(void);
 
 		void initialise(void);
 
@@ -84,7 +84,7 @@ namespace Thermite
 	};	
 }
 
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Map, QObject*)
+Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Volume, QObject*)
 
 
-#endif
+#endif //__THERMITE_VOLUME_H__

@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 #include <QtScript>
 #include <QScriptEngineDebugger>
 
-#include "Map.h"
+#include "Scriptable/Volume.h"
 #include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
 
@@ -137,7 +137,7 @@ namespace Thermite
 		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
 
 	public slots:
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Map& map);		
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Volume& volume);		
 
 	private slots:
 		void startScriptingEngine(void);
