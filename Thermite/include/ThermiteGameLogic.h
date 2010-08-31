@@ -134,10 +134,9 @@ namespace Thermite
 
 	public:		
 
-		PolyVox::Volume<MapRegion*>* m_volMapRegions;	
-
 	public slots:
 		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Volume& volume);		
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
 
 	private slots:
 		void startScriptingEngine(void);
@@ -156,6 +155,7 @@ namespace Thermite
 #endif //ENABLE_BULLET_PHYSICS	
 
 		PolyVox::Volume<uint32_t>* m_volLastUploadedTimeStamps;
+		PolyVox::Volume<Ogre::SceneNode*>* m_volOgreSceneNodes;
 
 		bool mFirstFind;
 

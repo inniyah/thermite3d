@@ -33,7 +33,6 @@ namespace Thermite
 	class LoadMapWidget;
 	class LoadSceneMenuPage;
 	class MainMenuPage;
-	class MapRegion;
 	class MoviePlayer;
 	class PhysicalObject;
 	class Shell;

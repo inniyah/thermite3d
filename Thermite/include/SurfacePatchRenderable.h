@@ -31,8 +31,6 @@ freely, subject to the following restrictions:
 
 #include "SurfaceMesh.h"
 
-#include "MapRegion.h"
-
 namespace Thermite
 {
 	//IDEA - If profiling identifies this class as a bottleneck, we could implement a memory pooling system.

@@ -333,7 +333,7 @@ namespace Thermite
 						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 						m_volLastUploadedTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-						m_volMapRegions = new PolyVox::Volume<MapRegion*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+						m_volOgreSceneNodes = new PolyVox::Volume<Ogre::SceneNode*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
 					}
 					else
 					{
@@ -388,16 +388,24 @@ namespace Thermite
 		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
 
-		//Create a MapRegion for that location if we don't have one already
-		MapRegion* pMapRegion = m_volMapRegions->getVoxelAt(regionX, regionY, regionZ);
-		if(pMapRegion == 0)
+		//Create a SceneNode for that location if we don't have one already
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes->getVoxelAt(regionX, regionY, regionZ);
+		if(pOgreSceneNode == 0)
 		{
-			pMapRegion = new MapRegion(this, region.getLowerCorner());
-			m_volMapRegions->setVoxelAt(regionX, regionY, regionZ, pMapRegion);
+			const std::string& strNodeName = generateUID("SN");
+			pOgreSceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
+			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
+			m_volOgreSceneNodes->setVoxelAt(regionX, regionY, regionZ,pOgreSceneNode);
 		}
 
-		//Clear any previous geometry
-		pMapRegion->removeAllSurfacePatchRenderables();
+		//Clear any previous geometry		
+		Ogre::SceneNode::ObjectIterator iter =  pOgreSceneNode->getAttachedObjectIterator();
+		while (iter.hasMoreElements())
+		{
+			Ogre::MovableObject* obj = iter.getNext();
+			m_pOgreSceneManager->destroyMovableObject(obj);
+		}
+		pOgreSceneNode->detachAllObjects();
 
 		//Get the SurfaceMesh and check it's valid
 		SurfaceMesh meshWhole = mesh;
@@ -413,21 +421,68 @@ namespace Thermite
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
 				shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
 
-				//And add it to the MapRegion
-				pMapRegion->addSurfacePatchRenderable(materialName, *meshSubset);
+				//And add it to the SceneNode
+				addSurfacePatchRenderable(materialName, *meshSubset, region);
 			}
-
-			//If we are simulating physics...
-			//if(bSimulatePhysics)
-			//{
-			//	//Update the physics geometry
-			//	pMapRegion->setPhysicsData(*(meshWhole.get()));
-			//}
 		}
 
 		volume.m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
 
 		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
+	}
+
+	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh, PolyVox::Region region)
+	{
+
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes->getVoxelAt(regionX, regionY, regionZ);
+
+		//Single Material
+		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
+
+		std::string strSprName = generateUID("SPR");
+		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
+		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
+		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
+
+		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, true);
+
+		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
+		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
+
+		//Multi material
+		SurfacePatchRenderable* pMultiMaterialSurfacePatchRenderable;
+
+		//Create additive material
+		Ogre::String strAdditiveMaterialName = materialName + "_WITH_ADDITIVE_BLENDING";
+		Ogre::MaterialPtr additiveMaterial = Ogre::MaterialManager::getSingleton().getByName(strAdditiveMaterialName);
+		if(additiveMaterial.isNull() == true)
+		{
+			Ogre::MaterialPtr originalMaterial = Ogre::MaterialManager::getSingleton().getByName(materialName);
+			additiveMaterial = originalMaterial->clone(strAdditiveMaterialName);
+			additiveMaterial->setSceneBlending(Ogre::SBT_ADD);
+		}
+
+		strSprName = generateUID("SPR");
+		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
+		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
+		pMultiMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
+
+		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, false);
+
+		//int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		//Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
+		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 
 	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)

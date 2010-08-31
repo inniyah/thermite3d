@@ -125,7 +125,6 @@ namespace Thermite
 						QVector3D centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).lengthSquared();
 
-						//If the region has changed then we may need to add or remove MapRegion to/from the scene graph
 						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
 						{

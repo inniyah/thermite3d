@@ -38,7 +38,6 @@ SET(MAIN_SRC_FILES
 	source/DataStreamWrapper.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
-	source/MapRegion.cpp
 	source/PhysicalEntity.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
@@ -51,7 +50,6 @@ SET(MAIN_INC_FILES
 	include/DataStreamWrapper.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
-	include/MapRegion.h
 	include/PhysicalEntity.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
