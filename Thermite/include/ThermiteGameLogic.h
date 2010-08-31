@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 #include <QtScript>
 #include <QScriptEngineDebugger>
 
-#include "Scriptable/Volume.h"
+#include "scriptable/Volume.h"
 #include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
 
