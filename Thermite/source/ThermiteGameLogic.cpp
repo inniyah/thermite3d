@@ -419,7 +419,7 @@ namespace Thermite
 				std::set<std::uint8_t> voxelValues = iter->second;
 
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
+				polyvox_shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
 
 				//And add it to the SceneNode
 				addSurfacePatchRenderable(materialName, *meshSubset, region);

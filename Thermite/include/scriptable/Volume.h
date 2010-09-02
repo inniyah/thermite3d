@@ -69,7 +69,7 @@ namespace Thermite
 
 		static TaskProcessorThread* m_backgroundThread;
 
-		std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
+		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 

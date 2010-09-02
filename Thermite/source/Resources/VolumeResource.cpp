@@ -65,7 +65,7 @@ namespace Thermite
 	void VolumeResource::unloadImpl ()
 	{
 		//Clear the pointer
-		m_pVolume = shared_ptr< PolyVox::Volume<MaterialDensityPair44> >();
+		m_pVolume = polyvox_shared_ptr< PolyVox::Volume<MaterialDensityPair44> >();
 	}
 	
 	size_t VolumeResource::calculateSize () const
@@ -75,7 +75,7 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	std::shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > VolumeResource::getVolume(void)
+	polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > VolumeResource::getVolume(void)
 	{
 		return m_pVolume;
 	}
