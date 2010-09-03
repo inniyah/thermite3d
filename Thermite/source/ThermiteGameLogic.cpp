@@ -332,8 +332,13 @@ namespace Thermite
 						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
 						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-						m_volLastUploadedTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-						m_volOgreSceneNodes = new PolyVox::Volume<Ogre::SceneNode*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+						uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
+						//Create the arrays
+						m_volLastUploadedTimeStamps.resize(dimensions);
+						m_volOgreSceneNodes.resize(dimensions);
+						//Clear the arrays
+						std::fill(m_volLastUploadedTimeStamps.getRawData(), m_volLastUploadedTimeStamps.getRawData() + m_volLastUploadedTimeStamps.getNoOfElements(), 0);						
+						std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
 					}
 					else
 					{
@@ -354,7 +359,7 @@ namespace Thermite
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
 									uint32_t volLatestMeshTimeStamp = volume->m_volLatestMeshTimeStamps[regionX][regionY][regionZ];
-									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps[regionX][regionY][ regionZ];
 									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
 									{
 										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
@@ -391,13 +396,13 @@ namespace Thermite
 		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
 
 		//Create a SceneNode for that location if we don't have one already
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes->getVoxelAt(regionX, regionY, regionZ);
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
 		if(pOgreSceneNode == 0)
 		{
 			const std::string& strNodeName = generateUID("SN");
 			pOgreSceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
 			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
-			m_volOgreSceneNodes->setVoxelAt(regionX, regionY, regionZ,pOgreSceneNode);
+			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
 		}
 
 		//Clear any previous geometry		
@@ -430,7 +435,7 @@ namespace Thermite
 
 		volume.m_volRegionBeingProcessed[regionX][regionY][regionZ] = false;
 
-		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
+		m_volLastUploadedTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
 	}
 
 	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh, PolyVox::Region region)
@@ -443,7 +448,7 @@ namespace Thermite
 		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
 
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes->getVoxelAt(regionX, regionY, regionZ);
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
 
 		//Single Material
 		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;

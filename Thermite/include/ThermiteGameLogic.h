@@ -154,8 +154,8 @@ namespace Thermite
 		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
 #endif //ENABLE_BULLET_PHYSICS	
 
-		PolyVox::Volume<uint32_t>* m_volLastUploadedTimeStamps;
-		PolyVox::Volume<Ogre::SceneNode*>* m_volOgreSceneNodes;
+		PolyVox::Array<3, uint32_t> m_volLastUploadedTimeStamps;
+		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
 
 		bool mFirstFind;
 
