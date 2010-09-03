@@ -75,12 +75,12 @@ namespace Thermite
 		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
 		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
 
-		m_volRegionTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volLatestMeshTimeStamps = new PolyVox::Volume<std::uint32_t>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		
-		m_volSurfaceMeshes = new PolyVox::Volume<SurfaceMesh*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volRegionBeingProcessed = new PolyVox::Volume<bool>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
-		m_volSurfaceDecimators = new PolyVox::Volume<SurfaceMeshDecimationTask*>(volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions, 0);
+		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
+		m_volRegionTimeStamps.resize(dimensions); std::fill(m_volRegionTimeStamps.getRawData(), m_volRegionTimeStamps.getRawData() + m_volRegionTimeStamps.getNoOfElements(), 0);
+		m_volLatestMeshTimeStamps.resize(dimensions); std::fill(m_volLatestMeshTimeStamps.getRawData(), m_volLatestMeshTimeStamps.getRawData() + m_volLatestMeshTimeStamps.getNoOfElements(), 0);
+		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (PolyVox::SurfaceMesh*)0);
+		m_volRegionBeingProcessed.resize(dimensions); std::fill(m_volRegionBeingProcessed.getRawData(), m_volRegionBeingProcessed.getRawData() + m_volRegionBeingProcessed.getNoOfElements(), 0);
+		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
 
 		if(!m_backgroundThread)
 		{
@@ -126,9 +126,9 @@ namespace Thermite
 						double distanceFromCameraSquared = (cameraPos - centre).lengthSquared();
 
 						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-						if(uRegionTimeStamp > m_volRegionTimeStamps->getVoxelAt(regionX,regionY,regionZ))
+						if(uRegionTimeStamp > m_volRegionTimeStamps[regionX][regionY][regionZ])
 						{
-							m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,true);
+							m_volRegionBeingProcessed[regionX][regionY][regionZ];
 
 							//Convert to a real PolyVox::Region
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
@@ -147,7 +147,7 @@ namespace Thermite
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
 
 							//Indicate that we've processed this region
-							m_volRegionTimeStamps->setVoxelAt(regionX,regionY,regionZ,volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ));
+							m_volRegionTimeStamps[regionX][regionY][regionZ] = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 						}
 					}
 				}
@@ -166,7 +166,7 @@ namespace Thermite
 
 		SurfaceMesh* pMesh = new SurfaceMesh;
 		*pMesh = result.m_meshResult;
-		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
+		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
 	}
 
 	void Volume::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
@@ -189,20 +189,20 @@ namespace Thermite
 		SurfaceMesh* pMesh = new SurfaceMesh;
 		*pMesh = result.m_meshResult;
 		pMesh->m_Region = result.getRegion();
-		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
-		m_volLatestMeshTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
+		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
+		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
 
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 
 
-		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators->getVoxelAt(regionX, regionY, regionZ);
+		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators[regionX][regionY][regionZ];
 
 		m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
 		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(result);
 		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
 
-		m_volSurfaceDecimators->setVoxelAt(regionX, regionY, regionZ, surfaceMeshDecimationTask);
+		m_volSurfaceDecimators[regionX][regionY][regionZ] = surfaceMeshDecimationTask;
 
 		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
@@ -226,8 +226,8 @@ namespace Thermite
 
 		SurfaceMesh* pMesh = new SurfaceMesh;
 		*pMesh = result.m_meshResult;
-		m_volSurfaceMeshes->setVoxelAt(regionX, regionY, regionZ, pMesh);
-		m_volLatestMeshTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
+		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
+		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
 
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}	
@@ -282,7 +282,7 @@ namespace Thermite
 				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					if(m_volRegionBeingProcessed->getVoxelAt(xCt,yCt,zCt))
+					if(m_volRegionBeingProcessed[xCt][yCt][zCt])
 					{
 						return;
 					}

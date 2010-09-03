@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "SurfaceExtractorTaskData.h"
 
 #include "PolyVoxForwardDeclarations.h"
+#include "Array.h"
 
 #include <map>
 
@@ -76,11 +77,11 @@ namespace Thermite
 		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
 
 		
-		PolyVox::Volume<PolyVox::SurfaceMesh*>* m_volSurfaceMeshes;
-		PolyVox::Volume<uint32_t>* m_volRegionTimeStamps;
-		PolyVox::Volume<uint32_t>* m_volLatestMeshTimeStamps;
-		PolyVox::Volume<bool>* m_volRegionBeingProcessed;
-		PolyVox::Volume<SurfaceMeshDecimationTask*>* m_volSurfaceDecimators;
+		PolyVox::Array<3, PolyVox::SurfaceMesh*> m_volSurfaceMeshes;
+		PolyVox::Array<3, uint32_t> m_volRegionTimeStamps;
+		PolyVox::Array<3, uint32_t> m_volLatestMeshTimeStamps;
+		PolyVox::Array<3, bool> m_volRegionBeingProcessed;
+		PolyVox::Array<3, SurfaceMeshDecimationTask*> m_volSurfaceDecimators;
 	};	
 }
 

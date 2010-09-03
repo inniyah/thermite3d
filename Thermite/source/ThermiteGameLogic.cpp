@@ -353,11 +353,13 @@ namespace Thermite
 							{
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
-									uint32_t volLatestMeshTimeStamp = volume->m_volLatestMeshTimeStamps->getVoxelAt(regionX, regionY, regionZ);
+									uint32_t volLatestMeshTimeStamp = volume->m_volLatestMeshTimeStamps[regionX][regionY][regionZ];
 									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps->getVoxelAt(regionX, regionY, regionZ);
 									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
 									{
-										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)), volume->m_volSurfaceMeshes->getVoxelAt(regionX, regionY, regionZ)->m_Region, *volume);
+										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
+										Region reg = mesh->m_Region;
+										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
 									}
 								}
 							}
@@ -426,7 +428,7 @@ namespace Thermite
 			}
 		}
 
-		volume.m_volRegionBeingProcessed->setVoxelAt(regionX,regionY,regionZ,false);
+		volume.m_volRegionBeingProcessed[regionX][regionY][regionZ] = false;
 
 		m_volLastUploadedTimeStamps->setVoxelAt(regionX, regionY, regionZ, getTimeStamp());
 	}
