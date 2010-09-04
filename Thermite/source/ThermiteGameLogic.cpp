@@ -363,7 +363,7 @@ namespace Thermite
 									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
 									{
 										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
-										Region reg = mesh->m_Region;
+										PolyVox::Region reg = mesh->m_Region;
 										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
 									}
 								}

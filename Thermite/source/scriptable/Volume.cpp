@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "Scriptable/Volume.h"
+#include "scriptable/Volume.h"
 
 #include "Application.h"
 #include "VolumeManager.h"
