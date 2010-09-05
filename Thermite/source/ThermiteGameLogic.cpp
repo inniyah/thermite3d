@@ -346,9 +346,9 @@ namespace Thermite
 							{
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
-									uint32_t volLatestMeshTimeStamp = volume->m_volLatestMeshTimeStamps[regionX][regionY][regionZ];
+									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
 									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps[regionX][regionY][ regionZ];
-									if(volLatestMeshTimeStamp > volLastUploadedTimeStamp)
+									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
 									{
 										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
 										PolyVox::Region reg = mesh->m_Region;
@@ -419,9 +419,7 @@ namespace Thermite
 				//And add it to the SceneNode
 				addSurfacePatchRenderable(materialName, *meshSubset, region);
 			}
-		}
-
-		volume.m_volRegionBeingProcessed[regionX][regionY][regionZ] = false;
+		}		
 
 		m_volLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}

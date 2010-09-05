@@ -62,7 +62,6 @@ namespace Thermite
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 
 	public:
-
 		static TaskProcessorThread* m_backgroundThread;
 
 		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
@@ -71,10 +70,10 @@ namespace Thermite
 
 		
 		PolyVox::Array<3, PolyVox::SurfaceMesh*> m_volSurfaceMeshes;
-		PolyVox::Array<3, uint32_t> m_volLastModifiedTime;
-		PolyVox::Array<3, uint32_t> m_volRegionTimeStamps;
-		PolyVox::Array<3, uint32_t> m_volLatestMeshTimeStamps;
-		PolyVox::Array<3, bool> m_volRegionBeingProcessed;
+		PolyVox::Array<3, uint32_t> mLastModifiedArray;
+		PolyVox::Array<3, uint32_t> mExtractionStartedArray;
+		PolyVox::Array<3, uint32_t> mExtractionFinishedArray;
+		PolyVox::Array<3, bool> mRegionBeingExtracted;
 		PolyVox::Array<3, SurfaceMeshDecimationTask*> m_volSurfaceDecimators;
 	};	
 }

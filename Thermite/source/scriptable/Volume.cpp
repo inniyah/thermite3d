@@ -75,11 +75,11 @@ namespace Thermite
 		int volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
-		m_volLastModifiedTime.resize(dimensions); std::fill(m_volLastModifiedTime.getRawData(), m_volLastModifiedTime.getRawData() + m_volLastModifiedTime.getNoOfElements(), 0);
-		m_volRegionTimeStamps.resize(dimensions); std::fill(m_volRegionTimeStamps.getRawData(), m_volRegionTimeStamps.getRawData() + m_volRegionTimeStamps.getNoOfElements(), 0);
-		m_volLatestMeshTimeStamps.resize(dimensions); std::fill(m_volLatestMeshTimeStamps.getRawData(), m_volLatestMeshTimeStamps.getRawData() + m_volLatestMeshTimeStamps.getNoOfElements(), 0);
+		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), 0);
+		mExtractionStartedArray.resize(dimensions); std::fill(mExtractionStartedArray.getRawData(), mExtractionStartedArray.getRawData() + mExtractionStartedArray.getNoOfElements(), 0);
+		mExtractionFinishedArray.resize(dimensions); std::fill(mExtractionFinishedArray.getRawData(), mExtractionFinishedArray.getRawData() + mExtractionFinishedArray.getNoOfElements(), 0);
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (PolyVox::SurfaceMesh*)0);
-		m_volRegionBeingProcessed.resize(dimensions); std::fill(m_volRegionBeingProcessed.getRawData(), m_volRegionBeingProcessed.getRawData() + m_volRegionBeingProcessed.getNoOfElements(), 0);
+		mRegionBeingExtracted.resize(dimensions); std::fill(mRegionBeingExtracted.getRawData(), mRegionBeingExtracted.getRawData() + mRegionBeingExtracted.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
 
 		//Iterate over each region
@@ -89,7 +89,7 @@ namespace Thermite
 			{
 				for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 				{
-					m_volLastModifiedTime[regionX][regionY][regionZ] = globals.timeStamp();
+					mLastModifiedArray[regionX][regionY][regionZ] = globals.timeStamp();
 				}
 			}
 		}
@@ -137,9 +137,10 @@ namespace Thermite
 						QVector3D centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).lengthSquared();
 
-						if(m_volLastModifiedTime[regionX][regionY][regionZ] > m_volRegionTimeStamps[regionX][regionY][regionZ])
+						if(mLastModifiedArray[regionX][regionY][regionZ] > mExtractionStartedArray[regionX][regionY][regionZ])
 						{
-							m_volRegionBeingProcessed[regionX][regionY][regionZ];
+							//Make a note that we're extracting this region - this is used to block other updates.
+							mRegionBeingExtracted[regionX][regionY][regionZ] = true;
 
 							//Convert to a real PolyVox::Region
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
@@ -152,13 +153,13 @@ namespace Thermite
 							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
-							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, m_volLastModifiedTime[regionX][regionY][regionZ]);
+							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, mLastModifiedArray[regionX][regionY][regionZ]);
 							surfaceMeshExtractionTask->setAutoDelete(false);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceMeshExtractionTask*)), this, SLOT(uploadSurfaceExtractorResult(SurfaceMeshExtractionTask*)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
 
 							//Indicate that we've processed this region
-							m_volRegionTimeStamps[regionX][regionY][regionZ] = m_volLastModifiedTime[regionX][regionY][regionZ];
+							mExtractionStartedArray[regionX][regionY][regionZ] = mLastModifiedArray[regionX][regionY][regionZ];
 						}
 					}
 				}
@@ -177,7 +178,7 @@ namespace Thermite
 		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = m_volLastModifiedTime[regionX][regionY][regionZ];
+		std::uint32_t uRegionTimeStamp = mLastModifiedArray[regionX][regionY][regionZ];
 		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -187,9 +188,11 @@ namespace Thermite
 		
 		//pMesh->m_Region = result.getRegion();
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
-		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+		mExtractionFinishedArray[regionX][regionY][regionZ] = globals.timeStamp();
 
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
+
+		mRegionBeingExtracted[regionX][regionY][regionZ] = false;
 
 
 		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators[regionX][regionY][regionZ];
@@ -216,7 +219,7 @@ namespace Thermite
 		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = m_volLastModifiedTime[regionX][regionY][regionZ];
+		std::uint32_t uRegionTimeStamp = mLastModifiedArray[regionX][regionY][regionZ];
 
 		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
@@ -227,7 +230,7 @@ namespace Thermite
 
 		
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
-		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+		mExtractionFinishedArray[regionX][regionY][regionZ] = globals.timeStamp();
 
 		delete pTask;
 
@@ -289,7 +292,7 @@ namespace Thermite
 				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					if(m_volRegionBeingProcessed[xCt][yCt][zCt])
+					if(mRegionBeingExtracted[xCt][yCt][zCt])
 					{
 						return;
 					}
@@ -321,7 +324,7 @@ namespace Thermite
 				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					m_volLastModifiedTime[xCt][yCt][zCt] = globals.timeStamp();
+					mLastModifiedArray[xCt][yCt][zCt] = globals.timeStamp();
 				}
 			}
 		}
