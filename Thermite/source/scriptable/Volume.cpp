@@ -29,8 +29,6 @@ freely, subject to the following restrictions:
 #include "VolumeManager.h"
 #include "Utility.h"
 
-#include "VolumeChangeTracker.h"
-
 #include "MaterialDensityPair.h"
 
 #include "SurfaceExtractor.h"
@@ -70,19 +68,29 @@ namespace Thermite
 	{
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
-		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(m_pPolyVoxVolume.get(), regionSideLength);
-		volumeChangeTracker->setAllRegionsModified();
-
 		int volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
 		int volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
 		int volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
+		m_volLastModifiedTime.resize(dimensions); std::fill(m_volLastModifiedTime.getRawData(), m_volLastModifiedTime.getRawData() + m_volLastModifiedTime.getNoOfElements(), 0);
 		m_volRegionTimeStamps.resize(dimensions); std::fill(m_volRegionTimeStamps.getRawData(), m_volRegionTimeStamps.getRawData() + m_volRegionTimeStamps.getNoOfElements(), 0);
 		m_volLatestMeshTimeStamps.resize(dimensions); std::fill(m_volLatestMeshTimeStamps.getRawData(), m_volLatestMeshTimeStamps.getRawData() + m_volLatestMeshTimeStamps.getNoOfElements(), 0);
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (PolyVox::SurfaceMesh*)0);
 		m_volRegionBeingProcessed.resize(dimensions); std::fill(m_volRegionBeingProcessed.getRawData(), m_volRegionBeingProcessed.getRawData() + m_volRegionBeingProcessed.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
+
+		//Iterate over each region
+		for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+		{		
+			for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+			{
+				for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+				{
+					m_volLastModifiedTime[regionX][regionY][regionZ] = getTimeStamp();
+				}
+			}
+		}
 
 		if(!m_backgroundThread)
 		{
@@ -127,8 +135,7 @@ namespace Thermite
 						QVector3D centre(centreX, centreY, centreZ);
 						double distanceFromCameraSquared = (cameraPos - centre).lengthSquared();
 
-						std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-						if(uRegionTimeStamp > m_volRegionTimeStamps[regionX][regionY][regionZ])
+						if(m_volLastModifiedTime[regionX][regionY][regionZ] > m_volRegionTimeStamps[regionX][regionY][regionZ])
 						{
 							m_volRegionBeingProcessed[regionX][regionY][regionZ];
 
@@ -143,13 +150,13 @@ namespace Thermite
 							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
-							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, uRegionTimeStamp);
+							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, m_volLastModifiedTime[regionX][regionY][regionZ]);
 							surfaceMeshExtractionTask->setAutoDelete(false);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceMeshExtractionTask*)), this, SLOT(uploadSurfaceExtractorResult(SurfaceMeshExtractionTask*)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
 
 							//Indicate that we've processed this region
-							m_volRegionTimeStamps[regionX][regionY][regionZ] = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+							m_volRegionTimeStamps[regionX][regionY][regionZ] = m_volLastModifiedTime[regionX][regionY][regionZ];
 						}
 					}
 				}
@@ -168,7 +175,7 @@ namespace Thermite
 		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = m_volLastModifiedTime[regionX][regionY][regionZ];
 		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
@@ -193,7 +200,7 @@ namespace Thermite
 
 		m_volSurfaceDecimators[regionX][regionY][regionZ] = surfaceMeshDecimationTask;
 
-		m_backgroundThread->addTask(surfaceMeshDecimationTask);
+		//m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
 	void Volume::uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask)
@@ -207,7 +214,7 @@ namespace Thermite
 		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
 		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
-		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
+		std::uint32_t uRegionTimeStamp = m_volLastModifiedTime[regionX][regionY][regionZ];
 
 		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
@@ -257,16 +264,21 @@ namespace Thermite
 		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
 		//handle these checks as well.
 
-		//Longer term, it might be interesting to introduce a 'ModyfyVolumeCommand' which can be issued to runn on seperate threads.
+		//Longer term, it might be interesting to introduce a 'ModifyVolumeCommand' which can be issued to runn on seperate threads.
 		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
 		//for that region.
-		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
 
-		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() >> volumeChangeTracker->m_uRegionSideLengthPower;
-		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() >> volumeChangeTracker->m_uRegionSideLengthPower;
+
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Should shift not divide!
+		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() / regionSideLength;
+		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() / regionSideLength;
+		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() / regionSideLength;
+
+		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() / regionSideLength;
+		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() / regionSideLength;
+		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() / regionSideLength;
 
 		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
 		{
@@ -284,7 +296,6 @@ namespace Thermite
 		}
 		////////////////////////////////////////////////////////////////////////////////
 
-		volumeChangeTracker->lockRegion(regionToLock);
 		for(int z = firstZ; z <= lastZ; ++z)
 		{
 			for(int y = firstY; y <= lastY; ++y)
@@ -295,12 +306,23 @@ namespace Thermite
 					{
 						MaterialDensityPair44 currentValue = m_pPolyVoxVolume->getVoxelAt(x,y,z);
 						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
-						volumeChangeTracker->setLockedVoxelAt(x,y,z,currentValue);
+						m_pPolyVoxVolume->setVoxelAt(x,y,z,currentValue);
 					}
 				}
 			}
 		}
-		volumeChangeTracker->unlockRegion();
+
+		for(uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		{
+			for(uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			{
+				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				{
+					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
+					m_volLastModifiedTime[xCt][yCt][zCt] = getTimeStamp();
+				}
+			}
+		}
 	}
 
 	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)

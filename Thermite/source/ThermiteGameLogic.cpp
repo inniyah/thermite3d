@@ -348,7 +348,7 @@ namespace Thermite
 						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
 						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-						//Iterate over each region in the VolumeChangeTracker
+						//Iterate over each region
 						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 						{		
 							for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)

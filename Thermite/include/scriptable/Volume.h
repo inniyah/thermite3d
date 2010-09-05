@@ -27,12 +27,12 @@ freely, subject to the following restrictions:
 #define __THERMITE_VOLUME_H__
 
 #include "ThermiteForwardDeclarations.h"
-#include "VolumeChangeTracker.h"
 
 #include "PolyVoxForwardDeclarations.h"
 #include "Array.h"
 
 #include <map>
+#include <set>
 
 #include "Object.h"
 
@@ -69,10 +69,9 @@ namespace Thermite
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
-		PolyVox::VolumeChangeTracker<PolyVox::MaterialDensityPair44>* volumeChangeTracker;
-
 		
 		PolyVox::Array<3, PolyVox::SurfaceMesh*> m_volSurfaceMeshes;
+		PolyVox::Array<3, uint32_t> m_volLastModifiedTime;
 		PolyVox::Array<3, uint32_t> m_volRegionTimeStamps;
 		PolyVox::Array<3, uint32_t> m_volLatestMeshTimeStamps;
 		PolyVox::Array<3, bool> m_volRegionBeingProcessed;
