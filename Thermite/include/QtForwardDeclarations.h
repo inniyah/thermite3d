@@ -30,5 +30,6 @@ class QMutex;
 class QRunnable;
 class QSemaphore;
 class QTime;
+class QVector3D;
 
 #endif

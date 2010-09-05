@@ -26,18 +26,17 @@ freely, subject to the following restrictions:
 #ifndef __THERMITE_VOLUME_H__
 #define __THERMITE_VOLUME_H__
 
+#include "Object.h"
+#include "QtForwardDeclarations.h"
 #include "ThermiteForwardDeclarations.h"
 
-#include "PolyVoxForwardDeclarations.h"
 #include "Array.h"
+#include "PolyVoxForwardDeclarations.h"
+
+#include <QScriptEngine>
 
 #include <map>
 #include <set>
-
-#include "Object.h"
-
-#include <QScriptEngine>
-#include <QVector3D>
 
 namespace Thermite
 {
@@ -48,6 +47,8 @@ namespace Thermite
 	public:
 		Volume(QObject* parent = 0);
 		~Volume(void);
+
+		void setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume);
 
 		void initialise(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);

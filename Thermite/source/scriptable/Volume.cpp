@@ -29,11 +29,9 @@ freely, subject to the following restrictions:
 
 #include "Application.h"
 #include "VolumeManager.h"
-#include "Utility.h"
 
 #include "MaterialDensityPair.h"
 
-#include "SurfaceExtractor.h"
 
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceMeshDecimationTask.h"
@@ -42,7 +40,6 @@ freely, subject to the following restrictions:
 #include <QSettings>
 #include <QThreadPool>
 
-//using namespace Ogre;
 using namespace PolyVox;
 
 namespace Thermite
@@ -66,8 +63,10 @@ namespace Thermite
 	{
 	}
 
-	void Volume::initialise(void)
+	void Volume::setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume)
 	{
+		m_pPolyVoxVolume = pPolyVoxVolume;
+
 		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		int volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
@@ -75,25 +74,16 @@ namespace Thermite
 		int volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
-		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), 0);
+		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), globals.timeStamp());
 		mExtractionStartedArray.resize(dimensions); std::fill(mExtractionStartedArray.getRawData(), mExtractionStartedArray.getRawData() + mExtractionStartedArray.getNoOfElements(), 0);
 		mExtractionFinishedArray.resize(dimensions); std::fill(mExtractionFinishedArray.getRawData(), mExtractionFinishedArray.getRawData() + mExtractionFinishedArray.getNoOfElements(), 0);
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (PolyVox::SurfaceMesh*)0);
 		mRegionBeingExtracted.resize(dimensions); std::fill(mRegionBeingExtracted.getRawData(), mRegionBeingExtracted.getRawData() + mRegionBeingExtracted.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
+	}
 
-		//Iterate over each region
-		for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
-		{		
-			for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
-			{
-				for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
-				{
-					mLastModifiedArray[regionX][regionY][regionZ] = globals.timeStamp();
-				}
-			}
-		}
-
+	void Volume::initialise(void)
+	{
 		if(!m_backgroundThread)
 		{
 			m_backgroundThread = new TaskProcessorThread;
@@ -367,7 +357,8 @@ namespace Thermite
 
 	bool Volume::loadFromFile(const QString& filename)
 	{
-		m_pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		setPolyVoxVolume(pPolyVoxVolume);
 		return true;
 	}
 }

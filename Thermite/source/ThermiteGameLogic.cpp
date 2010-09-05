@@ -297,10 +297,9 @@ namespace Thermite
 					if(mFirstFind)
 					{
 						mFirstFind = false;
-						
-						volume->loadFromFile("castle.volume");						
 
-						volume->initialise();
+						volume->initialise();						
+						volume->loadFromFile("castle.volume");	
 
 						if(!m_axisNode)
 						{
