@@ -176,8 +176,6 @@ namespace Thermite
 		ObjectStore mObjectStore;
 
 		QString mInitialiseScript;
-
-		Globals* mGlobals;
 	};
 }
 

@@ -219,16 +219,7 @@ namespace Thermite
 	{
 
 		mLastFrameTime = mCurrentTime;
-		mCurrentTime = mTime->elapsed();
-
-		mGlobals->setPreviousFrameTime(mGlobals->getCurrentFrameTime());
-		mGlobals->setCurrentFrameTime(mCurrentTime);
-
-		//The fun stuff!
-		/*if(mMap)
-		{
-			mMap->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
-		}*/
+		mCurrentTime = globals.timeSinceAppStart();
 
 		++mCurrentFrameNumber;
 
@@ -693,8 +684,6 @@ namespace Thermite
 
 	void ThermiteGameLogic::initScriptEnvironment(void)
 	{
-		mGlobals = new Globals(this);
-
 		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
 		scriptEngine->globalObject().setProperty("Light", lightClass);
 
@@ -704,7 +693,7 @@ namespace Thermite
 		QScriptValue volumeClass = scriptEngine->scriptValueFromQMetaObject<Volume>();
 		scriptEngine->globalObject().setProperty("Volume", volumeClass);
 
-		QScriptValue globalsScriptValue = scriptEngine->newQObject(mGlobals);
+		QScriptValue globalsScriptValue = scriptEngine->newQObject(&globals);
 		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
 
 		QScriptValue keyboardScriptValue = scriptEngine->newQObject(&keyboard);

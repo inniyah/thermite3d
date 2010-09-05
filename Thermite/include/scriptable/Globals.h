@@ -3,6 +3,7 @@
 
 #include <QColor>
 #include <QObject>
+#include <QTime>
 #include <QScriptEngine>
 #include <QVector3D>
 
@@ -15,19 +16,16 @@ namespace Thermite
 	public:
 		Globals(QObject* parent = 0);
 
-		Q_PROPERTY(quint32 currentFrameTime READ getCurrentFrameTime)
-		Q_PROPERTY(quint32 previousFrameTime READ getPreviousFrameTime)
+		Q_PROPERTY(int timeSinceAppStart READ timeSinceAppStart)
 
 	public slots:
-		quint32 getCurrentFrameTime(void) const;
-		void setCurrentFrameTime(const quint32 uCurrentFrameTime);
+		int timeSinceAppStart(void) const;
 
-		quint32 getPreviousFrameTime(void) const;
-		void setPreviousFrameTime(const quint32 uPreviousFrameTime);
 	private:
-		quint32 m_uCurrentFrameTime;
-		quint32 m_uPreviousFrameTime;
+		QTime mTimeSinceAppStart;
 	};
+
+	extern Globals globals;
 }
 
 #endif //GLOBALS_H_

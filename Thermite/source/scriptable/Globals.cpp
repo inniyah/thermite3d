@@ -2,12 +2,21 @@
 
 namespace Thermite
 {
+	//Our single globals object
+	Globals globals;
+
 	Globals::Globals(QObject* parent)
 		:QObject(parent)
 	{
+		mTimeSinceAppStart.start();
 	}
 
-	quint32 Globals::getCurrentFrameTime(void) const
+	int Globals::timeSinceAppStart(void) const
+	{
+		return mTimeSinceAppStart.elapsed();
+	}
+
+	/*quint32 Globals::getCurrentFrameTime(void) const
 	{
 		return m_uCurrentFrameTime;
 	}
@@ -25,5 +34,5 @@ namespace Thermite
 	void Globals::setPreviousFrameTime(const quint32 uPreviousFrameTime)
 	{
 		m_uPreviousFrameTime = uPreviousFrameTime;
-	}
+	}*/
 }
