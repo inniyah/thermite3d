@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include <QMutex>
+#include <QTime>
 
 namespace Thermite
 {
@@ -12,7 +13,8 @@ namespace Thermite
 		,mTimeStamp(0)
 		,mTimeStampMutex(0)
 	{
-		mTimeSinceAppStart.start();
+		mTimeSinceAppStart = new QTime;
+		mTimeSinceAppStart->start();
 
 		mTimeStampMutex = new QMutex;
 	}
@@ -27,7 +29,7 @@ namespace Thermite
 
 	int Globals::timeSinceAppStart(void) const
 	{
-		return mTimeSinceAppStart.elapsed();
+		return mTimeSinceAppStart->elapsed();
 	}
 
 	uint32_t Globals::timeStamp(void)

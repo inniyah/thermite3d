@@ -23,29 +23,12 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __ThermiteForwardDeclarations_H__
-#define __ThermiteForwardDeclarations_H__
+#ifndef __QtForwardDeclarations_H__
+#define __QtForwardDeclarations_H__
 
-namespace Thermite
-{
-	class ApplicationGameLogic;
-	class CannonController;
-	class LoadMapWidget;
-	class LoadSceneMenuPage;
-	class MainMenuPage;
-	class MoviePlayer;
-	class PhysicalObject;
-	class Shell;
-	class SurfaceMeshDecimationTask;
-	class SurfaceMeshExtractionTask;
-	class SurfacePatchRenderable;
-	class Task;
-	class TaskProcessorThread;
-	class ThermiteGameLogic;
-	class Volume;
-	class VolumeManager;
-	class VolumeResourse;
-	class VolumeSerializationProgressListener;
-}
+class QMutex;
+class QRunnable;
+class QSemaphore;
+class QTime;
 
 #endif

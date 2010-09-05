@@ -26,15 +26,12 @@ freely, subject to the following restrictions:
 #ifndef __THERMITE_TASK_PROCESSOR_THREAD_H__
 #define __THERMITE_TASK_PROCESSOR_THREAD_H__
 
+#include "QtForwardDeclarations.h"
 #include "ThermiteForwardDeclarations.h"
 
 #include <QThread>
 
 #include <list>
-
-class QMutex;
-class QRunnable;
-class QSemaphore;
 
 namespace Thermite
 {

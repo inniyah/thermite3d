@@ -51,6 +51,7 @@ SET(MAIN_INC_FILES
 	include/LoadMapWidget.h
 	include/MainMenu.h
 	include/PhysicalEntity.h
+	include/QtForwardDeclarations.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h

@@ -1,15 +1,11 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-#include <QColor>
+#include "QtForwardDeclarations.h"
+
 #include <QObject>
-#include <QTime>
-#include <QScriptEngine>
-#include <QVector3D>
 
 #include <cstdint>
-
-class QMutex;
 
 namespace Thermite
 {
@@ -29,10 +25,10 @@ namespace Thermite
 		uint32_t timeStamp(void);
 
 	private:
-		QTime mTimeSinceAppStart;
-		uint32_t mTimeStamp;
+		QTime* mTimeSinceAppStart;
 
 		QMutex* mTimeStampMutex;
+		uint32_t mTimeStamp;
 	};
 
 	extern Globals globals;
