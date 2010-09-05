@@ -73,9 +73,9 @@ namespace Thermite
 		volumeChangeTracker = new VolumeChangeTracker<MaterialDensityPair44>(m_pPolyVoxVolume.get(), regionSideLength);
 		volumeChangeTracker->setAllRegionsModified();
 
-		int volumeWidthInRegions = volumeChangeTracker->getWrappedVolume()->getWidth() / regionSideLength;
-		int volumeHeightInRegions = volumeChangeTracker->getWrappedVolume()->getHeight() / regionSideLength;
-		int volumeDepthInRegions = volumeChangeTracker->getWrappedVolume()->getDepth() / regionSideLength;
+		int volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
+		int volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
+		int volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
 		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
 		m_volRegionTimeStamps.resize(dimensions); std::fill(m_volRegionTimeStamps.getRawData(), m_volRegionTimeStamps.getRawData() + m_volRegionTimeStamps.getNoOfElements(), 0);
@@ -103,7 +103,7 @@ namespace Thermite
 			std::uint16_t volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
 			std::uint16_t volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-			//Iterate over each region in the VolumeChangeTracker
+			//Iterate over each region
 			for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
 			{		
 				for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
@@ -136,7 +136,7 @@ namespace Thermite
 							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
-							region.cropTo(volumeChangeTracker->getWrappedVolume()->getEnclosingRegion());
+							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
 
 							//The prioirty ensures that the surfaces for regions close to the
 							//camera get extracted before those which are distant from the camera.
@@ -187,7 +187,7 @@ namespace Thermite
 
 		m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
-		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(pMesh);
+		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(pMesh, pTask->m_uTimeStamp);
 		surfaceMeshDecimationTask->setAutoDelete(false);
 		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceMeshDecimationTask*)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask*)), Qt::QueuedConnection);
 
@@ -209,12 +209,12 @@ namespace Thermite
 
 		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
 
-		/*if(uRegionTimeStamp > result.m_uTimeStamp)
+		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
 			// Just ignore it, and a correct version should be along soon...
 			return;
-		}*/
+		}
 
 		
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
@@ -242,9 +242,9 @@ namespace Thermite
 		firstY = std::max(firstY,0);
 		firstZ = std::max(firstZ,0);
 
-		lastX = std::min(lastX,int(volumeChangeTracker->getWrappedVolume()->getWidth()-1));
-		lastY = std::min(lastY,int(volumeChangeTracker->getWrappedVolume()->getHeight()-1));
-		lastZ = std::min(lastZ,int(volumeChangeTracker->getWrappedVolume()->getDepth()-1));
+		lastX = std::min(lastX,int(m_pPolyVoxVolume->getWidth()-1));
+		lastY = std::min(lastY,int(m_pPolyVoxVolume->getHeight()-1));
+		lastZ = std::min(lastZ,int(m_pPolyVoxVolume->getDepth()-1));
 
 		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
 
@@ -293,7 +293,7 @@ namespace Thermite
 				{
 					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						MaterialDensityPair44 currentValue = volumeChangeTracker->getWrappedVolume()->getVoxelAt(x,y,z);
+						MaterialDensityPair44 currentValue = m_pPolyVoxVolume->getVoxelAt(x,y,z);
 						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
 						volumeChangeTracker->setLockedVoxelAt(x,y,z,currentValue);
 					}

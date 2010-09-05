@@ -36,8 +36,9 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceMesh* mesh)
+	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceMesh* mesh, uint32_t uTimeStamp)
 		:mMesh(mesh)
+		,m_uTimeStamp(uTimeStamp)
 	{
 	}
 	
