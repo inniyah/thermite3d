@@ -423,7 +423,7 @@ namespace Thermite
 
 		volume.m_volRegionBeingProcessed[regionX][regionY][regionZ] = false;
 
-		m_volLastUploadedTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
+		m_volLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
 	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh, PolyVox::Region region)

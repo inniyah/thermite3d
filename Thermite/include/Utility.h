@@ -30,8 +30,6 @@ freely, subject to the following restrictions:
 namespace Thermite
 {
 	std::string generateUID(const std::string& prefix);
-
-	uint32_t getTimeStamp(void);
 }
 
 #endif

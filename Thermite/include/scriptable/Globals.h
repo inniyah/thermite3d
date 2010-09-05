@@ -7,6 +7,10 @@
 #include <QScriptEngine>
 #include <QVector3D>
 
+#include <cstdint>
+
+class QMutex;
+
 namespace Thermite
 {
 	class Globals : public QObject
@@ -15,14 +19,20 @@ namespace Thermite
 
 	public:
 		Globals(QObject* parent = 0);
+		~Globals();
 
 		Q_PROPERTY(int timeSinceAppStart READ timeSinceAppStart)
+		Q_PROPERTY(uint32_t timeStamp READ timeStamp)
 
 	public slots:
 		int timeSinceAppStart(void) const;
+		uint32_t timeStamp(void);
 
 	private:
 		QTime mTimeSinceAppStart;
+		uint32_t mTimeStamp;
+
+		QMutex* mTimeStampMutex;
 	};
 
 	extern Globals globals;

@@ -1,5 +1,7 @@
 #include "Globals.h"
 
+#include <QMutex>
+
 namespace Thermite
 {
 	//Our single globals object
@@ -7,8 +9,20 @@ namespace Thermite
 
 	Globals::Globals(QObject* parent)
 		:QObject(parent)
+		,mTimeStamp(0)
+		,mTimeStampMutex(0)
 	{
 		mTimeSinceAppStart.start();
+
+		mTimeStampMutex = new QMutex;
+	}
+
+	Globals::~Globals()
+	{
+		if(mTimeStampMutex)
+		{
+			delete mTimeStampMutex;
+		}
 	}
 
 	int Globals::timeSinceAppStart(void) const
@@ -16,23 +30,11 @@ namespace Thermite
 		return mTimeSinceAppStart.elapsed();
 	}
 
-	/*quint32 Globals::getCurrentFrameTime(void) const
+	uint32_t Globals::timeStamp(void)
 	{
-		return m_uCurrentFrameTime;
+		mTimeStampMutex->lock();
+		++mTimeStamp;
+		mTimeStampMutex->unlock();
+		return mTimeStamp;
 	}
-
-	void Globals::setCurrentFrameTime(const quint32 uCurrentFrameTime)
-	{
-		m_uCurrentFrameTime = uCurrentFrameTime;
-	}
-
-	quint32 Globals::getPreviousFrameTime(void) const
-	{
-		return m_uPreviousFrameTime;
-	}
-
-	void Globals::setPreviousFrameTime(const quint32 uPreviousFrameTime)
-	{
-		m_uPreviousFrameTime = uPreviousFrameTime;
-	}*/
 }

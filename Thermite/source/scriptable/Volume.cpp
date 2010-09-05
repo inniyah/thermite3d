@@ -25,6 +25,8 @@ freely, subject to the following restrictions:
 
 #include "scriptable/Volume.h"
 
+#include "scriptable/Globals.h"
+
 #include "Application.h"
 #include "VolumeManager.h"
 #include "Utility.h"
@@ -87,7 +89,7 @@ namespace Thermite
 			{
 				for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 				{
-					m_volLastModifiedTime[regionX][regionY][regionZ] = getTimeStamp();
+					m_volLastModifiedTime[regionX][regionY][regionZ] = globals.timeStamp();
 				}
 			}
 		}
@@ -185,7 +187,7 @@ namespace Thermite
 		
 		//pMesh->m_Region = result.getRegion();
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
-		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
+		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 
@@ -225,7 +227,7 @@ namespace Thermite
 
 		
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
-		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
+		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 
 		delete pTask;
 
@@ -319,7 +321,7 @@ namespace Thermite
 				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					m_volLastModifiedTime[xCt][yCt][zCt] = getTimeStamp();
+					m_volLastModifiedTime[xCt][yCt][zCt] = globals.timeStamp();
 				}
 			}
 		}
