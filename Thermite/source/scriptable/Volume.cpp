@@ -33,6 +33,8 @@ freely, subject to the following restrictions:
 
 #include "MaterialDensityPair.h"
 
+#include "SurfaceExtractor.h"
+
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "TaskProcessorThread.h"
@@ -141,9 +143,9 @@ namespace Thermite
 							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
-							SurfaceExtractorTaskData taskData(m_pPolyVoxVolume.get(), region, uRegionTimeStamp);
-							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(taskData);
-							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceExtractorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
+							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, uRegionTimeStamp);
+							surfaceMeshExtractionTask->setAutoDelete(false);
+							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceMeshExtractionTask*)), this, SLOT(uploadSurfaceExtractorResult(SurfaceMeshExtractionTask*)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
 
 							//Indicate that we've processed this region
@@ -155,40 +157,26 @@ namespace Thermite
 		}
 	}
 
-	void Volume::surfaceExtractionFinished(SurfaceExtractorTaskData result)
+	void Volume::uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask)
 	{
+		SurfaceMesh* pMesh = &(pTask->m_meshResult);
+
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
-
-		SurfaceMesh* pMesh = new SurfaceMesh;
-		*pMesh = result.m_meshResult;
-		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
-	}
-
-	void Volume::uploadSurfaceExtractorResult(SurfaceExtractorTaskData result)
-	{
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
-		//Determine where it came from
-		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
 		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-		if(uRegionTimeStamp > result.m_uTimeStamp)
+		if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
 			// Just ignore it, and a correct version should be along soon...
 			return;
 		}
-
-		SurfaceMesh* pMesh = new SurfaceMesh;
-		*pMesh = result.m_meshResult;
-		pMesh->m_Region = result.getRegion();
+		
+		//pMesh->m_Region = result.getRegion();
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
 		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
 
@@ -199,35 +187,40 @@ namespace Thermite
 
 		m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
-		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(result);
-		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceExtractorTaskData)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceExtractorTaskData)), Qt::QueuedConnection);
+		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(pMesh);
+		surfaceMeshDecimationTask->setAutoDelete(false);
+		QObject::connect(surfaceMeshDecimationTask, SIGNAL(finished(SurfaceMeshDecimationTask*)), this, SLOT(uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask*)), Qt::QueuedConnection);
 
 		m_volSurfaceDecimators[regionX][regionY][regionZ] = surfaceMeshDecimationTask;
 
 		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
-	void Volume::uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result)
+	void Volume::uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask)
 	{
+		SurfaceMesh* pMesh = pTask->mMesh;
+
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		uint16_t regionX = result.getRegion().getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = result.getRegion().getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = result.getRegion().getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
 
 		std::uint32_t uRegionTimeStamp = volumeChangeTracker->getLastModifiedTimeForRegion(regionX, regionY, regionZ);
-		if(uRegionTimeStamp > result.m_uTimeStamp)
+
+		/*if(uRegionTimeStamp > result.m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
 			// Just ignore it, and a correct version should be along soon...
 			return;
-		}
+		}*/
 
-		SurfaceMesh* pMesh = new SurfaceMesh;
-		*pMesh = result.m_meshResult;
+		
 		m_volSurfaceMeshes[regionX][regionY][regionZ] = pMesh;
 		m_volLatestMeshTimeStamps[regionX][regionY][regionZ] = getTimeStamp();
+
+		delete pTask;
 
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}	

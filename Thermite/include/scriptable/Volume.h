@@ -29,8 +29,6 @@ freely, subject to the following restrictions:
 #include "ThermiteForwardDeclarations.h"
 #include "VolumeChangeTracker.h"
 
-#include "SurfaceExtractorTaskData.h"
-
 #include "PolyVoxForwardDeclarations.h"
 #include "Array.h"
 
@@ -52,7 +50,6 @@ namespace Thermite
 		~Volume(void);
 
 		void initialise(void);
-
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
 	public slots:
@@ -61,10 +58,8 @@ namespace Thermite
 
 		bool loadFromFile(const QString& filename);
 
-		void surfaceExtractionFinished(SurfaceExtractorTaskData result);
-
-		void uploadSurfaceExtractorResult(SurfaceExtractorTaskData result);
-		void uploadSurfaceDecimatorResult(SurfaceExtractorTaskData result);
+		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
+		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 
 	public:
 

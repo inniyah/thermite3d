@@ -27,7 +27,6 @@ freely, subject to the following restrictions:
 #include "AnyOption.h"
 #include "GameLogic.h"
 #include "Serialization.h"
-#include "SurfaceExtractorTaskData.h"
 #include "VolumeChangeTracker.h"
 
 #include "Camera.h"

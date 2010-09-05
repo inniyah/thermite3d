@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 #include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
-#include "SurfaceExtractorTaskData.h"
 #include "SurfacePatchRenderable.h"
 #include "MaterialDensityPair.h"
 #include "ScriptManager.h"
@@ -80,8 +79,6 @@ namespace Thermite
 		,mOgreCamera(0)
 		,mFirstFind(true)
 	{
-		qRegisterMetaType<SurfaceExtractorTaskData>("SurfaceExtractorTaskData");
-
 		mouse = new Mouse(this);
 		camera = new Camera(this);
 	}

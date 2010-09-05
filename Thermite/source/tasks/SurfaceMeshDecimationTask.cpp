@@ -32,17 +32,18 @@ freely, subject to the following restrictions:
 
 #include <QMutex>
 
+using namespace PolyVox;
+
 namespace Thermite
 {
-	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData)
-		:m_taskData(taskData)
+	SurfaceMeshDecimationTask::SurfaceMeshDecimationTask(SurfaceMesh* mesh)
+		:mMesh(mesh)
 	{
 	}
-
+	
 	void SurfaceMeshDecimationTask::run(void)
 	{
-		//m_taskData.m_meshResult->decimate(0.95);
-		//m_pGameLogic->m_completedSurfaceDecimatorTaskQueue.push(m_taskData);
-		emit finished(m_taskData);
+		mMesh->decimate(0.95);
+		emit finished(this);
 	}
 }

@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #define __THERMITE_SURFACE_MESH_DECIMATION_RUNNABLE_H__
 
 #include "Task.h"
-#include "SurfaceExtractorTaskData.h"
+#include "SurfaceMesh.h"
 
 namespace Thermite
 {
@@ -37,15 +37,15 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		SurfaceMeshDecimationTask(SurfaceExtractorTaskData taskData);
+		SurfaceMeshDecimationTask(PolyVox::SurfaceMesh* mesh);
 
 		void run(void);
 
 	signals:
-		void finished(SurfaceExtractorTaskData taskData);
+		void finished(SurfaceMeshDecimationTask* mesh);
 
-	protected:
-		SurfaceExtractorTaskData m_taskData;
+	public:
+		PolyVox::SurfaceMesh* mMesh;
 	};
 }
 

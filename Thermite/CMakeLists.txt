@@ -129,7 +129,6 @@ SOURCE_GROUP("Headers\\Scriptable" FILES ${SCRIPTABLE_INC_FILES})
 SET(TASKS_SRC_FILES
 	source/tasks/SurfaceMeshDecimationTask.cpp
 	source/tasks/SurfaceMeshExtractionTask.cpp
-	source/tasks/SurfaceExtractorTaskData.cpp
 	source/tasks/Task.cpp
 	source/tasks/TaskProcessorThread.cpp
 )
@@ -137,7 +136,6 @@ SET(TASKS_SRC_FILES
 SET(TASKS_INC_FILES
 	include/Tasks/SurfaceMeshDecimationTask.h
 	include/Tasks/SurfaceMeshExtractionTask.h
-	include/Tasks/SurfaceExtractorTaskData.h
 	include/Tasks/Task.h
 	include/Tasks/TaskProcessorThread.h
 )

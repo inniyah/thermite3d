@@ -27,7 +27,11 @@ freely, subject to the following restrictions:
 #define __THERMITE_SURFACE_MESH_EXTRACTION_RUNNABLE_H__
 
 #include "Task.h"
-#include "SurfaceExtractorTaskData.h"
+
+#include <MaterialDensityPair.h>
+#include <PolyVoxForwardDeclarations.h>
+#include <Region.h>
+#include <SurfaceMesh.h>
 
 namespace Thermite
 {
@@ -37,16 +41,18 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		SurfaceMeshExtractionTask(SurfaceExtractorTaskData taskData);
+		SurfaceMeshExtractionTask(PolyVox::Volume<PolyVox::MaterialDensityPair44>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp);
 
 		void run(void);
 
 	signals:
-		void finished(SurfaceExtractorTaskData taskData);
+		void finished(SurfaceMeshExtractionTask* pTask);
 
-
-	protected:
-		SurfaceExtractorTaskData m_taskData;
+	public:
+		PolyVox::Region m_regToProcess;
+		PolyVox::SurfaceMesh m_meshResult;
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* mVolume;
+		uint32_t m_uTimeStamp;
 	};
 }
 
