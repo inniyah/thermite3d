@@ -293,7 +293,7 @@ namespace Thermite
 				}
 				Volume* volume = dynamic_cast<Volume*>(pObj);
 				if(volume)
-				{
+				{			
 					if(mFirstFind)
 					{
 						mFirstFind = false;
@@ -301,23 +301,18 @@ namespace Thermite
 						volume->initialise();						
 						volume->loadFromFile("castle.volume");	
 
+						//Some values we'll need later.
+						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
+						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
+						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
+
 						if(!m_axisNode)
 						{
 							if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 							{
 								createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
 							}
-						}
-
-						//mMap = new Map;
-						//mMap->m_pOgreSceneManager = m_pOgreSceneManager;
-
-						//Some values we'll need later.
-						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = volume->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						}						
 
 						uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
 						//Create the arrays
@@ -329,14 +324,12 @@ namespace Thermite
 					}
 					else
 					{
-						volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
-
 						//Some values we'll need later.
-						std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-						std::uint16_t halfRegionSideLength = regionSideLength / 2;
-						std::uint16_t volumeWidthInRegions = volume->m_pPolyVoxVolume->getWidth() / regionSideLength;
-						std::uint16_t volumeHeightInRegions = volume->m_pPolyVoxVolume->getHeight() / regionSideLength;
-						std::uint16_t volumeDepthInRegions = volume->m_pPolyVoxVolume->getDepth() / regionSideLength;
+						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
+						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
+						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
+
+						volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
 
 						//Iterate over each region
 						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
@@ -375,12 +368,11 @@ namespace Thermite
 	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region, Volume& volume)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 
 		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = region.getLowerCorner().getX() / volume.mRegionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / volume.mRegionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / volume.mRegionSideLength;
 
 		//Create a SceneNode for that location if we don't have one already
 		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
@@ -472,8 +464,6 @@ namespace Thermite
 
 		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, false);
 
-		//int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		//Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
 		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 

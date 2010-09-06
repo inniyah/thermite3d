@@ -63,17 +63,16 @@ namespace Thermite
 	{
 	}
 
-	void Volume::setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume)
+	void Volume::setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume, uint16_t regionSideLength)
 	{
 		m_pPolyVoxVolume = pPolyVoxVolume;
+		mRegionSideLength = regionSideLength;		
 
-		int regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		mVolumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
+		mVolumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
+		mVolumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-		int volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
-		int volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
-		int volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
-
-		uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
+		uint32_t dimensions[3] = {mVolumeWidthInRegions, mVolumeHeightInRegions, mVolumeDepthInRegions}; // Array dimensions
 		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), globals.timeStamp());
 		mExtractionStartedArray.resize(dimensions); std::fill(mExtractionStartedArray.getRawData(), mExtractionStartedArray.getRawData() + mExtractionStartedArray.getNoOfElements(), 0);
 		mExtractionFinishedArray.resize(dimensions); std::fill(mExtractionFinishedArray.getRawData(), mExtractionFinishedArray.getRawData() + mExtractionFinishedArray.getNoOfElements(), 0);
@@ -96,29 +95,23 @@ namespace Thermite
 	{
 		if(m_pPolyVoxVolume)
 		{		
-			//Some values we'll need later.
-			std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-			std::uint16_t halfRegionSideLength = regionSideLength / 2;
-			std::uint16_t volumeWidthInRegions = m_pPolyVoxVolume->getWidth() / regionSideLength;
-			std::uint16_t volumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
-			std::uint16_t volumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
-
 			//Iterate over each region
-			for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+			for(std::uint16_t regionZ = 0; regionZ < mVolumeDepthInRegions; ++regionZ)
 			{		
-				for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+				for(std::uint16_t regionY = 0; regionY < mVolumeHeightInRegions; ++regionY)
 				{
-					for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+					for(std::uint16_t regionX = 0; regionX < mVolumeWidthInRegions; ++regionX)
 					{
 						//Compute the extents of the current region
-						const std::uint16_t firstX = regionX * regionSideLength;
-						const std::uint16_t firstY = regionY * regionSideLength;
-						const std::uint16_t firstZ = regionZ * regionSideLength;
+						const std::uint16_t firstX = regionX * mRegionSideLength;
+						const std::uint16_t firstY = regionY * mRegionSideLength;
+						const std::uint16_t firstZ = regionZ * mRegionSideLength;
 
-						const std::uint16_t lastX = firstX + regionSideLength;
-						const std::uint16_t lastY = firstY + regionSideLength;
-						const std::uint16_t lastZ = firstZ + regionSideLength;	
+						const std::uint16_t lastX = firstX + mRegionSideLength;
+						const std::uint16_t lastY = firstY + mRegionSideLength;
+						const std::uint16_t lastZ = firstZ + mRegionSideLength;	
 
+						const uint16_t halfRegionSideLength = mRegionSideLength / 2;
 						const float centreX = firstX + halfRegionSideLength;
 						const float centreY = firstY + halfRegionSideLength;
 						const float centreZ = firstZ + halfRegionSideLength;
@@ -161,12 +154,10 @@ namespace Thermite
 	{
 		SurfaceMesh* pMesh = &(pTask->m_meshResult);
 
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
 		//Determine where it came from
-		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / mRegionSideLength;
+		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / mRegionSideLength;
+		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / mRegionSideLength;
 
 		std::uint32_t uRegionTimeStamp = mLastModifiedArray[regionX][regionY][regionZ];
 		if(uRegionTimeStamp > pTask->m_uTimeStamp)
@@ -202,12 +193,10 @@ namespace Thermite
 	{
 		SurfaceMesh* pMesh = pTask->mMesh;
 
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
 		//Determine where it came from
-		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / regionSideLength;
+		uint16_t regionX = pMesh->m_Region.getLowerCorner().getX() / mRegionSideLength;
+		uint16_t regionY = pMesh->m_Region.getLowerCorner().getY() / mRegionSideLength;
+		uint16_t regionZ = pMesh->m_Region.getLowerCorner().getZ() / mRegionSideLength;
 
 		std::uint32_t uRegionTimeStamp = mLastModifiedArray[regionX][regionY][regionZ];
 
@@ -263,17 +252,14 @@ namespace Thermite
 		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
 		//for that region.
 
-
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
 		//Should shift not divide!
-		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() / regionSideLength;
-		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() / regionSideLength;
-		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() / regionSideLength;
+		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() / mRegionSideLength;
+		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() / mRegionSideLength;
+		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() / mRegionSideLength;
 
-		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() / regionSideLength;
-		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() / regionSideLength;
-		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() / regionSideLength;
+		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() / mRegionSideLength;
+		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() / mRegionSideLength;
+		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() / mRegionSideLength;
 
 		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
 		{
@@ -357,8 +343,9 @@ namespace Thermite
 
 	bool Volume::loadFromFile(const QString& filename)
 	{
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
-		setPolyVoxVolume(pPolyVoxVolume);
+		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
 }
