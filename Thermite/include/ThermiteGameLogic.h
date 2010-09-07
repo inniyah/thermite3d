@@ -146,6 +146,8 @@ namespace Thermite
 		
 	public:
 
+		Ogre::SceneNode* mPointLightMarkerNode;
+
 		
 
 #ifdef ENABLE_BULLET_PHYSICS

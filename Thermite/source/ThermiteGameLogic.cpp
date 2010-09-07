@@ -78,6 +78,7 @@ namespace Thermite
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
 		,mFirstFind(true)
+		,mPointLightMarkerNode(0)
 	{
 		mouse = new Mouse(this);
 		camera = new Camera(this);
@@ -140,6 +141,7 @@ namespace Thermite
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
 		mOgreCamera->setFarClipDistance(1000);
+		m_pOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
 		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
@@ -212,7 +214,9 @@ namespace Thermite
 			m_pOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
 			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
 			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}			
+		}		
+
+		mPointLightMarkerNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -236,6 +240,17 @@ namespace Thermite
 		if(m_pOgreSceneManager)
 		{
 			m_pOgreSceneManager->destroyAllLights();
+			mPointLightMarkerNode->removeAndDestroyAllChildren();
+
+			/*Ogre::SceneNode::ObjectIterator iter =  mPointLightMarkerNode->getAttachedObjectIterator();
+			while (iter.hasMoreElements())
+			{
+				Ogre::MovableObject* obj = iter.getNext();
+				m_pOgreSceneManager->destroyMovableObject(obj);
+			}
+			mPointLightMarkerNode->detachAllObjects();*/
+
+			//mPointLightMarkerNode->detachAllObjects();
 			QHashIterator<QString, QObject*> objectIter(mObjectStore);
 			while(objectIter.hasNext())
 			{
@@ -253,6 +268,12 @@ namespace Thermite
 
 					QColor col = light->getColour();
 					ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+
+					//And create the marker
+					Ogre::SceneNode* sceneNode = mPointLightMarkerNode->createChildSceneNode();
+					Ogre::Entity* ogreEntity = m_pOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+					sceneNode->attachObject(ogreEntity);
+					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
 				}
 
 				Entity* entity = dynamic_cast<Entity*>(pObj);
