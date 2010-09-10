@@ -78,7 +78,8 @@ namespace Thermite
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
 		,mFirstFind(true)
-		,mPointLightMarkerNode(0)
+		,mPointLightMarkerNode(0),
+		m_axisNode(0)
 	{
 		mouse = new Mouse(this);
 		camera = new Camera(this);
@@ -329,7 +330,7 @@ namespace Thermite
 
 						if(!m_axisNode)
 						{
-							if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
+							//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
 							{
 								createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
 							}
