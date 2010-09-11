@@ -261,11 +261,28 @@ namespace Thermite
 				Light* light = dynamic_cast<Light*>(pObj);
 				if(light)
 				{
+					//light->setProperty("type", "DirectionalLight");
+					//light->setType(DirectionalLight);
+
 					Ogre::Light* ogreLight = m_pOgreSceneManager->createLight(objectIter.key().toStdString());
-					ogreLight->setType(Ogre::Light::LT_POINT);
+					switch(light->getType())
+					{
+					case Light::PointLight:
+						ogreLight->setType(Ogre::Light::LT_POINT);
+						break;
+					case Light::DirectionalLight:
+						ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
+						break;
+					case Light::SpotLight:
+						ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
+						break;
+					}
 
 					QVector3D pos = light->position();
 					ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+					QVector3D dir = light->zAxis();
+					ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
 
 					QColor col = light->getColour();
 					ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
@@ -696,6 +713,9 @@ namespace Thermite
 		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
 		scriptEngine->globalObject().setProperty("Light", lightClass);
 
+		/*QScriptValue thermiteClass = scriptEngine->scriptValueFromQMetaObject<Thermite2>();
+		scriptEngine->globalObject().setProperty("Thermite", thermiteClass);*/
+
 		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
 		scriptEngine->globalObject().setProperty("Entity", entityClass);
 
@@ -717,6 +737,10 @@ namespace Thermite
 		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));
 		scriptEngine->globalObject().setProperty("Qt", Qt);
+
+		/*QScriptValue LightType = scriptEngine->newQMetaObject();
+		Qt.setProperty("App", scriptEngine->newQObject(qApp));
+		scriptEngine->globalObject().setProperty("Qt", Qt);*/
 
 		QScriptValue objectStoreScriptValue = scriptEngine->newQObject(&mObjectStore);
 		scriptEngine->globalObject().setProperty("objectStore", objectStoreScriptValue);
