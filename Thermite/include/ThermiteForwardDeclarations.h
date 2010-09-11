@@ -28,23 +28,34 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
+	//Resources
+	class VolumeManager;
+	class VolumeResourse;
+
+	//Scriptable
+	class Keyboard;
+	class Mouse;
+
+	//Tasks
+	class SurfaceMeshDecimationTask;
+	class SurfaceMeshExtractionTask;
+	class Task;
+	class TaskProcessorThread;
+
+	//Other
 	class ApplicationGameLogic;
-	class CannonController;
 	class LoadMapWidget;
 	class LoadSceneMenuPage;
 	class MainMenuPage;
+	
 	class MoviePlayer;
 	class PhysicalObject;
-	class Shell;
-	class SurfaceMeshDecimationTask;
-	class SurfaceMeshExtractionTask;
+	
 	class SurfacePatchRenderable;
-	class Task;
-	class TaskProcessorThread;
+	
 	class ThermiteGameLogic;
 	class Volume;
-	class VolumeManager;
-	class VolumeResourse;
+	
 	class VolumeSerializationProgressListener;
 }
 

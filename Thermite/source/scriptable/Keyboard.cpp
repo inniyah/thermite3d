@@ -2,6 +2,11 @@
 
 namespace Thermite
 {
+	Keyboard::Keyboard(QObject * parent)
+		:QObject(parent)
+	{
+	}
+
 	bool Keyboard::isPressed(int key)
 	{
 		return mKeyStates[key];

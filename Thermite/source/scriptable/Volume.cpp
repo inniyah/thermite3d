@@ -49,14 +49,23 @@ namespace Thermite
 	Volume::Volume(QObject* parent)
 		:Object(parent)
 	{
-		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
+		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(3);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(4);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(5);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(6);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
-		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);
+		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);*/
+
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(1);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(2);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(3);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(4);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(5);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(6);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(7);
+		m_mapMaterialIds["ColouredCubicVoxel"].insert(8);
 	}
 
 	Volume::~Volume(void)

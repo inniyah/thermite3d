@@ -23,6 +23,8 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "Keyboard.h"
+#include "Mouse.h"
 #include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
@@ -70,7 +72,6 @@ namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
-		,mCurrentFrameNumber(0)
 		,m_pOgreSceneManager(0)
 		,m_bRunScript(true)
 		,scriptEngine(0)
@@ -78,11 +79,13 @@ namespace Thermite
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
 		,mFirstFind(true)
-		,mPointLightMarkerNode(0),
-		m_axisNode(0)
+		,mPointLightMarkerNode(0)
+		,m_axisNode(0)
+		,keyboard(0)
 	{
-		mouse = new Mouse(this);
 		camera = new Camera(this);
+		keyboard = new Keyboard(this);
+		mouse = new Mouse(this);		
 	}
 
 	void ThermiteGameLogic::setupScripting(void)
@@ -169,11 +172,6 @@ namespace Thermite
 
 		ScriptManager* sm = new ScriptManager;
 
-		mTime = new QTime;
-		mTime->start();
-
-		mCurrentFrameNumber = 0;		
-
 		//The main menu
 		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
 		Application::centerWidget(mMainMenu, qApp->mainWidget());
@@ -222,12 +220,6 @@ namespace Thermite
 
 	void ThermiteGameLogic::update(void)
 	{
-
-		mLastFrameTime = mCurrentTime;
-		mCurrentTime = globals.timeSinceAppStart();
-
-		++mCurrentFrameNumber;
-
 		if(m_bRunScript)
 		{
 			QScriptValue result = scriptEngine->evaluate(m_pScriptEditorWidget->getScriptCode());
@@ -502,7 +494,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)
 	{
-		keyboard.press(event->key());
+		keyboard->press(event->key());
 
 		if(event->key() == Qt::Key_F5)
 		{
@@ -517,7 +509,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::onKeyRelease(QKeyEvent* event)
 	{
-		keyboard.release(event->key());
+		keyboard->release(event->key());
 	}
 
 	void ThermiteGameLogic::onMousePress(QMouseEvent* event)
@@ -719,7 +711,7 @@ namespace Thermite
 		QScriptValue globalsScriptValue = scriptEngine->newQObject(&globals);
 		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
 
-		QScriptValue keyboardScriptValue = scriptEngine->newQObject(&keyboard);
+		QScriptValue keyboardScriptValue = scriptEngine->newQObject(keyboard);
 		scriptEngine->globalObject().setProperty("keyboard", keyboardScriptValue);
 
 		QScriptValue mouseScriptValue = scriptEngine->newQObject(mouse);

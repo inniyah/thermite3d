@@ -9,6 +9,9 @@ namespace Thermite
 	{
 		Q_OBJECT
 
+	public:
+		Keyboard(QObject * parent = 0);
+
 	public slots:
 		bool isPressed(int key);
 		void press(int key);

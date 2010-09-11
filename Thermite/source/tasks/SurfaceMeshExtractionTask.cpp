@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 
 #include "GradientEstimators.h"
 #include "SurfaceMesh.h"
-#include "SurfaceExtractor.h"
+#include "CubicSurfaceExtractor.h"
 
 #include <QMutex>
 
@@ -49,7 +49,7 @@ namespace Thermite
 	{
 		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
 		//Or at least not use 'new'
-		PolyVox::SurfaceExtractor<MaterialDensityPair44> surfaceExtractor(mVolume, m_regToProcess, &m_meshResult);
+		PolyVox::CubicSurfaceExtractor<MaterialDensityPair44> surfaceExtractor(mVolume, m_regToProcess, &m_meshResult);
 
 		surfaceExtractor.execute();
 		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_meshResult.get()), PolyVox::SOBEL_SMOOTHED);

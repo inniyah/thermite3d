@@ -31,9 +31,7 @@ freely, subject to the following restrictions:
 #include "Camera.h"
 #include "Entity.h"
 #include "Globals.h"
-#include "Keyboard.h"
 #include "Light.h"
-#include "Mouse.h"
 #include "ObjectStore.h"
 #include "ScriptEditorWidget.h"
 
@@ -61,12 +59,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	enum KeyStates
-	{
-		KS_RELEASED,
-		KS_PRESSED
-	};
-
 	class MainMenu;
 
 	class ThermiteGameLogic : public QObject, public QtOgre::GameLogic
@@ -101,17 +93,6 @@ namespace Thermite
 		void addResourceDirectory(const QString& directoryName);
 
 		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
-
-		
-		QTime* mTime;
-
-		int mLastFrameTime;
-		int mCurrentTime;
-		float mTimeElapsedInSeconds;
-
-		unsigned int mCurrentFrameNumber;
-
-		
 
 		MoviePlayer* mMoviePlayer;
 
@@ -161,7 +142,7 @@ namespace Thermite
 
 		MainMenu* mMainMenu;
 
-		Keyboard keyboard;
+		Keyboard* keyboard;
 		Mouse* mouse;
 
 		//Scripting
