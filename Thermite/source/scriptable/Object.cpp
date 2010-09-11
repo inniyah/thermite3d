@@ -99,4 +99,27 @@ namespace Thermite
 	{
 		mScale *= QVector3D(x,y,z);
 	}
+
+	// This function rotates the object so that its *negative* z axis points at the target.
+	// The negative z is used so that it works with cameras, which have z going *into* the screen.
+	void Object::lookAt(const QVector3D& target)
+	{
+		//Our local negative z vector.
+		QVector3D negativeZ(0.0f, 0.0f, -1.0f);
+
+		//The point we want to look at.
+		QVector3D desiredDirection = target - mPosition;
+		desiredDirection.normalize();
+
+		//The axis we need to rotate around.
+		QVector3D axis = QVector3D::crossProduct(negativeZ, desiredDirection);
+
+		//And the angle of rotation
+		float angle = QVector3D::dotProduct(negativeZ, desiredDirection);
+		angle = acosf(angle);
+		angle *= 57.2957795f; //Convert to degrees.
+
+		//Set the orientation.
+		mOrientation = QQuaternion::fromAxisAndAngle(axis, angle);
+	}
 }

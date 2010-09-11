@@ -49,6 +49,8 @@ namespace Thermite
 		void scale(const QVector3D & vector);
 		void scale(qreal x, qreal y, qreal z);
 
+		void lookAt(const QVector3D& target);
+
 	private:
 		QVector3D mPosition;
 		QQuaternion mOrientation;

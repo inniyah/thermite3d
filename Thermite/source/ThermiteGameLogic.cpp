@@ -243,14 +243,6 @@ namespace Thermite
 			m_pOgreSceneManager->destroyAllLights();
 			mPointLightMarkerNode->removeAndDestroyAllChildren();
 
-			/*Ogre::SceneNode::ObjectIterator iter =  mPointLightMarkerNode->getAttachedObjectIterator();
-			while (iter.hasMoreElements())
-			{
-				Ogre::MovableObject* obj = iter.getNext();
-				m_pOgreSceneManager->destroyMovableObject(obj);
-			}
-			mPointLightMarkerNode->detachAllObjects();*/
-
 			//mPointLightMarkerNode->detachAllObjects();
 			QHashIterator<QString, QObject*> objectIter(mObjectStore);
 			while(objectIter.hasNext())
@@ -281,7 +273,9 @@ namespace Thermite
 					QVector3D pos = light->position();
 					ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
 
-					QVector3D dir = light->zAxis();
+					//Note we negate the z axis as Thermite considers negative z
+					//to be forwards. This means that lights will match cameras.
+					QVector3D dir = -light->zAxis();
 					ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
 
 					QColor col = light->getColour();
