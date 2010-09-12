@@ -1,5 +1,7 @@
 #include "Object.h"
 
+#include <math.h>
+
 namespace Thermite
 {
 	Object::Object(QObject * parent)
