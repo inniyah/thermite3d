@@ -52,16 +52,6 @@ freely, subject to the following restrictions:
 #include <QThreadPool>
 #include <QWaitCondition>
 
-#ifdef ENABLE_BULLET_PHYSICS
-	#include "OgreBulletDynamicsWorld.h"
-	#include "Shapes/OgreBulletCollisionsBoxShape.h"
-#endif //ENABLE_BULLET_PHYSICS
-
-#ifdef ENABLE_BULLET_PHYSICS
-using namespace OgreBulletDynamics;
-using namespace OgreBulletCollisions;
-#endif //ENABLE_BULLET_PHYSICS
-
 using namespace QtOgre;
 
 using namespace std;
@@ -72,10 +62,10 @@ namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
-		,m_pOgreSceneManager(0)
+		,mOgreSceneManager(0)
 		,m_bRunScript(true)
 		,scriptEngine(0)
-		,camera(0)
+		,mCamera(0)
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
 		,mFirstFind(true)
@@ -83,7 +73,7 @@ namespace Thermite
 		,m_axisNode(0)
 		,keyboard(0)
 	{
-		camera = new Camera(this);
+		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);		
 	}
@@ -140,12 +130,12 @@ namespace Thermite
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
-		m_pOgreSceneManager = new Ogre::DefaultSceneManager("OgreSceneManager");
-		mOgreCamera = m_pOgreSceneManager->createCamera("OgreCamera");
+		mOgreSceneManager = new Ogre::DefaultSceneManager("OgreSceneManager");
+		mOgreCamera = mOgreSceneManager->createCamera("OgreCamera");
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
 		mOgreCamera->setFarClipDistance(1000);
-		m_pOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
+		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
 		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
@@ -206,16 +196,16 @@ namespace Thermite
 
 		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
 		{
-			m_pOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-			//m_pOgreSceneManager->setShadowFarDistance(1000.0f);
-			m_pOgreSceneManager->setShadowTextureSelfShadow(true);
-			m_pOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-			m_pOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-			m_pOgreSceneManager->setShadowCasterRenderBackFaces(true);
-			m_pOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
+			mOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			//mOgreSceneManager->setShadowFarDistance(1000.0f);
+			mOgreSceneManager->setShadowTextureSelfShadow(true);
+			mOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
+			mOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+			mOgreSceneManager->setShadowCasterRenderBackFaces(true);
+			mOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
 		}		
 
-		mPointLightMarkerNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+		mPointLightMarkerNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -230,9 +220,9 @@ namespace Thermite
 			}
 		}
 
-		if(m_pOgreSceneManager)
+		if(mOgreSceneManager)
 		{
-			m_pOgreSceneManager->destroyAllLights();
+			mOgreSceneManager->destroyAllLights();
 			mPointLightMarkerNode->removeAndDestroyAllChildren();
 
 			//mPointLightMarkerNode->detachAllObjects();
@@ -248,7 +238,7 @@ namespace Thermite
 					//light->setProperty("type", "DirectionalLight");
 					//light->setType(DirectionalLight);
 
-					Ogre::Light* ogreLight = m_pOgreSceneManager->createLight(objectIter.key().toStdString());
+					Ogre::Light* ogreLight = mOgreSceneManager->createLight(objectIter.key().toStdString());
 					switch(light->getType())
 					{
 					case Light::PointLight:
@@ -275,7 +265,7 @@ namespace Thermite
 
 					//And create the marker
 					Ogre::SceneNode* sceneNode = mPointLightMarkerNode->createChildSceneNode();
-					Ogre::Entity* ogreEntity = m_pOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+					Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
 					sceneNode->attachObject(ogreEntity);
 					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
 				}
@@ -286,15 +276,15 @@ namespace Thermite
 					Ogre::Entity* ogreEntity;
 					Ogre::SceneNode* sceneNode;
 
-					if(m_pOgreSceneManager->hasEntity(objectIter.key().toStdString()))
+					if(mOgreSceneManager->hasEntity(objectIter.key().toStdString()))
 					{
-						ogreEntity = m_pOgreSceneManager->getEntity(objectIter.key().toStdString());
+						ogreEntity = mOgreSceneManager->getEntity(objectIter.key().toStdString());
 						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
 					}
 					else
 					{
-						sceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-						ogreEntity = m_pOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
+						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+						ogreEntity = mOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
 						sceneNode->attachObject(ogreEntity);
 					}
 
@@ -341,10 +331,10 @@ namespace Thermite
 
 						uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
 						//Create the arrays
-						m_volLastUploadedTimeStamps.resize(dimensions);
+						mVolLastUploadedTimeStamps.resize(dimensions);
 						m_volOgreSceneNodes.resize(dimensions);
 						//Clear the arrays
-						std::fill(m_volLastUploadedTimeStamps.getRawData(), m_volLastUploadedTimeStamps.getRawData() + m_volLastUploadedTimeStamps.getNoOfElements(), 0);						
+						std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
 						std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
 					}
 					else
@@ -364,7 +354,7 @@ namespace Thermite
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
 									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-									uint32_t volLastUploadedTimeStamp = m_volLastUploadedTimeStamps[regionX][regionY][ regionZ];
+									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
 									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
 									{
 										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
@@ -381,9 +371,9 @@ namespace Thermite
 
 		if(mOgreCamera)
 		{
-			mOgreCamera->setPosition(Ogre::Vector3(camera->position().x(), camera->position().y(), camera->position().z()));
-			mOgreCamera->setOrientation(Ogre::Quaternion(camera->orientation().scalar(), camera->orientation().x(), camera->orientation().y(), camera->orientation().z()));
-			mOgreCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
+			mOgreCamera->setPosition(Ogre::Vector3(mCamera->position().x(), mCamera->position().y(), mCamera->position().z()));
+			mOgreCamera->setOrientation(Ogre::Quaternion(mCamera->orientation().scalar(), mCamera->orientation().x(), mCamera->orientation().y(), mCamera->orientation().z()));
+			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 		}
 
 		mouse->setPreviousPosition(mouse->position());
@@ -404,7 +394,7 @@ namespace Thermite
 		if(pOgreSceneNode == 0)
 		{
 			const std::string& strNodeName = generateUID("SN");
-			pOgreSceneNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
+			pOgreSceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
 			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
 			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
 		}
@@ -414,7 +404,7 @@ namespace Thermite
 		while (iter.hasMoreElements())
 		{
 			Ogre::MovableObject* obj = iter.getNext();
-			m_pOgreSceneManager->destroyMovableObject(obj);
+			mOgreSceneManager->destroyMovableObject(obj);
 		}
 		pOgreSceneNode->detachAllObjects();
 
@@ -437,7 +427,7 @@ namespace Thermite
 			}
 		}		
 
-		m_volLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
 	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh, PolyVox::Region region)
@@ -456,7 +446,7 @@ namespace Thermite
 		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
 
 		std::string strSprName = generateUID("SPR");
-		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
 		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
 		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
@@ -481,7 +471,7 @@ namespace Thermite
 		}
 
 		strSprName = generateUID("SPR");
-		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(m_pOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
 		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
 		pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
@@ -538,7 +528,7 @@ namespace Thermite
 
 	void ThermiteGameLogic::shutdown(void)
 	{
-		Ogre::Root::getSingleton().destroySceneManager(m_pOgreSceneManager);
+		Ogre::Root::getSingleton().destroySceneManager(mOgreSceneManager);
 	}
 
 	Log* ThermiteGameLogic::thermiteLog(void)
@@ -576,11 +566,11 @@ namespace Thermite
 		Ogre::Vector3 vecToUnitCube(0.01,0.01,0.01);
 
 		//Create the main node for the axes
-		m_axisNode = m_pOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+		m_axisNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
 
 		//Create sphere representing origin
 		Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *originSphereEntity = m_pOgreSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *originSphereEntity = mOgreSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
 		originSphereEntity->setMaterialName("OriginMaterial");
 		originNode->attachObject(originSphereEntity);
 		originNode->scale(vecToUnitCube);
@@ -588,7 +578,7 @@ namespace Thermite
 
 		//Create x-axis
 		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *xAxisCylinderEntity = m_pOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *xAxisCylinderEntity = mOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
 		xAxisCylinderEntity->setMaterialName("RedMaterial");
 		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
 		xAxisCylinderNode->scale(vecToUnitCube);
@@ -597,7 +587,7 @@ namespace Thermite
 
 		//Create y-axis
 		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *yAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *yAxisCylinderEntity = mOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
 		yAxisCylinderEntity->setMaterialName("GreenMaterial");
 		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
 		yAxisCylinderNode->scale(vecToUnitCube);
@@ -606,7 +596,7 @@ namespace Thermite
 
 		//Create z-axis
 		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *zAxisCylinderEntity = m_pOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
+		Ogre::Entity *zAxisCylinderEntity = mOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
 		zAxisCylinderEntity->setMaterialName("BlueMaterial");
 		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
 		zAxisCylinderNode->scale(vecToUnitCube);
@@ -614,7 +604,7 @@ namespace Thermite
 		zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfDepth));
 
 		//Create remainder of box		
-		Ogre::ManualObject* remainingBox = m_pOgreSceneManager->createManualObject("Remaining Box");
+		Ogre::ManualObject* remainingBox = mOgreSceneManager->createManualObject("Remaining Box");
 		remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
 		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		0.0,		fDepth);
 		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(0.0,		fHeight,	fDepth);
@@ -699,9 +689,6 @@ namespace Thermite
 		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
 		scriptEngine->globalObject().setProperty("Light", lightClass);
 
-		/*QScriptValue thermiteClass = scriptEngine->scriptValueFromQMetaObject<Thermite2>();
-		scriptEngine->globalObject().setProperty("Thermite", thermiteClass);*/
-
 		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
 		scriptEngine->globalObject().setProperty("Entity", entityClass);
 
@@ -717,16 +704,12 @@ namespace Thermite
 		QScriptValue mouseScriptValue = scriptEngine->newQObject(mouse);
 		scriptEngine->globalObject().setProperty("mouse", mouseScriptValue);
 
-		QScriptValue cameraScriptValue = scriptEngine->newQObject(camera);
+		QScriptValue cameraScriptValue = scriptEngine->newQObject(mCamera);
 		scriptEngine->globalObject().setProperty("camera", cameraScriptValue);
 
 		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));
 		scriptEngine->globalObject().setProperty("Qt", Qt);
-
-		/*QScriptValue LightType = scriptEngine->newQMetaObject();
-		Qt.setProperty("App", scriptEngine->newQObject(qApp));
-		scriptEngine->globalObject().setProperty("Qt", Qt);*/
 
 		QScriptValue objectStoreScriptValue = scriptEngine->newQObject(&mObjectStore);
 		scriptEngine->globalObject().setProperty("objectStore", objectStoreScriptValue);

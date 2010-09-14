@@ -94,23 +94,6 @@ namespace Thermite
 
 		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
 
-		MoviePlayer* mMoviePlayer;
-
-		Ogre::Camera* mOgreCamera;
-		Ogre::Viewport* mMainViewport;
-		Ogre::SceneManager* m_pOgreSceneManager;
-		QtOgre::Log* mThermiteLog;
-
-		//Thermite stuff
-		std::queue<PhysicalObject*> m_queueObjects;
-
-		QMovie* m_pThermiteLogoMovie;
-		QLabel* m_pThermiteLogoLabel;
-
-		Ogre::SceneNode* m_axisNode;
-
-		AnyOption m_commandLineArgs;
-
 	public:		
 
 	public slots:
@@ -125,40 +108,41 @@ namespace Thermite
 		void showLastMovieFrame(void);
 		void deleteMovie(void);
 		
-	public:
+	private:
 
+		//Scene representation
+		Camera* mCamera;
+		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
+		ObjectStore mObjectStore;		
+
+		//Ogre's scene representation
 		Ogre::SceneNode* mPointLightMarkerNode;
-
-		
-
-#ifdef ENABLE_BULLET_PHYSICS
-		OgreBulletDynamics::DynamicsWorld *m_pOgreBulletWorld;
-#endif //ENABLE_BULLET_PHYSICS	
-
-		PolyVox::Array<3, uint32_t> m_volLastUploadedTimeStamps;
 		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
+		Ogre::Camera* mOgreCamera;
+		Ogre::Viewport* mMainViewport;
+		Ogre::SceneManager* mOgreSceneManager;
+		Ogre::SceneNode* m_axisNode;
 
-		bool mFirstFind;
-
-		MainMenu* mMainMenu;
-
+		//Input
 		Keyboard* keyboard;
 		Mouse* mouse;
 
-		//Scripting
+		//Scripting support
 		QScriptEngine* scriptEngine;
-
-		Camera* camera;
-
 		ScriptEditorWidget* m_pScriptEditorWidget;
-
 		bool m_bRunScript;
-
-		QHash<QString, Light*> m_Lights;
-
-		ObjectStore mObjectStore;
-
 		QString mInitialiseScript;
+
+		//User interface
+		MainMenu* mMainMenu;
+		MoviePlayer* mMoviePlayer;
+		QMovie* m_pThermiteLogoMovie;
+		QLabel* m_pThermiteLogoLabel;
+
+		//Other
+		bool mFirstFind;
+		QtOgre::Log* mThermiteLog;
+		AnyOption m_commandLineArgs;
 	};
 }
 

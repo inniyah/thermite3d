@@ -28,6 +28,8 @@ freely, subject to the following restrictions:
 #include "scriptable/Globals.h"
 
 #include "Application.h"
+#include "Log.h"
+
 #include "VolumeManager.h"
 
 #include "MaterialDensityPair.h"
@@ -225,7 +227,70 @@ namespace Thermite
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}	
 
-	void  Volume::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
+	bool Volume::isRegionBeingExtracted(const Region& regionToTest)
+	{
+		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
+		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
+		//the same region, only to have them rejected because the time stamp has changed again since they were issued.
+
+		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
+		//handle these checks as well.
+
+		//Longer term, it might be interesting to introduce a 'ModifyVolumeCommand' which can be issued to runn on seperate threads.
+		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
+		//for that region.
+
+		//Should shift not divide!
+		const std::uint16_t firstRegionX = regionToTest.getLowerCorner().getX() / mRegionSideLength;
+		const std::uint16_t firstRegionY = regionToTest.getLowerCorner().getY() / mRegionSideLength;
+		const std::uint16_t firstRegionZ = regionToTest.getLowerCorner().getZ() / mRegionSideLength;
+
+		const std::uint16_t lastRegionX = regionToTest.getUpperCorner().getX() / mRegionSideLength;
+		const std::uint16_t lastRegionY = regionToTest.getUpperCorner().getY() / mRegionSideLength;
+		const std::uint16_t lastRegionZ = regionToTest.getUpperCorner().getZ() / mRegionSideLength;
+
+		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		{
+			for(std::uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			{
+				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				{
+					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
+					if(mRegionBeingExtracted[xCt][yCt][zCt])
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	void Volume::updateLastModifedArray(const Region& regionToTest)
+	{
+		const std::uint16_t firstRegionX = regionToTest.getLowerCorner().getX() / mRegionSideLength;
+		const std::uint16_t firstRegionY = regionToTest.getLowerCorner().getY() / mRegionSideLength;
+		const std::uint16_t firstRegionZ = regionToTest.getLowerCorner().getZ() / mRegionSideLength;
+
+		const std::uint16_t lastRegionX = regionToTest.getUpperCorner().getX() / mRegionSideLength;
+		const std::uint16_t lastRegionY = regionToTest.getUpperCorner().getY() / mRegionSideLength;
+		const std::uint16_t lastRegionZ = regionToTest.getUpperCorner().getZ() / mRegionSideLength;
+
+		for(uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		{
+			for(uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			{
+				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				{
+					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
+					mLastModifiedArray[xCt][yCt][zCt] = globals.timeStamp();
+				}
+			}
+		}
+	}
+
+	void Volume::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.x() - radius));
 		int firstY = static_cast<int>(std::floor(centre.y() - radius));
@@ -248,43 +313,11 @@ namespace Thermite
 
 		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
 
-		////////////////////////////////////////////////////////////////////////////////
-
-		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
-		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
-		//the same region, only to have them rejected because the time stamp has changed again since they were issued.
-
-		//At this point it probably makes sense to pull the VolumeChangeTracker from PolyVox into Thermite and have it
-		//handle these checks as well.
-
-		//Longer term, it might be interesting to introduce a 'ModifyVolumeCommand' which can be issued to runn on seperate threads.
-		//We could then schedule these so that all the ones for a given region are processed before we issue the extract surface command
-		//for that region.
-
-		//Should shift not divide!
-		const std::uint16_t firstRegionX = regionToLock.getLowerCorner().getX() / mRegionSideLength;
-		const std::uint16_t firstRegionY = regionToLock.getLowerCorner().getY() / mRegionSideLength;
-		const std::uint16_t firstRegionZ = regionToLock.getLowerCorner().getZ() / mRegionSideLength;
-
-		const std::uint16_t lastRegionX = regionToLock.getUpperCorner().getX() / mRegionSideLength;
-		const std::uint16_t lastRegionY = regionToLock.getUpperCorner().getY() / mRegionSideLength;
-		const std::uint16_t lastRegionZ = regionToLock.getUpperCorner().getZ() / mRegionSideLength;
-
-		for(std::uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		if(isRegionBeingExtracted(regionToLock))
 		{
-			for(std::uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
-			{
-				for(std::uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
-				{
-					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					if(mRegionBeingExtracted[xCt][yCt][zCt])
-					{
-						return;
-					}
-				}
-			}
+			//Just skip doing anything - volume will not be modified. Try again later...
+			return;
 		}
-		////////////////////////////////////////////////////////////////////////////////
 
 		for(int z = firstZ; z <= lastZ; ++z)
 		{
@@ -302,17 +335,55 @@ namespace Thermite
 			}
 		}
 
-		for(uint16_t zCt = firstRegionZ; zCt <= lastRegionZ; zCt++)
+		updateLastModifedArray(regionToLock);
+
+		qApp->getLogByName("Thermite")->logMessage("Volume was modified", QtOgre::LL_INFO);
+	}
+
+	void Volume::createCuboidAt(QVector3D centre, QVector3D dimensions, int material, int density, bool bPaintMode)
+	{
+		dimensions /= 2.0f;
+
+		int firstX = static_cast<int>(std::floor(centre.x() - dimensions.x()));
+		int firstY = static_cast<int>(std::floor(centre.y() - dimensions.y()));
+		int firstZ = static_cast<int>(std::floor(centre.z() - dimensions.z()));
+
+		int lastX = static_cast<int>(std::ceil(centre.x() + dimensions.x()));
+		int lastY = static_cast<int>(std::ceil(centre.y() + dimensions.y()));
+		int lastZ = static_cast<int>(std::ceil(centre.z() + dimensions.z()));
+
+		//Check bounds
+		firstX = std::max(firstX,0);
+		firstY = std::max(firstY,0);
+		firstZ = std::max(firstZ,0);
+
+		lastX = std::min(lastX,int(m_pPolyVoxVolume->getWidth()-1));
+		lastY = std::min(lastY,int(m_pPolyVoxVolume->getHeight()-1));
+		lastZ = std::min(lastZ,int(m_pPolyVoxVolume->getDepth()-1));
+
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+
+		if(isRegionBeingExtracted(regionToLock))
 		{
-			for(uint16_t yCt = firstRegionY; yCt <= lastRegionY; yCt++)
+			//Just skip doing anything - volume will not be modified. Try again later...
+			return;
+		}
+
+		for(int z = firstZ; z <= lastZ; ++z)
+		{
+			for(int y = firstY; y <= lastY; ++y)
 			{
-				for(uint16_t xCt = firstRegionX; xCt <= lastRegionX; xCt++)
+				for(int x = firstX; x <= lastX; ++x)
 				{
-					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					mLastModifiedArray[xCt][yCt][zCt] = globals.timeStamp();
+					MaterialDensityPair44 value(material, density);
+					m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 				}
 			}
 		}
+
+		updateLastModifedArray(regionToLock);
+
+		qApp->getLogByName("Thermite")->logMessage("Volume was modified", QtOgre::LL_INFO);
 	}
 
 	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
