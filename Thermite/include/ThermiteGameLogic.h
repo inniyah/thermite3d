@@ -39,7 +39,6 @@ freely, subject to the following restrictions:
 #include <QScriptEngineDebugger>
 
 #include "scriptable/Volume.h"
-#include "PhysicalEntity.h"
 #include "ThermiteForwardDeclarations.h"
 
 #include "QtOgreForwardDeclarations.h"
