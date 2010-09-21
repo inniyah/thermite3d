@@ -686,6 +686,9 @@ namespace Thermite
 
 	void ThermiteGameLogic::initScriptEnvironment(void)
 	{
+		QScriptValue thermiteGameLogicClass = scriptEngine->newQObject(this);
+		scriptEngine->globalObject().setProperty("ThermiteGameLogic", thermiteGameLogicClass);
+
 		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
 		scriptEngine->globalObject().setProperty("Light", lightClass);
 
@@ -755,5 +758,31 @@ namespace Thermite
 			delete m_pThermiteLogoMovie;
 			m_pThermiteLogoMovie = 0;
 		}
+	}
+
+	QVector3D ThermiteGameLogic::getPickingRayOrigin(int x, int y)
+	{
+		float actualWidth = mOgreCamera->getViewport()->getActualWidth();
+		float actualHeight = mOgreCamera->getViewport()->getActualHeight();
+
+		float fNormalisedX = x / actualWidth;
+		float fNormalisedY = y / actualHeight;
+
+		Ogre::Ray pickingRay = mOgreCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
+
+		return QVector3D(pickingRay.getOrigin().x, pickingRay.getOrigin().y, pickingRay.getOrigin().z);
+	}
+
+	QVector3D ThermiteGameLogic::getPickingRayDir(int x, int y)
+	{
+		float actualWidth = mOgreCamera->getViewport()->getActualWidth();
+		float actualHeight = mOgreCamera->getViewport()->getActualHeight();
+
+		float fNormalisedX = x / actualWidth;
+		float fNormalisedY = y / actualHeight;
+
+		Ogre::Ray pickingRay = mOgreCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
+
+		return QVector3D(pickingRay.getDirection().x, pickingRay.getDirection().y, pickingRay.getDirection().z);
 	}
 }
