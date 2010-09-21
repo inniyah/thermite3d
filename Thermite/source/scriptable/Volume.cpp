@@ -344,13 +344,13 @@ namespace Thermite
 	{
 		dimensions /= 2.0f;
 
-		int firstX = static_cast<int>(std::floor(centre.x() - dimensions.x()));
-		int firstY = static_cast<int>(std::floor(centre.y() - dimensions.y()));
-		int firstZ = static_cast<int>(std::floor(centre.z() - dimensions.z()));
+		int firstX = static_cast<int>(std::ceil(centre.x() - dimensions.x()));
+		int firstY = static_cast<int>(std::ceil(centre.y() - dimensions.y()));
+		int firstZ = static_cast<int>(std::ceil(centre.z() - dimensions.z()));
 
-		int lastX = static_cast<int>(std::ceil(centre.x() + dimensions.x()));
-		int lastY = static_cast<int>(std::ceil(centre.y() + dimensions.y()));
-		int lastZ = static_cast<int>(std::ceil(centre.z() + dimensions.z()));
+		int lastX = static_cast<int>(std::floor(centre.x() + dimensions.x()));
+		int lastY = static_cast<int>(std::floor(centre.y() + dimensions.y()));
+		int lastZ = static_cast<int>(std::floor(centre.z() + dimensions.z()));
 
 		//Check bounds
 		firstX = std::max(firstX,0);
