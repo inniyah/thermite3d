@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 	}
 
 	ofstream file (arguments.outputFilename.toStdString().c_str(), ios::out|ios::binary);
-	saveVolumeRle(file, volData);
+	saveVolume(file, volData);
 	file.close();
 
 	//return app.exec();

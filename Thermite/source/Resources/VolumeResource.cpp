@@ -58,14 +58,15 @@ namespace Thermite
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::istream stdStream(new DataStreamWrapper(stream)); 
-		m_pVolume = loadVolumeRle<MaterialDensityPair44>(stdStream, VolumeManager::getSingletonPtr()->m_pProgressListener);
+		m_pVolume = new PolyVox::Volume<MaterialDensityPair44>(64,64,64,32);
+		loadVolume<MaterialDensityPair44>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
 		m_pVolume->tidyUpMemory();
 	}
 
 	void VolumeResource::unloadImpl ()
 	{
-		//Clear the pointer
-		m_pVolume = polyvox_shared_ptr< PolyVox::Volume<MaterialDensityPair44> >();
+		delete m_pVolume;
+		m_pVolume = 0;
 	}
 	
 	size_t VolumeResource::calculateSize () const
@@ -75,7 +76,7 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > VolumeResource::getVolume(void)
+	PolyVox::Volume<PolyVox::MaterialDensityPair44>* VolumeResource::getVolume(void)
 	{
 		return m_pVolume;
 	}

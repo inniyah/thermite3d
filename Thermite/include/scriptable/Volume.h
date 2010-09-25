@@ -48,7 +48,7 @@ namespace Thermite
 		Volume(QObject* parent = 0);
 		~Volume(void);
 
-		void setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume, uint16_t regionSideLength);
+		void setPolyVoxVolume(PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume, uint16_t regionSideLength);
 
 		void initialise(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
@@ -66,7 +66,7 @@ namespace Thermite
 	public:
 		static TaskProcessorThread* m_backgroundThread;
 
-		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > m_pPolyVoxVolume;
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* m_pPolyVoxVolume;
 		uint16_t mRegionSideLength;
 		uint16_t mVolumeWidthInRegions;
 		uint16_t mVolumeHeightInRegions;

@@ -50,6 +50,7 @@ namespace Thermite
 
 	Volume::Volume(QObject* parent)
 		:Object(parent)
+		,m_pPolyVoxVolume(0)
 	{
 		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
@@ -74,7 +75,7 @@ namespace Thermite
 	{
 	}
 
-	void Volume::setPolyVoxVolume(polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume, uint16_t regionSideLength)
+	void Volume::setPolyVoxVolume(PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume, uint16_t regionSideLength)
 	{
 		m_pPolyVoxVolume = pPolyVoxVolume;
 		mRegionSideLength = regionSideLength;		
@@ -147,7 +148,7 @@ namespace Thermite
 							std::uint32_t uPriority = std::numeric_limits<std::uint32_t>::max() - static_cast<std::uint32_t>(distanceFromCameraSquared);
 
 							//Extract the region
-							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume.get(), region, mLastModifiedArray[regionX][regionY][regionZ]);
+							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume, region, mLastModifiedArray[regionX][regionY][regionZ]);
 							surfaceMeshExtractionTask->setAutoDelete(false);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceMeshExtractionTask*)), this, SLOT(uploadSurfaceExtractorResult(SurfaceMeshExtractionTask*)), Qt::QueuedConnection);
 							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
@@ -396,7 +397,7 @@ namespace Thermite
 		QVector3D result = QVector3D(0,0,0);
 
 		//Ensure the voume is valid
-		PolyVox::Volume<MaterialDensityPair44>* pVolume = m_pPolyVoxVolume.get();
+		PolyVox::Volume<MaterialDensityPair44>* pVolume = m_pPolyVoxVolume;
 		if(pVolume == 0)
 		{
 			return result;
@@ -424,7 +425,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		polyvox_shared_ptr< PolyVox::Volume<PolyVox::MaterialDensityPair44> > pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
