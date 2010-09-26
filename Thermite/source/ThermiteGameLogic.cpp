@@ -23,6 +23,7 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
+#include "Console.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "TaskProcessorThread.h"
@@ -174,6 +175,9 @@ namespace Thermite
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
 
 		mPointLightMarkerNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+
+		mConsole = new Console(scriptEngine, qApp->mainWidget(), Qt::Tool);
+		mConsole->show();
 
 		char* strAppName = m_commandLineArgs.getValue("appname");
 		if(strAppName != 0)

@@ -142,6 +142,7 @@ namespace Thermite
 		QString mInitialiseScript;
 
 		//User interface
+		Console* mConsole;
 		MainMenu* mMainMenu;
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;

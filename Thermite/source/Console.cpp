@@ -1,4 +1,3 @@
-#pragma region License
 /*******************************************************************************
 Copyright (c) 2005-2009 David Williams
 
@@ -21,42 +20,35 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution. 	
 *******************************************************************************/
-#pragma endregion
 
-#ifndef __ThermiteForwardDeclarations_H__
-#define __ThermiteForwardDeclarations_H__
+#include "Console.h"
+
+#include <QScriptEngine>
 
 namespace Thermite
 {
-	//Resources
-	class VolumeManager;
-	class VolumeResourse;
+	Console::Console(QScriptEngine* scriptEngine, QWidget* parent, Qt::WindowFlags f)
+		:QWidget(parent, f)
+		,mScriptEngine(scriptEngine)
+	{
+		setupUi(this);
 
-	//Scriptable
-	class Keyboard;
-	class Mouse;
+		connect(mInputLineEdit, SIGNAL(returnPressed(void)), this, SLOT(executeCommand(void)));
+	}
 
-	//Tasks
-	class SurfaceMeshDecimationTask;
-	class SurfaceMeshExtractionTask;
-	class Task;
-	class TaskProcessorThread;
+	void Console::executeCommand(void)
+	{
+		//Get the command
+		QString command = mInputLineEdit->text();
+		mInputLineEdit->setText("");
 
-	//Other
-	class ApplicationGameLogic;
-	class Console;
-	class LoadMapWidget;
-	class LoadSceneMenuPage;
-	class MainMenuPage;
-	
-	class PhysicalObject;
-	
-	class SurfacePatchRenderable;
-	
-	class ThermiteGameLogic;
-	class Volume;
-	
-	class VolumeSerializationProgressListener;
+		//Output the command
+		mOutputTextEdit->append(command);
+
+		QScriptValue result = mScriptEngine->evaluate(command);		
+		if (mScriptEngine->hasUncaughtException())
+		{
+			mOutputTextEdit->append(result.toString());
+		}
+	}
 }
-
-#endif

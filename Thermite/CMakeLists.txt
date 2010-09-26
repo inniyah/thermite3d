@@ -22,6 +22,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(MAIN_SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
+	source/Console.cpp
 	source/DataStreamWrapper.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
@@ -33,6 +34,7 @@ SET(MAIN_SRC_FILES
 
 SET(MAIN_INC_FILES
 	include/AnyOption.h
+	include/Console.h
 	include/DataStreamWrapper.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
@@ -45,6 +47,7 @@ SET(MAIN_INC_FILES
 )
 
 SET(MAIN_UI_FILES
+	ui/Console.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
 	ui/ScriptEditorWidget.ui

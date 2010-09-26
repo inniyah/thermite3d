@@ -1,4 +1,3 @@
-#pragma region License
 /*******************************************************************************
 Copyright (c) 2005-2009 David Williams
 
@@ -21,42 +20,31 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution. 	
 *******************************************************************************/
-#pragma endregion
 
-#ifndef __ThermiteForwardDeclarations_H__
-#define __ThermiteForwardDeclarations_H__
+#ifndef THERMITE_CONSOLE_H_
+#define THERMITE_CONSOLE_H_
+
+#include "ui_Console.h"
+
+#include "ThermiteForwardDeclarations.h"
+
+class QScriptEngine;
 
 namespace Thermite
 {
-	//Resources
-	class VolumeManager;
-	class VolumeResourse;
+	class Console : public QWidget, private Ui::Console
+	{
+		Q_OBJECT
 
-	//Scriptable
-	class Keyboard;
-	class Mouse;
+	public:
+		Console(QScriptEngine* scriptEngine, QWidget* parent = 0, Qt::WindowFlags f = 0 );
 
-	//Tasks
-	class SurfaceMeshDecimationTask;
-	class SurfaceMeshExtractionTask;
-	class Task;
-	class TaskProcessorThread;
+	private slots:
+		void executeCommand(void);
 
-	//Other
-	class ApplicationGameLogic;
-	class Console;
-	class LoadMapWidget;
-	class LoadSceneMenuPage;
-	class MainMenuPage;
-	
-	class PhysicalObject;
-	
-	class SurfacePatchRenderable;
-	
-	class ThermiteGameLogic;
-	class Volume;
-	
-	class VolumeSerializationProgressListener;
+	private:
+		QScriptEngine* mScriptEngine;
+	};
 }
 
-#endif
+#endif //THERMITE_CONSOLE_H_
