@@ -99,6 +99,8 @@ namespace Thermite
 		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Volume& volume);		
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
 
+		bool loadApp(const QString& appName);
+
 		//Don't like having these functions here - really they should be inside camera or something. But they are
 		//using Ogre methods which aren't available in the scriptable classes. Eventually they should be rewritten
 		//without the utility classes. Also, there are two seperate functions because I couldn't pass QVector3D
@@ -141,7 +143,6 @@ namespace Thermite
 
 		//User interface
 		MainMenu* mMainMenu;
-		MoviePlayer* mMoviePlayer;
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
 

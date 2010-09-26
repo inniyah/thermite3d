@@ -13,6 +13,7 @@ namespace Thermite
 		ScriptEditorWidget(QWidget *parent = 0);
 
 		QString getScriptCode(void);
+		void setScriptCode(const QString& scriptCode);
 
 	signals:
 		void start(void);

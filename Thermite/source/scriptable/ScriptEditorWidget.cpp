@@ -12,19 +12,11 @@ namespace Thermite
 
 		connect(m_pStartButton, SIGNAL(clicked(void)), this, SIGNAL(start(void)));
 		connect(m_pStopButton, SIGNAL(clicked(void)), this, SIGNAL(stop(void)));
+	}
 
-		QFile updateScriptFile("..\\share\\thermite\\apps\\TechDemo\\scripts\\update.js");
-
-		if (updateScriptFile.open(QFile::ReadOnly))
-		{
-			QTextStream stream(&updateScriptFile);
-			m_pTextEdit->setPlainText(stream.readAll());
-			updateScriptFile.close();
-		}
-		else
-		{
-			m_pTextEdit->setPlainText("//Failed to open file");
-		}
+	void ScriptEditorWidget::setScriptCode(const QString& scriptCode)
+	{
+		return m_pTextEdit->setPlainText(scriptCode);
 	}
 
 	QString ScriptEditorWidget::getScriptCode(void)

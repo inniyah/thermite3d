@@ -48,7 +48,6 @@ namespace Thermite
 	class LoadSceneMenuPage;
 	class MainMenuPage;
 	
-	class MoviePlayer;
 	class PhysicalObject;
 	
 	class SurfacePatchRenderable;

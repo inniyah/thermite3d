@@ -143,14 +143,8 @@ namespace Thermite
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		//playStartupMovie();
 
-		//Initialise all resources
+		//Load engine built-in resources
 		addResourceDirectory("./resources/");
-		char* strAppName = m_commandLineArgs.getValue("appname");
-		if(strAppName != 0)
-		{
-			addResourceDirectory(QString("../share/thermite/apps/") + QString::fromAscii(strAppName));
-		}
-		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		//Set the frame sate to be as high as possible
 		mApplication->setAutoUpdateInterval(0);
@@ -169,43 +163,47 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(quitClicked(void)), qApp->mainWidget(), SLOT(close(void)));
 		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
-		mMainMenu->show();
+		//mMainMenu->show();
 
 		qApp->mainWidget()->setMouseTracking(true);
 
 		m_pScriptEditorWidget = new ScriptEditorWidget(qApp->mainWidget());
-		m_pScriptEditorWidget->show();		
+		//m_pScriptEditorWidget->show();		
 
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
 
+		mPointLightMarkerNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+
+		char* strAppName = m_commandLineArgs.getValue("appname");
+		if(strAppName != 0)
+		{
+			loadApp(QString::fromAscii(strAppName));
+		}
+	}
+
+	bool ThermiteGameLogic::loadApp(const QString& appName)
+	{
+		//Initialise all resources		
+		addResourceDirectory(QString("../share/thermite/apps/") + appName);
+		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+		//Load the scripts
 		ScriptResourcePtr pScriptResource = ScriptManager::getSingletonPtr()->load("initialise.js", "General");
 		mInitialiseScript = QString::fromStdString(pScriptResource->getScriptData());
 
+		ScriptResourcePtr pUpdateScriptResource = ScriptManager::getSingletonPtr()->load("update.js", "General");
+		m_pScriptEditorWidget->setScriptCode(QString::fromStdString(pUpdateScriptResource->getScriptData()));
+
+		//Run the initialise script
 		QScriptValue result = scriptEngine->evaluate(mInitialiseScript);
 		if (scriptEngine->hasUncaughtException())
 		{
 			int line = scriptEngine->uncaughtExceptionLineNumber();
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
+		}	
 
-		/*if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
-		{
-			createAxis(map->m_pPolyVoxVolume->getWidth(), map->m_pPolyVoxVolume->getHeight(), map->m_pPolyVoxVolume->getDepth());
-		}*/
-
-		if(qApp->settings()->value("Shadows/EnableShadows", false).toBool())
-		{
-			mOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-			//mOgreSceneManager->setShadowFarDistance(1000.0f);
-			mOgreSceneManager->setShadowTextureSelfShadow(true);
-			mOgreSceneManager->setShadowTextureCasterMaterial("ShadowMapCasterMaterial");
-			mOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-			mOgreSceneManager->setShadowCasterRenderBackFaces(true);
-			mOgreSceneManager->setShadowTextureSize(qApp->settings()->value("Shadows/ShadowMapSize", 1024).toInt());
-		}		
-
-		mPointLightMarkerNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+		return true;
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -485,6 +483,16 @@ namespace Thermite
 	void ThermiteGameLogic::onKeyPress(QKeyEvent* event)
 	{
 		keyboard->press(event->key());
+
+		if(event->key() == Qt::Key_F1)
+		{
+			qApp->showLogManager();
+		}
+
+		if(event->key() == Qt::Key_F2)
+		{
+			m_pScriptEditorWidget->show();
+		}
 
 		if(event->key() == Qt::Key_F5)
 		{
