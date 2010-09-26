@@ -73,6 +73,9 @@ namespace Thermite
 		,mPointLightMarkerNode(0)
 		,m_axisNode(0)
 		,keyboard(0)
+		,mCachedVolumeWidthInRegions(0)
+		,mCachedVolumeHeightInRegions(0)
+		,mCachedVolumeDepthInRegions(0)
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
@@ -140,6 +143,8 @@ namespace Thermite
 
 		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
+
+		createAxis();
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		//playStartupMovie();
@@ -310,59 +315,55 @@ namespace Thermite
 				}
 				Volume* volume = dynamic_cast<Volume*>(pObj);
 				if(volume)
-				{			
-					if(mFirstFind)
-					{
-						mFirstFind = false;
-
-						volume->initialise();						
-						volume->loadFromFile("castle.volume");	
-
-						//Some values we'll need later.
-						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
-						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
-						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-						if(!m_axisNode)
+				{	
+					//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
+					if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
+					{	
+						/*for(uint32_t ct = 0; ct < m_volOgreSceneNodes.getNoOfElements(); ct++)
 						{
-							//if(qApp->settings()->value("Debug/ShowVolumeAxes", false).toBool())
-							{
-								createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
-							}
-						}						
+							Ogre::SceneNode* nodeToDelete = m_volOgreSceneNodes.getRawData()[ct];
+							nodeToDelete->remo
+						}*/
 
-						uint32_t dimensions[3] = {volumeWidthInRegions, volumeHeightInRegions, volumeDepthInRegions}; // Array dimensions
+						mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
+						mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
+						mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
+
+						//createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
+						m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
+						
+						uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
+
 						//Create the arrays
 						mVolLastUploadedTimeStamps.resize(dimensions);
 						m_volOgreSceneNodes.resize(dimensions);
+
 						//Clear the arrays
 						std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
 						std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
 					}
-					else
-					{
-						//Some values we'll need later.
-						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
-						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
-						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
 
-						volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
+					//Some values we'll need later.
+					uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
+					uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
+					uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
 
-						//Iterate over each region
-						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
-						{		
-							for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+					volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
+
+					//Iterate over each region
+					for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+					{		
+						for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+						{
+							for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 							{
-								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+								uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
+								uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
+								if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
 								{
-									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
-									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
-									{
-										SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
-										PolyVox::Region reg = mesh->m_Region;
-										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
-									}
+									SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
+									PolyVox::Region reg = mesh->m_Region;
+									uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
 								}
 							}
 						}
@@ -565,76 +566,33 @@ namespace Thermite
 		}
 	}
 
-	void ThermiteGameLogic::createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth)
+	void ThermiteGameLogic::createAxis(void)
 	{
-		float fWidth = static_cast<float>(uWidth);
-		float fHeight = static_cast<float>(uHeight);
-		float fDepth = static_cast<float>(uDepth);
-		float fHalfWidth = fWidth/2.0;
-		float fHalfHeight = fHeight/2.0;
-		float fHalfDepth = fDepth/2.0;
-
-		float fOriginSize = 4.0f;	
-		Ogre::Vector3 vecToUnitCube(0.01,0.01,0.01);
-
 		//Create the main node for the axes
 		m_axisNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
 
-		//Create sphere representing origin
-		Ogre::SceneNode* originNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *originSphereEntity = mOgreSceneManager->createEntity( "Origin Sphere", Ogre::SceneManager::PT_CUBE );
-		originSphereEntity->setMaterialName("OriginMaterial");
-		originNode->attachObject(originSphereEntity);
-		originNode->scale(vecToUnitCube);
-		originNode->scale(fOriginSize,fOriginSize,fOriginSize);
-
-		//Create x-axis
-		Ogre::SceneNode *xAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *xAxisCylinderEntity = mOgreSceneManager->createEntity( "X Axis", Ogre::SceneManager::PT_CUBE );
-		xAxisCylinderEntity->setMaterialName("RedMaterial");
-		xAxisCylinderNode->attachObject(xAxisCylinderEntity);	
-		xAxisCylinderNode->scale(vecToUnitCube);
-		xAxisCylinderNode->scale(Ogre::Vector3(fWidth,1.0,1.0));
-		xAxisCylinderNode->translate(Ogre::Vector3(fHalfWidth,0.0,0.0));
-
-		//Create y-axis
-		Ogre::SceneNode *yAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *yAxisCylinderEntity = mOgreSceneManager->createEntity( "Y Axis", Ogre::SceneManager::PT_CUBE );
-		yAxisCylinderEntity->setMaterialName("GreenMaterial");
-		yAxisCylinderNode->attachObject(yAxisCylinderEntity);		
-		yAxisCylinderNode->scale(vecToUnitCube);
-		yAxisCylinderNode->scale(Ogre::Vector3(1.0,fHeight,1.0));
-		yAxisCylinderNode->translate(Ogre::Vector3(0.0,fHalfHeight,0.0));
-
-		//Create z-axis
-		Ogre::SceneNode *zAxisCylinderNode = m_axisNode->createChildSceneNode();
-		Ogre::Entity *zAxisCylinderEntity = mOgreSceneManager->createEntity( "Z Axis", Ogre::SceneManager::PT_CUBE );
-		zAxisCylinderEntity->setMaterialName("BlueMaterial");
-		zAxisCylinderNode->attachObject(zAxisCylinderEntity);
-		zAxisCylinderNode->scale(vecToUnitCube);
-		zAxisCylinderNode->scale(Ogre::Vector3(1.0,1.0,fDepth));
-		zAxisCylinderNode->translate(Ogre::Vector3(0.0,0.0,fHalfDepth));
-
 		//Create remainder of box		
-		Ogre::ManualObject* remainingBox = mOgreSceneManager->createManualObject("Remaining Box");
-		remainingBox->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		0.0,		fDepth);
-		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(0.0,		fHeight,	fDepth);
-		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	0.0,		fDepth);
-		remainingBox->position(fWidth,	fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	fDepth);
+		Ogre::ManualObject* axis = mOgreSceneManager->createManualObject("Axis");
+		axis->begin("BaseWhiteNoLighting",Ogre::RenderOperation::OT_LINE_LIST);
+		axis->position(0.0,	0.0, 0.0);	axis->colour(0.0, 0.0, 1.0);	axis->position(0.0,	0.0, 1.0);	axis->colour(0.0, 0.0, 1.0);
+		axis->position(0.0,	1.0, 0.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(0.0,	1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(1.0,	0.0, 0.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	0.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(1.0,	1.0, 0.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0, 1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
 
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(0.0,		fHeight,	0.0);
-		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(0.0,		fHeight,	fDepth);
-		remainingBox->position(fWidth,	0.0,		0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
-		remainingBox->position(fWidth,	0.0,		fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
+		axis->position(0.0, 0.0, 0.0);	axis->colour(0.0, 1.0, 0.0);	axis->position(0.0,	1.0, 0.0);	axis->colour(0.0, 1.0, 0.0);
+		axis->position(0.0,	0.0, 1.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(0.0,	1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(1.0,	0.0, 0.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	1.0, 0.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(1.0,	0.0, 1.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
 
-		remainingBox->position(0.0,		0.0,		0.0);		remainingBox->position(fWidth,	0.0,		0.0);
-		remainingBox->position(0.0,		0.0,		fDepth);	remainingBox->position(fWidth,	0.0,		fDepth);
-		remainingBox->position(0.0,		fHeight,	0.0);		remainingBox->position(fWidth,	fHeight,	0.0);
-		remainingBox->position(0.0,		fHeight,	fDepth);	remainingBox->position(fWidth,	fHeight,	fDepth);
-		remainingBox->end();
-		Ogre::SceneNode *remainingBoxNode = m_axisNode->createChildSceneNode();
-		remainingBoxNode->attachObject(remainingBox);
+		axis->position(0.0,	0.0, 0.0);	axis->colour(1.0, 0.0, 0.0);	axis->position(1.0,	0.0, 0.0);	axis->colour(1.0, 0.0, 0.0);
+		axis->position(0.0,	0.0, 1.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	0.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(0.0,	1.0, 0.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	1.0, 0.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->position(0.0,	1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);	axis->position(1.0,	1.0, 1.0);	axis->colour(1.0, 1.0, 1.0);
+		axis->end();
+
+		//Attach the box to the node
+		Ogre::SceneNode *axisNode = m_axisNode->createChildSceneNode();
+		axisNode->attachObject(axis);		
 	}
 
 	void ThermiteGameLogic::reloadShaders(void)

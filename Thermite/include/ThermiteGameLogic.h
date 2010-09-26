@@ -91,7 +91,7 @@ namespace Thermite
 	public:
 		void addResourceDirectory(const QString& directoryName);
 
-		void createAxis(unsigned int uWidth, unsigned int uHeight, unsigned int uDepth);
+		void createAxis(void);
 
 	public:		
 
@@ -121,7 +121,10 @@ namespace Thermite
 		//Scene representation
 		Camera* mCamera;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
-		ObjectStore mObjectStore;		
+		ObjectStore mObjectStore;	
+		uint16_t mCachedVolumeWidthInRegions;
+		uint16_t mCachedVolumeHeightInRegions;
+		uint16_t mCachedVolumeDepthInRegions;
 
 		//Ogre's scene representation
 		Ogre::SceneNode* mPointLightMarkerNode;

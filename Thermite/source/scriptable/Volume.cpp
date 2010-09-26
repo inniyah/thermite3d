@@ -51,6 +51,9 @@ namespace Thermite
 	Volume::Volume(QObject* parent)
 		:Object(parent)
 		,m_pPolyVoxVolume(0)
+		,mVolumeWidthInRegions(0)
+		,mVolumeHeightInRegions(0)
+		,mVolumeDepthInRegions(0)
 	{
 		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
@@ -69,6 +72,13 @@ namespace Thermite
 		m_mapMaterialIds["ColouredCubicVoxel"].insert(6);
 		m_mapMaterialIds["ColouredCubicVoxel"].insert(7);
 		m_mapMaterialIds["ColouredCubicVoxel"].insert(8);
+
+		if(!m_backgroundThread)
+		{
+			m_backgroundThread = new TaskProcessorThread;
+			m_backgroundThread->setPriority(QThread::LowestPriority);
+			m_backgroundThread->start();
+		}
 	}
 
 	Volume::~Volume(void)
@@ -94,13 +104,7 @@ namespace Thermite
 	}
 
 	void Volume::initialise(void)
-	{
-		if(!m_backgroundThread)
-		{
-			m_backgroundThread = new TaskProcessorThread;
-			m_backgroundThread->setPriority(QThread::LowestPriority);
-			m_backgroundThread->start();
-		}
+	{		
 	}
 
 	void Volume::updatePolyVoxGeometry(const QVector3D& cameraPos)
