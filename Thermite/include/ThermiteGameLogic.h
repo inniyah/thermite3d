@@ -118,8 +118,12 @@ namespace Thermite
 		
 	private:
 
+		//Deletes all children (both nodes and attached objects) but not the node itself.
+		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
+
 		//Scene representation
 		Camera* mCamera;
+		Ogre::SceneNode* mVolumeSceneNode;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
 		ObjectStore mObjectStore;	
 		uint16_t mCachedVolumeWidthInRegions;

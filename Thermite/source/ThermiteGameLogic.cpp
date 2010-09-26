@@ -76,6 +76,7 @@ namespace Thermite
 		,mCachedVolumeWidthInRegions(0)
 		,mCachedVolumeHeightInRegions(0)
 		,mCachedVolumeDepthInRegions(0)
+		,mVolumeSceneNode(0)
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
@@ -316,20 +317,21 @@ namespace Thermite
 				Volume* volume = dynamic_cast<Volume*>(pObj);
 				if(volume)
 				{	
+					//Create a scene node to attach this volume under
+					if(mVolumeSceneNode == 0)
+					{
+						mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
+					}
+
 					//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
 					if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
 					{	
-						/*for(uint32_t ct = 0; ct < m_volOgreSceneNodes.getNoOfElements(); ct++)
-						{
-							Ogre::SceneNode* nodeToDelete = m_volOgreSceneNodes.getRawData()[ct];
-							nodeToDelete->remo
-						}*/
+						deleteSceneNodeChildren(mVolumeSceneNode);
 
 						mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
 						mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
 						mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
 
-						//createAxis(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
 						m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
 						
 						uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
@@ -397,19 +399,23 @@ namespace Thermite
 		if(pOgreSceneNode == 0)
 		{
 			const std::string& strNodeName = generateUID("SN");
-			pOgreSceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode(strNodeName);
+			pOgreSceneNode = mVolumeSceneNode->createChildSceneNode(strNodeName);
 			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
 			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
 		}
+		else
+		{
+			deleteSceneNodeChildren(pOgreSceneNode);
+		}
 
 		//Clear any previous geometry		
-		Ogre::SceneNode::ObjectIterator iter =  pOgreSceneNode->getAttachedObjectIterator();
+		/*Ogre::SceneNode::ObjectIterator iter =  pOgreSceneNode->getAttachedObjectIterator();
 		while (iter.hasMoreElements())
 		{
 			Ogre::MovableObject* obj = iter.getNext();
 			mOgreSceneManager->destroyMovableObject(obj);
 		}
-		pOgreSceneNode->detachAllObjects();
+		pOgreSceneNode->detachAllObjects();*/
 
 		//Get the SurfaceMesh and check it's valid
 		SurfaceMesh meshWhole = mesh;
@@ -754,5 +760,33 @@ namespace Thermite
 		Ogre::Ray pickingRay = mOgreCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
 
 		return QVector3D(pickingRay.getDirection().x, pickingRay.getDirection().y, pickingRay.getDirection().z);
+	}
+
+	void ThermiteGameLogic::deleteSceneNodeChildren(Ogre::SceneNode* sceneNode)
+	{
+		//Delete any attached objects
+		Ogre::SceneNode::ObjectIterator iter =  sceneNode->getAttachedObjectIterator();
+		while (iter.hasMoreElements())
+		{
+			//Destroy the objects (leaves dangling pointers?)
+			Ogre::MovableObject* obj = iter.getNext();
+			mOgreSceneManager->destroyMovableObject(obj);
+		}
+		//Clean up all dangling pointers.
+		sceneNode->detachAllObjects();
+
+		//Delete any child nodes
+		Ogre::Node::ChildNodeIterator childNodeIter = sceneNode->getChildIterator();
+		while(childNodeIter.hasMoreElements())
+		{
+			//A Node has to actually be a SceneNode or a Bone. We are not concerned with Bones at the moment.
+			Ogre::SceneNode* childSceneNode = dynamic_cast<Ogre::SceneNode*>(childNodeIter.getNext());
+			if(childSceneNode)
+			{
+				//Recursive call
+				deleteSceneNodeChildren(childSceneNode);
+			}
+		}
+		
 	}
 }
