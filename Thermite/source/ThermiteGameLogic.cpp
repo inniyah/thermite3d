@@ -622,7 +622,7 @@ namespace Thermite
 				   << "qt.network"
 				   << "qt.sql"
 				   << "qt.opengl"
-				   << "qt.webkit"
+				   //<< "qt.webkit"
 				   << "qt.xmlpatterns"
 				   << "qt.uitools";
 		QStringList failExtensions;
