@@ -70,7 +70,6 @@ namespace Thermite
 		,m_pScriptEditorWidget(0)
 		,mOgreCamera(0)
 		,mFirstFind(true)
-		,mPointLightMarkerNode(0)
 		,m_axisNode(0)
 		,keyboard(0)
 		,mCachedVolumeWidthInRegions(0)
@@ -180,8 +179,6 @@ namespace Thermite
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
 		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
 
-		mPointLightMarkerNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-
 		mConsole = new Console(scriptEngine, qApp->mainWidget(), Qt::Tool);
 		mConsole->show();
 
@@ -230,10 +227,6 @@ namespace Thermite
 
 		if(mOgreSceneManager)
 		{
-			mOgreSceneManager->destroyAllLights();
-			mPointLightMarkerNode->removeAndDestroyAllChildren();
-
-			//mPointLightMarkerNode->detachAllObjects();
 			QHashIterator<QString, QObject*> objectIter(mObjectStore);
 			while(objectIter.hasNext())
 			{
@@ -243,10 +236,23 @@ namespace Thermite
 				Light* light = dynamic_cast<Light*>(pObj);
 				if(light)
 				{
-					//light->setProperty("type", "DirectionalLight");
-					//light->setType(DirectionalLight);
+					Ogre::SceneNode* sceneNode;
+					Ogre::Light* ogreLight;
 
-					Ogre::Light* ogreLight = mOgreSceneManager->createLight(objectIter.key().toStdString());
+					if(mOgreSceneManager->hasLight(objectIter.key().toStdString()))
+					{
+						ogreLight = mOgreSceneManager->getLight(objectIter.key().toStdString());
+						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreLight->getParentNode());
+					}
+					else
+					{
+						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+						ogreLight = mOgreSceneManager->createLight(objectIter.key().toStdString());
+						Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+						sceneNode->attachObject(ogreLight);
+						sceneNode->attachObject(ogreEntity);
+					}
+
 					switch(light->getType())
 					{
 					case Light::PointLight:
@@ -261,7 +267,7 @@ namespace Thermite
 					}
 
 					QVector3D pos = light->position();
-					ogreLight->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
 
 					//Note we negate the z axis as Thermite considers negative z
 					//to be forwards. This means that lights will match cameras.
@@ -270,12 +276,6 @@ namespace Thermite
 
 					QColor col = light->getColour();
 					ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
-
-					//And create the marker
-					Ogre::SceneNode* sceneNode = mPointLightMarkerNode->createChildSceneNode();
-					Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
-					sceneNode->attachObject(ogreEntity);
-					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
 				}
 
 				Entity* entity = dynamic_cast<Entity*>(pObj);

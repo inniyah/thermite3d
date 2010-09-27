@@ -123,7 +123,6 @@ namespace Thermite
 
 		//Scene representation
 		Camera* mCamera;
-		Ogre::SceneNode* mVolumeSceneNode;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
 		ObjectStore mObjectStore;	
 		uint16_t mCachedVolumeWidthInRegions;
@@ -131,7 +130,7 @@ namespace Thermite
 		uint16_t mCachedVolumeDepthInRegions;
 
 		//Ogre's scene representation
-		Ogre::SceneNode* mPointLightMarkerNode;
+		Ogre::SceneNode* mVolumeSceneNode;
 		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
 		Ogre::Camera* mOgreCamera;
 		Ogre::Viewport* mMainViewport;
