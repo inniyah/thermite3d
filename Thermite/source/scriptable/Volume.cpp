@@ -232,7 +232,7 @@ namespace Thermite
 		//uploadSurfaceMesh(result.getSurfaceMesh(), result.getRegion());
 	}	
 
-	bool Volume::isRegionBeingExtracted(const Region& regionToTest)
+	bool Volume::isRegionBeingExtracted(const PolyVox::Region& regionToTest)
 	{
 		//This is ugly, but basically we are making sure that we do not modify part of the volume of the mesh is currently
 		//being regenerated for that part. This is to avoid 'queing up' a whole bunch of surface exreaction commands for 
@@ -272,7 +272,7 @@ namespace Thermite
 		return false;
 	}
 
-	void Volume::updateLastModifedArray(const Region& regionToTest)
+	void Volume::updateLastModifedArray(const PolyVox::Region& regionToTest)
 	{
 		const std::uint16_t firstRegionX = regionToTest.getLowerCorner().getX() / mRegionSideLength;
 		const std::uint16_t firstRegionY = regionToTest.getLowerCorner().getY() / mRegionSideLength;
