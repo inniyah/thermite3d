@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 
 #include "MaterialDensityPair.h"
 
-
+#include "Perlin.h"
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "TaskProcessorThread.h"
@@ -432,5 +432,106 @@ namespace Thermite
 		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
+	}
+
+	void Volume::generateMapForTankWars(void)
+	{
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::MaterialDensityPair44>(256,128,256);
+
+		int mapWidth = 256;
+		int mapHeight = 128;
+		int mapDepth = 256;
+
+		float minVal = 1000.0f;
+		float maxVal = -1000.0f;
+
+		Perlin perlin(2,2,1,123);
+
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) //Note that x and y are the other way round to usual. Y will be up in our world.
+			{
+				//float perlinVal = perlin.Get(x /static_cast<float>(mapWidth-1), z / static_cast<float>(mapDepth-1));
+				float perlinVal = sin(x / 20.0f);
+
+				minVal = std::min(minVal, perlinVal);
+				maxVal = std::max(maxVal, perlinVal);
+
+				float amplitudeScale = 0.5f; //Should be 0.5 but in practice bigger values seem better.
+				perlinVal = ((perlinVal * amplitudeScale) + 0.5f) * 2.0f;
+
+				float desiredGroundHeight = 0.5f;
+				if(perlinVal > desiredGroundHeight)
+				{
+					perlinVal = std::max(desiredGroundHeight, perlinVal - 1.0f);
+				}
+				/*else if(perlinVal < desiredGroundHeight)
+				{
+					perlinVal = std::min(desiredGroundHeight, perlinVal + 0.5f);
+				}*/
+
+				int terrainHeight = perlinVal * (mapHeight-1);
+
+				for(int y = 0; y < mapHeight; y++)
+				{
+					MaterialDensityPair44 voxel;
+					if(y <= terrainHeight)
+					{
+						voxel.setMaterial(1);
+						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(MaterialDensityPair44::getMinDensity());
+					}
+
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		//Set all edge voxels to empty.
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int y = 0; y < mapHeight; y++)
+			{
+				for(int x = 0; x < mapWidth; x++)
+				{
+					if((x == 0) || (x == mapWidth-1) || (y == 0) || (y == mapHeight-1) || (z == 0) || (z == mapDepth-1))
+					{
+						MaterialDensityPair44 voxel(0,0);
+						pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+					}
+				}
+			}
+		}
+
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
+		return;
+
+
+		QSize size(256,256);
+		QImage image(size, QImage::Format_RGB32);		
+
+		for(int y = 0; y < 256; y++)
+		{
+			for(int x = 0; x < 256; x++)
+			{
+				float value = perlin.Get(x/255.0f, y/255.0f);
+				value += 1.0f;
+				value *= 0.5;
+
+				//QColor color(value * 255, value * 255, value * 255);
+
+				//QRgb rgb = color.toRgb();
+				uint rgb = qRgb(value * 255, value * 255, value * 255);
+
+				image.setPixel(x,y,rgb);
+			}
+		}
+
+		image.save("C:\\temp\\perlin.png");
 	}
 }

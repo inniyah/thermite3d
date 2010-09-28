@@ -63,6 +63,8 @@ namespace Thermite
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 
+		void generateMapForTankWars(void);
+
 	public:
 		static TaskProcessorThread* m_backgroundThread;
 

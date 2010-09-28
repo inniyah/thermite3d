@@ -58,6 +58,22 @@ SOURCE_GROUP("Headers" FILES ${MAIN_INC_FILES})
 SOURCE_GROUP("UI" FILES ${MAIN_UI_FILES})
 
 ################################################################################
+## Hacks - Tese are files which are added to Thermite
+## temporarily but should really be removed in the future.
+################################################################################
+
+SET(HACKS_SRC_FILES
+	source/Hacks/Perlin.cpp # Needed for terrain generation for tank wars.
+)
+
+SET(HACKS_INC_FILES
+	include/Hacks/Perlin.h
+)
+
+SOURCE_GROUP("Sources\\Hacks" FILES ${HACKS_SRC_FILES})
+SOURCE_GROUP("Headers\\Hacks" FILES ${HACKS_INC_FILES})
+
+################################################################################
 ## Resource files
 ################################################################################
 
@@ -133,8 +149,8 @@ SOURCE_GROUP("Sources\\Tasks" FILES ${TASKS_SRC_FILES})
 SOURCE_GROUP("Headers\\Tasks" FILES ${TASKS_INC_FILES})
 
 #Combine all the source/include/UI files into a single list
-SET(SRC_FILES ${MAIN_SRC_FILES} ${RESOURCE_SRC_FILES} ${TASKS_SRC_FILES} ${SCRIPTABLE_SRC_FILES})
-SET(INC_FILES ${MAIN_INC_FILES} ${RESOURCE_INC_FILES} ${TASKS_INC_FILES} ${SCRIPTABLE_INC_FILES})
+SET(SRC_FILES ${MAIN_SRC_FILES} ${RESOURCE_SRC_FILES} ${TASKS_SRC_FILES} ${SCRIPTABLE_SRC_FILES} ${HACKS_SRC_FILES})
+SET(INC_FILES ${MAIN_INC_FILES} ${RESOURCE_INC_FILES} ${TASKS_INC_FILES} ${SCRIPTABLE_INC_FILES} ${HACKS_INC_FILES})
 SET(UI_FILES ${MAIN_UI_FILES})
 
 SET(RESOURCE_FILES
@@ -156,7 +172,7 @@ QT4_WRAP_UI(UI_SRCS ${UI_FILES})
 QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})
