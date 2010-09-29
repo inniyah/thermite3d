@@ -436,48 +436,74 @@ namespace Thermite
 
 	void Volume::generateMapForTankWars(void)
 	{
-		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::MaterialDensityPair44>(256,128,256);
+		const int mapWidth = 256;
+		const int mapHeight = 32;
+		const int mapDepth = 256;
 
-		int mapWidth = 256;
-		int mapHeight = 128;
-		int mapDepth = 256;
+		int volumeHeight = 64;
 
-		float minVal = 1000.0f;
-		float maxVal = -1000.0f;
+		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::MaterialDensityPair44>(mapWidth,volumeHeight,mapDepth);
 
-		Perlin perlin(2,2,1,123);
-
+		//Create a grid of Perlin noise values
+		Perlin perlin(2,4,1,234);
+		float perlinValues[mapWidth][mapDepth];
+		float minPerlinValue = 1000.0f;
+		float maxPerlinValue = -1000.0f;
 		for(int z = 0; z < mapDepth; z++)
 		{
-			for(int x = 0; x < mapWidth; x++) //Note that x and y are the other way round to usual. Y will be up in our world.
+			for(int x = 0; x < mapWidth; x++) 
 			{
-				//float perlinVal = perlin.Get(x /static_cast<float>(mapWidth-1), z / static_cast<float>(mapDepth-1));
-				float perlinVal = sin(x / 20.0f);
+				perlinValues[x][z] = perlin.Get(x /static_cast<float>(mapWidth-1), z / static_cast<float>(mapDepth-1));
+				minPerlinValue = std::min(minPerlinValue, perlinValues[x][z]);
+				maxPerlinValue = std::max(maxPerlinValue, perlinValues[x][z]);
+			}
+		}
 
-				minVal = std::min(minVal, perlinVal);
-				maxVal = std::max(maxVal, perlinVal);
+		//Normalise values so that th smallest is 0.0 and the biggest is 1.0
+		float range = maxPerlinValue - minPerlinValue;
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{
+				perlinValues[x][z] = (perlinValues[x][z] - minPerlinValue) / range;
+			}
+		}
 
-				float amplitudeScale = 0.5f; //Should be 0.5 but in practice bigger values seem better.
-				perlinVal = ((perlinVal * amplitudeScale) + 0.5f) * 2.0f;
+		//Introduce a flat area into the map. This code saves the top and bottom parts and collapses the rest.
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{				
+				float flatAreaSize = 1.0; //0.0 gives no flat area, larger number give increasing flat area.
 
-				float desiredGroundHeight = 0.5f;
-				if(perlinVal > desiredGroundHeight)
+				perlinValues[x][z] = perlinValues[x][z] * (flatAreaSize + 1.0f);
+
+				float desiredGroundHeight = 0.25f;
+				if(perlinValues[x][z] > desiredGroundHeight)
 				{
-					perlinVal = std::max(desiredGroundHeight, perlinVal - 1.0f);
-				}
-				/*else if(perlinVal < desiredGroundHeight)
-				{
-					perlinVal = std::min(desiredGroundHeight, perlinVal + 0.5f);
-				}*/
+					perlinValues[x][z] = std::max(desiredGroundHeight, perlinValues[x][z] - flatAreaSize);
+				}				
+			}
+		}
 
-				int terrainHeight = perlinVal * (mapHeight-1);
+		//Copy the data into the volume
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{							
+				int terrainHeight = perlinValues[x][z] * (mapHeight-1);
 
 				for(int y = 0; y < mapHeight; y++)
 				{
 					MaterialDensityPair44 voxel;
-					if(y <= terrainHeight)
+					if(y < terrainHeight)
 					{
 						voxel.setMaterial(1);
+						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
+					}
+					else if(y == terrainHeight)
+					{
+						voxel.setMaterial(2);
 						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
 					}
 					else
@@ -512,7 +538,7 @@ namespace Thermite
 		return;
 
 
-		QSize size(256,256);
+		/*QSize size(256,256);
 		QImage image(size, QImage::Format_RGB32);		
 
 		for(int y = 0; y < 256; y++)
@@ -532,6 +558,6 @@ namespace Thermite
 			}
 		}
 
-		image.save("C:\\temp\\perlin.png");
+		image.save("C:\\temp\\perlin.png");*/
 	}
 }
