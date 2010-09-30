@@ -64,14 +64,10 @@ namespace Thermite
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(7);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(8);*/
 
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(1);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(2);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(3);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(4);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(5);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(6);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(7);
-		m_mapMaterialIds["ColouredCubicVoxel"].insert(8);
+		for(int ct = 1; ct < 256; ct++)
+		{
+			m_mapMaterialIds["ColouredCubicVoxel"].insert(ct);
+		}
 
 		if(!m_backgroundThread)
 		{
@@ -503,7 +499,7 @@ namespace Thermite
 					}
 					else if(y == terrainHeight)
 					{
-						voxel.setMaterial(2);
+						voxel.setMaterial(10);
 						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
 					}
 					else
@@ -536,28 +532,5 @@ namespace Thermite
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return;
-
-
-		/*QSize size(256,256);
-		QImage image(size, QImage::Format_RGB32);		
-
-		for(int y = 0; y < 256; y++)
-		{
-			for(int x = 0; x < 256; x++)
-			{
-				float value = perlin.Get(x/255.0f, y/255.0f);
-				value += 1.0f;
-				value *= 0.5;
-
-				//QColor color(value * 255, value * 255, value * 255);
-
-				//QRgb rgb = color.toRgb();
-				uint rgb = qRgb(value * 255, value * 255, value * 255);
-
-				image.setPixel(x,y,rgb);
-			}
-		}
-
-		image.save("C:\\temp\\perlin.png");*/
 	}
 }
