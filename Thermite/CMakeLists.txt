@@ -108,6 +108,8 @@ SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Object.cpp
 	source/scriptable/ObjectStore.cpp
 	source/scriptable/ScriptEditorWidget.cpp
+	source/scriptable/Vector3DClass.cpp
+	source/scriptable/Vector3DPrototype.cpp
 	source/scriptable/Volume.cpp
 )
 
@@ -121,6 +123,8 @@ SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Object.h
 	include/scriptable/ObjectStore.h
 	include/scriptable/ScriptEditorWidget.h
+	include/scriptable/Vector3DClass.h
+	include/scriptable/Vector3DPrototype.h
 	include/scriptable/Volume.h
 )
 

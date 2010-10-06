@@ -32,6 +32,7 @@ freely, subject to the following restrictions:
 #include "SurfacePatchRenderable.h"
 #include "MaterialDensityPair.h"
 #include "ScriptManager.h"
+#include "Vector3DClass.h"
 #include "VolumeManager.h"
 #include "Utility.h"
 
@@ -673,6 +674,9 @@ namespace Thermite
 
 		QScriptValue volumeClass = scriptEngine->scriptValueFromQMetaObject<Volume>();
 		scriptEngine->globalObject().setProperty("Volume", volumeClass);
+
+		Vector3DClass *vector3dClass = new Vector3DClass(scriptEngine);
+		scriptEngine->globalObject().setProperty("Vector3D", vector3dClass->constructor());
 
 		QScriptValue globalsScriptValue = scriptEngine->newQObject(&globals);
 		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
