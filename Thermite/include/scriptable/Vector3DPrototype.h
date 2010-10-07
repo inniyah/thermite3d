@@ -37,6 +37,37 @@ public slots:
 	qreal y () const {return thisVector3D()->y();}
 	qreal z () const {return thisVector3D()->z();}
 
+	//Member operators - can't easily modify 'thisVector3D()'?
+	//QVector3D&	timesEquals ( qreal factor ) 
+	//QVector3D&	timesEquals ( const QVector3D & vector )
+	//QVector3D&	plusEquals ( const QVector3D & vector )
+	//QVector3D&	minusEquals ( const QVector3D & vector )
+	//QVector3D&	divideEquals ( qreal divisor )
+
+	//Static methods - Search for 'static' in 'making applications scriptable'. It says:
+	//"Functions that don't operate on the this object ("static" methods) are typically
+	//stored as properties of the constructor function, not as properties of the prototype
+	//object. The same is true for constants, such as enum values".
+	//For now let's just make them normal methods
+	QVector3D	crossProduct (const QVector3D & v2 ) {return QVector3D::crossProduct(*thisVector3D(), v2);}
+	qreal	dotProduct (const QVector3D & v2 ) {return QVector3D::dotProduct(*thisVector3D(), v2);}
+	QVector3D	normal (const QVector3D & v2 ) {return QVector3D::normal(*thisVector3D(), v2);}
+	QVector3D	normal (const QVector3D & v2, const QVector3D & v3 ) {return QVector3D::normal(*thisVector3D(), v2, v3);}
+
+	//Operator overloading not supported by QtScript
+	bool qFuzzyCompare(const QVector3D & v2 ) {return ::qFuzzyCompare(*thisVector3D(), v2);}
+	bool notEqualTo(const QVector3D & v2 ) {return *thisVector3D() != v2;}
+	//const QVector3D	operator* ( qreal factor, const QVector3D & vector )
+	const QVector3D	times(qreal factor ) {return *thisVector3D() * factor;}
+	const QVector3D	times(const QVector3D & v2 ) {return *thisVector3D() * v2;}
+	const QVector3D	plus(const QVector3D & v2 ) {return *thisVector3D() + v2;}
+	const QVector3D	minus(const QVector3D & v2 ) {return *thisVector3D() - v2;}
+	const QVector3D	negate() {return -(*thisVector3D());}
+	const QVector3D	divideBy (qreal divisor ) {return *thisVector3D() / divisor;}
+	//QDataStream &	operator<< ( QDataStream & stream, const QVector3D & vector )
+	bool equalTo (const QVector3D & v2 ) {return *thisVector3D() == v2;}
+	//QDataStream &	operator>> ( QDataStream & stream, QVector3D & vector )
+
 private:
     QVector3D* thisVector3D() const;
 };
