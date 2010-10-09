@@ -142,6 +142,9 @@ namespace Thermite
 		mOgreCamera->setFarClipDistance(1000);
 		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
+		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
+		mCameraSceneNode->attachObject(mOgreCamera);
+
 		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
@@ -377,8 +380,36 @@ namespace Thermite
 
 		if(mOgreCamera)
 		{
-			mOgreCamera->setPosition(Ogre::Vector3(mCamera->position().x(), mCamera->position().y(), mCamera->position().z()));
-			mOgreCamera->setOrientation(Ogre::Quaternion(mCamera->orientation().scalar(), mCamera->orientation().x(), mCamera->orientation().y(), mCamera->orientation().z()));
+			QMatrix4x4 qtTransform = mCamera->transform();
+			Ogre::Matrix4 ogreTransform;
+			for(int row = 0; row < 4; ++row)
+			{
+				Ogre::Real* rowPtr = ogreTransform[row];
+				for(int col = 0; col < 4; ++col)
+				{
+					Ogre::Real* colPtr = rowPtr + col;
+					*colPtr = qtTransform(row, col);
+				}
+			}
+
+			//ogreTransform = ogreTransform.transpose();
+
+			mCameraSceneNode->setOrientation(ogreTransform.extractQuaternion());
+			mCameraSceneNode->setPosition(ogreTransform.getTrans());
+
+			/*for(int i = 0; i < 16; i++)
+			{
+				ogreTransform.ra
+			}*/
+
+			/*QVector3D pos = mCamera->position();
+			mCameraSceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+			QQuaternion orientation = mCamera->orientation();
+			mCameraSceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));*/
+
+			/*mOgreCamera->setPosition(Ogre::Vector3(mCamera->position().x(), mCamera->position().y(), mCamera->position().z()));
+			mOgreCamera->setOrientation(Ogre::Quaternion(mCamera->orientation().scalar(), mCamera->orientation().x(), mCamera->orientation().y(), mCamera->orientation().z()));*/
 			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 		}
 
@@ -671,6 +702,9 @@ namespace Thermite
 
 		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
 		scriptEngine->globalObject().setProperty("Entity", entityClass);
+
+		QScriptValue objectClass = scriptEngine->scriptValueFromQMetaObject<Object>();
+		scriptEngine->globalObject().setProperty("Object", objectClass);
 
 		QScriptValue volumeClass = scriptEngine->scriptValueFromQMetaObject<Volume>();
 		scriptEngine->globalObject().setProperty("Volume", volumeClass);

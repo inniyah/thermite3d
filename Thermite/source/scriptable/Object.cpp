@@ -40,6 +40,26 @@ namespace Thermite
 		mScale = scale;
 	}
 
+	const QMatrix4x4 Object::transform(void) const
+	{
+		QMatrix4x4 transform;
+		transform.setToIdentity();
+		transform.translate(mPosition);
+		transform.rotate(mOrientation);
+		transform.scale(mScale);
+
+		if(parent())
+		{
+			Object* objParent = dynamic_cast<Object*>(parent());
+			if(objParent)
+			{
+				transform = objParent->transform() * transform;
+			}
+		}
+
+		return transform;
+	}
+
 	const QVector3D Object::xAxis(void) const
 	{
 		QVector3D axis(1,0,0);

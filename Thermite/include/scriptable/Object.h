@@ -19,6 +19,7 @@ namespace Thermite
 		Q_PROPERTY(QVector3D position READ position WRITE setPosition)
 		Q_PROPERTY(QQuaternion orientation READ orientation WRITE setOrientation)
 		Q_PROPERTY(QVector3D size READ size WRITE setSize)
+		Q_PROPERTY(QMatrix4x4 transform READ transform)
 
 		Q_PROPERTY(QVector3D xAxis READ xAxis)
 		Q_PROPERTY(QVector3D yAxis READ yAxis)
@@ -32,6 +33,8 @@ namespace Thermite
 
 		const QVector3D& size(void) const;
 		void setSize(const QVector3D& size);
+
+		const QMatrix4x4 transform(void) const;
 
 		const QVector3D xAxis(void) const;
 		const QVector3D yAxis(void) const;
@@ -57,5 +60,7 @@ namespace Thermite
 		QVector3D mScale;
 	};
 }
+
+Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Object, QObject*)
 
 #endif //OBJECT_H_

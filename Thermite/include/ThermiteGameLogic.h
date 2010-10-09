@@ -132,6 +132,7 @@ namespace Thermite
 		//Ogre's scene representation
 		Ogre::SceneNode* mVolumeSceneNode;
 		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
+		Ogre::SceneNode* mCameraSceneNode;
 		Ogre::Camera* mOgreCamera;
 		Ogre::Viewport* mMainViewport;
 		Ogre::SceneManager* mOgreSceneManager;
