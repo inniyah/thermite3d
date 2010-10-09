@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QScriptable>
 #include <QScriptValue>
+#include <QTextStream>
 #include <QVector3D>
 
 class Vector3DPrototype : public QObject, public QScriptable
@@ -36,6 +37,8 @@ public slots:
 	qreal x () const {return thisVector3D()->x();}
 	qreal y () const {return thisVector3D()->y();}
 	qreal z () const {return thisVector3D()->z();}
+
+	QString toString() const {QString result; QTextStream(&result) << "Vector3D(" << x() << "," << y() << "," << z() << ")"; return result;}
 
 	//Member operators - can't easily modify 'thisVector3D()'?
 	//QVector3D&	timesEquals ( qreal factor ) 

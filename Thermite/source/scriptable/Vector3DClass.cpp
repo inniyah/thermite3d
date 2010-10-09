@@ -140,18 +140,16 @@ QScriptValue Vector3DClass::construct(QScriptContext *ctx, QScriptEngine *)
         return QScriptValue();
 	}
 
-	//This needs looking at - we should be able to construct
-	//from a QVector3D as well (see ByteArray example)
-    /*QScriptValue arg = ctx->argument(0);
+    QScriptValue arg = ctx->argument(0);
     if (arg.instanceOf(ctx->callee()))
-        return cls->newInstance(qscriptvalue_cast<QVector3D>(arg));*/
+        return cls->newInstance(qscriptvalue_cast<QVector3D>(arg));
 
-	/*if(ctx->argumentCount() == 1)
+	if(ctx->argumentCount() == 1)
 	{
 		QScriptValue arg = ctx->argument(0);
-		qDebug() << "Type is: " << arg.toString();
-		return cls->newInstance(qscriptvalue_cast<QVector3D>(arg));
-	}*/
+		QVector3D* vec = qscriptvalue_cast<QVector3D*>(arg);
+		return cls->newInstance(*vec);
+	}
 
 	if(ctx->argumentCount() == 3)
 	{
