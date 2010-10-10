@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #ifndef __QStringIODevice_H__
 #define __QStringIODevice_H__
 
-#include <QIODevice.h>
+#include <QIODevice>
 
 namespace Thermite
 {
