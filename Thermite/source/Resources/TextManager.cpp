@@ -23,26 +23,26 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#include "ScriptManager.h"
+#include "TextManager.h"
 
 #include "OgreLogManager.h" //FIXME - shouldn't realy need this in this class?'
 
-template<> Thermite::ScriptManager *Ogre::Singleton<Thermite::ScriptManager>::ms_Singleton = 0;
+template<> Thermite::TextManager *Ogre::Singleton<Thermite::TextManager>::ms_Singleton = 0;
 
 namespace Thermite
 {
-	ScriptManager *ScriptManager::getSingletonPtr ()
+	TextManager *TextManager::getSingletonPtr ()
 	{
 		return ms_Singleton;
 	}
 
-	ScriptManager &ScriptManager::getSingleton ()
+	TextManager &TextManager::getSingleton ()
 	{  
 		assert (ms_Singleton);  
 		return (*ms_Singleton);
 	}
 
-	ScriptManager::ScriptManager ()
+	TextManager::TextManager ()
 	{
 		mResourceType = "Script";
 
@@ -53,16 +53,16 @@ namespace Thermite
 		Ogre::ResourceGroupManager::getSingleton ()._registerResourceManager (mResourceType, this);
 	}
 
-	ScriptManager::~ScriptManager()
+	TextManager::~TextManager()
 	{
 		// and this is how we unregister it
 		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager (mResourceType);
 	}
 
-	ScriptResourcePtr ScriptManager::load (const Ogre::String &name, const Ogre::String &group)
+	TextResourcePtr TextManager::load (const Ogre::String &name, const Ogre::String &group)
 	{
 		Ogre::LogManager::getSingleton().logMessage("DAVID - calling getByName");
-		ScriptResourcePtr textf = getByName (name);
+		TextResourcePtr textf = getByName (name);
 		Ogre::LogManager::getSingleton().logMessage("DAVID - done getByName");
 
 		if (textf.isNull ())
@@ -75,10 +75,10 @@ namespace Thermite
 		return textf;
 	}
 
-	Ogre::Resource *ScriptManager::createImpl (const Ogre::String &name, Ogre::ResourceHandle handle, 
+	Ogre::Resource *TextManager::createImpl (const Ogre::String &name, Ogre::ResourceHandle handle, 
 												const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
 												const Ogre::NameValuePairList *createParams)
 	{
-		return new ScriptResource (this, name, handle, group, isManual, loader);
+		return new TextResource (this, name, handle, group, isManual, loader);
 	}
 }

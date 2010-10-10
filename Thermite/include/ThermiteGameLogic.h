@@ -100,6 +100,7 @@ namespace Thermite
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
 
 		bool loadApp(const QString& appName);
+		QWidget* loadUIFile(const QString& filename);
 
 		//Don't like having these functions here - really they should be inside camera or something. But they are
 		//using Ogre methods which aren't available in the scriptable classes. Eventually they should be rewritten

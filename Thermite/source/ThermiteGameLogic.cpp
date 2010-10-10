@@ -31,7 +31,8 @@ freely, subject to the following restrictions:
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfacePatchRenderable.h"
 #include "MaterialDensityPair.h"
-#include "ScriptManager.h"
+#include "QStringIODevice.h"
+#include "TextManager.h"
 #include "Vector3DClass.h"
 #include "VolumeManager.h"
 #include "Utility.h"
@@ -52,6 +53,7 @@ freely, subject to the following restrictions:
 #include <QMutex>
 #include <QSettings>
 #include <QThreadPool>
+#include <QUiLoader>
 #include <QWaitCondition>
 
 using namespace QtOgre;
@@ -164,7 +166,7 @@ namespace Thermite
 		VolumeManager* vm = new VolumeManager;
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl();
 
-		ScriptManager* sm = new ScriptManager;
+		TextManager* sm = new TextManager;
 
 		//The main menu
 		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
@@ -200,11 +202,11 @@ namespace Thermite
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		//Load the scripts
-		ScriptResourcePtr pScriptResource = ScriptManager::getSingletonPtr()->load("initialise.js", "General");
-		mInitialiseScript = QString::fromStdString(pScriptResource->getScriptData());
+		TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load("initialise.js", "General");
+		mInitialiseScript = QString::fromStdString(pTextResource->getScriptData());
 
-		ScriptResourcePtr pUpdateScriptResource = ScriptManager::getSingletonPtr()->load("update.js", "General");
-		m_pScriptEditorWidget->setScriptCode(QString::fromStdString(pUpdateScriptResource->getScriptData()));
+		TextResourcePtr pUpdateTextResource = TextManager::getSingletonPtr()->load("update.js", "General");
+		m_pScriptEditorWidget->setScriptCode(QString::fromStdString(pUpdateTextResource->getScriptData()));
 
 		//Run the initialise script
 		QScriptValue result = scriptEngine->evaluate(mInitialiseScript);
@@ -824,7 +826,16 @@ namespace Thermite
 				//Recursive call
 				deleteSceneNodeChildren(childSceneNode);
 			}
-		}
-		
+		}		
+	}
+
+	QWidget* ThermiteGameLogic::loadUIFile(const QString& filename)
+	{
+		TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load(filename.toStdString(), "General");
+		QString str = QString::fromStdString(pTextResource->getScriptData());
+		QStringIODevice device(str);
+		QUiLoader loader;
+		QWidget* ui = loader.load(&device);
+		return ui;
 	}
 }

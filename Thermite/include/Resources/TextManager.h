@@ -23,17 +23,17 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __ScriptManager_H__
-#define __ScriptManager_H__
+#ifndef __TextManager_H__
+#define __TextManager_H__
 
 #include <OgreResourceManager.h>
-#include "ScriptResource.h"
+#include "TextResource.h"
 
 #include "VolumeSerializationProgressListenerImpl.h"
 
 namespace Thermite
 {
-	class ScriptManager : public Ogre::ResourceManager, public Ogre::Singleton<ScriptManager>
+	class TextManager : public Ogre::ResourceManager, public Ogre::Singleton<TextManager>
 	{
 	protected:
 		// must implement this from ResourceManager's interface
@@ -42,14 +42,14 @@ namespace Thermite
 			const Ogre::NameValuePairList *createParams);
 
 	public:
-		ScriptManager ();
-		virtual ~ScriptManager ();
+		TextManager ();
+		virtual ~TextManager ();
 
-		virtual ScriptResourcePtr load (const Ogre::String &name, const Ogre::String &group);
+		virtual TextResourcePtr load (const Ogre::String &name, const Ogre::String &group);
 
-		static ScriptManager &getSingleton ();
-		static ScriptManager *getSingletonPtr ();
+		static TextManager &getSingleton ();
+		static TextManager *getSingletonPtr ();
 	};
 }
 
-#endif //__ScriptManager_H__
+#endif //__TextManager_H__

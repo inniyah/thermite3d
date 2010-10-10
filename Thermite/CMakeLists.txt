@@ -78,15 +78,17 @@ SOURCE_GROUP("Headers\\Hacks" FILES ${HACKS_INC_FILES})
 ################################################################################
 
 SET(RESOURCE_SRC_FILES
-	source/Resources/ScriptManager.cpp
-	source/Resources/ScriptResource.cpp
+	source/Resources/QStringIODevice.cpp
+	source/Resources/TextManager.cpp
+	source/Resources/TextResource.cpp
 	source/Resources/VolumeManager.cpp
 	source/Resources/VolumeResource.cpp
 )
 
 SET(RESOURCE_INC_FILES
-	include/Resources/ScriptManager.h
-	include/Resources/ScriptResource.h
+	include/Resources/QStringIODevice.h
+	include/Resources/TextManager.h
+	include/Resources/TextResource.h
 	include/Resources/VolumeManager.h
 	include/Resources/VolumeResource.h
 )
@@ -168,6 +170,7 @@ ENDIF (WIN32)
 SET(QT_USE_QTGUI 1)
 SET(QT_USE_QTSCRIPT 1)
 SET(QT_USE_QTSCRIPTTOOLS 1)
+SET(QT_USE_QTUITOOLS 1)
 SET(QT_USE_QTXML 1)
 INCLUDE(${QT_USE_FILE})
 

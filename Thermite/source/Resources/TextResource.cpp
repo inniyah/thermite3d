@@ -24,8 +24,8 @@ freely, subject to the following restrictions:
 #pragma endregion
 
 #include "DataStreamWrapper.h"
-#include "ScriptManager.h"
-#include "ScriptResource.h"
+#include "TextManager.h"
+#include "TextResource.h"
 
 #include "MaterialDensityPair.h"
 
@@ -40,7 +40,7 @@ using namespace std;
 
 namespace Thermite
 {
-	ScriptResource::ScriptResource(	Ogre::ResourceManager* creator, const Ogre::String &name, 
+	TextResource::TextResource(	Ogre::ResourceManager* creator, const Ogre::String &name, 
 									Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual, 
 									Ogre::ManualResourceLoader *loader)
 		:Ogre::Resource (creator, name, handle, group, isManual, loader)
@@ -48,28 +48,28 @@ namespace Thermite
 		createParamDictionary ("Script");
 	}
 
-	ScriptResource::~ScriptResource()
+	TextResource::~TextResource()
 	{
 		unload();
 	}
 
-	std::string ScriptResource::getScriptData(void) const
+	std::string TextResource::getScriptData(void) const
 	{
 		return mScriptData;
 	}
 
-	void ScriptResource::loadImpl ()
+	void TextResource::loadImpl ()
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		mScriptData = stream->getAsString();
 	}
 
-	void ScriptResource::unloadImpl ()
+	void TextResource::unloadImpl ()
 	{
 		mScriptData = "";
 	}
 	
-	size_t ScriptResource::calculateSize () const
+	size_t TextResource::calculateSize () const
 	{
 		//NOTE - I don't really know what this function is for,
 		//so am therefore a bit vague on how to implement it.

@@ -23,8 +23,8 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 #pragma endregion
 
-#ifndef __ScriptResource_H__
-#define __ScriptResource_H__
+#ifndef __TextResource_H__
+#define __TextResource_H__
 
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
@@ -37,13 +37,13 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class ScriptResource : public Ogre::Resource
+	class TextResource : public Ogre::Resource
 	{
 	public:		
-		ScriptResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
+		TextResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
 			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
 			Ogre::ManualResourceLoader *loader = 0);
-		~ScriptResource();		
+		~TextResource();		
 
 		std::string getScriptData(void) const;
 
@@ -58,13 +58,13 @@ namespace Thermite
 		std::string mScriptData;
 	};
 
-	class ScriptResourcePtr : public Ogre::SharedPtr<ScriptResource> 
+	class TextResourcePtr : public Ogre::SharedPtr<TextResource> 
 	{
 	public:
-		ScriptResourcePtr () : Ogre::SharedPtr<ScriptResource> () {}
-		explicit ScriptResourcePtr (ScriptResource *rep) : Ogre::SharedPtr<ScriptResource> (rep) {}
-		ScriptResourcePtr (const ScriptResourcePtr &r) : Ogre::SharedPtr<ScriptResource> (r) {} 
-		ScriptResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<ScriptResource> ()
+		TextResourcePtr () : Ogre::SharedPtr<TextResource> () {}
+		explicit TextResourcePtr (TextResource *rep) : Ogre::SharedPtr<TextResource> (rep) {}
+		TextResourcePtr (const TextResourcePtr &r) : Ogre::SharedPtr<TextResource> (r) {} 
+		TextResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<TextResource> ()
 		{
 			if(r.isNull())
 				return;
@@ -72,7 +72,7 @@ namespace Thermite
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<ScriptResource*> (r.getPointer ());
+				pRep = static_cast<TextResource*> (r.getPointer ());
 			pUseCount = r.useCountPointer ();
 			useFreeMethod = r.freeMethod();
 			if (pUseCount)
@@ -81,10 +81,10 @@ namespace Thermite
 			}
 		}
 
-		/// Operator used to convert a ResourcePtr to a ScriptResourcePtr
-		ScriptResourcePtr& operator=(const Ogre::ResourcePtr& r)
+		/// Operator used to convert a ResourcePtr to a TextResourcePtr
+		TextResourcePtr& operator=(const Ogre::ResourcePtr& r)
 		{
-			if (pRep == static_cast<ScriptResource*> (r.getPointer ()))
+			if (pRep == static_cast<TextResource*> (r.getPointer ()))
 				return *this;
 			release ();
 
@@ -94,7 +94,7 @@ namespace Thermite
 			// lock & copy other mutex pointer
 			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
 				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<ScriptResource*> (r.getPointer());
+				pRep = static_cast<TextResource*> (r.getPointer());
 			pUseCount = r.useCountPointer ();
 			useFreeMethod = r.freeMethod();
 			if (pUseCount)
@@ -106,4 +106,4 @@ namespace Thermite
 	};
 }
 
-#endif //__ScriptResource_H__
+#endif //__TextResource_H__
