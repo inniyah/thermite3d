@@ -40,6 +40,54 @@ namespace Thermite
 		mScale = scale;
 	}
 
+	const QVector3D Object::derivedPosition(void) const
+	{
+		QVector3D position = mPosition;
+
+		if(parent())
+		{
+			Object* objParent = dynamic_cast<Object*>(parent());
+			if(objParent)
+			{
+				position = objParent->position() + position;
+			}
+		}
+
+		return position;
+	}
+
+	const QQuaternion Object::derivedOrientation(void) const
+	{
+		QQuaternion orientation = mOrientation;
+
+		if(parent())
+		{
+			Object* objParent = dynamic_cast<Object*>(parent());
+			if(objParent)
+			{
+				orientation = objParent->orientation() * orientation;
+			}
+		}
+
+		return orientation;
+	}
+
+	const QVector3D Object::derivedSize(void) const
+	{
+		QVector3D size = mScale;
+
+		if(parent())
+		{
+			Object* objParent = dynamic_cast<Object*>(parent());
+			if(objParent)
+			{
+				size = objParent->size() * size;
+			}
+		}
+
+		return size;
+	}
+
 	const QMatrix4x4 Object::transform(void) const
 	{
 		QMatrix4x4 transform;
@@ -76,6 +124,24 @@ namespace Thermite
 	{
 		QVector3D axis(0,0,1);
 		return mOrientation.rotatedVector(axis);
+	}
+
+	const QVector3D Object::derivedXAxis(void) const
+	{
+		QVector3D axis(1,0,0);
+		return derivedOrientation().rotatedVector(axis);
+	}
+
+	const QVector3D Object::derivedYAxis(void) const
+	{
+		QVector3D axis(0,1,0);
+		return derivedOrientation().rotatedVector(axis);
+	}
+
+	const QVector3D Object::derivedZAxis(void) const
+	{
+		QVector3D axis(0,0,1);
+		return derivedOrientation().rotatedVector(axis);
 	}
 
 	void Object::translate(const QVector3D & vector)

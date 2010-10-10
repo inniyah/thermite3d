@@ -19,11 +19,19 @@ namespace Thermite
 		Q_PROPERTY(QVector3D position READ position WRITE setPosition)
 		Q_PROPERTY(QQuaternion orientation READ orientation WRITE setOrientation)
 		Q_PROPERTY(QVector3D size READ size WRITE setSize)
+
+		Q_PROPERTY(QVector3D derivedPosition READ derivedPosition)
+		Q_PROPERTY(QQuaternion derivedOrientation READ derivedOrientation)
+		Q_PROPERTY(QVector3D derivedSize READ derivedSize)
 		Q_PROPERTY(QMatrix4x4 transform READ transform)
 
 		Q_PROPERTY(QVector3D xAxis READ xAxis)
 		Q_PROPERTY(QVector3D yAxis READ yAxis)
 		Q_PROPERTY(QVector3D zAxis READ zAxis)
+
+		Q_PROPERTY(QVector3D derivedXAxis READ derivedXAxis)
+		Q_PROPERTY(QVector3D derivedYAxis READ derivedYAxis)
+		Q_PROPERTY(QVector3D derivedZAxis READ derivedZAxis)
 
 		const QVector3D& position(void) const;
 		void setPosition(const QVector3D& position);
@@ -34,11 +42,18 @@ namespace Thermite
 		const QVector3D& size(void) const;
 		void setSize(const QVector3D& size);
 
+		const QVector3D derivedPosition(void) const;
+		const QQuaternion derivedOrientation(void) const;
+		const QVector3D derivedSize(void) const;
 		const QMatrix4x4 transform(void) const;
 
 		const QVector3D xAxis(void) const;
 		const QVector3D yAxis(void) const;
 		const QVector3D zAxis(void) const;
+
+		const QVector3D derivedXAxis(void) const;
+		const QVector3D derivedYAxis(void) const;
+		const QVector3D derivedZAxis(void) const;
 
 	public slots:
 		void translate(const QVector3D & vector);
