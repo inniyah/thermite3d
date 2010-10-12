@@ -1,4 +1,3 @@
-#pragma region License
 /*******************************************************************************
 Copyright (c) 2005-2009 David Williams
 
@@ -21,7 +20,6 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution. 	
 *******************************************************************************/
-#pragma endregion
 
 #include "SurfacePatchRenderable.h"
 
@@ -39,7 +37,6 @@ using namespace Ogre;
 
 namespace Thermite
 {
-#pragma region Constructors/Destructors
 	SurfacePatchRenderable::SurfacePatchRenderable(const String& strName)
 		:m_RenderOp(0)
 	{
@@ -63,9 +60,7 @@ namespace Thermite
 			delete m_RenderOp;
 		}
 	}
-#pragma endregion
 
-#pragma region Getters
 	const Ogre::AxisAlignedBox& SurfacePatchRenderable::getBoundingBox(void) const
 	{
 		return mBox;
@@ -125,9 +120,7 @@ namespace Thermite
 	{
 		*xform = m_matWorldTransform * mParentNode->_getFullTransform();
 	}
-#pragma endregion
 
-#pragma region Setters
 	void SurfacePatchRenderable::setBoundingBox( const Ogre::AxisAlignedBox& box )
 	{
 		mBox = box;
@@ -149,9 +142,6 @@ namespace Thermite
 	{
 		m_matWorldTransform = xform;
 	}
-#pragma endregion
-
-#pragma region Other
 
 	void SurfacePatchRenderable::_updateRenderQueue(RenderQueue* queue)
 	{
@@ -509,8 +499,6 @@ namespace Thermite
 	{
 		return m_bIsSingleMaterial;
 	}
-
-#pragma endregion
 
 	//-----------------------------------------------------------------------
 	String SurfacePatchRenderableFactory::FACTORY_TYPE_NAME = "SurfacePatchRenderable";
