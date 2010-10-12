@@ -533,4 +533,15 @@ namespace Thermite
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return;
 	}
+
+	int Volume::materialAtPosition(QVector3D position)
+	{
+		int x = qRound(position.x());
+		int y = qRound(position.y());
+		int z = qRound(position.z());
+
+		MaterialDensityPair44 voxel = m_pPolyVoxVolume->getVoxelAt(x,y,z);
+
+		return voxel.getMaterial();
+	}
 }
