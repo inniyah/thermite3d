@@ -215,8 +215,7 @@ namespace Thermite
 		//Set up the vertex declaration
 		VertexDeclaration *decl = renderOperation->vertexData->vertexDeclaration;
 		decl->removeAllElements();
-		decl->addElement(0, 0, VET_FLOAT3, VES_POSITION);
-		decl->addElement(0, 3 * sizeof(float), VET_FLOAT1, VES_TEXTURE_COORDINATES);
+		decl->addElement(0, 0, VET_FLOAT4, VES_POSITION);// Material ID gets packed in 'w' coponent
 
 		const std::vector<PositionMaterial>& vecVertices = mesh.getVertices();
 		const std::vector<uint32_t>& vecIndices = mesh.getIndices();
@@ -243,42 +242,15 @@ namespace Thermite
 			false); // no shadow buffer	
 
 		renderOperation->indexData->indexBuffer = ibuf;	
-
-		// Drawing stuff
-		Vector3 vaabMin(std::numeric_limits<Real>::max(),std::numeric_limits<Real>::max(),std::numeric_limits<Real>::max());
-		Vector3 vaabMax(0.0,0.0,0.0);
 		
 		Real *prPos = static_cast<Real*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-
-		for(std::vector<PositionMaterial>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
-		{			
-			//prPos = addVertex(*vertexIter, 1.0f, prPos);	
-			*prPos++ = vertexIter->getPosition().getX();
-			*prPos++ = vertexIter->getPosition().getY();
-			*prPos++ = vertexIter->getPosition().getZ();
-
-			*prPos++ = vertexIter->getMaterial();
-				
-		}
-
+		memcpy(prPos, &vecVertices[0], sizeof(PositionMaterial) * vecVertices.size());
 
 		unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
-		unsigned long newVertexIndex = vecVertices.size();
-		for(int i = 0; i < vecIndices.size() - 2; i += 3)
-		{
-			*pIdx = vecIndices[i];
-			pIdx++;
-			*pIdx = vecIndices[i+1];
-			pIdx++;
-			*pIdx = vecIndices[i+2];
-			pIdx++;
-		}
+		memcpy(pIdx, &vecIndices[0], sizeof(uint32_t) * vecIndices.size());
 
 		ibuf->unlock();
 		vbuf->unlock();
-
-		//This function is extreamly slow.
-		//renderOperation->indexData->optimiseVertexCacheTriList();
 
 		m_RenderOp = renderOperation;
 	}
