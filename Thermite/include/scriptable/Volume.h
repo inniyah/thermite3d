@@ -76,7 +76,7 @@ namespace Thermite
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
 		
-		PolyVox::Array<3, PolyVox::SurfaceMesh*> m_volSurfaceMeshes;
+		PolyVox::Array<3, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>*> m_volSurfaceMeshes;
 		PolyVox::Array<3, uint32_t> mLastModifiedArray;
 		PolyVox::Array<3, uint32_t> mExtractionStartedArray;
 		PolyVox::Array<3, uint32_t> mExtractionFinishedArray;

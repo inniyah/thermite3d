@@ -60,8 +60,9 @@ namespace Thermite
 		virtual void _updateRenderQueue(Ogre::RenderQueue* queue);
 		void visitRenderables(Ogre::Renderable::Visitor* visitor, bool debugRenderables = false);
 
-		static Ogre::Real* addVertex(const PolyVox::SurfaceVertex& vertex, float alpha, Ogre::Real* prPos);
-		void buildRenderOperationFrom(PolyVox::SurfaceMesh& mesh, bool bSingleMaterial);
+		static Ogre::Real* addVertex(const PolyVox::PositionMaterialNormal& vertex, float alpha, Ogre::Real* prPos);
+		void buildRenderOperationFrom(PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, bool bSingleMaterial);
+		void buildRenderOperationFrom(PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh);
 
 	protected:
 		Ogre::RenderOperation* m_RenderOp;

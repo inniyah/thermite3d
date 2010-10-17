@@ -35,7 +35,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		SurfaceMeshDecimationTask(PolyVox::SurfaceMesh* mesh, uint32_t uTimeStamp);
+		SurfaceMeshDecimationTask(PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* mesh, uint32_t uTimeStamp);
 
 		void run(void);
 
@@ -43,7 +43,7 @@ namespace Thermite
 		void finished(SurfaceMeshDecimationTask* mesh);
 
 	public:
-		PolyVox::SurfaceMesh* mMesh;
+		PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* mMesh;
 		uint32_t m_uTimeStamp;
 	};
 }

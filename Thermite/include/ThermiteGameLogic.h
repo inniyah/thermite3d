@@ -96,8 +96,11 @@ namespace Thermite
 	public:		
 
 	public slots:
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh& mesh, PolyVox::Region region, Volume& volume);		
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh& mesh, PolyVox::Region region);
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region, Volume& volume);		
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region);
+
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume);		
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
 
 		bool loadApp(const QString& appName);
 		QWidget* loadUIFile(const QString& filename);

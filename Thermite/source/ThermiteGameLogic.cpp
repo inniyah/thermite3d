@@ -384,7 +384,7 @@ namespace Thermite
 								uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
 								if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
 								{
-									SurfaceMesh* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
+									SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
 									PolyVox::Region reg = mesh->m_Region;
 									uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
 								}
@@ -419,7 +419,82 @@ namespace Thermite
 		mouse->resetWheelDelta();
 	}
 
-	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh& mesh, PolyVox::Region region, Volume& volume)
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region, Volume& volume)
+	{
+		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
+
+		//Determine where it came from
+		uint16_t regionX = region.getLowerCorner().getX() / volume.mRegionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / volume.mRegionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / volume.mRegionSideLength;
+
+		//Create a SceneNode for that location if we don't have one already
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
+		if(pOgreSceneNode == 0)
+		{
+			const std::string& strNodeName = generateUID("SN");
+			pOgreSceneNode = mVolumeSceneNode->createChildSceneNode(strNodeName);
+			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
+			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
+		}
+		else
+		{
+			deleteSceneNodeChildren(pOgreSceneNode);
+		}
+
+		//Get the SurfaceMesh and check it's valid
+		SurfaceMesh<PositionMaterial> meshWhole = mesh;
+		if(meshWhole.isEmpty() == false)
+		{			
+			addSurfacePatchRenderable(volume.m_mapMaterialIds.begin()->first, meshWhole, region); ///[0] is HACK!!
+
+			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
+			/*for(std::map< std::string, std::set<uint8_t> >::iterator iter = volume.m_mapMaterialIds.begin(); iter != volume.m_mapMaterialIds.end(); iter++)
+			{
+				//Get the properties
+				std::string materialName = iter->first;
+				std::set<std::uint8_t> voxelValues = iter->second;
+
+				//Extract the part of the InexedSurfacePatch which corresponds to that material
+				polyvox_shared_ptr< SurfaceMesh<PositionMaterialNormal> > meshSubset = meshWhole.extractSubset(voxelValues);
+
+				//And add it to the SceneNode
+				addSurfacePatchRenderable(materialName, *meshSubset, region);
+			}*/
+		}		
+
+		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+	}
+
+	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region)
+	{
+
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+
+		//Determine where it came from
+		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
+		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
+		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
+
+		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
+
+		//Single Material
+		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
+
+		std::string strSprName = generateUID("SPR");
+		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
+		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
+		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
+		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
+
+		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh);
+
+		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
+		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
+	}
+
+	void ThermiteGameLogic::uploadSurfaceMesh(const SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 
@@ -452,7 +527,7 @@ namespace Thermite
 		pOgreSceneNode->detachAllObjects();*/
 
 		//Get the SurfaceMesh and check it's valid
-		SurfaceMesh meshWhole = mesh;
+		SurfaceMesh<PositionMaterialNormal> meshWhole = mesh;
 		if(meshWhole.isEmpty() == false)
 		{			
 			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
@@ -463,7 +538,7 @@ namespace Thermite
 				std::set<std::uint8_t> voxelValues = iter->second;
 
 				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				polyvox_shared_ptr<SurfaceMesh> meshSubset = meshWhole.extractSubset(voxelValues);
+				polyvox_shared_ptr< SurfaceMesh<PositionMaterialNormal> > meshSubset = meshWhole.extractSubset(voxelValues);
 
 				//And add it to the SceneNode
 				addSurfacePatchRenderable(materialName, *meshSubset, region);
@@ -473,7 +548,7 @@ namespace Thermite
 		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
-	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh& mesh, PolyVox::Region region)
+	void ThermiteGameLogic::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region)
 	{
 
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();

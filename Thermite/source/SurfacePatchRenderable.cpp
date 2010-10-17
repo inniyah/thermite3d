@@ -169,7 +169,7 @@ namespace Thermite
 		visitor->visit(this, 0, false);
 	}
 
-	Real* SurfacePatchRenderable::addVertex(const SurfaceVertex& vertex, float alpha, Real* prPos)
+	Real* SurfacePatchRenderable::addVertex(const PositionMaterialNormal& vertex, float alpha, Real* prPos)
 	{
 		*prPos++ = vertex.getPosition().getX();
 		*prPos++ = vertex.getPosition().getY();
@@ -186,7 +186,104 @@ namespace Thermite
 		return prPos;
 	}
 
-	void SurfacePatchRenderable::buildRenderOperationFrom(SurfaceMesh& mesh, bool bSingleMaterial)
+	void SurfacePatchRenderable::buildRenderOperationFrom(SurfaceMesh<PositionMaterial>& mesh)
+	{
+		if(mesh.isEmpty())
+		{
+			m_RenderOp = 0;
+			return;
+		}
+
+		m_vecLodRecords = mesh.m_vecLodRecords;
+
+		m_bIsSingleMaterial = true;
+
+		RenderOperation* renderOperation = new RenderOperation();
+
+		//Set up what we can of the vertex data
+		renderOperation->vertexData = new VertexData();
+		renderOperation->vertexData->vertexStart = 0;
+		renderOperation->vertexData->vertexCount = 0;
+		renderOperation->operationType = RenderOperation::OT_TRIANGLE_LIST;
+
+		//Set up what we can of the index data
+		renderOperation->indexData = new IndexData();
+		renderOperation->useIndexes = true;
+		renderOperation->indexData->indexStart = 0;
+		renderOperation->indexData->indexCount = 0;
+
+		//Set up the vertex declaration
+		VertexDeclaration *decl = renderOperation->vertexData->vertexDeclaration;
+		decl->removeAllElements();
+		decl->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+		decl->addElement(0, 3 * sizeof(float), VET_FLOAT1, VES_TEXTURE_COORDINATES);
+
+		const std::vector<PositionMaterial>& vecVertices = mesh.getVertices();
+		const std::vector<uint32_t>& vecIndices = mesh.getIndices();
+
+		renderOperation->vertexData->vertexCount = vecVertices.size();
+		renderOperation->indexData->indexCount = vecIndices.size();	
+
+		VertexBufferBinding *bind = renderOperation->vertexData->vertexBufferBinding;
+
+		HardwareVertexBufferSharedPtr vbuf =
+			HardwareBufferManager::getSingleton().createVertexBuffer(
+			renderOperation->vertexData->vertexDeclaration->getVertexSize(0),
+			renderOperation->vertexData->vertexCount,
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+			false);
+
+		bind->setBinding(0, vbuf);
+
+		HardwareIndexBufferSharedPtr ibuf =
+			HardwareBufferManager::getSingleton().createIndexBuffer(
+			HardwareIndexBuffer::IT_32BIT, // type of index
+			renderOperation->indexData->indexCount, // number of indexes
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+			false); // no shadow buffer	
+
+		renderOperation->indexData->indexBuffer = ibuf;	
+
+		// Drawing stuff
+		Vector3 vaabMin(std::numeric_limits<Real>::max(),std::numeric_limits<Real>::max(),std::numeric_limits<Real>::max());
+		Vector3 vaabMax(0.0,0.0,0.0);
+		
+		Real *prPos = static_cast<Real*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+
+		for(std::vector<PositionMaterial>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
+		{			
+			//prPos = addVertex(*vertexIter, 1.0f, prPos);	
+			*prPos++ = vertexIter->getPosition().getX();
+			*prPos++ = vertexIter->getPosition().getY();
+			*prPos++ = vertexIter->getPosition().getZ();
+
+			*prPos++ = vertexIter->getMaterial();
+				
+		}
+
+
+		unsigned long* pIdx = static_cast<unsigned long*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
+		unsigned long newVertexIndex = vecVertices.size();
+		for(int i = 0; i < vecIndices.size() - 2; i += 3)
+		{
+			*pIdx = vecIndices[i];
+			pIdx++;
+			*pIdx = vecIndices[i+1];
+			pIdx++;
+			*pIdx = vecIndices[i+2];
+			pIdx++;
+		}
+
+		ibuf->unlock();
+		vbuf->unlock();
+
+		//This function is extreamly slow.
+		//renderOperation->indexData->optimiseVertexCacheTriList();
+
+		m_RenderOp = renderOperation;
+	}
+
+	void SurfacePatchRenderable::buildRenderOperationFrom(SurfaceMesh<PositionMaterialNormal>& mesh, bool bSingleMaterial)
 	{
 		if(mesh.isEmpty())
 		{
@@ -225,7 +322,7 @@ namespace Thermite
 		decl->addElement(0, 3 * sizeof(float), VET_FLOAT3, VES_NORMAL);
 		decl->addElement(0, 6 * sizeof(float), VET_FLOAT2, VES_TEXTURE_COORDINATES);
 
-		const std::vector<SurfaceVertex>& vecVertices = mesh.getVertices();
+		const std::vector<PositionMaterialNormal>& vecVertices = mesh.getVertices();
 		const std::vector<uint32_t>& vecIndices = mesh.getIndices();
 
 		//The '3 * 3' in the following expressions comes from the fact that when we encounter a non uniform
@@ -269,7 +366,7 @@ namespace Thermite
 
 		if(bSingleMaterial)
 		{
-			for(std::vector<SurfaceVertex>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
+			for(std::vector<PositionMaterialNormal>::const_iterator vertexIter = vecVertices.begin(); vertexIter != vecVertices.end(); ++vertexIter)
 			{			
 				prPos = addVertex(*vertexIter, 1.0f, prPos);	
 				
@@ -302,9 +399,9 @@ namespace Thermite
 					pIdx++;*/
 
 					//Construct new vertices
-					SurfaceVertex vert0 = vecVertices[vecIndices[i+0]];
-					SurfaceVertex vert1 = vecVertices[vecIndices[i+1]];
-					SurfaceVertex vert2 = vecVertices[vecIndices[i+2]];
+					PositionMaterialNormal vert0 = vecVertices[vecIndices[i+0]];
+					PositionMaterialNormal vert1 = vecVertices[vecIndices[i+1]];
+					PositionMaterialNormal vert2 = vecVertices[vecIndices[i+2]];
 
 					/*float mat0 = vert0.getMaterial();
 					float mat1 = vert1.getMaterial();
@@ -398,9 +495,9 @@ namespace Thermite
 					pIdx++;*/
 
 					//Construct new vertices
-					SurfaceVertex vert0 = vecVertices[vecIndices[i+0]];
-					SurfaceVertex vert1 = vecVertices[vecIndices[i+1]];
-					SurfaceVertex vert2 = vecVertices[vecIndices[i+2]];
+					PositionMaterialNormal vert0 = vecVertices[vecIndices[i+0]];
+					PositionMaterialNormal vert1 = vecVertices[vecIndices[i+1]];
+					PositionMaterialNormal vert2 = vecVertices[vecIndices[i+2]];
 
 					float mat0 = vert0.getMaterial();
 					float mat1 = vert1.getMaterial();
