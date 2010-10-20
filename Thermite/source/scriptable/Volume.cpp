@@ -517,22 +517,6 @@ namespace Thermite
 			}
 		}
 
-		//Set all edge voxels to empty.
-		/*for(int z = 0; z < mapDepth; z++)
-		{
-			for(int y = 0; y < mapHeight; y++)
-			{
-				for(int x = 0; x < mapWidth; x++)
-				{
-					if((x == 0) || (x == mapWidth-1) || (y == 0) || (y == mapHeight-1) || (z == 0) || (z == mapDepth-1))
-					{
-						MaterialDensityPair44 voxel(0,0);
-						pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
-					}
-				}
-			}
-		}*/
-
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return;
