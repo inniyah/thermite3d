@@ -117,9 +117,15 @@ namespace Thermite
 						const std::uint16_t firstY = regionY * mRegionSideLength;
 						const std::uint16_t firstZ = regionZ * mRegionSideLength;
 
-						const std::uint16_t lastX = firstX + mRegionSideLength;
-						const std::uint16_t lastY = firstY + mRegionSideLength;
-						const std::uint16_t lastZ = firstZ + mRegionSideLength;	
+						/*const*/ std::uint16_t lastX = firstX + mRegionSideLength;
+						/*const*/ std::uint16_t lastY = firstY + mRegionSideLength;
+						/*const*/ std::uint16_t lastZ = firstZ + mRegionSideLength;	
+
+						//NOTE: When using the CubicSurfaceExtractor the regions do not tough
+						//in the same way as the MC surface extractor. Adjust for that here.
+						--lastX;
+						--lastY;
+						--lastZ;	
 
 						const uint16_t halfRegionSideLength = mRegionSideLength / 2;
 						const float centreX = firstX + halfRegionSideLength;
@@ -512,7 +518,7 @@ namespace Thermite
 		}
 
 		//Set all edge voxels to empty.
-		for(int z = 0; z < mapDepth; z++)
+		/*for(int z = 0; z < mapDepth; z++)
 		{
 			for(int y = 0; y < mapHeight; y++)
 			{
@@ -525,7 +531,7 @@ namespace Thermite
 					}
 				}
 			}
-		}
+		}*/
 
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
