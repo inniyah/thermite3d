@@ -53,7 +53,7 @@ namespace Thermite
 
 	public slots:
 		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, int density, bool bPaintMode);
-		void createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode);
+		void createSphereAt(QVector3D centre, float radius, int material, int density, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
@@ -66,6 +66,8 @@ namespace Thermite
 
 	public:
 		static TaskProcessorThread* m_backgroundThread;
+
+		bool mMultiThreadedSurfaceExtraction;
 
 		PolyVox::Volume<PolyVox::MaterialDensityPair44>* m_pPolyVoxVolume;
 		uint16_t mRegionSideLength;

@@ -52,6 +52,7 @@ namespace Thermite
 		,mVolumeWidthInRegions(0)
 		,mVolumeHeightInRegions(0)
 		,mVolumeDepthInRegions(0)
+		,mMultiThreadedSurfaceExtraction(true)
 	{
 		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
@@ -155,7 +156,14 @@ namespace Thermite
 							SurfaceMeshExtractionTask* surfaceMeshExtractionTask = new SurfaceMeshExtractionTask(m_pPolyVoxVolume, region, mLastModifiedArray[regionX][regionY][regionZ]);
 							surfaceMeshExtractionTask->setAutoDelete(false);
 							QObject::connect(surfaceMeshExtractionTask, SIGNAL(finished(SurfaceMeshExtractionTask*)), this, SLOT(uploadSurfaceExtractorResult(SurfaceMeshExtractionTask*)), Qt::QueuedConnection);
-							QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
+							if(mMultiThreadedSurfaceExtraction)
+							{
+								QThreadPool::globalInstance()->start(surfaceMeshExtractionTask, uPriority);
+							}
+							else
+							{
+								surfaceMeshExtractionTask->run();
+							}
 
 							//Indicate that we've processed this region
 							mExtractionStartedArray[regionX][regionY][regionZ] = mLastModifiedArray[regionX][regionY][regionZ];
@@ -295,7 +303,7 @@ namespace Thermite
 		}
 	}
 
-	void Volume::createSphereAt(QVector3D centre, float radius, int value, bool bPaintMode)
+	void Volume::createSphereAt(QVector3D centre, float radius, int material, int density, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.x() - radius));
 		int firstY = static_cast<int>(std::floor(centre.y() - radius));
@@ -332,9 +340,8 @@ namespace Thermite
 				{
 					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						MaterialDensityPair44 currentValue = m_pPolyVoxVolume->getVoxelAt(x,y,z);
-						currentValue.setDensity(MaterialDensityPair44::getMaxDensity());
-						m_pPolyVoxVolume->setVoxelAt(x,y,z,currentValue);
+						MaterialDensityPair44 value(material, density);
+						m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 					}
 				}
 			}
