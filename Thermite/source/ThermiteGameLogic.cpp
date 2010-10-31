@@ -326,6 +326,14 @@ namespace Thermite
 					QVector3D scale = entity->size();
 					sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
 
+					//Set a custom material if necessary
+					if(entity->materialName().isEmpty() == false)
+					{
+						//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
+						//But you can only get materials from SubEntities.
+						ogreEntity->setMaterialName(entity->materialName().toStdString());
+					}
+
 					//Animation
 					Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
 					if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))

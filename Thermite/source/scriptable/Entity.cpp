@@ -20,6 +20,16 @@ namespace Thermite
 		mMeshName = name;
 	}
 
+	const QString& Entity::materialName(void) const
+	{
+		return mMaterialName;
+	}
+
+	void Entity::setMaterialName(const QString& name)
+	{
+		mMaterialName = name;
+	}
+
 	const bool Entity::animated(void) const
 	{
 		return mAnimated;
