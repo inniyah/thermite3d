@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 
 #include "VolumeManager.h"
 
-#include "MaterialDensityPair.h"
+#include "Material.h"
 
 #include "Perlin.h"
 #include "SurfaceMeshExtractionTask.h"
@@ -80,7 +80,7 @@ namespace Thermite
 	{
 	}
 
-	void Volume::setPolyVoxVolume(PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume, uint16_t regionSideLength)
+	void Volume::setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength)
 	{
 		m_pPolyVoxVolume = pPolyVoxVolume;
 		mRegionSideLength = regionSideLength;		
@@ -303,7 +303,7 @@ namespace Thermite
 		}
 	}
 
-	void Volume::createSphereAt(QVector3D centre, float radius, int material, int density, bool bPaintMode)
+	void Volume::createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.x() - radius));
 		int firstY = static_cast<int>(std::floor(centre.y() - radius));
@@ -340,7 +340,7 @@ namespace Thermite
 				{
 					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						MaterialDensityPair44 value(material, density);
+						Material8 value(material);
 						m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 					}
 				}
@@ -352,7 +352,7 @@ namespace Thermite
 		qApp->getLogByName("Thermite")->logMessage("Volume was modified", QtOgre::LL_INFO);
 	}
 
-	void Volume::createCuboidAt(QVector3D centre, QVector3D dimensions, int material, int density, bool bPaintMode)
+	void Volume::createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode)
 	{
 		dimensions /= 2.0f;
 
@@ -387,7 +387,7 @@ namespace Thermite
 			{
 				for(int x = firstX; x <= lastX; ++x)
 				{
-					MaterialDensityPair44 value(material, density);
+					Material8 value(material);
 					m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 				}
 			}
@@ -408,7 +408,7 @@ namespace Thermite
 		QVector3D result = QVector3D(0,0,0);
 
 		//Ensure the voume is valid
-		PolyVox::Volume<MaterialDensityPair44>* pVolume = m_pPolyVoxVolume;
+		PolyVox::Volume<Material8>* pVolume = m_pPolyVoxVolume;
 		if(pVolume == 0)
 		{
 			return result;
@@ -436,7 +436,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
@@ -449,7 +449,7 @@ namespace Thermite
 
 		int volumeHeight = 64;
 
-		PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::MaterialDensityPair44>(mapWidth,volumeHeight,mapDepth);
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,volumeHeight,mapDepth);
 
 		//Create a grid of Perlin noise values
 		Perlin perlin(2,4,1,234);
@@ -502,21 +502,21 @@ namespace Thermite
 
 				for(int y = 0; y < mapHeight; y++)
 				{
-					MaterialDensityPair44 voxel;
+					Material8 voxel;
 					if(y < terrainHeight)
 					{
 						voxel.setMaterial(1);
-						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
+						voxel.setDensity(Material8::getMaxDensity());
 					}
 					else if(y == terrainHeight)
 					{
 						voxel.setMaterial(10);
-						voxel.setDensity(MaterialDensityPair44::getMaxDensity());
+						voxel.setDensity(Material8::getMaxDensity());
 					}
 					else
 					{
 						voxel.setMaterial(0);
-						voxel.setDensity(MaterialDensityPair44::getMinDensity());
+						voxel.setDensity(Material8::getMinDensity());
 					}
 
 					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
@@ -535,7 +535,7 @@ namespace Thermite
 		int y = qRound(position.y());
 		int z = qRound(position.z());
 
-		MaterialDensityPair44 voxel = m_pPolyVoxVolume->getVoxelAt(x,y,z);
+		Material8 voxel = m_pPolyVoxVolume->getVoxelAt(x,y,z);
 
 		return voxel.getMaterial();
 	}

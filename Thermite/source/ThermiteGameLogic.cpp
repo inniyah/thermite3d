@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfacePatchRenderable.h"
-#include "MaterialDensityPair.h"
+#include "Material.h"
 #include "QStringIODevice.h"
 #include "TextManager.h"
 #include "Vector3DClass.h"

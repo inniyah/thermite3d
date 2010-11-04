@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 #include "TextManager.h"
 #include "TextResource.h"
 
-#include "MaterialDensityPair.h"
+#include "Material.h"
 
 #include "OgreVector3.h"
 #include "OgreLogManager.h"

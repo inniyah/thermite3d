@@ -46,14 +46,14 @@ namespace Thermite
 		Volume(QObject* parent = 0);
 		~Volume(void);
 
-		void setPolyVoxVolume(PolyVox::Volume<PolyVox::MaterialDensityPair44>* pPolyVoxVolume, uint16_t regionSideLength);
+		void setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
 
 		void initialise(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
 	public slots:
-		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, int density, bool bPaintMode);
-		void createSphereAt(QVector3D centre, float radius, int material, int density, bool bPaintMode);
+		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode);
+		void createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
@@ -69,7 +69,7 @@ namespace Thermite
 
 		bool mMultiThreadedSurfaceExtraction;
 
-		PolyVox::Volume<PolyVox::MaterialDensityPair44>* m_pPolyVoxVolume;
+		PolyVox::Volume<PolyVox::Material8>* m_pPolyVoxVolume;
 		uint16_t mRegionSideLength;
 		uint16_t mVolumeWidthInRegions;
 		uint16_t mVolumeHeightInRegions;
