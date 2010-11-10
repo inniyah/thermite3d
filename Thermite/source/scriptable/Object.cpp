@@ -4,9 +4,16 @@
 
 namespace Thermite
 {
+	QList<Object*>* Object::mParentList = 0;
+
 	Object::Object(QObject * parent)
 		:QObject(parent)
 	{
+		if(mParentList)
+		{
+			mParentList->append(this);
+		}
+
 		mScale = QVector3D(1,1,1);
 	}
 

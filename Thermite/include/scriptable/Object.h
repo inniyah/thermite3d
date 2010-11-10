@@ -69,10 +69,14 @@ namespace Thermite
 
 		void lookAt(const QVector3D& target);
 
-	private:
+	public:
 		QVector3D mPosition;
 		QQuaternion mOrientation;
 		QVector3D mScale;
+
+		//All Objects are stored in this list so that we
+		//can quickly iterate over them when rendering.
+		static QList<Object*>* mParentList;
 	};
 }
 

@@ -82,7 +82,9 @@ namespace Thermite
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
-		mouse = new Mouse(this);		
+		mouse = new Mouse(this);	
+
+		Object::mParentList = &mObjectList;
 	}
 
 	void ThermiteGameLogic::setupScripting(void)
@@ -233,11 +235,12 @@ namespace Thermite
 
 		if(mOgreSceneManager)
 		{
-			QHashIterator<QString, QObject*> objectIter(mObjectStore);
+			QListIterator<Object*> objectIter(mObjectList);
 			while(objectIter.hasNext())
-			{
-				objectIter.next();
-				QObject* pObj = objectIter.value();
+			{				
+				QObject* pObj = objectIter.next();
+
+				QString objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16);
 
 				Light* light = dynamic_cast<Light*>(pObj);
 				if(light)
@@ -245,15 +248,15 @@ namespace Thermite
 					Ogre::SceneNode* sceneNode;
 					Ogre::Light* ogreLight;
 
-					if(mOgreSceneManager->hasLight(objectIter.key().toStdString()))
+					if(mOgreSceneManager->hasLight(objAddressAsString.toStdString()))
 					{
-						ogreLight = mOgreSceneManager->getLight(objectIter.key().toStdString());
+						ogreLight = mOgreSceneManager->getLight(objAddressAsString.toStdString());
 						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreLight->getParentNode());
 					}
 					else
 					{
 						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-						ogreLight = mOgreSceneManager->createLight(objectIter.key().toStdString());
+						ogreLight = mOgreSceneManager->createLight(objAddressAsString.toStdString());
 						Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
 						sceneNode->attachObject(ogreLight);
 						sceneNode->attachObject(ogreEntity);
@@ -290,15 +293,15 @@ namespace Thermite
 					Ogre::Entity* ogreEntity;
 					Ogre::SceneNode* sceneNode;
 
-					if(mOgreSceneManager->hasEntity(objectIter.key().toStdString()))
+					if(mOgreSceneManager->hasEntity(objAddressAsString.toStdString()))
 					{
-						ogreEntity = mOgreSceneManager->getEntity(objectIter.key().toStdString());
+						ogreEntity = mOgreSceneManager->getEntity(objAddressAsString.toStdString());
 						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
 					}
 					else
 					{
 						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-						ogreEntity = mOgreSceneManager->createEntity(objectIter.key().toStdString(), entity->meshName().toStdString());
+						ogreEntity = mOgreSceneManager->createEntity(objAddressAsString.toStdString(), entity->meshName().toStdString());
 						sceneNode->attachObject(ogreEntity);
 					}
 
@@ -812,9 +815,6 @@ namespace Thermite
 		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));
 		scriptEngine->globalObject().setProperty("Qt", Qt);
-
-		QScriptValue objectStoreScriptValue = scriptEngine->newQObject(&mObjectStore);
-		scriptEngine->globalObject().setProperty("objectStore", objectStoreScriptValue);
 	}
 
 	void ThermiteGameLogic::startScriptingEngine(void)

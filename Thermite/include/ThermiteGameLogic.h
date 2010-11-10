@@ -32,7 +32,6 @@ freely, subject to the following restrictions:
 #include "Entity.h"
 #include "Globals.h"
 #include "Light.h"
-#include "ObjectStore.h"
 #include "ScriptEditorWidget.h"
 
 #include <QtScript>
@@ -128,7 +127,7 @@ namespace Thermite
 		//Scene representation
 		Camera* mCamera;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
-		ObjectStore mObjectStore;	
+		QList<Object*> mObjectList;
 		uint16_t mCachedVolumeWidthInRegions;
 		uint16_t mCachedVolumeHeightInRegions;
 		uint16_t mCachedVolumeDepthInRegions;

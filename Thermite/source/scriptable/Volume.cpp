@@ -505,7 +505,7 @@ namespace Thermite
 					Material8 voxel;
 					if(y < terrainHeight)
 					{
-						voxel.setMaterial(135);
+						voxel.setMaterial(130);
 						voxel.setDensity(Material8::getMaxDensity());
 					}
 					else if(y == terrainHeight)
