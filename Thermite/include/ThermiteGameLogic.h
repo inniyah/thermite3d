@@ -126,6 +126,7 @@ namespace Thermite
 
 		//Scene representation
 		Camera* mCamera;
+		SkyBox* mSkyBox;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
 		QList<Object*> mObjectList;
 		uint16_t mCachedVolumeWidthInRegions;

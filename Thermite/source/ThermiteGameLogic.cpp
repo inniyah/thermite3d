@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #include "Console.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "SkyBox.h"
 #include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
@@ -83,6 +84,7 @@ namespace Thermite
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);	
+		mSkyBox = new SkyBox(this);
 
 		Object::mParentList = &mObjectList;
 	}
@@ -345,7 +347,8 @@ namespace Thermite
 						animationState->setEnabled(entity->animated());
 						animationState->setLoop(entity->loopAnimation());
 					}
-				}
+				}				
+
 				Volume* volume = dynamic_cast<Volume*>(pObj);
 				if(volume)
 				{	
@@ -424,6 +427,11 @@ namespace Thermite
 			mCameraSceneNode->setPosition(ogreTransform.getTrans());
 
 			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
+		}
+
+		if(mSkyBox)
+		{
+			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 500);
 		}
 
 		mouse->setPreviousPosition(mouse->position());
@@ -811,6 +819,9 @@ namespace Thermite
 
 		QScriptValue cameraScriptValue = scriptEngine->newQObject(mCamera);
 		scriptEngine->globalObject().setProperty("camera", cameraScriptValue);
+
+		QScriptValue skyBoxScriptValue = scriptEngine->newQObject(mSkyBox);
+		scriptEngine->globalObject().setProperty("skyBox", skyBoxScriptValue);
 
 		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));

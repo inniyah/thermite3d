@@ -33,6 +33,7 @@ namespace Thermite
 	//Scriptable
 	class Keyboard;
 	class Mouse;
+	class SkyBox;
 
 	//Tasks
 	class SurfaceMeshDecimationTask;

@@ -109,6 +109,7 @@ SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Mouse.cpp
 	source/scriptable/Object.cpp
 	source/scriptable/ScriptEditorWidget.cpp
+	source/scriptable/SkyBox.cpp
 	source/scriptable/Vector3DClass.cpp
 	source/scriptable/Vector3DPrototype.cpp
 	source/scriptable/Volume.cpp
@@ -123,6 +124,7 @@ SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Mouse.h
 	include/scriptable/Object.h
 	include/scriptable/ScriptEditorWidget.h
+	include/scriptable/SkyBox.h
 	include/scriptable/Vector3DClass.h
 	include/scriptable/Vector3DPrototype.h
 	include/scriptable/Volume.h
