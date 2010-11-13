@@ -145,7 +145,7 @@ namespace Thermite
 		mOgreCamera = mOgreSceneManager->createCamera("OgreCamera");
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
-		mOgreCamera->setFarClipDistance(1000);
+		mOgreCamera->setFarClipDistance(5000);
 		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
@@ -431,7 +431,7 @@ namespace Thermite
 
 		if(mSkyBox)
 		{
-			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 500);
+			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 2500);
 		}
 
 		mouse->setPreviousPosition(mouse->position());
