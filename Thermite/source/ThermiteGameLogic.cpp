@@ -67,19 +67,45 @@ namespace Thermite
 {
 	ThermiteGameLogic::ThermiteGameLogic(void)
 		:GameLogic()
-		,mOgreSceneManager(0)
-		,m_bRunScript(true)
-		,scriptEngine(0)
+
+		//Scene representation
 		,mCamera(0)
-		,m_pScriptEditorWidget(0)
-		,mOgreCamera(0)
-		,mFirstFind(true)
-		,m_axisNode(0)
-		,keyboard(0)
+		,mSkyBox(0)
+		//,mVolLastUploadedTimeStamps(0)
+		//,mObjectList(0)
 		,mCachedVolumeWidthInRegions(0)
 		,mCachedVolumeHeightInRegions(0)
 		,mCachedVolumeDepthInRegions(0)
+
+		//Ogre's scene representation
 		,mVolumeSceneNode(0)
+		//,m_volOgreSceneNodes(0)
+		,mCameraSceneNode(0)
+		,mOgreCamera(0)
+		,mMainViewport(0)
+		,mOgreSceneManager(0)
+		,m_axisNode(0)
+
+		//Input
+		,keyboard(0)
+		,mouse(0)
+
+		//Scripting support
+		,scriptEngine(0)
+		,m_pScriptEditorWidget(0)
+		,m_bRunScript(true)
+		//,mInitialiseScript(0)
+
+		//User interface
+		,mConsole(0)
+		,mMainMenu(0)
+		,m_pThermiteLogoMovie(0)
+		,m_pThermiteLogoLabel(0)
+
+		//Other
+		,mFirstFind(false)
+		,mThermiteLog(0)
+		//,m_commandLineArgs(0)
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
