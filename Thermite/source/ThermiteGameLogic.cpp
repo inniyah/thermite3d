@@ -106,6 +106,7 @@ namespace Thermite
 		,mFirstFind(false)
 		,mThermiteLog(0)
 		//,m_commandLineArgs(0)
+		//mCurrentAppName(0)
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
@@ -186,7 +187,9 @@ namespace Thermite
 		//playStartupMovie();
 
 		//Load engine built-in resources
-		addResourceDirectory("./resources/");
+		//addResourceDirectory("./resources/", "Thermite");
+		//Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Thermite");
+		//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		//Set the frame sate to be as high as possible
 		mApplication->setAutoUpdateInterval(0);
@@ -227,8 +230,20 @@ namespace Thermite
 
 	bool ThermiteGameLogic::loadApp(const QString& appName)
 	{
+		QString appDirectory("../share/thermite/apps/" + appName);
+
+		QDir dirToTest(appDirectory);
+		if(!dirToTest.exists())
+		{
+			mThermiteLog->logMessage("Application " + appName + " does not exist. It should be found in the following location: " + appDirectory, LL_ERROR);
+			return false;
+		}
+
+		mCurrentAppName = appName;
+
 		//Initialise all resources		
-		addResourceDirectory(QString("../share/thermite/apps/") + appName);
+		addResourceDirectory("./resources/");
+		addResourceDirectory(appDirectory);
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		//Load the scripts
@@ -247,6 +262,13 @@ namespace Thermite
 		}	
 
 		return true;
+	}
+
+	void ThermiteGameLogic::unloadApp(void)
+	{
+		Ogre::ResourceGroupManager::getSingleton().shutdownAll();
+
+		mCurrentAppName = "";
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -455,10 +477,10 @@ namespace Thermite
 			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 		}
 
-		if(mSkyBox)
+		/*if(mSkyBox)
 		{
 			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 2500);
-		}
+		}*/
 
 		mouse->setPreviousPosition(mouse->position());
 		mouse->resetWheelDelta();

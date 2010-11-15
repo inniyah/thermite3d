@@ -102,6 +102,7 @@ namespace Thermite
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
 
 		bool loadApp(const QString& appName);
+		void unloadApp(void);
 		QWidget* loadUIFile(const QString& filename);
 
 		//Don't like having these functions here - really they should be inside camera or something. But they are
@@ -162,6 +163,7 @@ namespace Thermite
 		bool mFirstFind;
 		QtOgre::Log* mThermiteLog;
 		AnyOption m_commandLineArgs;
+		QString mCurrentAppName;
 	};
 }
 
