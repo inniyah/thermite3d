@@ -235,7 +235,9 @@ namespace Thermite
 		QDir dirToTest(appDirectory);
 		if(!dirToTest.exists())
 		{
-			mThermiteLog->logMessage("Application " + appName + " does not exist. It should be found in the following location: " + appDirectory, LL_ERROR);
+			QString message("Application " + appName + " does not exist. It should be found in the following location: " + appDirectory);
+			mThermiteLog->logMessage(message, LL_ERROR);
+			qApp->showErrorMessageBox(message);
 			return false;
 		}
 
