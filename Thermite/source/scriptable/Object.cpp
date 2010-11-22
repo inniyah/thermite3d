@@ -8,6 +8,8 @@ namespace Thermite
 
 	Object::Object(QObject * parent)
 		:QObject(parent)
+		,mModified(true) //It's been constructed
+		,mVisible(true)
 	{
 		if(mParentList)
 		{
@@ -162,6 +164,17 @@ namespace Thermite
 	void Object::setModified(bool modified)
 	{
 		mModified = modified;
+	}
+
+	bool Object::isVisible(void) const
+	{
+		return mVisible;
+	}
+	
+	void Object::setVisible(bool visible)
+	{
+		mVisible = visible;
+		setModified(true);
 	}
 
 	void Object::translate(const QVector3D & vector)

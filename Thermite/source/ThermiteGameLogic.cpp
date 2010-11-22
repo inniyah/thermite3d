@@ -305,24 +305,55 @@ namespace Thermite
 				Object* pObj = objectIter.next();
 				if(pObj->isModified())
 				{
+					//Use the objects address to build unique names
+					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
 
-					QString objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16);
+					//Update the Object properties
+					Ogre::SceneNode* sceneNode;
+					std::string sceneNodeName(objAddressAsString + "_SceneNode");
+					if(mOgreSceneManager->hasSceneNode(sceneNodeName))
+					{
+						sceneNode = mOgreSceneManager->getSceneNode(sceneNodeName);
+					}
+					else
+					{
+						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode(sceneNodeName);
+					}
 
+					QMatrix4x4 qtTransform = pObj->transform();
+					Ogre::Matrix4 ogreTransform;
+					for(int row = 0; row < 4; ++row)
+					{
+						Ogre::Real* rowPtr = ogreTransform[row];
+						for(int col = 0; col < 4; ++col)
+						{
+							Ogre::Real* colPtr = rowPtr + col;
+							*colPtr = qtTransform(row, col);
+						}
+					}
+
+					sceneNode->setOrientation(ogreTransform.extractQuaternion());
+					sceneNode->setPosition(ogreTransform.getTrans());
+
+					QVector3D scale = pObj->size();
+					sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+
+					sceneNode->setVisible(pObj->isVisible());
+
+					//Update the Light properties
 					Light* light = dynamic_cast<Light*>(pObj);
 					if(light)
 					{
-						Ogre::SceneNode* sceneNode;
 						Ogre::Light* ogreLight;
+						std::string lightName(objAddressAsString + "_Light");
 
-						if(mOgreSceneManager->hasLight(objAddressAsString.toStdString()))
+						if(mOgreSceneManager->hasLight(lightName))
 						{
-							ogreLight = mOgreSceneManager->getLight(objAddressAsString.toStdString());
-							sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreLight->getParentNode());
+							ogreLight = mOgreSceneManager->getLight(lightName);
 						}
 						else
 						{
-							sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-							ogreLight = mOgreSceneManager->createLight(objAddressAsString.toStdString());
+							ogreLight = mOgreSceneManager->createLight(lightName);
 							Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
 							sceneNode->attachObject(ogreLight);
 							sceneNode->attachObject(ogreEntity);
@@ -341,9 +372,6 @@ namespace Thermite
 							break;
 						}
 
-						QVector3D pos = light->position();
-						sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-
 						//Note we negate the z axis as Thermite considers negative z
 						//to be forwards. This means that lights will match cameras.
 						QVector3D dir = -light->zAxis();
@@ -353,47 +381,22 @@ namespace Thermite
 						ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
 					}
 
+					//Update the Entity properties
 					Entity* entity = dynamic_cast<Entity*>(pObj);
 					if(entity && (entity->meshName().isEmpty() == false))
 					{
 						Ogre::Entity* ogreEntity;
-						Ogre::SceneNode* sceneNode;
+						std::string entityName(objAddressAsString + "_Entity");
 
-						if(mOgreSceneManager->hasEntity(objAddressAsString.toStdString()))
+						if(mOgreSceneManager->hasEntity(entityName))
 						{
-							ogreEntity = mOgreSceneManager->getEntity(objAddressAsString.toStdString());
-							sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
+							ogreEntity = mOgreSceneManager->getEntity(entityName);
 						}
 						else
 						{
-							sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-							ogreEntity = mOgreSceneManager->createEntity(objAddressAsString.toStdString(), entity->meshName().toStdString());
+							ogreEntity = mOgreSceneManager->createEntity(entityName, entity->meshName().toStdString());
 							sceneNode->attachObject(ogreEntity);
-						}
-
-						QMatrix4x4 qtTransform = entity->transform();
-						Ogre::Matrix4 ogreTransform;
-						for(int row = 0; row < 4; ++row)
-						{
-							Ogre::Real* rowPtr = ogreTransform[row];
-							for(int col = 0; col < 4; ++col)
-							{
-								Ogre::Real* colPtr = rowPtr + col;
-								*colPtr = qtTransform(row, col);
-							}
-						}
-
-						sceneNode->setOrientation(ogreTransform.extractQuaternion());
-						sceneNode->setPosition(ogreTransform.getTrans());
-
-						/*QVector3D pos = entity->position();
-						sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-
-						QQuaternion orientation = entity->orientation();
-						sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));*/
-
-						QVector3D scale = entity->size();
-						sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+						}						
 
 						//Set a custom material if necessary
 						if(entity->materialName().isEmpty() == false)
@@ -413,6 +416,7 @@ namespace Thermite
 						}
 					}				
 
+					//Update the Volume properties
 					Volume* volume = dynamic_cast<Volume*>(pObj);
 					if(volume)
 					{	
