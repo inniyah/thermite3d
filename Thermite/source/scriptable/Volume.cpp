@@ -122,7 +122,7 @@ namespace Thermite
 						/*const*/ std::uint16_t lastY = firstY + mRegionSideLength;
 						/*const*/ std::uint16_t lastZ = firstZ + mRegionSideLength;	
 
-						//NOTE: When using the CubicSurfaceExtractor the regions do not tough
+						//NOTE: When using the CubicSurfaceExtractor the regions do not touch
 						//in the same way as the MC surface extractor. Adjust for that here.
 						--lastX;
 						--lastY;
@@ -171,6 +171,7 @@ namespace Thermite
 					}
 				}
 			}
+			setModified(true);
 		}
 	}
 

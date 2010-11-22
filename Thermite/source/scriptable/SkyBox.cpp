@@ -16,5 +16,6 @@ namespace Thermite
 	void SkyBox::setMaterialName(const QString& name)
 	{
 		mMaterialName = name;
+		setModified(true);
 	}
 }

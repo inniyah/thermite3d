@@ -285,176 +285,191 @@ namespace Thermite
 			}
 		}
 
+		QListIterator<Object*> objectIter(mObjectList);
+		while(objectIter.hasNext())
+		{				
+			Object* pObj = objectIter.next();
+
+			Volume* volume = dynamic_cast<Volume*>(pObj);
+			if(volume)
+			{
+				volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
+			}
+		}
+
 		if(mOgreSceneManager)
 		{
 			QListIterator<Object*> objectIter(mObjectList);
 			while(objectIter.hasNext())
 			{				
-				QObject* pObj = objectIter.next();
-
-				QString objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16);
-
-				Light* light = dynamic_cast<Light*>(pObj);
-				if(light)
+				Object* pObj = objectIter.next();
+				if(pObj->isModified())
 				{
-					Ogre::SceneNode* sceneNode;
-					Ogre::Light* ogreLight;
 
-					if(mOgreSceneManager->hasLight(objAddressAsString.toStdString()))
+					QString objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16);
+
+					Light* light = dynamic_cast<Light*>(pObj);
+					if(light)
 					{
-						ogreLight = mOgreSceneManager->getLight(objAddressAsString.toStdString());
-						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreLight->getParentNode());
-					}
-					else
-					{
-						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-						ogreLight = mOgreSceneManager->createLight(objAddressAsString.toStdString());
-						Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
-						sceneNode->attachObject(ogreLight);
-						sceneNode->attachObject(ogreEntity);
-					}
+						Ogre::SceneNode* sceneNode;
+						Ogre::Light* ogreLight;
 
-					switch(light->getType())
-					{
-					case Light::PointLight:
-						ogreLight->setType(Ogre::Light::LT_POINT);
-						break;
-					case Light::DirectionalLight:
-						ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
-						break;
-					case Light::SpotLight:
-						ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
-						break;
-					}
-
-					QVector3D pos = light->position();
-					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-
-					//Note we negate the z axis as Thermite considers negative z
-					//to be forwards. This means that lights will match cameras.
-					QVector3D dir = -light->zAxis();
-					ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
-
-					QColor col = light->getColour();
-					ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
-				}
-
-				Entity* entity = dynamic_cast<Entity*>(pObj);
-				if(entity)
-				{
-					Ogre::Entity* ogreEntity;
-					Ogre::SceneNode* sceneNode;
-
-					if(mOgreSceneManager->hasEntity(objAddressAsString.toStdString()))
-					{
-						ogreEntity = mOgreSceneManager->getEntity(objAddressAsString.toStdString());
-						sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
-					}
-					else
-					{
-						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
-						ogreEntity = mOgreSceneManager->createEntity(objAddressAsString.toStdString(), entity->meshName().toStdString());
-						sceneNode->attachObject(ogreEntity);
-					}
-
-					QMatrix4x4 qtTransform = entity->transform();
-					Ogre::Matrix4 ogreTransform;
-					for(int row = 0; row < 4; ++row)
-					{
-						Ogre::Real* rowPtr = ogreTransform[row];
-						for(int col = 0; col < 4; ++col)
+						if(mOgreSceneManager->hasLight(objAddressAsString.toStdString()))
 						{
-							Ogre::Real* colPtr = rowPtr + col;
-							*colPtr = qtTransform(row, col);
+							ogreLight = mOgreSceneManager->getLight(objAddressAsString.toStdString());
+							sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreLight->getParentNode());
 						}
-					}
-
-					sceneNode->setOrientation(ogreTransform.extractQuaternion());
-					sceneNode->setPosition(ogreTransform.getTrans());
-
-					/*QVector3D pos = entity->position();
-					sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-
-					QQuaternion orientation = entity->orientation();
-					sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));*/
-
-					QVector3D scale = entity->size();
-					sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
-
-					//Set a custom material if necessary
-					if(entity->materialName().isEmpty() == false)
-					{
-						//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
-						//But you can only get materials from SubEntities.
-						ogreEntity->setMaterialName(entity->materialName().toStdString());
-					}
-
-					//Animation
-					Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
-					if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
-					{
-						Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
-						animationState->setEnabled(entity->animated());
-						animationState->setLoop(entity->loopAnimation());
-					}
-				}				
-
-				Volume* volume = dynamic_cast<Volume*>(pObj);
-				if(volume)
-				{	
-					//Create a scene node to attach this volume under
-					if(mVolumeSceneNode == 0)
-					{
-						mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
-					}
-
-					//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
-					if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
-					{	
-						deleteSceneNodeChildren(mVolumeSceneNode);
-
-						mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
-						mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
-						mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-						m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
-						
-						uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
-
-						//Create the arrays
-						mVolLastUploadedTimeStamps.resize(dimensions);
-						m_volOgreSceneNodes.resize(dimensions);
-
-						//Clear the arrays
-						std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
-						std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
-					}
-
-					//Some values we'll need later.
-					uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
-					uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
-					uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-					volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
-
-					//Iterate over each region
-					for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
-					{		
-						for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+						else
 						{
-							for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+							sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+							ogreLight = mOgreSceneManager->createLight(objAddressAsString.toStdString());
+							Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+							sceneNode->attachObject(ogreLight);
+							sceneNode->attachObject(ogreEntity);
+						}
+
+						switch(light->getType())
+						{
+						case Light::PointLight:
+							ogreLight->setType(Ogre::Light::LT_POINT);
+							break;
+						case Light::DirectionalLight:
+							ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
+							break;
+						case Light::SpotLight:
+							ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
+							break;
+						}
+
+						QVector3D pos = light->position();
+						sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+						//Note we negate the z axis as Thermite considers negative z
+						//to be forwards. This means that lights will match cameras.
+						QVector3D dir = -light->zAxis();
+						ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
+
+						QColor col = light->getColour();
+						ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+					}
+
+					Entity* entity = dynamic_cast<Entity*>(pObj);
+					if(entity && (entity->meshName().isEmpty() == false))
+					{
+						Ogre::Entity* ogreEntity;
+						Ogre::SceneNode* sceneNode;
+
+						if(mOgreSceneManager->hasEntity(objAddressAsString.toStdString()))
+						{
+							ogreEntity = mOgreSceneManager->getEntity(objAddressAsString.toStdString());
+							sceneNode = dynamic_cast<Ogre::SceneNode*>(ogreEntity->getParentNode());
+						}
+						else
+						{
+							sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
+							ogreEntity = mOgreSceneManager->createEntity(objAddressAsString.toStdString(), entity->meshName().toStdString());
+							sceneNode->attachObject(ogreEntity);
+						}
+
+						QMatrix4x4 qtTransform = entity->transform();
+						Ogre::Matrix4 ogreTransform;
+						for(int row = 0; row < 4; ++row)
+						{
+							Ogre::Real* rowPtr = ogreTransform[row];
+							for(int col = 0; col < 4; ++col)
 							{
-								uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-								uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
-								if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
+								Ogre::Real* colPtr = rowPtr + col;
+								*colPtr = qtTransform(row, col);
+							}
+						}
+
+						sceneNode->setOrientation(ogreTransform.extractQuaternion());
+						sceneNode->setPosition(ogreTransform.getTrans());
+
+						/*QVector3D pos = entity->position();
+						sceneNode->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+
+						QQuaternion orientation = entity->orientation();
+						sceneNode->setOrientation(Ogre::Quaternion(orientation.scalar(), orientation.x(), orientation.y(), orientation.z()));*/
+
+						QVector3D scale = entity->size();
+						sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+
+						//Set a custom material if necessary
+						if(entity->materialName().isEmpty() == false)
+						{
+							//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
+							//But you can only get materials from SubEntities.
+							ogreEntity->setMaterialName(entity->materialName().toStdString());
+						}
+
+						//Animation
+						Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
+						if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
+						{
+							Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
+							animationState->setEnabled(entity->animated());
+							animationState->setLoop(entity->loopAnimation());
+						}
+					}				
+
+					Volume* volume = dynamic_cast<Volume*>(pObj);
+					if(volume)
+					{	
+						//Create a scene node to attach this volume under
+						if(mVolumeSceneNode == 0)
+						{
+							mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
+						}
+
+						//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
+						if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
+						{	
+							deleteSceneNodeChildren(mVolumeSceneNode);
+
+							mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
+							mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
+							mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
+
+							m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
+						
+							uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
+
+							//Create the arrays
+							mVolLastUploadedTimeStamps.resize(dimensions);
+							m_volOgreSceneNodes.resize(dimensions);
+
+							//Clear the arrays
+							std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
+							std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
+						}
+
+						//Some values we'll need later.
+						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
+						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
+						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
+
+						//Iterate over each region
+						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+						{		
+							for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+							{
+								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
-									SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
-									PolyVox::Region reg = mesh->m_Region;
-									uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
+									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
+									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
+									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
+									{
+										SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
+										PolyVox::Region reg = mesh->m_Region;
+										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
+									}
 								}
 							}
 						}
 					}
+
+					pObj->setModified(false);
 				}
 			}
 		}
@@ -479,10 +494,10 @@ namespace Thermite
 			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 		}
 
-		/*if(mSkyBox)
+		if(mSkyBox && (mSkyBox->materialName().isEmpty() == false))
 		{
 			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 2500);
-		}*/
+		}
 
 		mouse->setPreviousPosition(mouse->position());
 		mouse->resetWheelDelta();
