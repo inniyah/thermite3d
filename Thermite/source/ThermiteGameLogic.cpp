@@ -120,36 +120,7 @@ namespace Thermite
 	{
 		initScriptEngine();	 
 
-		initScriptEnvironment();
-
-		QString script
-		(
-		"print('In initialise');"
-		"test = new QPoint();"
-		"print(test);"
-		"print('Done initialise');"
-		);
-
-		QScriptValue result = scriptEngine->evaluate(script);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
-
-		result = scriptEngine->evaluate(script);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
-
-		result = scriptEngine->evaluate(script);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}		
+		initScriptEnvironment();	
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -282,6 +253,7 @@ namespace Thermite
 			{
 				int line = scriptEngine->uncaughtExceptionLineNumber();
 				qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+				m_bRunScript = false;
 			}
 		}
 
@@ -895,6 +867,28 @@ namespace Thermite
 		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));
 		scriptEngine->globalObject().setProperty("Qt", Qt);
+
+		exposeFunction("include");
+		
+	}
+
+	//Functions which would normally be access by ThermiteGameLogic.xxx() are
+	//wrapped here by some simple script code so they appear to be called directly.
+	void ThermiteGameLogic::exposeFunction(const QString& identifier)
+	{
+		QString script
+		(
+		"print('Registering \"" + identifier + "\"');"
+		"function " + identifier + "(path) { ThermiteGameLogic." + identifier + "(path); }"
+		);
+
+		QScriptValue result = scriptEngine->evaluate(script);
+		if (scriptEngine->hasUncaughtException())
+		{
+			int line = scriptEngine->uncaughtExceptionLineNumber();
+			qCritical() << "Failed to register '" + identifier + "', message follows:";
+			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+		}
 	}
 
 	void ThermiteGameLogic::startScriptingEngine(void)
@@ -1000,5 +994,32 @@ namespace Thermite
 		QUiLoader loader;
 		QWidget* ui = loader.load(&device);
 		return ui;
+	}
+
+	void ThermiteGameLogic::include(QString path)
+	{
+		try
+		{
+			TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load(path.toStdString(), "General");
+
+			QString script = QString::fromStdString(pTextResource->getScriptData());
+    
+			//set ScriptContext
+			QScriptContext *context = scriptEngine->currentContext();
+			QScriptContext *parent=context->parentContext();
+			if(parent!=0)
+			{
+				context->setActivationObject(context->parentContext()->activationObject());
+				context->setThisObject(context->parentContext()->thisObject());
+			}
+
+			//execute script
+			QScriptValue result = scriptEngine->evaluate(script);
+		}
+		catch(Ogre::Exception& e)
+		{
+			qCritical() << "Failed to include file: " << path;
+			qCritical() << QString::fromStdString(e.getDescription());
+		}
 	}
 }

@@ -104,6 +104,7 @@ namespace Thermite
 		bool loadApp(const QString& appName);
 		void unloadApp(void);
 		QWidget* loadUIFile(const QString& filename);
+		void include(QString path);
 
 		//Don't like having these functions here - really they should be inside camera or something. But they are
 		//using Ogre methods which aren't available in the scriptable classes. Eventually they should be rewritten
@@ -124,6 +125,7 @@ namespace Thermite
 
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
+		void exposeFunction(const QString& identifier);
 
 		//Scene representation
 		Camera* mCamera;
