@@ -540,4 +540,12 @@ namespace Thermite
 
 		return voxel.getMaterial();
 	}
+
+	QVariantList Volume::findPath(QVector3D start, QVector3D end)
+	{
+		QVariantList result;
+		result.append(QVector3D(0,0,0));
+		result.append(end);
+		return result;
+	}
 }

@@ -125,7 +125,7 @@ namespace Thermite
 
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
-		void exposeFunction(const QString& identifier);
+		void exposeFunction(const QString& functionName, const QString& params);
 
 		//Scene representation
 		Camera* mCamera;

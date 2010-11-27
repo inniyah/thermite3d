@@ -868,25 +868,25 @@ namespace Thermite
 		Qt.setProperty("App", scriptEngine->newQObject(qApp));
 		scriptEngine->globalObject().setProperty("Qt", Qt);
 
-		exposeFunction("include");
+		exposeFunction("include", "path");
 		
 	}
 
 	//Functions which would normally be access by ThermiteGameLogic.xxx() are
 	//wrapped here by some simple script code so they appear to be called directly.
-	void ThermiteGameLogic::exposeFunction(const QString& identifier)
+	void ThermiteGameLogic::exposeFunction(const QString& functionName, const QString& params)
 	{
 		QString script
 		(
-		"print('Registering \"" + identifier + "\"');"
-		"function " + identifier + "(path) { ThermiteGameLogic." + identifier + "(path); }"
+			"print('Registering \"" + functionName + "(" + params + ")\"');"
+			"function " + functionName + "(" + params + ") { ThermiteGameLogic." + functionName + "(" + params + "); }"
 		);
 
 		QScriptValue result = scriptEngine->evaluate(script);
 		if (scriptEngine->hasUncaughtException())
 		{
 			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "Failed to register '" + identifier + "', message follows:";
+			qCritical() << "Failed to register '" + functionName + "', message follows:";
 			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
 		}
 	}

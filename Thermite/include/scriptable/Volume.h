@@ -57,6 +57,8 @@ namespace Thermite
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
+		QVariantList findPath(QVector3D start, QVector3D end);
+
 		bool loadFromFile(const QString& filename);
 
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
