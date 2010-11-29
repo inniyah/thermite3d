@@ -553,7 +553,7 @@ namespace Thermite
 		return voxel.getMaterial();
 	}
 
-	QVariantList Volume::findPath(QVector3D start, QVector3D end)
+	void Volume::findPath(QVector3D start, QVector3D end)
 	{
 		int startX = start.x() + 0.5f;
 		int startZ = start.z() + 0.5f;
@@ -588,7 +588,7 @@ namespace Thermite
 
 		std::vector<Node*> open;
 		//make_heap(open.begin(), open.end());
-		std::vector<Node*> closed;
+		std::set<Node*> closed;
 
 		startNode->gVal = 0;
 
@@ -604,7 +604,8 @@ namespace Thermite
 			int currentX = current->position.getX();
 			int currentZ = current->position.getZ();
 
-			closed.push_back(current);
+			//closed.push_back(current);
+			closed.insert(current);
 
 			//Plus X
 			//Node* plusX = nodes[currentX + 1][currentZ];
@@ -624,12 +625,21 @@ namespace Thermite
 
 		//result.append(QVector3D(128,end.y(),128));
 		//result.append(end);
-		return result;
+
+		emit foundPath(result);
+
+		//return result;
 	}
 
-	void Volume::processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::vector<Node*>& closed)
+	void Volume::processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::set<Node*>& closed)
 	{
+		Material8 voxel = m_pPolyVoxVolume->getVoxelAt(neighbour->position.getX(), neighbour->position.getY(), neighbour->position.getZ());
 		int cost = current->gVal + 1.0f;
+
+		if(voxel.getMaterial() > 0)
+		{
+			cost = 1000000;
+		}
 
 		std::vector<Node*>::iterator openIter = std::find(open.begin(), open.end(), neighbour);
 		if(openIter != open.end())
@@ -638,16 +648,18 @@ namespace Thermite
 			{
 				open.erase(openIter);
 				make_heap(open.begin(), open.end(), NodeSort());
+				openIter = open.end();
 			}
 		}
 
-		std::vector<Node*>::iterator closedIter = std::find(closed.begin(), closed.end(), neighbour);
+		std::set<Node*>::iterator closedIter = std::find(closed.begin(), closed.end(), neighbour);
 		if(closedIter != closed.end())
 		{
 			if(cost < neighbour->gVal)
 			{
 				//Probably shouldn't happen?
 				closed.erase(closedIter);
+				closedIter = closed.end();
 			}
 		}
 

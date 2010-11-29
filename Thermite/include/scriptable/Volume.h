@@ -78,14 +78,18 @@ namespace Thermite
 		void initialise(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
+	signals:
+		void foundPath(QVariantList path);
+
 	public slots:
 		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode);
 		void createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
-		QVariantList findPath(QVector3D start, QVector3D end);
-		void processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::vector<Node*>& closed);
+		void findPath(QVector3D start, QVector3D end);
+		void processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::set<Node*>& closed);
+
 
 		bool loadFromFile(const QString& filename);
 
