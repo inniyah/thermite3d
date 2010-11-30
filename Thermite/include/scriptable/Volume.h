@@ -40,31 +40,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	struct Node
-	{
-		PolyVox::Vector3DInt16 position;
-		Node* parent;
-		float gVal;
-
-		float g(void) const
-		{
-			return gVal;
-		}
-
-		float h(void) const
-		{
-			return abs(position.getX()-endNode->position.getX()) + abs(position.getY()-endNode->position.getY());
-		}
-
-        /*bool Node::operator<(const Node& rhs) const throw()
-		{
-			return g() + h() < rhs.g() + rhs.h();
-		} */
-
-		static Node* startNode;
-		static Node* endNode;
-	};
-
 	class Volume : public Object
 	{
 		Q_OBJECT
@@ -87,8 +62,9 @@ namespace Thermite
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
+		void finishedHandler(QVariantList path);
+
 		void findPath(QVector3D start, QVector3D end);
-		void processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::set<Node*>& closed);
 
 
 		bool loadFromFile(const QString& filename);

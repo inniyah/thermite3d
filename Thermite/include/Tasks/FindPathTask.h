@@ -30,16 +30,44 @@ freely, subject to the following restrictions:
 #include <PolyVoxForwardDeclarations.h>
 
 #include <QVariant>
+#include <QVector3d>
+
+#include "Vector.h"
+
+#include "scriptable/Volume.h"
 
 namespace Thermite
 {
+	struct Node
+	{
+		PolyVox::Vector3DInt16 position;
+		Node* parent;
+		float gVal;
+
+		float g(void) const
+		{
+			return gVal;
+		}
+
+		float h(void) const
+		{
+			return abs(position.getX()-endNode->position.getX()) + abs(position.getY()-endNode->position.getY());
+		}
+
+		static Node* startNode;
+		static Node* endNode;
+	};
+
 	class ThermiteGameLogic;
 
 	class FindPathTask : public Task
 	{
 		Q_OBJECT
 	public:
-		FindPathTask(PolyVox::Volume<PolyVox::Material8>* volume);
+		FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
+
+		void findPath(QVector3D start, QVector3D end);
+		void processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::set<Node*>& closed);
 
 		void run(void);
 
@@ -47,7 +75,10 @@ namespace Thermite
 		void finished(QVariantList path);
 
 	public:
-		PolyVox::Volume<PolyVox::Material8>* mVolume;
+		PolyVox::Volume<PolyVox::Material8>* mPolyVoxVolume;
+		QVector3D mStart;
+		QVector3D mEnd;
+		Volume* mThermiteVolume;
 	};
 }
 
