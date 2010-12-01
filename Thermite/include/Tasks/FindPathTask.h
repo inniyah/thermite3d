@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 #include <PolyVoxForwardDeclarations.h>
 
 #include <QVariant>
-#include <QVector3d>
+#include <QVector3D>
 
 #include "Vector.h"
 
