@@ -38,8 +38,39 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
+	class OpenNodesContainer;
+	class ClosedNodesContainer;
+
 	struct Node
 	{
+		Node()
+		{
+			position.setX(0);
+			position.setY(0);
+			position.setZ(0);
+			gVal = 1000000;
+			parent = 0;
+		};
+
+		Node(int x, int y, int z)
+		{
+			position.setX(x);
+			position.setY(y);
+			position.setZ(z);
+			gVal = 1000000;
+			parent = 0;
+		}
+
+		bool operator==(const Node& rhs) const
+		{
+			return position == rhs.position;
+		}
+
+		bool operator!=(const Node& rhs) const
+		{
+			return (position == rhs.position) == false;
+		}
+
 		PolyVox::Vector3DInt16 position;
 		Node* parent;
 		float gVal;
@@ -51,12 +82,15 @@ namespace Thermite
 
 		float h(void) const
 		{
-			return abs(position.getX()-endNode->position.getX()) + abs(position.getY()-endNode->position.getY());
+			return abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY());
 		}
 
-		static Node* startNode;
-		static Node* endNode;
+		//static Node* startNode;
+		//static Node* endNode;
+		static PolyVox::Vector3DInt16 endPos;
 	};
+
+	bool operator<(const Node& lhs, const Node& rhs);
 
 	class ThermiteGameLogic;
 
@@ -67,7 +101,7 @@ namespace Thermite
 		FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
 
 		void findPath(QVector3D start, QVector3D end);
-		void processNeighbour(Node* current, Node* neighbour, std::vector<Node*>& open, std::set<Node*>& closed);
+		void processNeighbour(Node* current, Node* neighbour, OpenNodesContainer& openNodes, ClosedNodesContainer& closedNodes);
 
 		void run(void);
 
