@@ -92,6 +92,62 @@ namespace Thermite
 
 	bool operator<(const Node& lhs, const Node& rhs);
 
+	class AllNodesContainer
+	{
+	public:
+		typedef std::set<Node>::iterator iterator;
+
+		AllNodesContainer(int yVal)
+		{
+			/*for(int z = 0; z < 256; z++)
+			{
+				for(int x = 0; x < 256; x++)
+				{
+
+					Node node;
+
+					node.position.setX(x);
+					node.position.setY(yVal);
+					node.position.setZ(z);
+					node.gVal = 1000000;
+					node.parent = 0;
+
+					nodes.push_back(node);
+				}
+			}*/
+
+			//nodes.reserve(1000000);
+
+			mYVal = yVal;
+		}
+
+		iterator getNode(int x, int y, int z)
+		{
+			Node nodeToFind(x, mYVal, z);
+			nodeToFind.gVal = 1000000;
+			nodeToFind.parent = 0;
+
+			std::set<Node>::iterator iter = std::find(nodes.begin(), nodes.end(), nodeToFind);
+
+			if(iter == nodes.end())
+			{
+				nodes.insert(nodeToFind);
+				iter = std::find(nodes.begin(), nodes.end(), nodeToFind);
+			}
+
+			assert(iter != nodes.end());
+
+			return iter;
+		}
+
+	private:
+		//Node nodes[256][256];
+		std::set<Node> nodes;
+		int mYVal;
+	};
+
+	bool operator<(const AllNodesContainer::iterator& lhs, const  AllNodesContainer::iterator& rhs);
+
 	class ThermiteGameLogic;
 
 	class FindPathTask : public Task
@@ -101,7 +157,7 @@ namespace Thermite
 		FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
 
 		void findPath(QVector3D start, QVector3D end);
-		void processNeighbour(Node* current, Node* neighbour, OpenNodesContainer& openNodes, ClosedNodesContainer& closedNodes);
+		void processNeighbour(AllNodesContainer::iterator current, AllNodesContainer::iterator neighbour, OpenNodesContainer& openNodes, ClosedNodesContainer& closedNodes);
 
 		void run(void);
 

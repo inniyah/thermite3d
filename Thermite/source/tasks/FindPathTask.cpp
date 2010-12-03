@@ -33,52 +33,25 @@ namespace Thermite
 	class NodeSort
 	{
 	public:
-		bool operator() (const Node* lhs, const Node* rhs) const
+		bool operator() (const AllNodesContainer::iterator lhs, const AllNodesContainer::iterator rhs) const
 		{
 			return lhs->g() + lhs->h() > rhs->g() + rhs->h();
 		}
 	};
 
-	class AllNodesContainer
-	{
-	public:
-		AllNodesContainer(int yVal)
-		{
-			for(int z = 0; z < 256; z++)
-			{
-				for(int x = 0; x < 256; x++)
-				{
-					nodes[x][z].position.setX(x);
-					nodes[x][z].position.setY(yVal);
-					nodes[x][z].position.setZ(z);
-					nodes[x][z].gVal = 1000000;
-					nodes[x][z].parent = 0;
-				}
-			}
-		}
-
-		Node& getNode(int x, int y, int z)
-		{
-			return nodes[x][z];
-		}
-
-	private:
-		Node nodes[256][256];
-	};
-
 	class OpenNodesContainer
 	{
 	public:
-		typedef std::vector<Node*>::iterator iterator;
+		typedef std::vector<AllNodesContainer::iterator>::iterator iterator;
 
 	public:
-		void insert(Node* node)
+		void insert(AllNodesContainer::iterator node)
 		{
 			open.push_back(node);
 			push_heap(open.begin(), open.end(), NodeSort());
 		}
 
-		Node* getFirst(void)
+		AllNodesContainer::iterator getFirst(void)
 		{
 			return open[0];
 		}
@@ -105,23 +78,23 @@ namespace Thermite
 			return open.end();
 		}
 
-		iterator find(Node* node)
+		iterator find(AllNodesContainer::iterator node)
 		{
-			std::vector<Node*>::iterator openIter = std::find(open.begin(), open.end(), node);
+			std::vector<AllNodesContainer::iterator>::iterator openIter = std::find(open.begin(), open.end(), node);
 			return openIter;
 		}
 
 	private:
-		std::vector<Node*> open;
+		std::vector<AllNodesContainer::iterator> open;
 	};
 
 	class ClosedNodesContainer
 	{
 	public:
-		typedef std::set<Node*>::iterator iterator;
+		typedef std::set<AllNodesContainer::iterator>::iterator iterator;
 
 	public:
-		void insert(Node* node)
+		void insert(AllNodesContainer::iterator node)
 		{
 			closed.insert(node);
 		}
@@ -141,14 +114,14 @@ namespace Thermite
 			return closed.end();
 		}
 
-		iterator find(Node* node)
+		iterator find(AllNodesContainer::iterator node)
 		{
 			iterator iter = std::find(closed.begin(), closed.end(), node);
 			return iter;
 		}
 
 	private:
-		std::set<Node*> closed;
+		std::set<AllNodesContainer::iterator> closed;
 	};
 
 	bool operator<(const Node& lhs, const Node& rhs)
@@ -169,6 +142,11 @@ namespace Thermite
 			return false;
 
 		return false;
+	}
+
+	bool operator<(const AllNodesContainer::iterator& lhs, const  AllNodesContainer::iterator& rhs)
+	{
+		return (&(*lhs)) < (&(*rhs));
 	}
 
 	Vector3DInt16 Node::endPos = Vector3DInt16(0,0,0);
@@ -206,18 +184,19 @@ namespace Thermite
 		//std::set<Node*> closed;
 		ClosedNodesContainer closedNodes;
 
-		Node* startNode = &(allNodes.getNode(startX,startY,startZ));
-		Node* endNode = &(allNodes.getNode(endX, endY, endZ));
+		AllNodesContainer::iterator startNode = allNodes.getNode(startX,startY,startZ);
+		AllNodesContainer::iterator endNode = allNodes.getNode(endX, endY, endZ);
 
 		Node::endPos = endNode->position;
 
-		startNode->gVal = 0;
+		Node* temp = const_cast<Node*>(&(*startNode));
+		temp->gVal = 0;
 
 		openNodes.insert(startNode);
 
 		while(openNodes.getFirst() != endNode)
 		{
-			Node* current = openNodes.getFirst();
+			AllNodesContainer::iterator current = openNodes.getFirst();
 			openNodes.removeFirst();
 
 			int currentX = current->position.getX();
@@ -228,14 +207,18 @@ namespace Thermite
 			closedNodes.insert(current);
 
 			//Neighbours
-			processNeighbour(current, &(allNodes.getNode(currentX + 1, startY, currentZ)), openNodes, closedNodes);
-			processNeighbour(current, &(allNodes.getNode(currentX - 1, startY, currentZ)), openNodes, closedNodes);
-			processNeighbour(current, &(allNodes.getNode(currentX, startY, currentZ + 1)), openNodes, closedNodes);
-			processNeighbour(current, &(allNodes.getNode(currentX, startY, currentZ - 1)), openNodes, closedNodes);
+			if(currentX < 255)
+				processNeighbour(current, allNodes.getNode(currentX + 1, startY, currentZ), openNodes, closedNodes);
+			if(currentX > 0)
+				processNeighbour(current, allNodes.getNode(currentX - 1, startY, currentZ), openNodes, closedNodes);
+			if(currentZ < 255)
+				processNeighbour(current, allNodes.getNode(currentX, startY, currentZ + 1), openNodes, closedNodes);
+			if(currentZ > 0)
+				processNeighbour(current, allNodes.getNode(currentX, startY, currentZ - 1), openNodes, closedNodes);
 			
 		}
 
-		Node* n = endNode;
+		Node* n = const_cast<Node*>(&(*endNode));
 		while(n != 0)
 		{
 			result.prepend(QVector3D(n->position.getX(), n->position.getY(), n->position.getZ()));
@@ -245,7 +228,7 @@ namespace Thermite
 		emit finished(result);
 	}
 
-	void FindPathTask::processNeighbour(Node* current, Node* neighbour, OpenNodesContainer& openNodes, ClosedNodesContainer& closedNodes)
+	void FindPathTask::processNeighbour(AllNodesContainer::iterator current, AllNodesContainer::iterator neighbour, OpenNodesContainer& openNodes, ClosedNodesContainer& closedNodes)
 	{
 		Material8 voxel = mPolyVoxVolume->getVoxelAt(neighbour->position.getX(), neighbour->position.getY(), neighbour->position.getZ());
 		int cost = current->gVal + 1.0f;
@@ -280,11 +263,13 @@ namespace Thermite
 
 		if((openIter == openNodes.end()) && (closedIter == closedNodes.end()))
 		{
-			neighbour->gVal = cost;
+			Node* temp = const_cast<Node*>(&(*neighbour));
+
+			temp->gVal = cost;
 
 			openNodes.insert(neighbour);
 
-			neighbour->parent = current;
+			temp->parent = const_cast<Node*>(&(*current));
 		}
 	}
 }
