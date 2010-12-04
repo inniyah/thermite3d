@@ -66,9 +66,24 @@ namespace Thermite
 			return position == rhs.position;
 		}
 
-		bool operator!=(const Node& rhs) const
+		bool operator<(const Node& rhs) const
 		{
-			return (position == rhs.position) == false;
+			if (position.getX() < rhs.position.getX())
+				return true;
+			if (rhs.position.getX() < position.getX())
+				return false;
+
+			if (position.getY() < rhs.position.getY())
+				return true;
+			if (rhs.position.getY() < position.getY())
+				return false;
+
+			if (position.getZ() < rhs.position.getZ())
+				return true;
+			if (rhs.position.getZ() < position.getZ())
+				return false;
+
+			return false;
 		}
 
 		PolyVox::Vector3DInt16 position;
@@ -85,12 +100,10 @@ namespace Thermite
 			return abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY());
 		}
 
-		//static Node* startNode;
-		//static Node* endNode;
 		static PolyVox::Vector3DInt16 endPos;
 	};
 
-	bool operator<(const Node& lhs, const Node& rhs);
+	//bool operator<(const Node& lhs, const Node& rhs);
 
 	class AllNodesContainer
 	{
@@ -99,49 +112,17 @@ namespace Thermite
 
 		AllNodesContainer(int yVal)
 		{
-			/*for(int z = 0; z < 256; z++)
-			{
-				for(int x = 0; x < 256; x++)
-				{
-
-					Node node;
-
-					node.position.setX(x);
-					node.position.setY(yVal);
-					node.position.setZ(z);
-					node.gVal = 1000000;
-					node.parent = 0;
-
-					nodes.push_back(node);
-				}
-			}*/
-
-			//nodes.reserve(1000000);
-
 			mYVal = yVal;
 		}
 
 		iterator getNode(int x, int y, int z)
 		{
 			Node nodeToFind(x, mYVal, z);
-			nodeToFind.gVal = 1000000;
-			nodeToFind.parent = 0;
 
-			std::set<Node>::iterator iter = std::find(nodes.begin(), nodes.end(), nodeToFind);
-
-			if(iter == nodes.end())
-			{
-				nodes.insert(nodeToFind);
-				iter = std::find(nodes.begin(), nodes.end(), nodeToFind);
-			}
-
-			assert(iter != nodes.end());
-
-			return iter;
+			return nodes.insert(nodeToFind).first;
 		}
 
 	private:
-		//Node nodes[256][256];
 		std::set<Node> nodes;
 		int mYVal;
 	};

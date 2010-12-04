@@ -124,25 +124,6 @@ namespace Thermite
 		std::set<AllNodesContainer::iterator> closed;
 	};
 
-	bool operator<(const Node& lhs, const Node& rhs)
-	{
-		if (lhs.position.getX() < rhs.position.getX())
-			return true;
-		if (rhs.position.getX() < lhs.position.getX())
-			return false;
-
-		if (lhs.position.getY() < rhs.position.getY())
-			return true;
-		if (rhs.position.getY() < lhs.position.getY())
-			return false;
-
-		if (lhs.position.getZ() < rhs.position.getZ())
-			return true;
-		if (rhs.position.getZ() < lhs.position.getZ())
-			return false;
-
-		return false;
-	}
 
 	bool operator<(const AllNodesContainer::iterator& lhs, const  AllNodesContainer::iterator& rhs)
 	{
