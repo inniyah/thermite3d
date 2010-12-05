@@ -84,6 +84,22 @@ namespace PolyVox
 		Node* parent;
 		float gVal;
 
+		uint32_t hash(uint32_t a) const
+		{
+			a = (a ^ 61) ^ (a >> 16);
+			a = a + (a << 3);
+			a = a ^ (a >> 4);
+			a = a * 0x27d4eb2d;
+			a = a ^ (a >> 15);
+			return a;
+		}
+
+		float f(void) const
+		{
+			float f = g() + h();
+			return f;
+		}
+
 		float g(void) const
 		{
 			return gVal;
@@ -94,18 +110,23 @@ namespace PolyVox
 
 			//return 1.0f;
 
-			float h = abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY());
+			float h = abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY()) + abs(position.getZ()-endPos.getZ());
+
+			uint32_t hashValX = hash(position.getX());
+			uint32_t hashValY = hash(position.getY());
+			uint32_t hashValZ = hash(position.getZ());
+
+			uint32_t hashVal = hashValX ^ hashValY ^ hashValZ;
+
+			hashVal &= 0x0000FFFF;
+
+			float fHash = hashVal / 1000000.0f;
+
+			h += fHash;
+
 			return h;
-
-			/*Vector3DFloat endToCurrent = static_cast<Vector3DFloat>(position - endPos);
-			Vector3DFloat endToStart = static_cast<Vector3DFloat>(startPos - endPos);
-
-			float angle = endToCurrent.angleTo(endToStart);
-
-			angle *= 0.01f;
-
-			return h + angle;*/
 		}
+
 
 		static PolyVox::Vector3DInt16 startPos;
 		static PolyVox::Vector3DInt16 endPos;
@@ -143,7 +164,7 @@ namespace PolyVox
 	public:
 		bool operator() (const AllNodesContainer::iterator& lhs, const AllNodesContainer::iterator& rhs) const
 		{
-			return lhs->g() + lhs->h() > rhs->g() + rhs->h();
+			return lhs->f() > rhs->f();
 		}
 	};
 
