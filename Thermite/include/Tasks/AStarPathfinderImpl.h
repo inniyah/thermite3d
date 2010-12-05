@@ -84,16 +84,6 @@ namespace PolyVox
 		Node* parent;
 		float gVal;
 
-		uint32_t hash(uint32_t a) const
-		{
-			a = (a ^ 61) ^ (a >> 16);
-			a = a + (a << 3);
-			a = a ^ (a >> 4);
-			a = a * 0x27d4eb2d;
-			a = a ^ (a >> 15);
-			return a;
-		}
-
 		float f(void) const
 		{
 			float f = g() + h();
@@ -107,14 +97,13 @@ namespace PolyVox
 
 		float h(void) const
 		{
-
-			//return 1.0f;
-
 			float h = abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY()) + abs(position.getZ()-endPos.getZ());
 
-			uint32_t hashValX = hash(position.getX());
-			uint32_t hashValY = hash(position.getY());
-			uint32_t hashValZ = hash(position.getZ());
+			std::hash<uint32_t> uint32Hash;
+
+			uint32_t hashValX = uint32Hash(position.getX());
+			uint32_t hashValY = uint32Hash(position.getY());
+			uint32_t hashValZ = uint32Hash(position.getZ());
 
 			uint32_t hashVal = hashValX ^ hashValY ^ hashValZ;
 
@@ -138,6 +127,11 @@ namespace PolyVox
 		typedef std::set<Node>::iterator iterator;
 
 		AllNodesContainer() {}
+
+		void clear(void)
+		{
+			nodes.clear();
+		}
 
 		iterator getNode(int x, int y, int z)
 		{
@@ -174,6 +168,11 @@ namespace PolyVox
 		typedef std::vector<AllNodesContainer::iterator>::iterator iterator;
 
 	public:
+		void clear(void)
+		{
+			open.clear();
+		}
+
 		void insert(AllNodesContainer::iterator node)
 		{
 			open.push_back(node);
@@ -223,6 +222,11 @@ namespace PolyVox
 		typedef std::set<AllNodesContainer::iterator, AllNodesContainerIteratorComparator>::iterator iterator;
 
 	public:
+		void clear(void)
+		{
+			closed.clear();
+		}
+
 		void insert(AllNodesContainer::iterator node)
 		{
 			closed.insert(node);

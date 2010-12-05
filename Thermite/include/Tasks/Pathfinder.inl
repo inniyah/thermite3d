@@ -25,41 +25,26 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {
-	/*template <typename VoxelType>
-	static Vector3DInt16 Pathfinder<VoxelType>::m_pFaces[6] =
-	{
-		Vector3DInt16(0, 0, -1),
-		Vector3DInt16(0, 0, +1),
-		Vector3DInt16(0, -1, 0),
-		Vector3DInt16(0, +1, 0),
-		Vector3DInt16(-1, 0, 0),
-		Vector3DInt16(+1, 0, 0)
-	}*/
-
 	template <typename VoxelType>
-	Pathfinder<VoxelType>::Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult)
+	Pathfinder<VoxelType>::Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult, Connectivity connectivity = TwentySixConnected)
 		:m_volData(volData)
 		,m_v3dStart(v3dStart)
 		,m_v3dEnd(v3dEnd)
 		,m_listResult(listResult)
+		,m_eConnectivity(connectivity)
 	{
-		m_pFaces[0].setElements(0, 0, -1);
-		m_pFaces[1].setElements(0, 0, +1);
-		m_pFaces[2].setElements(0, -1, 0);
-		m_pFaces[3].setElements(0, +1, 0);
-		m_pFaces[4].setElements(-1, 0, 0);
-		m_pFaces[5].setElements(+1, 0, 0);
-
-		for(uint32_t ct = 0; ct < 6; ct++)
-		{
-			m_pIndices[ct] = ct;
-		}
 	}
 
 	template <typename VoxelType>
 	void Pathfinder<VoxelType>::execute()
 	{
-		//TODO - clear containers.
+		//Clear any existing nodes
+		allNodes.clear();
+		openNodes.clear();
+		closedNodes.clear();
+
+		//Clear the result
+		m_listResult->clear();
 
 		AllNodesContainer::iterator startNode = allNodes.getNode(m_v3dStart.getX(), m_v3dStart.getY(), m_v3dStart.getZ());
 		AllNodesContainer::iterator endNode = allNodes.getNode(m_v3dEnd.getX(), m_v3dEnd.getY(), m_v3dEnd.getZ());
@@ -71,7 +56,6 @@ namespace PolyVox
 		temp->gVal = 0;
 
 		openNodes.insert(startNode);
-		//srand(123456);
 
 		while(openNodes.getFirst() != endNode)
 		{
@@ -80,15 +64,47 @@ namespace PolyVox
 			openNodes.removeFirst();
 			closedNodes.insert(current);
 
-			//random_shuffle(&m_pIndices[0], &m_pIndices[6]);
+			//The distance from one cell to another connected by face, edge, or corner.
+			const float fFaceCost = 1.0f;
+			const float fEdgeCost = 1.41421356f; //sqrt(2)
+			const float fCornerCost = 1.73205081; //sqrt(3)
 
-			//Process the neighbours
-			processNeighbour(current->position + m_pFaces[m_pIndices[0]], current->gVal + 1.0f);
-			processNeighbour(current->position + m_pFaces[m_pIndices[1]], current->gVal + 1.0f);
-			processNeighbour(current->position + m_pFaces[m_pIndices[2]], current->gVal + 1.0f);
-			processNeighbour(current->position + m_pFaces[m_pIndices[3]], current->gVal + 1.0f);
-			processNeighbour(current->position + m_pFaces[m_pIndices[4]], current->gVal + 1.0f);
-			processNeighbour(current->position + m_pFaces[m_pIndices[5]], current->gVal + 1.0f);			
+			//Process the neighbours. Note the deliberate lack of 'break' 
+			//statements, larger connectivities include smaller ones.
+			switch(m_eConnectivity)
+			{
+			case TwentySixConnected:
+				processNeighbour(current->position + arrayPathfinderCorners[0], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[1], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[2], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[3], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[4], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[5], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[6], current->gVal + fCornerCost);
+				processNeighbour(current->position + arrayPathfinderCorners[7], current->gVal + fCornerCost);
+
+			case EighteenConnected:
+				processNeighbour(current->position + arrayPathfinderEdges[ 0], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 1], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 2], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 3], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 4], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 5], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 6], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 7], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 8], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[ 9], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[10], current->gVal + fEdgeCost);
+				processNeighbour(current->position + arrayPathfinderEdges[11], current->gVal + fEdgeCost);
+
+			case SixConnected:
+				processNeighbour(current->position + arrayPathfinderFaces[0], current->gVal + fFaceCost);
+				processNeighbour(current->position + arrayPathfinderFaces[1], current->gVal + fFaceCost);
+				processNeighbour(current->position + arrayPathfinderFaces[2], current->gVal + fFaceCost);
+				processNeighbour(current->position + arrayPathfinderFaces[3], current->gVal + fFaceCost);
+				processNeighbour(current->position + arrayPathfinderFaces[4], current->gVal + fFaceCost);
+				processNeighbour(current->position + arrayPathfinderFaces[5], current->gVal + fFaceCost);
+			}
 		}
 
 		Node* n = const_cast<Node*>(&(*endNode));

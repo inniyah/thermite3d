@@ -139,6 +139,7 @@ SOURCE_GROUP("Headers\\Scriptable" FILES ${SCRIPTABLE_INC_FILES})
 
 SET(TASKS_SRC_FILES
 	source/tasks/FindPathTask.cpp
+	source/Tasks/Pathfinder.cpp
 	source/tasks/SurfaceMeshDecimationTask.cpp
 	source/tasks/SurfaceMeshExtractionTask.cpp
 	source/tasks/Task.cpp

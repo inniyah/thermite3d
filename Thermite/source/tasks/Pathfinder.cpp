@@ -21,39 +21,50 @@ freely, subject to the following restrictions:
     distribution. 	
 *******************************************************************************/
 
-#include "FindPathTask.h"
-
-#include "Material.h"
-#include "ThermiteGameLogic.h"
+#include "Pathfinder.h"
 
 using namespace PolyVox;
 
-namespace Thermite
+Vector3DInt16 Node::startPos = Vector3DInt16(0,0,0);
+Vector3DInt16 Node::endPos = Vector3DInt16(0,0,0);
+
+namespace PolyVox
 {
-	FindPathTask::FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume)
-		:mPolyVoxVolume(polyVoxVolume)
-		,mStart(start)
-		,mEnd(end)
-		,mThermiteVolume(thermiteVolume)
+	const Vector3DInt16 arrayPathfinderFaces[6] =
 	{
-	}
+		Vector3DInt16(0, 0, -1),
+		Vector3DInt16(0, 0, +1),
+		Vector3DInt16(0, -1, 0),
+		Vector3DInt16(0, +1, 0),
+		Vector3DInt16(-1, 0, 0),
+		Vector3DInt16(+1, 0, 0)
+	};
 
-	void FindPathTask::run(void)
+	const Vector3DInt16 arrayPathfinderEdges[12] =
 	{
-		Vector3DInt16 start(mStart.x() + 0.5, mStart.y() + 0.5, mStart.z() + 0.5);
-		Vector3DInt16 end(mEnd.x() + 0.5, mEnd.y() + 0.5, mEnd.z() + 0.5);
+		Vector3DInt16(0, -1, -1),
+		Vector3DInt16(0, -1, +1),
+		Vector3DInt16(0, +1, -1),
+		Vector3DInt16(0, +1, +1),
+		Vector3DInt16(-1, 0, -1),
+		Vector3DInt16(-1, 0, +1),
+		Vector3DInt16(+1, 0, -1),
+		Vector3DInt16(+1, 0, +1),
+		Vector3DInt16(-1, -1, 0),
+		Vector3DInt16(-1, +1, 0),
+		Vector3DInt16(+1, -1, 0),
+		Vector3DInt16(+1, +1, 0)
+	};
 
-		list<Vector3DInt16> path;
-		Pathfinder<Material8> pathfinder(mPolyVoxVolume, start, end, &path);
-		pathfinder.execute();
-
-		QVariantList variantPath;
-
-		for(list<Vector3DInt16>::iterator iter = path.begin(); iter != path.end(); iter++)
-		{
-			variantPath.append(QVector3D(iter->getX(), iter->getY(), iter->getZ()));
-		}
-
-		emit finished(variantPath);
-	}
+	const Vector3DInt16 arrayPathfinderCorners[8] =
+	{
+		Vector3DInt16(-1, -1, -1),
+		Vector3DInt16(-1, -1, +1),
+		Vector3DInt16(-1, +1, -1),
+		Vector3DInt16(-1, +1, +1),
+		Vector3DInt16(+1, -1, -1),
+		Vector3DInt16(+1, -1, +1),
+		Vector3DInt16(+1, +1, -1),
+		Vector3DInt16(+1, +1, +1)
+	};
 }

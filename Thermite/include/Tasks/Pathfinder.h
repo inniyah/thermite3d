@@ -34,11 +34,22 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {
+	enum Connectivity
+	{
+		SixConnected,
+		EighteenConnected,
+		TwentySixConnected
+	};
+
+	extern const Vector3DInt16 arrayPathfinderFaces[6];
+	extern const Vector3DInt16 arrayPathfinderEdges[12];
+	extern const Vector3DInt16 arrayPathfinderCorners[8];
+
 	template <typename VoxelType>
 	class Pathfinder
 	{
 	public:
-		Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult);
+		Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult, Connectivity connectivity = TwentySixConnected);
 
 		void execute();
 
@@ -64,8 +75,8 @@ namespace PolyVox
 		//The current node
 		AllNodesContainer::iterator current;
 
-		Vector3DInt16 m_pFaces[6];
-		uint32_t m_pIndices[6];
+		//The requied connectivity
+		Connectivity m_eConnectivity;
 	};
 }
 
