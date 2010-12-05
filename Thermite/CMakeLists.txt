@@ -147,6 +147,8 @@ SET(TASKS_SRC_FILES
 
 SET(TASKS_INC_FILES
 	include/Tasks/FindPathTask.h
+	include/Tasks/Pathfinder.h
+	include/Tasks/Pathfinder.inl
 	include/Tasks/SurfaceMeshDecimationTask.h
 	include/Tasks/SurfaceMeshExtractionTask.h
 	include/Tasks/Task.h
