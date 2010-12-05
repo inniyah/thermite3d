@@ -60,6 +60,7 @@ namespace PolyVox
 			const Vector3DInt16& v3dStart,
 			const Vector3DInt16& v3dEnd,
 			std::list<Vector3DInt16>* listResult,
+			uint32_t uMaxNoOfNodes = 10000,
 			Connectivity connectivity = TwentySixConnected,
 			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>
 		);
@@ -88,6 +89,9 @@ namespace PolyVox
 
 		//The requied connectivity
 		Connectivity m_eConnectivity;
+
+		//Max number of nodes to examine
+		uint32_t m_uMaxNoOfNodes;
 
 	public:
 		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> m_funcIsVoxelValidForPath;

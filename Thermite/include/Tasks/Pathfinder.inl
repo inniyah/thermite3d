@@ -32,6 +32,7 @@ namespace PolyVox
 		const Vector3DInt16& v3dStart,
 		const Vector3DInt16& v3dEnd,
 		std::list<Vector3DInt16>* listResult,
+		uint32_t uMaxNoOfNodes,
 		Connectivity connectivity,
 		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath
 	)
@@ -41,6 +42,7 @@ namespace PolyVox
 		,m_listResult(listResult)
 		,m_eConnectivity(connectivity)
 		,m_funcIsVoxelValidForPath(funcIsVoxelValidForPath)
+		,m_uMaxNoOfNodes(uMaxNoOfNodes)
 	{
 	}
 
@@ -66,7 +68,7 @@ namespace PolyVox
 
 		openNodes.insert(startNode);
 
-		while(openNodes.getFirst() != endNode)
+		while((openNodes.empty() == false) && (openNodes.getFirst() != endNode))
 		{
 			//Move the first node from open to closed.
 			current = openNodes.getFirst();
@@ -114,13 +116,28 @@ namespace PolyVox
 				processNeighbour(current->position + arrayPathfinderFaces[4], current->gVal + fFaceCost);
 				processNeighbour(current->position + arrayPathfinderFaces[5], current->gVal + fFaceCost);
 			}
+
+			if(allNodes.size() > m_uMaxNoOfNodes)
+			{
+				//We've reached the specified maximum number
+				//of nodes. Just give up on the search.
+				break;
+			}
 		}
 
-		Node* n = const_cast<Node*>(&(*endNode));
-		while(n != 0)
+		if((openNodes.empty()) || (openNodes.getFirst() != endNode))
 		{
-			m_listResult->push_front(n->position);
-			n = n->parent;
+			//In this case we failed to find a valid path.
+			throw runtime_error("No path found");
+		}
+		else
+		{
+			Node* n = const_cast<Node*>(&(*endNode));
+			while(n != 0)
+			{
+				m_listResult->push_front(n->position);
+				n = n->parent;
+			}
 		}
 	}
 

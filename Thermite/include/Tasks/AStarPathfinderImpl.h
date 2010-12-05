@@ -133,6 +133,11 @@ namespace PolyVox
 			nodes.clear();
 		}
 
+		uint32_t size(void)
+		{
+			return nodes.size();
+		}
+
 		iterator getNode(int x, int y, int z)
 		{
 			Node nodeToFind(x, y, z);
@@ -171,6 +176,11 @@ namespace PolyVox
 		void clear(void)
 		{
 			open.clear();
+		}
+
+		bool empty(void) const
+		{
+			return open.empty();
 		}
 
 		void insert(AllNodesContainer::iterator node)
