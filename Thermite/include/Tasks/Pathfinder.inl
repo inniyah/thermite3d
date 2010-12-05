@@ -34,7 +34,8 @@ namespace PolyVox
 		std::list<Vector3DInt16>* listResult,
 		uint32_t uMaxNoOfNodes,
 		Connectivity connectivity,
-		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath
+		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath,
+		std::function<void (float)> funcProgressCallback
 	)
 		:m_volData(volData)
 		,m_v3dStart(v3dStart)
@@ -43,6 +44,7 @@ namespace PolyVox
 		,m_eConnectivity(connectivity)
 		,m_funcIsVoxelValidForPath(funcIsVoxelValidForPath)
 		,m_uMaxNoOfNodes(uMaxNoOfNodes)
+		,m_funcProgressCallback(funcProgressCallback)
 	{
 	}
 
@@ -68,12 +70,33 @@ namespace PolyVox
 
 		openNodes.insert(startNode);
 
+		float fDistStartToEnd = (endNode->position - startNode->position).length();
+		m_fProgress = 0.0f;
+		if(m_funcProgressCallback)
+		{
+			m_funcProgressCallback(m_fProgress);
+		}
+
 		while((openNodes.empty() == false) && (openNodes.getFirst() != endNode))
 		{
 			//Move the first node from open to closed.
 			current = openNodes.getFirst();
 			openNodes.removeFirst();
 			closedNodes.insert(current);
+
+			//Update the user on our progress
+			if(m_funcProgressCallback)
+			{
+				const float fMinProgresIncreament = 0.001f;
+				float fDistCurrentToEnd = (endNode->position - current->position).length();
+				float fDistNormalised = fDistCurrentToEnd / fDistStartToEnd;
+				float fProgress = 1.0f - fDistNormalised;
+				if(fProgress >= m_fProgress + fMinProgresIncreament)
+				{
+					m_fProgress = fProgress;
+					m_funcProgressCallback(m_fProgress);
+				}
+			}
 
 			//The distance from one cell to another connected by face, edge, or corner.
 			const float fFaceCost = 1.0f;
@@ -138,6 +161,11 @@ namespace PolyVox
 				m_listResult->push_front(n->position);
 				n = n->parent;
 			}
+		}
+
+		if(m_funcProgressCallback)
+		{
+			m_funcProgressCallback(1.0f);
 		}
 	}
 

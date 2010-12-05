@@ -50,7 +50,7 @@ namespace Thermite
 		{
 			pathfinder.execute();
 		}
-		catch(runtime_error& e) {} //No path found
+		catch(runtime_error&) {} //No path found
 
 		QVariantList variantPath;
 

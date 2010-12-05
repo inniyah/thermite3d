@@ -62,7 +62,8 @@ namespace PolyVox
 			std::list<Vector3DInt16>* listResult,
 			uint32_t uMaxNoOfNodes = 10000,
 			Connectivity connectivity = TwentySixConnected,
-			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>
+			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>,
+			std::function<void (float)> funcProgressCallback = 0
 		);
 
 		void execute();
@@ -93,8 +94,12 @@ namespace PolyVox
 		//Max number of nodes to examine
 		uint32_t m_uMaxNoOfNodes;
 
-	public:
+		//Used to determine whether a given voxel is valid.
 		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> m_funcIsVoxelValidForPath;
+
+		//Progress callback
+		std::function<void (float)> m_funcProgressCallback;
+		float m_fProgress;
 	};
 }
 
