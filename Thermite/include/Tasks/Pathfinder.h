@@ -32,6 +32,8 @@ freely, subject to the following restrictions:
 
 #include "PolyVoxImpl/TypeDef.h"
 
+#include <functional>
+
 namespace PolyVox
 {
 	enum Connectivity
@@ -46,14 +48,23 @@ namespace PolyVox
 	extern const Vector3DInt16 arrayPathfinderCorners[8];
 
 	template <typename VoxelType>
+	bool aStarDefaultVoxelValidator(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos);
+
+	template <typename VoxelType>
 	class Pathfinder
 	{
 	public:
-		Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult, Connectivity connectivity = TwentySixConnected);
+		Pathfinder
+		(
+			Volume<VoxelType>* volData,
+			const Vector3DInt16& v3dStart,
+			const Vector3DInt16& v3dEnd,
+			std::list<Vector3DInt16>* listResult,
+			Connectivity connectivity = TwentySixConnected,
+			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>
+		);
 
 		void execute();
-
-		bool isVoxelValidForPath(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos);
 
 	private:
 		void processNeighbour(const Vector3DInt16& neighbourPos, float neighbourGVal);
@@ -77,6 +88,9 @@ namespace PolyVox
 
 		//The requied connectivity
 		Connectivity m_eConnectivity;
+
+	public:
+		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> m_funcIsVoxelValidForPath;
 	};
 }
 

@@ -23,6 +23,8 @@ freely, subject to the following restrictions:
 
 #include "Pathfinder.h"
 
+#include "Material.h"
+
 using namespace PolyVox;
 
 Vector3DInt16 Node::startPos = Vector3DInt16(0,0,0);

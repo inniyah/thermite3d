@@ -26,12 +26,21 @@ freely, subject to the following restrictions:
 namespace PolyVox
 {
 	template <typename VoxelType>
-	Pathfinder<VoxelType>::Pathfinder(Volume<VoxelType>* volData, const Vector3DInt16& v3dStart, const Vector3DInt16& v3dEnd, std::list<Vector3DInt16>* listResult, Connectivity connectivity = TwentySixConnected)
+	Pathfinder<VoxelType>::Pathfinder
+	(
+		Volume<VoxelType>* volData,
+		const Vector3DInt16& v3dStart,
+		const Vector3DInt16& v3dEnd,
+		std::list<Vector3DInt16>* listResult,
+		Connectivity connectivity,
+		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath
+	)
 		:m_volData(volData)
 		,m_v3dStart(v3dStart)
 		,m_v3dEnd(v3dEnd)
 		,m_listResult(listResult)
 		,m_eConnectivity(connectivity)
+		,m_funcIsVoxelValidForPath(funcIsVoxelValidForPath)
 	{
 	}
 
@@ -67,7 +76,7 @@ namespace PolyVox
 			//The distance from one cell to another connected by face, edge, or corner.
 			const float fFaceCost = 1.0f;
 			const float fEdgeCost = 1.41421356f; //sqrt(2)
-			const float fCornerCost = 1.73205081; //sqrt(3)
+			const float fCornerCost = 1.73205081f; //sqrt(3)
 
 			//Process the neighbours. Note the deliberate lack of 'break' 
 			//statements, larger connectivities include smaller ones.
@@ -118,7 +127,7 @@ namespace PolyVox
 	template <typename VoxelType>
 	void Pathfinder<VoxelType>::processNeighbour(const Vector3DInt16& neighbourPos, float neighbourGVal)
 	{
-		bool bIsVoxelValidForPath = isVoxelValidForPath(m_volData, neighbourPos);
+		bool bIsVoxelValidForPath = m_funcIsVoxelValidForPath(m_volData, neighbourPos);
 		if(!bIsVoxelValidForPath)
 		{
 			return;
@@ -163,21 +172,17 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	bool Pathfinder<VoxelType>::isVoxelValidForPath(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos)
+	bool aStarDefaultVoxelValidator(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos)
 	{
-		//For tanks wars, nodes are only valid if they lie on the 2D plane.
-		if(v3dPos.getY() != m_v3dStart.getY())
+		//Voxels are considered valid candidates for the path if they are inside the volume...
+		if(volData->getEnclosingRegion().containsPoint(v3dPos) == false)
 		{
 			return false;
 		}
 
-		if(m_volData->getEnclosingRegion().containsPoint(v3dPos) == false)
-		{
-			return false;
-		}
-
-		Material8 voxel = m_volData->getVoxelAt(static_cast<Vector3DUint16>(v3dPos));
-		if(voxel.getMaterial() > 0)
+		//and if their density is below the threshold.
+		Material8 voxel = volData->getVoxelAt(static_cast<Vector3DUint16>(v3dPos));
+		if(voxel.getDensity() >= Material8::getThreshold())
 		{
 			return false;
 		}

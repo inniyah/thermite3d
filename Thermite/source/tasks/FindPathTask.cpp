@@ -44,7 +44,8 @@ namespace Thermite
 		Vector3DInt16 end(mEnd.x() + 0.5, mEnd.y() + 0.5, mEnd.z() + 0.5);
 
 		list<Vector3DInt16> path;
-		Pathfinder<Material8> pathfinder(mPolyVoxVolume, start, end, &path);
+		TankWarsVoxelValidator<Material8> validator(start.getY());
+		Pathfinder<Material8> pathfinder(mPolyVoxVolume, start, end, &path, TwentySixConnected, validator);
 		pathfinder.execute();
 
 		QVariantList variantPath;

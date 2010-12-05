@@ -40,6 +40,51 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
+	template <typename VoxelType>
+	class TankWarsVoxelValidator
+	{
+	public:
+		TankWarsVoxelValidator(int16_t iHeight)
+			:m_iHeight(iHeight)
+		{
+		}
+
+		bool operator() (const PolyVox::Volume<VoxelType>* volData, const PolyVox::Vector3DInt16& v3dPos)
+		{
+			//For tanks wars, nodes are only valid if they lie on the 2D plane.
+			if(v3dPos.getY() != m_iHeight)
+			{
+				return false;
+			}
+
+			//Don't go off the edge and leave a border
+			if(volData->getEnclosingRegion().containsPoint(v3dPos, 2) == false)
+			{
+				return false;
+			}
+
+			//Ensure the space is big enough for a tank
+			const int16_t tankSize = 3;
+			const int16_t y = v3dPos.getY();
+			for(int16_t z = v3dPos.getZ() - tankSize; z <= v3dPos.getZ() + tankSize; z++)
+			{
+				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
+				{
+					Material8 voxel = volData->getVoxelAt(x,y,z);
+					if(voxel.getMaterial() > 0)
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+	private:
+		int16_t m_iHeight;
+	};
+
 	class FindPathTask : public Task
 	{
 		Q_OBJECT
