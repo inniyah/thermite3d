@@ -36,13 +36,6 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {
-	enum Connectivity
-	{
-		SixConnected,
-		EighteenConnected,
-		TwentySixConnected
-	};
-
 	extern const Vector3DInt16 arrayPathfinderFaces[6];
 	extern const Vector3DInt16 arrayPathfinderEdges[12];
 	extern const Vector3DInt16 arrayPathfinderCorners[8];

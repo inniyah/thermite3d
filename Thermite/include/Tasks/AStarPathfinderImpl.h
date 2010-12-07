@@ -35,24 +35,28 @@ namespace PolyVox
 	class ClosedNodesContainer;
 	class ThermiteGameLogic;
 
+	enum Connectivity
+	{
+		SixConnected,
+		EighteenConnected,
+		TwentySixConnected
+	};
+
+	float SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+	float EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+	float TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+	float computeH(const Vector3DInt16& a, const Vector3DInt16& b, Connectivity eConnectivity);
+
 	struct Node
 	{
-		Node()
-		{
-			position.setX(0);
-			position.setY(0);
-			position.setZ(0);
-			gVal = 1000000;
-			parent = 0;
-		};
-
 		Node(int x, int y, int z)
+			:gVal(std::numeric_limits<float>::quiet_NaN()) //Initilise with NaNs so that we will
+			,hVal(std::numeric_limits<float>::quiet_NaN()) //know if we forget to set these properly.
+			,parent(0)
 		{
 			position.setX(x);
 			position.setY(y);
 			position.setZ(z);
-			gVal = 1000000;
-			parent = 0;
 		}
 
 		bool operator==(const Node& rhs) const
@@ -83,71 +87,16 @@ namespace PolyVox
 		PolyVox::Vector3DInt16 position;
 		Node* parent;
 		float gVal;
+		float hVal;
 
 		float f(void) const
 		{
-			float f = g() + h();
+			float f = gVal + hVal;
 			return f;
 		}
-
-		float g(void) const
-		{
-			return gVal;
-		}
-
-		float h(void) const
-		{
-			float h = abs(position.getX()-endPos.getX()) + abs(position.getY()-endPos.getY()) + abs(position.getZ()-endPos.getZ());
-
-			std::hash<uint32_t> uint32Hash;
-
-			uint32_t hashValX = uint32Hash(position.getX());
-			uint32_t hashValY = uint32Hash(position.getY());
-			uint32_t hashValZ = uint32Hash(position.getZ());
-
-			uint32_t hashVal = hashValX ^ hashValY ^ hashValZ;
-
-			hashVal &= 0x0000FFFF;
-
-			float fHash = hashVal / 1000000.0f;
-
-			h += fHash;
-
-			return h;
-		}
-
-
-		static PolyVox::Vector3DInt16 startPos;
-		static PolyVox::Vector3DInt16 endPos;
 	};
 
-	class AllNodesContainer
-	{
-	public:
-		typedef std::set<Node>::iterator iterator;
-
-		AllNodesContainer() {}
-
-		void clear(void)
-		{
-			nodes.clear();
-		}
-
-		uint32_t size(void)
-		{
-			return nodes.size();
-		}
-
-		iterator getNode(int x, int y, int z)
-		{
-			Node nodeToFind(x, y, z);
-
-			return nodes.insert(nodeToFind).first;
-		}
-
-	private:
-		std::set<Node> nodes;
-	};
+	typedef std::set<Node> AllNodesContainer;
 
 	class AllNodesContainerIteratorComparator
 	{

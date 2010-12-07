@@ -59,14 +59,19 @@ namespace PolyVox
 		//Clear the result
 		m_listResult->clear();
 
-		AllNodesContainer::iterator startNode = allNodes.getNode(m_v3dStart.getX(), m_v3dStart.getY(), m_v3dStart.getZ());
-		AllNodesContainer::iterator endNode = allNodes.getNode(m_v3dEnd.getX(), m_v3dEnd.getY(), m_v3dEnd.getZ());
+		AllNodesContainer::iterator startNode = allNodes.insert(Node(m_v3dStart.getX(), m_v3dStart.getY(), m_v3dStart.getZ())).first;
+		AllNodesContainer::iterator endNode = allNodes.insert(Node(m_v3dEnd.getX(), m_v3dEnd.getY(), m_v3dEnd.getZ())).first;
 
-		Node::startPos = startNode->position;
+		/*Node::startPos = startNode->position;
 		Node::endPos = endNode->position;
+		Node::m_eConnectivity = m_eConnectivity;*/
 
-		Node* temp = const_cast<Node*>(&(*startNode));
-		temp->gVal = 0;
+		Node* tempStart = const_cast<Node*>(&(*startNode));
+		tempStart->gVal = 0;
+		tempStart->hVal = computeH(startNode->position, endNode->position, m_eConnectivity);
+
+		Node* tempEnd = const_cast<Node*>(&(*endNode));
+		tempEnd->hVal = 0.0f;
 
 		openNodes.insert(startNode);
 
@@ -180,7 +185,14 @@ namespace PolyVox
 
 		float cost = neighbourGVal;
 
-		AllNodesContainer::iterator neighbour = allNodes.getNode(neighbourPos.getX(), neighbourPos.getY(), neighbourPos.getZ());
+		std::pair<AllNodesContainer::iterator, bool> insertResult = allNodes.insert(Node(neighbourPos.getX(), neighbourPos.getY(), neighbourPos.getZ()));
+		AllNodesContainer::iterator neighbour = insertResult.first;
+
+		if(insertResult.second == true) //New node, compute h.
+		{
+			Node* tempNeighbour = const_cast<Node*>(&(*neighbour));
+			tempNeighbour -> hVal = computeH(neighbour->position, m_v3dEnd, m_eConnectivity);
+		}
 
 		OpenNodesContainer::iterator openIter = openNodes.find(neighbour);
 		if(openIter != openNodes.end())
