@@ -48,10 +48,10 @@ namespace PolyVox
 	bool aStarDefaultVoxelValidator(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos);
 
 	template <typename VoxelType>
-	class Pathfinder
+	struct AStarPathfinderParams
 	{
 	public:
-		Pathfinder
+		AStarPathfinderParams
 		(
 			Volume<VoxelType>* volData,
 			const Vector3DInt16& v3dStart,
@@ -62,7 +62,49 @@ namespace PolyVox
 			Connectivity connectivity = TwentySixConnected,
 			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>,
 			std::function<void (float)> funcProgressCallback = 0
-		);
+		)
+			:volume(volData)
+			,start(v3dStart)
+			,end(v3dEnd)
+			,result(listResult)
+			,hBias(fHBias)
+			,connectivity(connectivity)
+			,isVoxelValidForPath(funcIsVoxelValidForPath)
+			,maxNumberOfNodes(uMaxNoOfNodes)
+			,progressCallback(funcProgressCallback)
+		{
+		}
+
+		//The volume data.
+		Volume<VoxelType>* volume;
+
+		Vector3DInt16 start;
+		Vector3DInt16 end;
+
+		//The resulting path
+		std::list<Vector3DInt16>* result;
+
+		//The requied connectivity
+		Connectivity connectivity;
+
+		//Bias applied to h()
+		float hBias;
+
+		//Max number of nodes to examine
+		uint32_t maxNumberOfNodes;
+
+		//Used to determine whether a given voxel is valid.
+		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> isVoxelValidForPath;
+
+		//Progress callback
+		std::function<void (float)> progressCallback;
+	};
+
+	template <typename VoxelType>
+	class AStarPathfinder
+	{
+	public:
+		AStarPathfinder(const AStarPathfinderParams<VoxelType>& params);
 
 		void execute();
 
@@ -72,16 +114,7 @@ namespace PolyVox
 		float SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
 		float EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
 		float TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
-		float computeH(const Vector3DInt16& a, const Vector3DInt16& b);
-
-		//The volume data and a sampler to access it.
-		Volume<VoxelType>* m_volData;
-
-		Vector3DInt16 m_v3dStart;
-		Vector3DInt16 m_v3dEnd;
-
-		//The resulting path
-		std::list<Vector3DInt16>* m_listResult;
+		float computeH(const Vector3DInt16& a, const Vector3DInt16& b);		
 
 		//Node containers
 		AllNodesContainer allNodes;
@@ -90,22 +123,10 @@ namespace PolyVox
 
 		//The current node
 		AllNodesContainer::iterator current;
-
-		//The requied connectivity
-		Connectivity m_eConnectivity;
-
-		//Bias applied to h()
-		float m_fHBias;
-
-		//Max number of nodes to examine
-		uint32_t m_uMaxNoOfNodes;
-
-		//Used to determine whether a given voxel is valid.
-		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> m_funcIsVoxelValidForPath;
-
-		//Progress callback
-		std::function<void (float)> m_funcProgressCallback;
+		
 		float m_fProgress;
+
+		AStarPathfinderParams<VoxelType> m_params;
 	};
 }
 

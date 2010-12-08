@@ -48,35 +48,16 @@ namespace PolyVox
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-	// Pathfinder Class
+	// AStarPathfinder Class
 	////////////////////////////////////////////////////////////////////////////////
 	template <typename VoxelType>
-	Pathfinder<VoxelType>::Pathfinder
-	(
-		Volume<VoxelType>* volData,
-		const Vector3DInt16& v3dStart,
-		const Vector3DInt16& v3dEnd,
-		std::list<Vector3DInt16>* listResult,
-		float fHBias,
-		uint32_t uMaxNoOfNodes,
-		Connectivity connectivity,
-		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath,
-		std::function<void (float)> funcProgressCallback
-	)
-		:m_volData(volData)
-		,m_v3dStart(v3dStart)
-		,m_v3dEnd(v3dEnd)
-		,m_listResult(listResult)
-		,m_fHBias(fHBias)
-		,m_eConnectivity(connectivity)
-		,m_funcIsVoxelValidForPath(funcIsVoxelValidForPath)
-		,m_uMaxNoOfNodes(uMaxNoOfNodes)
-		,m_funcProgressCallback(funcProgressCallback)
+	AStarPathfinder<VoxelType>::AStarPathfinder(const AStarPathfinderParams<VoxelType>& params)
+		:m_params(params)
 	{
 	}
 
 	template <typename VoxelType>
-	void Pathfinder<VoxelType>::execute()
+	void AStarPathfinder<VoxelType>::execute()
 	{
 		//Clear any existing nodes
 		allNodes.clear();
@@ -84,10 +65,10 @@ namespace PolyVox
 		closedNodes.clear();
 
 		//Clear the result
-		m_listResult->clear();
+		m_params.result->clear();
 
-		AllNodesContainer::iterator startNode = allNodes.insert(Node(m_v3dStart.getX(), m_v3dStart.getY(), m_v3dStart.getZ())).first;
-		AllNodesContainer::iterator endNode = allNodes.insert(Node(m_v3dEnd.getX(), m_v3dEnd.getY(), m_v3dEnd.getZ())).first;
+		AllNodesContainer::iterator startNode = allNodes.insert(Node(m_params.start.getX(), m_params.start.getY(), m_params.start.getZ())).first;
+		AllNodesContainer::iterator endNode = allNodes.insert(Node(m_params.end.getX(), m_params.end.getY(), m_params.end.getZ())).first;
 
 		/*Node::startPos = startNode->position;
 		Node::endPos = endNode->position;
@@ -104,9 +85,9 @@ namespace PolyVox
 
 		float fDistStartToEnd = (endNode->position - startNode->position).length();
 		m_fProgress = 0.0f;
-		if(m_funcProgressCallback)
+		if(m_params.progressCallback)
 		{
-			m_funcProgressCallback(m_fProgress);
+			m_params.progressCallback(m_fProgress);
 		}
 
 		while((openNodes.empty() == false) && (openNodes.getFirst() != endNode))
@@ -117,7 +98,7 @@ namespace PolyVox
 			closedNodes.insert(current);
 
 			//Update the user on our progress
-			if(m_funcProgressCallback)
+			if(m_params.progressCallback)
 			{
 				const float fMinProgresIncreament = 0.001f;
 				float fDistCurrentToEnd = (endNode->position - current->position).length();
@@ -126,7 +107,7 @@ namespace PolyVox
 				if(fProgress >= m_fProgress + fMinProgresIncreament)
 				{
 					m_fProgress = fProgress;
-					m_funcProgressCallback(m_fProgress);
+					m_params.progressCallback(m_fProgress);
 				}
 			}
 
@@ -137,7 +118,7 @@ namespace PolyVox
 
 			//Process the neighbours. Note the deliberate lack of 'break' 
 			//statements, larger connectivities include smaller ones.
-			switch(m_eConnectivity)
+			switch(m_params.connectivity)
 			{
 			case TwentySixConnected:
 				processNeighbour(current->position + arrayPathfinderCorners[0], current->gVal + fCornerCost);
@@ -172,7 +153,7 @@ namespace PolyVox
 				processNeighbour(current->position + arrayPathfinderFaces[5], current->gVal + fFaceCost);
 			}
 
-			if(allNodes.size() > m_uMaxNoOfNodes)
+			if(allNodes.size() > m_params.maxNumberOfNodes)
 			{
 				//We've reached the specified maximum number
 				//of nodes. Just give up on the search.
@@ -190,21 +171,21 @@ namespace PolyVox
 			Node* n = const_cast<Node*>(&(*endNode));
 			while(n != 0)
 			{
-				m_listResult->push_front(n->position);
+				m_params.result->push_front(n->position);
 				n = n->parent;
 			}
 		}
 
-		if(m_funcProgressCallback)
+		if(m_params.progressCallback)
 		{
-			m_funcProgressCallback(1.0f);
+			m_params.progressCallback(1.0f);
 		}
 	}
 
 	template <typename VoxelType>
-	void Pathfinder<VoxelType>::processNeighbour(const Vector3DInt16& neighbourPos, float neighbourGVal)
+	void AStarPathfinder<VoxelType>::processNeighbour(const Vector3DInt16& neighbourPos, float neighbourGVal)
 	{
-		bool bIsVoxelValidForPath = m_funcIsVoxelValidForPath(m_volData, neighbourPos);
+		bool bIsVoxelValidForPath = m_params.isVoxelValidForPath(m_params.volume, neighbourPos);
 		if(!bIsVoxelValidForPath)
 		{
 			return;
@@ -218,7 +199,7 @@ namespace PolyVox
 		if(insertResult.second == true) //New node, compute h.
 		{
 			Node* tempNeighbour = const_cast<Node*>(&(*neighbour));
-			tempNeighbour -> hVal = computeH(neighbour->position, m_v3dEnd);
+			tempNeighbour -> hVal = computeH(neighbour->position, m_params.end);
 		}
 
 		OpenNodesContainer::iterator openIter = openNodes.find(neighbour);
@@ -256,7 +237,7 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	float Pathfinder<VoxelType>::SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
+	float AStarPathfinder<VoxelType>::SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
 	{
 		//This is the only heuristic I'm sure of - just use the manhatten distance for the 6-connected case.
 		uint16_t faceSteps = abs(a.getX()-b.getX()) + abs(a.getY()-b.getY()) + abs(a.getZ()-b.getZ());
@@ -265,7 +246,7 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	float Pathfinder<VoxelType>::EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
+	float AStarPathfinder<VoxelType>::EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
 	{
 		//I'm not sure of the correct heuristic for the 18-connected case, so I'm just letting it fall through to the 
 		//6-connected case. This means 'h' will be bigger than it should be, resulting in a faster path which may not 
@@ -275,7 +256,7 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	float Pathfinder<VoxelType>::TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
+	float AStarPathfinder<VoxelType>::TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
 	{
 		//Can't say I'm certain about this heuristic - if anyone has
 		//a better idea of what it should be then please let me know.
@@ -294,11 +275,11 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	float Pathfinder<VoxelType>::computeH(const Vector3DInt16& a, const Vector3DInt16& b)
+	float AStarPathfinder<VoxelType>::computeH(const Vector3DInt16& a, const Vector3DInt16& b)
 	{
 		float hVal;
 			
-		switch(m_eConnectivity)
+		switch(m_params.connectivity)
 		{
 		case TwentySixConnected:
 			hVal = TwentySixConnectedCost(a, b);
@@ -320,7 +301,7 @@ namespace PolyVox
 		assert(EighteenConnectedCost(a,b) <= SixConnectedCost(a,b));
 
 		//Apply the bias to the computed h value;
-		hVal *= m_fHBias;
+		hVal *= m_params.hBias;
 
 		std::hash<uint32_t> uint32Hash;
 
