@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 
 #include "scriptable/Volume.h"
 
-#include "Pathfinder.h"
+#include <AStarPathfinder.h>
 
 namespace Thermite
 {
