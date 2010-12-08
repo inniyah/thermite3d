@@ -25,6 +25,31 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {
+	////////////////////////////////////////////////////////////////////////////////
+	// aStarDefaultVoxelValidator free function
+	////////////////////////////////////////////////////////////////////////////////
+	template <typename VoxelType>
+	bool aStarDefaultVoxelValidator(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos)
+	{
+		//Voxels are considered valid candidates for the path if they are inside the volume...
+		if(volData->getEnclosingRegion().containsPoint(v3dPos) == false)
+		{
+			return false;
+		}
+
+		//and if their density is below the threshold.
+		Material8 voxel = volData->getVoxelAt(static_cast<Vector3DUint16>(v3dPos));
+		if(voxel.getDensity() >= Material8::getThreshold())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Pathfinder Class
+	////////////////////////////////////////////////////////////////////////////////
 	template <typename VoxelType>
 	Pathfinder<VoxelType>::Pathfinder
 	(
@@ -32,6 +57,7 @@ namespace PolyVox
 		const Vector3DInt16& v3dStart,
 		const Vector3DInt16& v3dEnd,
 		std::list<Vector3DInt16>* listResult,
+		float fHBias,
 		uint32_t uMaxNoOfNodes,
 		Connectivity connectivity,
 		std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath,
@@ -41,6 +67,7 @@ namespace PolyVox
 		,m_v3dStart(v3dStart)
 		,m_v3dEnd(v3dEnd)
 		,m_listResult(listResult)
+		,m_fHBias(fHBias)
 		,m_eConnectivity(connectivity)
 		,m_funcIsVoxelValidForPath(funcIsVoxelValidForPath)
 		,m_uMaxNoOfNodes(uMaxNoOfNodes)
@@ -68,7 +95,7 @@ namespace PolyVox
 
 		Node* tempStart = const_cast<Node*>(&(*startNode));
 		tempStart->gVal = 0;
-		tempStart->hVal = computeH(startNode->position, endNode->position, m_eConnectivity);
+		tempStart->hVal = computeH(startNode->position, endNode->position);
 
 		Node* tempEnd = const_cast<Node*>(&(*endNode));
 		tempEnd->hVal = 0.0f;
@@ -104,9 +131,9 @@ namespace PolyVox
 			}
 
 			//The distance from one cell to another connected by face, edge, or corner.
-			const float fFaceCost = 1.0f;
-			const float fEdgeCost = 1.41421356f; //sqrt(2)
-			const float fCornerCost = 1.73205081f; //sqrt(3)
+			const float fFaceCost = sqrt_1;
+			const float fEdgeCost = sqrt_2;
+			const float fCornerCost = sqrt_3;
 
 			//Process the neighbours. Note the deliberate lack of 'break' 
 			//statements, larger connectivities include smaller ones.
@@ -191,7 +218,7 @@ namespace PolyVox
 		if(insertResult.second == true) //New node, compute h.
 		{
 			Node* tempNeighbour = const_cast<Node*>(&(*neighbour));
-			tempNeighbour -> hVal = computeH(neighbour->position, m_v3dEnd, m_eConnectivity);
+			tempNeighbour -> hVal = computeH(neighbour->position, m_v3dEnd);
 		}
 
 		OpenNodesContainer::iterator openIter = openNodes.find(neighbour);
@@ -229,21 +256,86 @@ namespace PolyVox
 	}
 
 	template <typename VoxelType>
-	bool aStarDefaultVoxelValidator(const Volume<VoxelType>* volData, const Vector3DInt16& v3dPos)
+	float Pathfinder<VoxelType>::SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
 	{
-		//Voxels are considered valid candidates for the path if they are inside the volume...
-		if(volData->getEnclosingRegion().containsPoint(v3dPos) == false)
+		//This is the only heuristic I'm sure of - just use the manhatten distance for the 6-connected case.
+		uint16_t faceSteps = abs(a.getX()-b.getX()) + abs(a.getY()-b.getY()) + abs(a.getZ()-b.getZ());
+
+		return faceSteps * 1.0f;
+	}
+
+	template <typename VoxelType>
+	float Pathfinder<VoxelType>::EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
+	{
+		//I'm not sure of the correct heuristic for the 18-connected case, so I'm just letting it fall through to the 
+		//6-connected case. This means 'h' will be bigger than it should be, resulting in a faster path which may not 
+		//actually be the shortest one. If you have a correct heuristic for the 18-connected case then please let me know.
+
+		return SixConnectedCost(a,b);
+	}
+
+	template <typename VoxelType>
+	float Pathfinder<VoxelType>::TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b)
+	{
+		//Can't say I'm certain about this heuristic - if anyone has
+		//a better idea of what it should be then please let me know.
+		uint16_t array[3];
+		array[0] = abs(a.getX() - b.getX());
+		array[1] = abs(a.getY() - b.getY());
+		array[2] = abs(a.getZ() - b.getZ());
+
+		std::sort(&array[0], &array[3]);
+
+		uint16_t cornerSteps = array[0];
+		uint16_t edgeSteps = array[1] - array[0];
+		uint16_t faceSteps = array[2] - array[1];
+
+		return cornerSteps * sqrt_3 + edgeSteps * sqrt_2 + faceSteps * sqrt_1;
+	}
+
+	template <typename VoxelType>
+	float Pathfinder<VoxelType>::computeH(const Vector3DInt16& a, const Vector3DInt16& b)
+	{
+		float hVal;
+			
+		switch(m_eConnectivity)
 		{
-			return false;
+		case TwentySixConnected:
+			hVal = TwentySixConnectedCost(a, b);
+			break;
+		case EighteenConnected:
+			hVal = EighteenConnectedCost(a, b);
+			break;
+		case SixConnected:				
+			hVal = SixConnectedCost(a, b);
+			break;
+		default:
+			assert(false); //Invalid case.
 		}
 
-		//and if their density is below the threshold.
-		Material8 voxel = volData->getVoxelAt(static_cast<Vector3DUint16>(v3dPos));
-		if(voxel.getDensity() >= Material8::getThreshold())
-		{
-			return false;
-		}
+		//Sanity checks in debug mode. These can come out eventually, but I
+		//want to make sure that the heuristics I've come up with make sense.
+		assert((a-b).length() <= TwentySixConnectedCost(a,b));
+		assert(TwentySixConnectedCost(a,b) <= EighteenConnectedCost(a,b));
+		assert(EighteenConnectedCost(a,b) <= SixConnectedCost(a,b));
 
-		return true;
+		//Apply the bias to the computed h value;
+		hVal *= m_fHBias;
+
+		std::hash<uint32_t> uint32Hash;
+
+		uint32_t hashValX = uint32Hash(a.getX());
+		uint32_t hashValY = uint32Hash(a.getY());
+		uint32_t hashValZ = uint32Hash(a.getZ());
+
+		uint32_t hashVal = hashValX ^ hashValY ^ hashValZ;
+
+		hashVal &= 0x0000FFFF;
+
+		float fHash = hashVal / 1000000.0f;
+
+		hVal += fHash;
+
+		return hVal;
 	}
 }

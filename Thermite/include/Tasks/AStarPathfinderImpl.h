@@ -42,11 +42,6 @@ namespace PolyVox
 		TwentySixConnected
 	};
 
-	float SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
-	float EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
-	float TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
-	float computeH(const Vector3DInt16& a, const Vector3DInt16& b, Connectivity eConnectivity);
-
 	struct Node
 	{
 		Node(int x, int y, int z)

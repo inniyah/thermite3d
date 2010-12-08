@@ -36,6 +36,10 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {
+	const float sqrt_1 = 1.0f;
+	const float sqrt_2 = 1.4143f;
+	const float sqrt_3 = 1.7321f;
+
 	extern const Vector3DInt16 arrayPathfinderFaces[6];
 	extern const Vector3DInt16 arrayPathfinderEdges[12];
 	extern const Vector3DInt16 arrayPathfinderCorners[8];
@@ -53,6 +57,7 @@ namespace PolyVox
 			const Vector3DInt16& v3dStart,
 			const Vector3DInt16& v3dEnd,
 			std::list<Vector3DInt16>* listResult,
+			float fHBias = 1.0,
 			uint32_t uMaxNoOfNodes = 10000,
 			Connectivity connectivity = TwentySixConnected,
 			std::function<bool (const Volume<VoxelType>*, const Vector3DInt16&)> funcIsVoxelValidForPath = &aStarDefaultVoxelValidator<VoxelType>,
@@ -63,6 +68,11 @@ namespace PolyVox
 
 	private:
 		void processNeighbour(const Vector3DInt16& neighbourPos, float neighbourGVal);
+
+		float SixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+		float EighteenConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+		float TwentySixConnectedCost(const Vector3DInt16& a, const Vector3DInt16& b);
+		float computeH(const Vector3DInt16& a, const Vector3DInt16& b);
 
 		//The volume data and a sampler to access it.
 		Volume<VoxelType>* m_volData;
@@ -83,6 +93,9 @@ namespace PolyVox
 
 		//The requied connectivity
 		Connectivity m_eConnectivity;
+
+		//Bias applied to h()
+		float m_fHBias;
 
 		//Max number of nodes to examine
 		uint32_t m_uMaxNoOfNodes;
