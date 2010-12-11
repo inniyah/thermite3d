@@ -64,14 +64,28 @@ namespace Thermite
 			}
 
 			//Ensure the space is big enough for a tank
-			const int16_t tankSize = 3;
-			const int16_t y = v3dPos.getY();
+			const int16_t tankSize = 4;
+			int16_t y = v3dPos.getY();
 			for(int16_t z = v3dPos.getZ() - tankSize; z <= v3dPos.getZ() + tankSize; z++)
 			{
 				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
 				{
 					Material8 voxel = volData->getVoxelAt(x,y,z);
 					if(voxel.getMaterial() > 0)
+					{
+						return false;
+					}
+				}
+			}
+
+			//Ensure there is ground underneath the tank
+			y = v3dPos.getY()-3;
+			for(int16_t z = v3dPos.getZ() - tankSize; z <= v3dPos.getZ() + tankSize; z++)
+			{
+				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
+				{
+					Material8 voxel = volData->getVoxelAt(x,y,z);
+					if(voxel.getMaterial() == 0)
 					{
 						return false;
 					}

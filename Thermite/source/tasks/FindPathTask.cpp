@@ -45,7 +45,7 @@ namespace Thermite
 
 		list<Vector3DInt16> path;
 		TankWarsVoxelValidator<Material8> validator(start.getY());
-		AStarPathfinderParams<Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 1.0f, 10000);
+		AStarPathfinderParams<Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
 		pathfinderParams.connectivity = TwentySixConnected;
 		pathfinderParams.isVoxelValidForPath = validator;
 		AStarPathfinder<Material8> pathfinder(pathfinderParams);
@@ -57,9 +57,26 @@ namespace Thermite
 
 		QVariantList variantPath;
 
-		for(list<Vector3DInt16>::iterator iter = path.begin(); iter != path.end(); iter++)
+		int ct = 0;
+		int howOftenToInclude = 10; //Controls whether we include every xth point.
+		list<Vector3DInt16>::iterator iter;
+		for(iter = path.begin(); iter != path.end(); iter++)
 		{
-			variantPath.append(QVector3D(iter->getX(), iter->getY(), iter->getZ()));
+			if(ct % howOftenToInclude == 0)
+			{
+				variantPath.append(QVector3D(iter->getX(), iter->getY(), iter->getZ()));
+			}
+			ct++;
+		}
+
+		if(path.size() != 0)
+		{
+			if((ct-1) % howOftenToInclude != 0)
+			{
+				//We didn't add the end point, add it now
+				iter--;
+				variantPath.append(QVector3D(iter->getX(), iter->getY(), iter->getZ()));
+			}
 		}
 
 		emit finished(variantPath);
