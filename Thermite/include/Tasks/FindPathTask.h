@@ -70,7 +70,7 @@ namespace Thermite
 			{
 				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
 				{
-					Material8 voxel = volData->getVoxelAt(x,y,z);
+					PolyVox::Material8 voxel = volData->getVoxelAt(x,y,z);
 					if(voxel.getMaterial() > 0)
 					{
 						return false;
@@ -84,7 +84,7 @@ namespace Thermite
 			{
 				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
 				{
-					Material8 voxel = volData->getVoxelAt(x,y,z);
+					PolyVox::Material8 voxel = volData->getVoxelAt(x,y,z);
 					if(voxel.getMaterial() == 0)
 					{
 						return false;
