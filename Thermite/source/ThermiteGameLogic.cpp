@@ -827,6 +827,8 @@ namespace Thermite
 		{
 			qDebug("All Qt bindings loaded successfully.");
 		}
+
+		scriptEngine->setProcessEventsInterval(100); //10 times a second
 	}
 
 	void ThermiteGameLogic::initScriptEnvironment(void)
@@ -1014,7 +1016,14 @@ namespace Thermite
 			}
 
 			//execute script
+			qDebug() << "Including " << path;
 			QScriptValue result = scriptEngine->evaluate(script);
+			if (scriptEngine->hasUncaughtException())
+			{
+				int line = scriptEngine->uncaughtExceptionLineNumber();
+				qCritical() << "uncaught exception at line" << line << ":" << result.toString();
+				m_bRunScript = false;
+			}
 		}
 		catch(Ogre::Exception& e)
 		{
