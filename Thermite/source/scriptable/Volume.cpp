@@ -32,6 +32,8 @@ freely, subject to the following restrictions:
 
 #include "Material.h"
 
+#include "Raycast.h"
+
 #include "Perlin.h"
 #include "FindPathTask.h"
 #include "SurfaceMeshExtractionTask.h"
@@ -402,34 +404,19 @@ namespace Thermite
 
 	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
 	{
-		//Initialise to failure
-		/*std::pair<bool, QVector3D> result;
-		result.first = false;
-		result.second = QVector3D(0,0,0);*/
-
 		QVector3D result = QVector3D(0,0,0);
 
-		//Ensure the voume is valid
-		PolyVox::Volume<Material8>* pVolume = m_pPolyVoxVolume;
-		if(pVolume == 0)
+		Vector3DFloat start(rayOrigin.x(), rayOrigin.y(), rayOrigin.z());
+		Vector3DFloat direction(rayDir.x(), rayDir.y(), rayDir.z());
+		direction.normalise();
+		direction *= 1000.0f;
+
+		Raycast<Material8> raycast(m_pPolyVoxVolume, start, direction);
+		raycast.execute();
+
+		if(raycast.hit)
 		{
-			return result;
-		}
-
-		Ogre::Real dist = 0.0f;
-		for(int steps = 0; steps < 1000; steps++)
-		{
-			//Ogre::Vector3 point = ray.getPoint(dist);
-			//PolyVox::Vector3DUint16 v3dPoint = PolyVox::Vector3DUint16(point.x + 0.5, point.y + 0.5, point.z + 0.5);
-			rayOrigin += rayDir.normalized();
-
-			if(pVolume->getVoxelAt(rayOrigin.x(), rayOrigin.y(), rayOrigin.z()).getMaterial() > 0)
-			{
-				result = rayOrigin;
-				return result;
-			}
-
-			dist += 1.0f;			
+			result = QVector3D(raycast.x, raycast.y, raycast.z);
 		}
 
 		return result;
