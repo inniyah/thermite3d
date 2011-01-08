@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #include "ThermiteGameLogic.h"
 
 #include "SurfaceMesh.h"
-#include "SurfaceExtractor.h"
+#include "MeshDecimator.h"
 
 #include <QMutex>
 
@@ -43,6 +43,12 @@ namespace Thermite
 	void SurfaceMeshDecimationTask::run(void)
 	{
 		//mMesh->decimate(0.95);
+
+		PolyVox::SurfaceMesh<PolyVox::PositionMaterial> meshDecimated;
+		PolyVox::MeshDecimator<PositionMaterial> decimator(mMesh, &meshDecimated);
+		decimator.execute();
+		*mMesh = meshDecimated;
+
 		emit finished(this);
 	}
 }

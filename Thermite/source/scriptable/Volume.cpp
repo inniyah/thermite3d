@@ -214,7 +214,7 @@ namespace Thermite
 
 		m_volSurfaceDecimators[regionX][regionY][regionZ] = surfaceMeshDecimationTask;
 
-		//m_backgroundThread->addTask(surfaceMeshDecimationTask);
+		m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
 	void Volume::uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask)
