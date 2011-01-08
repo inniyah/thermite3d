@@ -411,12 +411,13 @@ namespace Thermite
 		direction.normalise();
 		direction *= 1000.0f;
 
-		Raycast<Material8> raycast(m_pPolyVoxVolume, start, direction);
+		RaycastResult raycastResult;
+		Raycast<Material8> raycast(m_pPolyVoxVolume, start, direction, raycastResult);
 		raycast.execute();
-
-		if(raycast.hit)
+		
+		if(raycastResult.foundIntersection)
 		{
-			result = QVector3D(raycast.x, raycast.y, raycast.z);
+			result = QVector3D(raycastResult.intersectionVoxel.getX(), raycastResult.intersectionVoxel.getY(), raycastResult.intersectionVoxel.getZ());
 		}
 
 		return result;
