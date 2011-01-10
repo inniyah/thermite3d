@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "Material.h"
 
 #include "Raycast.h"
+#include "VolumeResampler.h"
 
 #include "Perlin.h"
 #include "FindPathTask.h"
@@ -99,6 +100,18 @@ namespace Thermite
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (SurfaceMesh<PositionMaterial>*)0);
 		mRegionBeingExtracted.resize(dimensions); std::fill(mRegionBeingExtracted.getRawData(), mRegionBeingExtracted.getRawData() + mRegionBeingExtracted.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
+
+		/*PolyVox::Volume<Material8> subSampledVolume(m_pPolyVoxVolume->getWidth() / 2, m_pPolyVoxVolume->getHeight() / 2, m_pPolyVoxVolume->getDepth() / 2);
+		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &subSampledVolume);
+		volumeResampler.execute();*/
+
+		//Ambient Occlusion
+		mAmbientOcclusionVolume.resize(ArraySizes(64)(16)(64));
+
+		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume);
+		volumeResampler.execute();
+
+		mAmbientOcclusionVolumeChanged = true;
 	}
 
 	void Volume::initialise(void)
@@ -511,6 +524,17 @@ namespace Thermite
 
 					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
 				}
+			}
+		}
+
+		for(int z = 50; z < 150; z++)
+		{
+			for(int x = 50; x < 150; x++) 
+			{
+				Material8 voxel;
+				voxel.setMaterial(130);
+				voxel.setDensity(Material8::getMaxDensity());
+				pPolyVoxVolume->setVoxelAt(x,15,z,voxel);
 			}
 		}
 

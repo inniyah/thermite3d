@@ -192,6 +192,20 @@ namespace Thermite
 		mConsole = new Console(scriptEngine, qApp->mainWidget(), Qt::Tool);
 		mConsole->show();
 
+		Ogre::TexturePtr newTexture = Ogre::TextureManager::getSingleton().createManual(
+		  "MyTextureMap", // Name of texture
+		  "General", // Name of resource group in which the texture should be created
+		  Ogre::TEX_TYPE_3D, // Texture type
+		  64, // Width
+		  16, // Height
+		  64, // Depth (Must be 1 for two dimensional textures)
+		  0, // Number of mipmaps
+		  Ogre::PF_L8, // Pixel format
+		  Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE // usage
+		  );
+
+		Ogre::HardwarePixelBuffer* pixelBuffer = newTexture.getPointer()->getBuffer().getPointer();
+
 		char* strAppName = m_commandLineArgs.getValue("appname");
 		if(strAppName != 0)
 		{
@@ -433,7 +447,7 @@ namespace Thermite
 								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 								{
 									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][ regionZ];
+									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][regionZ];
 									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
 									{
 										SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
@@ -442,6 +456,17 @@ namespace Thermite
 									}
 								}
 							}
+						}
+
+						//Ambient Occlusion
+						if(volume->mAmbientOcclusionVolumeChanged)
+						{
+							Ogre::TexturePtr texturePtr = Ogre::TextureManager::getSingletonPtr()->getByName("MyTextureMap");
+							Ogre::HardwarePixelBuffer* pixelBuffer = texturePtr.getPointer()->getBuffer().getPointer();
+							Ogre::PixelBox pixelBox(64,16,64, Ogre::PF_L8, volume->mAmbientOcclusionVolume.getRawData());
+							pixelBuffer->blitFromMemory(pixelBox);
+
+							volume->mAmbientOcclusionVolumeChanged = false;
 						}
 					}
 

@@ -87,6 +87,9 @@ namespace Thermite
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
+		PolyVox::Array<3, uint8_t> mAmbientOcclusionVolume;
+		bool mAmbientOcclusionVolumeChanged;
+
 		
 		PolyVox::Array<3, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>*> m_volSurfaceMeshes;
 		PolyVox::Array<3, uint32_t> mLastModifiedArray;
