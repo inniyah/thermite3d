@@ -45,7 +45,6 @@ SET(MAIN_INC_FILES
 	include/Utility.h
 	include/VolumeSerializationProgressListenerImpl.h	
 	include/VolumeResampler.h
-	include/VolumeResampler.inl
 )
 
 SET(MAIN_UI_FILES
