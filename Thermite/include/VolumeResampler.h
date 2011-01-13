@@ -32,7 +32,7 @@ namespace PolyVox
 	class VolumeResampler
 	{
 	public:
-		VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult);
+		VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult, Region region);
 		~VolumeResampler();
 
 		void execute(void);
@@ -43,6 +43,7 @@ namespace PolyVox
 
 		Volume<VoxelType>* m_volInput;
 		Array<3, uint8_t>* m_arrayResult;
+		Region m_region;
 		VolumeSampler<VoxelType> m_sampVolume;
 	};
 }

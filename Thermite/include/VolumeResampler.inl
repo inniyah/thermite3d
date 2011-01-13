@@ -29,9 +29,10 @@ freely, subject to the following restrictions:
 namespace PolyVox
 {
 	template <typename VoxelType>
-	VolumeResampler<VoxelType>::VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult)
+	VolumeResampler<VoxelType>::VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult, Region region)
 		:m_volInput(volInput)
 		,m_arrayResult(arrayResult)
+		,m_region(region)
 		,m_sampVolume(volInput)
 	{
 		/*assert(m_volInput.getWidth() == m_volOutput.getWidth() * 2);
@@ -48,12 +49,15 @@ namespace PolyVox
 	template <typename VoxelType>
 	void VolumeResampler<VoxelType>::execute(void)
 	{
-		std::fill(m_arrayResult->getRawData(), m_arrayResult->getRawData() + m_arrayResult->getNoOfElements(), 0);
+		const int iRatioX = m_volInput->getWidth()  / m_arrayResult->getDimension(0);
+		const int iRatioY = m_volInput->getHeight() / m_arrayResult->getDimension(1);
+		const int iRatioZ = m_volInput->getDepth()  / m_arrayResult->getDimension(2);
+		const int iRatioMax = std::max(std::max(iRatioX, iRatioY), iRatioZ);
 
-		const float fRatioX = m_volInput->getWidth()  / m_arrayResult->getDimension(0);
-		const float fRatioY = m_volInput->getHeight() / m_arrayResult->getDimension(1);
-		const float fRatioZ = m_volInput->getDepth()  / m_arrayResult->getDimension(2);
-		const float fRatioMax = std::max(std::max(fRatioX, fRatioY), fRatioZ);
+		const float fRatioX = iRatioX;
+		const float fRatioY = iRatioY;
+		const float fRatioZ = iRatioZ;
+		const float fRatioMax = iRatioMax;
 		const Vector3DFloat v3dRatio(fRatioX, fRatioY, fRatioZ);
 
 		const float fHalfRatioX = fRatioX * 0.5f;
@@ -64,17 +68,18 @@ namespace PolyVox
 
 		const Vector3DFloat v3dOffset(0.5f,0.5f,0.5f);
 
-		for(uint16_t z = 0; z < m_arrayResult->getDimension(2); z++)
+		for(uint16_t z = m_region.getLowerCorner().getZ(); z <= m_region.getUpperCorner().getZ(); z += iRatioZ)
 		{
-			for(uint16_t y = 0; y < m_arrayResult->getDimension(1); y++)
+			for(uint16_t y = m_region.getLowerCorner().getY(); y <= m_region.getUpperCorner().getY(); y += iRatioY)
 			{
-				for(uint16_t x = 0; x < m_arrayResult->getDimension(0); x++)
+				for(uint16_t x = m_region.getLowerCorner().getX(); x <= m_region.getUpperCorner().getX(); x += iRatioX)
 				{
 					uint16_t uVisibleDirections = 0;
 
 					for(int ct = 0; ct < 256; ct++)
 					{
-						Vector3DFloat v3dStart(x * fRatioX, y * fRatioY, z * fRatioZ);
+						Vector3DFloat v3dStart(x, y, z);
+						//v3dStart += static_cast<Vector3DFloat>(m_region.getLowerCorner()); //Move cast outside loop.
 						v3dStart -= v3dOffset;
 						v3dStart += v3dHalfRatio;
 
@@ -86,7 +91,7 @@ namespace PolyVox
 
 						Vector3DFloat unitVector = randomUnitVector();
 						Vector3DFloat v3dEscapeFromCube = unitVector * fEscapeFromCube;
-						Vector3DFloat vectorScaled = unitVector * 20.0f;
+						Vector3DFloat vectorScaled = unitVector * 16.0f;
 
 						RaycastResult raycastResult;
 						Raycast<VoxelType> raycast(m_volInput, v3dStart + v3dJitter + v3dEscapeFromCube, vectorScaled, raycastResult);
@@ -97,7 +102,7 @@ namespace PolyVox
 							uVisibleDirections += 1;
 						}
 					}
-					(*m_arrayResult)[z][y][x] = uVisibleDirections / 1;
+					(*m_arrayResult)[z / iRatioZ][y / iRatioY][x / iRatioX] = uVisibleDirections / 1;
 				}
 			}
 		}

@@ -85,6 +85,11 @@ namespace Thermite
 		uint16_t mVolumeHeightInRegions;
 		uint16_t mVolumeDepthInRegions; 
 
+		/*uint16_t mLightRegionSideLength;
+		uint16_t mVolumeWidthInLightRegions;
+		uint16_t mVolumeHeightInLightRegions;
+		uint16_t mVolumeDepthInLightRegions; */
+
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
 		PolyVox::Array<3, uint8_t> mAmbientOcclusionVolume;

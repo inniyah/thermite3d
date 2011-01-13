@@ -107,11 +107,7 @@ namespace Thermite
 
 		//Ambient Occlusion
 		mAmbientOcclusionVolume.resize(ArraySizes(64)(16)(64));
-
-		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume);
-		volumeResampler.execute();
-
-		mAmbientOcclusionVolumeChanged = true;
+		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
 	}
 
 	void Volume::initialise(void)
@@ -183,6 +179,10 @@ namespace Thermite
 
 							//Indicate that we've processed this region
 							mExtractionStartedArray[regionX][regionY][regionZ] = mLastModifiedArray[regionX][regionY][regionZ];
+
+							VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume, region);
+							volumeResampler.execute();
+							mAmbientOcclusionVolumeChanged = true;
 						}
 					}
 				}
@@ -227,7 +227,7 @@ namespace Thermite
 
 		m_volSurfaceDecimators[regionX][regionY][regionZ] = surfaceMeshDecimationTask;
 
-		m_backgroundThread->addTask(surfaceMeshDecimationTask);
+		//m_backgroundThread->addTask(surfaceMeshDecimationTask);
 	}
 
 	void Volume::uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask)
