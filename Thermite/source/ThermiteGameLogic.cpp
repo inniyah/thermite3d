@@ -77,6 +77,10 @@ namespace Thermite
 		,mCachedVolumeHeightInRegions(0)
 		,mCachedVolumeDepthInRegions(0)
 
+		,mCachedVolumeWidthInLightRegions(0)
+		,mCachedVolumeHeightInLightRegions(0)
+		,mCachedVolumeDepthInLightRegions(0)
+
 		//Ogre's scene representation
 		,mVolumeSceneNode(0)
 		//,m_volOgreSceneNodes(0)
@@ -429,9 +433,21 @@ namespace Thermite
 							mVolLastUploadedTimeStamps.resize(dimensions);
 							m_volOgreSceneNodes.resize(dimensions);
 
+							//Lighting
+							mCachedVolumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
+							mCachedVolumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
+							mCachedVolumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
+						
+							uint32_t lightDimensions[3] = {mCachedVolumeWidthInLightRegions, mCachedVolumeHeightInLightRegions, mCachedVolumeDepthInLightRegions}; // Array dimensions
+
+							//Create the arrays
+							mVolLightingLastUploadedTimeStamps.resize(lightDimensions);
+
 							//Clear the arrays
 							std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
 							std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
+
+							std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
 						}
 
 						//Some values we'll need later.
@@ -458,15 +474,37 @@ namespace Thermite
 							}
 						}
 
+						//Some values we'll need later.
+						uint16_t volumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
+						uint16_t volumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
+						uint16_t volumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
+
+						bool needsLightingUpload = false;
+						//Iterate over each region
+						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInLightRegions; ++regionZ)
+						{		
+							for(std::uint16_t regionY = 0; regionY < volumeHeightInLightRegions; ++regionY)
+							{
+								for(std::uint16_t regionX = 0; regionX < volumeWidthInLightRegions; ++regionX)
+								{
+									uint32_t volLightingFinsishedTimeStamp = volume->mLightingFinishedArray[regionX][regionY][regionZ];
+									uint32_t volLightingLastUploadedTimeStamp = mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ];
+									if(volLightingFinsishedTimeStamp > volLightingLastUploadedTimeStamp)
+									{
+										needsLightingUpload = true;
+
+										mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+									}
+								}
+							}
+						}
 						//Ambient Occlusion
-						if(volume->mAmbientOcclusionVolumeChanged)
+						if(needsLightingUpload)
 						{
 							Ogre::TexturePtr texturePtr = Ogre::TextureManager::getSingletonPtr()->getByName("MyTextureMap");
 							Ogre::HardwarePixelBuffer* pixelBuffer = texturePtr.getPointer()->getBuffer().getPointer();
 							Ogre::PixelBox pixelBox(64,16,64, Ogre::PF_L8, volume->mAmbientOcclusionVolume.getRawData());
 							pixelBuffer->blitFromMemory(pixelBox);
-
-							volume->mAmbientOcclusionVolumeChanged = false;
 						}
 					}
 

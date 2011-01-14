@@ -38,7 +38,7 @@ namespace PolyVox
 		/*assert(m_volInput.getWidth() == m_volOutput.getWidth() * 2);
 		assert(m_volInput.getHeight() == m_volOutput.getHeight() * 2);
 		assert(m_volInput.getDepth() == m_volOutput.getDepth() * 2);*/
-		srand(12345);
+		//srand(12345);
 	}
 
 	template <typename VoxelType>
@@ -76,7 +76,7 @@ namespace PolyVox
 				{
 					uint16_t uVisibleDirections = 0;
 
-					for(int ct = 0; ct < 256; ct++)
+					for(int ct = 0; ct < 255; ct++)
 					{
 						Vector3DFloat v3dStart(x, y, z);
 						//v3dStart += static_cast<Vector3DFloat>(m_region.getLowerCorner()); //Move cast outside loop.

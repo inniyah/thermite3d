@@ -139,6 +139,7 @@ SOURCE_GROUP("Headers\\Scriptable" FILES ${SCRIPTABLE_INC_FILES})
 ################################################################################
 
 SET(TASKS_SRC_FILES
+	source/tasks/AmbientOcclusionTask.cpp
 	source/tasks/FindPathTask.cpp
 	source/tasks/SurfaceMeshDecimationTask.cpp
 	source/tasks/SurfaceMeshExtractionTask.cpp
@@ -147,6 +148,7 @@ SET(TASKS_SRC_FILES
 )
 
 SET(TASKS_INC_FILES
+	include/Tasks/AmbientOcclusionTask.h
 	include/Tasks/FindPathTask.h
 	include/Tasks/SurfaceMeshDecimationTask.h
 	include/Tasks/SurfaceMeshExtractionTask.h

@@ -71,6 +71,7 @@ namespace Thermite
 
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
+		void uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask);
 
 		void generateMapForTankWars(void);
 
@@ -85,15 +86,14 @@ namespace Thermite
 		uint16_t mVolumeHeightInRegions;
 		uint16_t mVolumeDepthInRegions; 
 
-		/*uint16_t mLightRegionSideLength;
+		uint16_t mLightRegionSideLength;
 		uint16_t mVolumeWidthInLightRegions;
 		uint16_t mVolumeHeightInLightRegions;
-		uint16_t mVolumeDepthInLightRegions; */
+		uint16_t mVolumeDepthInLightRegions;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
 		PolyVox::Array<3, uint8_t> mAmbientOcclusionVolume;
-		bool mAmbientOcclusionVolumeChanged;
 
 		
 		PolyVox::Array<3, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>*> m_volSurfaceMeshes;
@@ -102,6 +102,10 @@ namespace Thermite
 		PolyVox::Array<3, uint32_t> mExtractionFinishedArray;
 		PolyVox::Array<3, bool> mRegionBeingExtracted;
 		PolyVox::Array<3, SurfaceMeshDecimationTask*> m_volSurfaceDecimators;
+
+		PolyVox::Array<3, uint32_t> mLightLastModifiedArray;
+		PolyVox::Array<3, uint32_t> mLightingStartedArray;
+		PolyVox::Array<3, uint32_t> mLightingFinishedArray;
 
 	private:
 		bool isRegionBeingExtracted(const PolyVox::Region& regionToTest);

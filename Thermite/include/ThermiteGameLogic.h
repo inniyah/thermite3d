@@ -131,10 +131,15 @@ namespace Thermite
 		Camera* mCamera;
 		SkyBox* mSkyBox;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
+		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
 		QList<Object*> mObjectList;
 		uint16_t mCachedVolumeWidthInRegions;
 		uint16_t mCachedVolumeHeightInRegions;
 		uint16_t mCachedVolumeDepthInRegions;
+
+		uint16_t mCachedVolumeWidthInLightRegions;
+		uint16_t mCachedVolumeHeightInLightRegions;
+		uint16_t mCachedVolumeDepthInLightRegions;
 
 		//Ogre's scene representation
 		Ogre::SceneNode* mVolumeSceneNode;

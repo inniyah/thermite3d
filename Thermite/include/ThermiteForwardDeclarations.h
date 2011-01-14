@@ -36,6 +36,7 @@ namespace Thermite
 	class SkyBox;
 
 	//Tasks
+	class AmbientOcclusionTask;
 	class SurfaceMeshDecimationTask;
 	class SurfaceMeshExtractionTask;
 	class Task;
