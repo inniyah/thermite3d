@@ -80,42 +80,46 @@ namespace PolyVox
 
 		const Vector3DFloat v3dOffset(0.5f,0.5f,0.5f);
 
-		const Vector3DFloat v3dHalfRatioMinusOffset = v3dOffset - v3dHalfRatio;
+		RaycastResult raycastResult;
+		Raycast<VoxelType> raycast(m_volInput, Vector3DFloat(0.0f,0.0f,0.0f), Vector3DFloat(1.0f,1.0f,1.0f), raycastResult);
 
-		const float sqrt_3 = 1.7321f;
-		const float fEscapeFromCube = sqrt_3 * (fHalfRatioMax);
-
+		//This loop iterates over the bottom-lower-left voxel in each of the cells in the output array
 		for(uint16_t z = m_region.getLowerCorner().getZ(); z <= m_region.getUpperCorner().getZ(); z += iRatioZ)
 		{
 			for(uint16_t y = m_region.getLowerCorner().getY(); y <= m_region.getUpperCorner().getY(); y += iRatioY)
 			{
 				for(uint16_t x = m_region.getLowerCorner().getX(); x <= m_region.getUpperCorner().getX(); x += iRatioX)
 				{
-					uint16_t uVisibleDirections = 0;
+					//Compute a start position corresponding to 
+					//the centre of the cell in the output array.
+					Vector3DFloat v3dStart(x, y, z);
+					v3dStart -= v3dOffset;
+					v3dStart += v3dHalfRatio;
+
+					//Keep track of how many rays did not hit anything
+					uint8_t uVisibleDirections = 0;
 
 					for(int ct = 0; ct < 255; ct++)
-					{
-						Vector3DFloat v3dStart(x, y, z);
-						v3dStart -= v3dOffset;
-						v3dStart += v3dHalfRatio;
-						
+					{						
+						//We take a random vector with components going from -1 to 1 and scale it to go from -haflRatio to +halfRatio.
+						//This jitter value moves our sample point from the center of the array cell to somewhere else in the array cell
 						Vector3DFloat v3dJitter = randomVectors[(mRandomVectorIndex += (++mIndexIncreament)) % 1019]; //Prime number helps avoid repetition on sucessive loops.
-						v3dJitter *= v3dRatio;
+						v3dJitter *= v3dHalfRatio;
+						const Vector3DFloat v3dRayStart = v3dStart + v3dJitter;
 
-						const Vector3DFloat& unitVector = randomUnitVectors[(mRandomUnitVectorIndex += (++mIndexIncreament)) % 1021]; //Differenct prime number.
-						Vector3DFloat v3dEscapeFromCube = unitVector * fEscapeFromCube;
-						Vector3DFloat vectorScaled = unitVector * m_fRayLength;
-
-						RaycastResult raycastResult;
-						Raycast<VoxelType> raycast(m_volInput, v3dStart + v3dJitter + v3dEscapeFromCube, vectorScaled, raycastResult);
+						Vector3DFloat v3dRayDirection = randomUnitVectors[(mRandomUnitVectorIndex += (++mIndexIncreament)) % 1021]; //Differenct prime number.
+						v3dRayDirection *= m_fRayLength;
+						
+						raycast.setStart(v3dRayStart);
+						raycast.setDirection(v3dRayDirection);
 						raycast.execute();
 
 						if(raycastResult.foundIntersection == false)
 						{
-							uVisibleDirections += 1;
+							++uVisibleDirections;
 						}
 					}
-					(*m_arrayResult)[z / iRatioZ][y / iRatioY][x / iRatioX] = uVisibleDirections / 1;
+					(*m_arrayResult)[z / iRatioZ][y / iRatioY][x / iRatioX] = uVisibleDirections;
 				}
 			}
 		}
