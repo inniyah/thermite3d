@@ -28,7 +28,6 @@ freely, subject to the following restrictions:
 
 namespace PolyVox
 {	
-	extern const uint32_t NoOfRandomUnitVectors;
 	extern const Vector3DFloat randomUnitVectors[];
 }
 

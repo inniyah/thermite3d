@@ -27,6 +27,7 @@ SET(MAIN_SRC_FILES
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
 	source/RandomUnitVectors.cpp
+	source/RandomVectors.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
@@ -41,6 +42,7 @@ SET(MAIN_INC_FILES
 	include/MainMenu.h
 	include/QtForwardDeclarations.h
 	include/RandomUnitVectors.h
+	include/RandomVectors.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
 	include/ThermiteGameLogic.h

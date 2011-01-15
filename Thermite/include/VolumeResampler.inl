@@ -23,6 +23,7 @@ freely, subject to the following restrictions:
 
 #include "Array.h"
 #include "RandomUnitVectors.h"
+#include "RandomVectors.h"
 #include "Raycast.h"
 #include "Volume.h"
 #include "VolumeSampler.h"
@@ -42,7 +43,14 @@ namespace PolyVox
 		assert(m_volInput.getHeight() % arrayResult.getDimension(1) == 0);
 		assert(m_volInput.getDepth() % arrayResult.getDimension(2) == 0);
 
-		mRandomUnitVectorIndex = 0;
+		//Our initial indices. It doesn't matter exactly what we set here, but the code below makes 
+		//sure they are different for different regions which helps reduce tiling patterns is the results.
+		mRandomUnitVectorIndex += m_region.getLowerCorner().getX() + m_region.getLowerCorner().getY() + m_region.getLowerCorner().getZ();
+		mRandomVectorIndex += m_region.getLowerCorner().getX() + m_region.getLowerCorner().getY() + m_region.getLowerCorner().getZ();
+
+		//This value helps us jump around in the array a bit more, so the
+		//nth 'random' value isn't always followed by the n+1th 'random' value.
+		mIndexIncreament = 1;
 	}
 
 	template <typename VoxelType>
@@ -72,6 +80,11 @@ namespace PolyVox
 
 		const Vector3DFloat v3dOffset(0.5f,0.5f,0.5f);
 
+		const Vector3DFloat v3dHalfRatioMinusOffset = v3dOffset - v3dHalfRatio;
+
+		const float sqrt_3 = 1.7321f;
+		const float fEscapeFromCube = sqrt_3 * (fHalfRatioMax);
+
 		for(uint16_t z = m_region.getLowerCorner().getZ(); z <= m_region.getUpperCorner().getZ(); z += iRatioZ)
 		{
 			for(uint16_t y = m_region.getLowerCorner().getY(); y <= m_region.getUpperCorner().getY(); y += iRatioY)
@@ -85,14 +98,11 @@ namespace PolyVox
 						Vector3DFloat v3dStart(x, y, z);
 						v3dStart -= v3dOffset;
 						v3dStart += v3dHalfRatio;
-
-						const float sqrt_3 = 1.7321f;
-						const float fEscapeFromCube = sqrt_3 * (fHalfRatioMax);
 						
-						Vector3DFloat v3dJitter = randomJitterVector();
+						Vector3DFloat v3dJitter = randomVectors[(mRandomVectorIndex += (++mIndexIncreament)) % 1019]; //Prime number helps avoid repetition on sucessive loops.
 						v3dJitter *= v3dRatio;
 
-						const Vector3DFloat& unitVector = randomUnitVectors[(++mRandomUnitVectorIndex) % NoOfRandomUnitVectors];
+						const Vector3DFloat& unitVector = randomUnitVectors[(mRandomUnitVectorIndex += (++mIndexIncreament)) % 1021]; //Differenct prime number.
 						Vector3DFloat v3dEscapeFromCube = unitVector * fEscapeFromCube;
 						Vector3DFloat vectorScaled = unitVector * m_fRayLength;
 
@@ -109,21 +119,5 @@ namespace PolyVox
 				}
 			}
 		}
-	}
-
-	template <typename VoxelType>
-	Vector3DFloat VolumeResampler<VoxelType>::randomJitterVector(void)
-	{
-		float x = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		float y = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		float z = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		Vector3DFloat result(x,y,z);
-		return result;
-	}
-
-	template <typename VoxelType>
-	Vector3DFloat VolumeResampler<VoxelType>::randomUnitVector(void)
-	{
-		return randomUnitVectors[(++mRandomUnitVectorIndex) % NoOfRandomUnitVectors];
 	}
 }

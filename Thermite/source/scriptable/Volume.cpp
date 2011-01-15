@@ -94,7 +94,7 @@ namespace Thermite
 		mVolumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
 		mVolumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-		mLightRegionSideLength = qApp->settings()->value("Engine/LightRegionSideLength", 16).toInt();
+		mLightRegionSideLength = qApp->settings()->value("Engine/LightRegionSideLength", 32).toInt();
 		mVolumeWidthInLightRegions = m_pPolyVoxVolume->getWidth() / mLightRegionSideLength;
 		mVolumeHeightInLightRegions = m_pPolyVoxVolume->getHeight() / mLightRegionSideLength;
 		mVolumeDepthInLightRegions = m_pPolyVoxVolume->getDepth() / mLightRegionSideLength;
