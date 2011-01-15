@@ -22,6 +22,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 
 #include "Array.h"
+#include "RandomUnitVectors.h"
 #include "Raycast.h"
 #include "Volume.h"
 #include "VolumeSampler.h"
@@ -29,16 +30,19 @@ freely, subject to the following restrictions:
 namespace PolyVox
 {
 	template <typename VoxelType>
-	VolumeResampler<VoxelType>::VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult, Region region)
-		:m_volInput(volInput)
-		,m_arrayResult(arrayResult)
-		,m_region(region)
+	VolumeResampler<VoxelType>::VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult, Region region, float fRayLength)
+		:m_region(region)
 		,m_sampVolume(volInput)
+		,m_volInput(volInput)
+		,m_arrayResult(arrayResult)
+		,m_fRayLength(fRayLength)
 	{
-		/*assert(m_volInput.getWidth() == m_volOutput.getWidth() * 2);
-		assert(m_volInput.getHeight() == m_volOutput.getHeight() * 2);
-		assert(m_volInput.getDepth() == m_volOutput.getDepth() * 2);*/
-		//srand(12345);
+		//Make sure that the size of the volume is an exact multiple of the size of the array.
+		assert(m_volInput.getWidth() % arrayResult.getDimension(0) == 0);
+		assert(m_volInput.getHeight() % arrayResult.getDimension(1) == 0);
+		assert(m_volInput.getDepth() % arrayResult.getDimension(2) == 0);
+
+		mRandomUnitVectorIndex = 0;
 	}
 
 	template <typename VoxelType>
@@ -79,7 +83,6 @@ namespace PolyVox
 					for(int ct = 0; ct < 255; ct++)
 					{
 						Vector3DFloat v3dStart(x, y, z);
-						//v3dStart += static_cast<Vector3DFloat>(m_region.getLowerCorner()); //Move cast outside loop.
 						v3dStart -= v3dOffset;
 						v3dStart += v3dHalfRatio;
 
@@ -89,9 +92,9 @@ namespace PolyVox
 						Vector3DFloat v3dJitter = randomJitterVector();
 						v3dJitter *= v3dRatio;
 
-						Vector3DFloat unitVector = randomUnitVector();
+						const Vector3DFloat& unitVector = randomUnitVectors[(++mRandomUnitVectorIndex) % NoOfRandomUnitVectors];
 						Vector3DFloat v3dEscapeFromCube = unitVector * fEscapeFromCube;
-						Vector3DFloat vectorScaled = unitVector * 16.0f;
+						Vector3DFloat vectorScaled = unitVector * m_fRayLength;
 
 						RaycastResult raycastResult;
 						Raycast<VoxelType> raycast(m_volInput, v3dStart + v3dJitter + v3dEscapeFromCube, vectorScaled, raycastResult);
@@ -121,11 +124,6 @@ namespace PolyVox
 	template <typename VoxelType>
 	Vector3DFloat VolumeResampler<VoxelType>::randomUnitVector(void)
 	{
-		float x = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		float y = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		float z = ((float)rand()/(float)RAND_MAX) * 2.0f - 1.0f;
-		Vector3DFloat result(x,y,z);
-		result.normalise();
-		return result;
+		return randomUnitVectors[(++mRandomUnitVectorIndex) % NoOfRandomUnitVectors];
 	}
 }

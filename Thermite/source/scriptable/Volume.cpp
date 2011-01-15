@@ -119,6 +119,12 @@ namespace Thermite
 		//Ambient Occlusion
 		mAmbientOcclusionVolume.resize(ArraySizes(64)(16)(64));
 		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
+
+		QTime time;
+		time.start();
+		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
+		volumeResampler.execute();
+		qDebug() << "Lighting time = " << time.elapsed();
 	}
 
 	void Volume::initialise(void)
@@ -228,7 +234,7 @@ namespace Thermite
 							/*VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume, region);
 							volumeResampler.execute();*/
 
-							AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ]);
+							AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ], mLightRegionSideLength);
 							ambientOcclusionTask->setAutoDelete(false);
 							QObject::connect(ambientOcclusionTask, SIGNAL(finished(AmbientOcclusionTask*)), this, SLOT(uploadAmbientOcclusionResult(AmbientOcclusionTask*)), Qt::QueuedConnection);
 							if(mMultiThreadedSurfaceExtraction)

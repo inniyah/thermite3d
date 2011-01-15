@@ -21,36 +21,15 @@ freely, subject to the following restrictions:
     distribution. 	
 *******************************************************************************/
 
-#ifndef __VolumeResampler_H__
-#define __VolumeResampler_H__
+#ifndef __PolyVox_RandomUnitVectors_H__
+#define __PolyVox_RandomUnitVectors_H__
 
-#include "PolyVoxForwardDeclarations.h"
+#include "Vector.h"
 
 namespace PolyVox
-{
-	template <typename VoxelType>
-	class VolumeResampler
-	{
-	public:
-		VolumeResampler(Volume<VoxelType>* volInput, Array<3, uint8_t>* arrayResult, Region region, float fRayLength);
-		~VolumeResampler();
-
-		void execute(void);
-
-	private:
-		Vector3DFloat randomJitterVector(void);
-		Vector3DFloat randomUnitVector(void);
-
-		Region m_region;
-		VolumeSampler<VoxelType> m_sampVolume;
-		Volume<VoxelType>* m_volInput;
-		Array<3, uint8_t>* m_arrayResult;
-		float m_fRayLength;
-
-		uint16_t mRandomUnitVectorIndex;
-	};
+{	
+	extern const uint32_t NoOfRandomUnitVectors;
+	extern const Vector3DFloat randomUnitVectors[];
 }
 
-#include "VolumeResampler.inl"
-
-#endif //__VolumeResampler_H__
+#endif //__PolyVox_RandomUnitVectors_H__
