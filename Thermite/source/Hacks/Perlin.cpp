@@ -230,6 +230,30 @@ float Perlin::perlin_noise_2D(float vec[2])
 	return result;
 }
 
+float Perlin::perlin_noise_3D(float vec[3])
+{
+  int terms    = mOctaves;
+	float freq   = mFrequency;
+	float result = 0.0f;
+  float amp = mAmplitude;
+
+  vec[0]*=mFrequency;
+  vec[1]*=mFrequency;
+  vec[2]*=mFrequency;
+
+	for( int i=0; i<terms; i++ )
+	{
+		result += noise3(vec)*amp;
+		vec[0] *= 2.0f;
+		vec[1] *= 2.0f;
+		vec[2] *= 2.0f;
+    amp*=0.5f;
+	}
+
+
+	return result;
+}
+
 
 
 Perlin::Perlin(int octaves,float freq,float amp,int seed)

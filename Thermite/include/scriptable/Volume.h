@@ -74,6 +74,8 @@ namespace Thermite
 		void uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask);
 
 		void generateMapForTankWars(void);
+		void generateHillyMapForTankWars(void);
+		void generateRockyMapForTankWars(void);
 
 	public:
 		static TaskProcessorThread* m_backgroundThread;

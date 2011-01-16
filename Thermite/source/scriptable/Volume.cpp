@@ -550,6 +550,11 @@ namespace Thermite
 
 	void Volume::generateMapForTankWars(void)
 	{
+		generateRockyMapForTankWars();
+	}
+
+	void Volume::generateHillyMapForTankWars(void)
+	{
 		const int mapWidth = 256;
 		const int mapHeight = 32;
 		const int mapDepth = 256;
@@ -631,14 +636,59 @@ namespace Thermite
 			}
 		}
 
-		for(int z = 50; z < 150; z++)
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
+		return;
+	}
+
+	void Volume::generateRockyMapForTankWars(void)
+	{
+		const int mapWidth = 256;
+		const int mapHeight = 32;
+		const int mapDepth = 256;
+
+		int volumeHeight = 64;
+
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,volumeHeight,mapDepth);
+
+		Perlin perlin(2,4,1,234);
+
+		for(int z = 0; z < mapDepth; z++)
 		{
-			for(int x = 50; x < 150; x++) 
+			for(int y = 0; y < mapHeight; y++)
 			{
-				Material8 voxel;
-				voxel.setMaterial(130);
-				voxel.setDensity(Material8::getMaxDensity());
-				pPolyVoxVolume->setVoxelAt(x,15,z,voxel);
+				for(int x = 0; x < mapWidth; x++) 
+				{							
+					//float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
+
+					float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8.0f) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
+
+					float height = y / static_cast<float>(mapHeight);
+
+					height *= height;
+					height *= height;
+					height *= height;
+
+					Material8 voxel;
+					if(perlinVal + height < 0.0f)
+					{
+						voxel.setMaterial(245);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(Material8::getMinDensity());
+					}
+
+					if(y < 8)
+					{
+						voxel.setMaterial(245);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
 			}
 		}
 
