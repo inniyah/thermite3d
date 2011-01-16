@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #include "Material.h"
 #include "ThermiteGameLogic.h"
 
-#include "VolumeResampler.h"
+#include "AmbientOcclusionCalculator.h"
 
 #include <QMutex>
 
@@ -45,8 +45,8 @@ namespace Thermite
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		VolumeResampler<Material8> volumeResampler(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength);
-		volumeResampler.execute();
+		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength);
+		ambientOcclusionCalculator.execute();
 
 		emit finished(this);
 	}

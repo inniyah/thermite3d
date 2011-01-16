@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include "Material.h"
 
 #include "Raycast.h"
-#include "VolumeResampler.h"
+#include "AmbientOcclusionCalculator.h"
 
 #include "Perlin.h"
 #include "FindPathTask.h"
@@ -112,18 +112,14 @@ namespace Thermite
 		mLightingStartedArray.resize(lightDimensions); std::fill(mLightingStartedArray.getRawData(), mLightingStartedArray.getRawData() + mLightingStartedArray.getNoOfElements(), 0);
 		mLightingFinishedArray.resize(lightDimensions); std::fill(mLightingFinishedArray.getRawData(), mLightingFinishedArray.getRawData() + mLightingFinishedArray.getNoOfElements(), 0);
 
-		/*PolyVox::Volume<Material8> subSampledVolume(m_pPolyVoxVolume->getWidth() / 2, m_pPolyVoxVolume->getHeight() / 2, m_pPolyVoxVolume->getDepth() / 2);
-		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &subSampledVolume);
-		volumeResampler.execute();*/
-
 		//Ambient Occlusion
 		mAmbientOcclusionVolume.resize(ArraySizes(64)(16)(64));
 		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
 
 		/*QTime time;
 		time.start();
-		VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
-		volumeResampler.execute();
+		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
+		ambientOcclusionCalculator.execute();
 		qDebug() << "Lighting time = " << time.elapsed();*/
 	}
 
@@ -230,9 +226,6 @@ namespace Thermite
 							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
-
-							/*VolumeResampler<Material8> volumeResampler(m_pPolyVoxVolume, &mAmbientOcclusionVolume, region);
-							volumeResampler.execute();*/
 
 							AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ], mLightRegionSideLength);
 							ambientOcclusionTask->setAutoDelete(false);
