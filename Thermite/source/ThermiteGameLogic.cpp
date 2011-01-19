@@ -196,20 +196,6 @@ namespace Thermite
 		mConsole = new Console(scriptEngine, qApp->mainWidget(), Qt::Tool);
 		mConsole->show();
 
-		Ogre::TexturePtr newTexture = Ogre::TextureManager::getSingleton().createManual(
-		  "MyTextureMap", // Name of texture
-		  "General", // Name of resource group in which the texture should be created
-		  Ogre::TEX_TYPE_3D, // Texture type
-		  64, // Width
-		  16, // Height
-		  64, // Depth (Must be 1 for two dimensional textures)
-		  0, // Number of mipmaps
-		  Ogre::PF_L8, // Pixel format
-		  Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE // usage
-		  );
-
-		Ogre::HardwarePixelBuffer* pixelBuffer = newTexture.getPointer()->getBuffer().getPointer();
-
 		char* strAppName = m_commandLineArgs.getValue("appname");
 		if(strAppName != 0)
 		{
@@ -448,6 +434,26 @@ namespace Thermite
 							std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
 
 							std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
+
+							//Resize the ambient occlusion volume texture
+							if(mAmbientOcclusionVolumeTexture.isNull() == false)
+							{
+								//Not sure if we actually need to (or even should) remove the old one first - maybe the smart pointer handles it.
+								Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
+							}
+
+							const int iRatio = 4; //Ration od ambient occlusion volume size to main volume size.
+							mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
+							  "AmbientOcclusionVolumeTexture", // Name of texture
+							  "General", // Name of resource group in which the texture should be created
+							  Ogre::TEX_TYPE_3D, // Texture type
+							  volume->m_pPolyVoxVolume->getWidth() / iRatio, // Width
+							  volume->m_pPolyVoxVolume->getHeight() / iRatio, // Height
+							  volume->m_pPolyVoxVolume->getDepth() / iRatio, // Depth (Must be 1 for two dimensional textures)
+							  0, // Number of mipmaps
+							  Ogre::PF_L8, // Pixel format
+							  Ogre::TU_STATIC_WRITE_ONLY // usage
+							  );
 						}
 
 						//Some values we'll need later.
@@ -501,9 +507,8 @@ namespace Thermite
 						//Ambient Occlusion
 						if(needsLightingUpload)
 						{
-							Ogre::TexturePtr texturePtr = Ogre::TextureManager::getSingletonPtr()->getByName("MyTextureMap");
-							Ogre::HardwarePixelBuffer* pixelBuffer = texturePtr.getPointer()->getBuffer().getPointer();
-							Ogre::PixelBox pixelBox(64,16,64, Ogre::PF_L8, volume->mAmbientOcclusionVolume.getRawData());
+							Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
+							Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), volume->mAmbientOcclusionVolume.getRawData());
 							pixelBuffer->blitFromMemory(pixelBox);
 						}
 					}

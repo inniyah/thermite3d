@@ -43,6 +43,7 @@ freely, subject to the following restrictions:
 #include "QtOgreForwardDeclarations.h"
 
 #include <OgrePrerequisites.h>
+#include <OgreTexture.h>
 
 #include <QHash>
 
@@ -142,6 +143,8 @@ namespace Thermite
 		uint16_t mCachedVolumeWidthInLightRegions;
 		uint16_t mCachedVolumeHeightInLightRegions;
 		uint16_t mCachedVolumeDepthInLightRegions;
+
+		Ogre::TexturePtr mAmbientOcclusionVolumeTexture;
 
 		//Ogre's scene representation
 		Ogre::SceneNode* mVolumeSceneNode;
