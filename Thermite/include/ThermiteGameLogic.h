@@ -102,8 +102,6 @@ namespace Thermite
 		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume);		
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
 
-		polyvox_shared_ptr< PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal> > extractSubset(std::set<uint8_t> setMaterials, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& inputMesh);
-
 		bool loadApp(const QString& appName);
 		void unloadApp(void);
 		QWidget* loadUIFile(const QString& filename);
