@@ -43,7 +43,7 @@ namespace Thermite
 			Ogre::ManualResourceLoader *loader = 0);
 		~TextResource();		
 
-		std::string getScriptData(void) const;
+		std::string getTextData(void) const;
 
 	protected:
 
@@ -53,7 +53,7 @@ namespace Thermite
 		size_t calculateSize () const;
 
 	private:
-		std::string mScriptData;
+		std::string mTextData;
 	};
 
 	class TextResourcePtr : public Ogre::SharedPtr<TextResource> 

@@ -4,7 +4,6 @@
 #include "Object.h"
 
 #include <QColor>
-#include <QScriptEngine>
 #include <QVector3D>
 
 namespace Thermite
@@ -40,7 +39,5 @@ namespace Thermite
 		LightType mType;
 	};
 }
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Light, QObject*)
 
 #endif //LIGHT_H_

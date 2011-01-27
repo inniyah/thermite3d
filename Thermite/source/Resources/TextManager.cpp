@@ -42,7 +42,7 @@ namespace Thermite
 
 	TextManager::TextManager ()
 	{
-		mResourceType = "Script";
+		mResourceType = "Text";
 
 		// low, because it will likely reference other resources
 		mLoadOrder = 30.0f;

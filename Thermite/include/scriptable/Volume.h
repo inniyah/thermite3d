@@ -31,7 +31,7 @@ freely, subject to the following restrictions:
 #include "Array.h"
 #include "PolyVoxForwardDeclarations.h"
 
-#include <QScriptEngine>
+#include <QVariantList>
 
 #include <map>
 #include <set>
@@ -114,8 +114,6 @@ namespace Thermite
 		void updateLastModifedArray(const PolyVox::Region& regionToTest);
 	};	
 }
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Volume, QObject*)
 
 
 #endif //__THERMITE_VOLUME_H__

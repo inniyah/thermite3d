@@ -44,7 +44,6 @@ namespace Thermite
 
 	//Other
 	class ApplicationGameLogic;
-	class Console;
 	class LoadMapWidget;
 	class LoadSceneMenuPage;
 	class MainMenuPage;

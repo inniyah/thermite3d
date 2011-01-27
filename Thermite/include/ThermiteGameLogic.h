@@ -32,10 +32,6 @@ freely, subject to the following restrictions:
 #include "Entity.h"
 #include "Globals.h"
 #include "Light.h"
-#include "ScriptEditorWidget.h"
-
-#include <QtScript>
-#include <QScriptEngineDebugger>
 
 #include "scriptable/Volume.h"
 #include "ThermiteForwardDeclarations.h"
@@ -66,15 +62,11 @@ namespace Thermite
 	public:
 		ThermiteGameLogic(void);
 
-		void setupScripting(void);
-
 		void initialise(void);
 		void update(void);
 		void shutdown(void);
 
 		QtOgre::Log* thermiteLog(void);
-
-		void reloadShaders(void);
 
 		void onKeyPress(QKeyEvent* event);
 		void onKeyRelease(QKeyEvent* event);
@@ -84,9 +76,6 @@ namespace Thermite
 		void onMouseRelease(QMouseEvent* event);
 
 		void onWheel(QWheelEvent* event);
-
-		void initScriptEngine(void);
-		void initScriptEnvironment(void);
 
 	public:
 		void addResourceDirectory(const QString& directoryName);
@@ -105,7 +94,6 @@ namespace Thermite
 		bool loadApp(const QString& appName);
 		void unloadApp(void);
 		QWidget* loadUIFile(const QString& filename);
-		void include(QString path);
 
 		//Don't like having these functions here - really they should be inside camera or something. But they are
 		//using Ogre methods which aren't available in the scriptable classes. Eventually they should be rewritten
@@ -115,8 +103,6 @@ namespace Thermite
 		QVector3D getPickingRayDir(int x, int y);
 
 	private slots:
-		void startScriptingEngine(void);
-		void stopScriptingEngine(void);
 
 		void playStartupMovie(void);
 		void showLastMovieFrame(void);
@@ -127,6 +113,9 @@ namespace Thermite
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
 		void exposeFunction(const QString& functionName, const QString& params);
+
+		void initialiseHandler(void);
+		void updateHandler(void);
 
 		//Scene representation
 		Camera* mCamera;
@@ -157,14 +146,7 @@ namespace Thermite
 		Keyboard* keyboard;
 		Mouse* mouse;
 
-		//Scripting support
-		QScriptEngine* scriptEngine;
-		ScriptEditorWidget* m_pScriptEditorWidget;
-		bool m_bRunScript;
-		QString mInitialiseScript;
-
 		//User interface
-		Console* mConsole;
 		MainMenu* mMainMenu;
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
@@ -174,6 +156,26 @@ namespace Thermite
 		QtOgre::Log* mThermiteLog;
 		AnyOption m_commandLineArgs;
 		QString mCurrentAppName;
+
+		//Game specific
+		Object* cameraNode;
+		float cameraSpeedInUnitsPerSecond;
+		QVector3D cameraFocusPoint;
+		float cameraElevationAngle;
+		float cameraRotationAngle;
+		float cameraDistance;
+
+		Volume* volume;
+		Entity* cursor;
+		Light* light0;
+		Entity* fireball;
+		float explosionSize;
+		float explosionStartTime;
+		float explosionAge;
+
+		float currentTimeInSeconds;
+		float timeElapsedInSeconds;
+		float previousTimeInMS;
 	};
 }
 

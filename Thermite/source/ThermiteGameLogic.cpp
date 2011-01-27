@@ -23,7 +23,6 @@ freely, subject to the following restrictions:
 
 #include "ThermiteGameLogic.h"
 
-#include "Console.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "SkyBox.h"
@@ -34,7 +33,6 @@ freely, subject to the following restrictions:
 #include "Material.h"
 #include "QStringIODevice.h"
 #include "TextManager.h"
-#include "Vector3DClass.h"
 #include "VolumeManager.h"
 #include "Utility.h"
 
@@ -50,12 +48,17 @@ freely, subject to the following restrictions:
 #include <OgreRoot.h>
 
 #include <QDirIterator>
+#include <QKeyEvent>
+#include <QGlobal.h>
+#include <QMouseEvent>
 #include <QMovie>
 #include <QMutex>
 #include <QSettings>
 #include <QThreadPool>
 #include <QUiLoader>
 #include <QWaitCondition>
+
+#include <qmath.h>
 
 using namespace QtOgre;
 
@@ -94,14 +97,7 @@ namespace Thermite
 		,keyboard(0)
 		,mouse(0)
 
-		//Scripting support
-		,scriptEngine(0)
-		,m_pScriptEditorWidget(0)
-		,m_bRunScript(true)
-		//,mInitialiseScript(0)
-
 		//User interface
-		,mConsole(0)
 		,mMainMenu(0)
 		,m_pThermiteLogoMovie(0)
 		,m_pThermiteLogoLabel(0)
@@ -118,13 +114,6 @@ namespace Thermite
 		mSkyBox = new SkyBox(this);
 
 		Object::mParentList = &mObjectList;
-	}
-
-	void ThermiteGameLogic::setupScripting(void)
-	{
-		initScriptEngine();	 
-
-		initScriptEnvironment();	
 	}
 
 	void ThermiteGameLogic::initialise(void)
@@ -185,16 +174,7 @@ namespace Thermite
 		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
 		//mMainMenu->show();
 
-		qApp->mainWidget()->setMouseTracking(true);
-
-		m_pScriptEditorWidget = new ScriptEditorWidget(qApp->mainWidget());
-		//m_pScriptEditorWidget->show();		
-
-		QObject::connect(m_pScriptEditorWidget, SIGNAL(start(void)), this, SLOT(startScriptingEngine(void)));
-		QObject::connect(m_pScriptEditorWidget, SIGNAL(stop(void)), this, SLOT(stopScriptingEngine(void)));
-
-		mConsole = new Console(scriptEngine, qApp->mainWidget(), Qt::Tool);
-		mConsole->show();
+		qApp->mainWidget()->setMouseTracking(true);		
 
 		char* strAppName = m_commandLineArgs.getValue("appname");
 		if(strAppName != 0)
@@ -223,20 +203,7 @@ namespace Thermite
 		addResourceDirectory(appDirectory);
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-		//Load the scripts
-		TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load("initialise.js", "General");
-		mInitialiseScript = QString::fromStdString(pTextResource->getScriptData());
-
-		TextResourcePtr pUpdateTextResource = TextManager::getSingletonPtr()->load("update.js", "General");
-		m_pScriptEditorWidget->setScriptCode(QString::fromStdString(pUpdateTextResource->getScriptData()));
-
-		//Run the initialise script
-		QScriptValue result = scriptEngine->evaluate(mInitialiseScript);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}	
+		initialiseHandler();
 
 		return true;
 	}
@@ -249,17 +216,8 @@ namespace Thermite
 	}
 
 	void ThermiteGameLogic::update(void)
-	{
-		if(m_bRunScript)
-		{
-			QScriptValue result = scriptEngine->evaluate(m_pScriptEditorWidget->getScriptCode());
-			if (scriptEngine->hasUncaughtException())
-			{
-				int line = scriptEngine->uncaughtExceptionLineNumber();
-				qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-				m_bRunScript = false;
-			}
-		}
+	{			
+		updateHandler();
 
 		QListIterator<Object*> objectIter(mObjectList);
 		while(objectIter.hasNext())
@@ -738,16 +696,6 @@ namespace Thermite
 			qApp->showLogManager();
 		}
 
-		if(event->key() == Qt::Key_F2)
-		{
-			m_pScriptEditorWidget->show();
-		}
-
-		if(event->key() == Qt::Key_F5)
-		{
-			reloadShaders();
-		}
-
 		if(event->key() == Qt::Key_Escape)
 		{
 			mMainMenu->show();
@@ -839,139 +787,6 @@ namespace Thermite
 		axisNode->attachObject(axis);		
 	}
 
-	void ThermiteGameLogic::reloadShaders(void)
-	{
-		Ogre::ResourceManager::ResourceMapIterator I = Ogre::HighLevelGpuProgramManager::getSingleton().getResourceIterator();
-		while (I.hasMoreElements()) {
-			Ogre::ResourcePtr resource = I.getNext();
-			resource->reload();
-		}
-	}	
-
-	void ThermiteGameLogic::initScriptEngine(void)
-	{
-		scriptEngine = new QScriptEngine;
-
-		QStringList extensions;
-		extensions << "qt.core"
-				   << "qt.gui"
-				   << "qt.xml"
-				   << "qt.svg"
-				   << "qt.network"
-				   << "qt.sql"
-				   << "qt.opengl"
-				   //<< "qt.webkit"
-				   << "qt.xmlpatterns"
-				   << "qt.uitools";
-		QStringList failExtensions;
-		foreach (const QString &ext, extensions)
-		{
-			QScriptValue ret = scriptEngine->importExtension(ext);
-			if (ret.isError())
-			{
-				failExtensions.append(ext);
-			}
-		}
-		if (!failExtensions.isEmpty())
-		{
-			if (failExtensions.size() == extensions.size())
-			{
-				qWarning("Failed to import Qt bindings!\n"
-						 "Plugins directory searched: %s/script\n"
-						 "Make sure that the bindings have been built, "
-						 "and that this executable and the plugins are "
-						 "using compatible Qt libraries.", qPrintable(qApp->libraryPaths().join(", ")));
-			}
-			else
-			{
-				qWarning("Failed to import some Qt bindings: %s\n"
-						 "Plugins directory searched: %s/script\n"
-						 "Make sure that the bindings have been built, "
-						 "and that this executable and the plugins are "
-						 "using compatible Qt libraries.",
-						 qPrintable(failExtensions.join(", ")), qPrintable(qApp->libraryPaths().join(", ")));
-			}
-		}
-		else
-		{
-			qDebug("All Qt bindings loaded successfully.");
-		}
-
-		scriptEngine->setProcessEventsInterval(100); //10 times a second
-	}
-
-	void ThermiteGameLogic::initScriptEnvironment(void)
-	{
-		QScriptValue thermiteGameLogicClass = scriptEngine->newQObject(this);
-		scriptEngine->globalObject().setProperty("ThermiteGameLogic", thermiteGameLogicClass);
-
-		QScriptValue lightClass = scriptEngine->scriptValueFromQMetaObject<Light>();
-		scriptEngine->globalObject().setProperty("Light", lightClass);
-
-		QScriptValue entityClass = scriptEngine->scriptValueFromQMetaObject<Entity>();
-		scriptEngine->globalObject().setProperty("Entity", entityClass);
-
-		QScriptValue objectClass = scriptEngine->scriptValueFromQMetaObject<Object>();
-		scriptEngine->globalObject().setProperty("Object", objectClass);
-
-		QScriptValue volumeClass = scriptEngine->scriptValueFromQMetaObject<Volume>();
-		scriptEngine->globalObject().setProperty("Volume", volumeClass);
-
-		Vector3DClass *vector3dClass = new Vector3DClass(scriptEngine);
-		scriptEngine->globalObject().setProperty("Vector3D", vector3dClass->constructor());
-
-		QScriptValue globalsScriptValue = scriptEngine->newQObject(&globals);
-		scriptEngine->globalObject().setProperty("globals", globalsScriptValue);
-
-		QScriptValue keyboardScriptValue = scriptEngine->newQObject(keyboard);
-		scriptEngine->globalObject().setProperty("keyboard", keyboardScriptValue);
-
-		QScriptValue mouseScriptValue = scriptEngine->newQObject(mouse);
-		scriptEngine->globalObject().setProperty("mouse", mouseScriptValue);
-
-		QScriptValue cameraScriptValue = scriptEngine->newQObject(mCamera);
-		scriptEngine->globalObject().setProperty("camera", cameraScriptValue);
-
-		QScriptValue skyBoxScriptValue = scriptEngine->newQObject(mSkyBox);
-		scriptEngine->globalObject().setProperty("skyBox", skyBoxScriptValue);
-
-		QScriptValue Qt = scriptEngine->newQMetaObject(&staticQtMetaObject);
-		Qt.setProperty("App", scriptEngine->newQObject(qApp));
-		scriptEngine->globalObject().setProperty("Qt", Qt);
-
-		exposeFunction("include", "path");
-		
-	}
-
-	//Functions which would normally be access by ThermiteGameLogic.xxx() are
-	//wrapped here by some simple script code so they appear to be called directly.
-	void ThermiteGameLogic::exposeFunction(const QString& functionName, const QString& params)
-	{
-		QString script
-		(
-			"print('Registering \"" + functionName + "(" + params + ")\"');"
-			"function " + functionName + "(" + params + ") { ThermiteGameLogic." + functionName + "(" + params + "); }"
-		);
-
-		QScriptValue result = scriptEngine->evaluate(script);
-		if (scriptEngine->hasUncaughtException())
-		{
-			int line = scriptEngine->uncaughtExceptionLineNumber();
-			qCritical() << "Failed to register '" + functionName + "', message follows:";
-			qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-		}
-	}
-
-	void ThermiteGameLogic::startScriptingEngine(void)
-	{
-		m_bRunScript = true;
-	}
-
-	void ThermiteGameLogic::stopScriptingEngine(void)
-	{
-		m_bRunScript = false;
-	}
-
 	void ThermiteGameLogic::playStartupMovie(void)
 	{
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
@@ -1060,44 +875,117 @@ namespace Thermite
 	QWidget* ThermiteGameLogic::loadUIFile(const QString& filename)
 	{
 		TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load(filename.toStdString(), "General");
-		QString str = QString::fromStdString(pTextResource->getScriptData());
+		QString str = QString::fromStdString(pTextResource->getTextData());
 		QStringIODevice device(str);
 		QUiLoader loader;
 		QWidget* ui = loader.load(&device);
 		return ui;
 	}
 
-	void ThermiteGameLogic::include(QString path)
+	void ThermiteGameLogic::initialiseHandler(void)
 	{
-		try
+		//Light setup
+		light0 = new Light();
+		light0->setType(Light::DirectionalLight);
+		light0->setPosition(QVector3D(64,128,255));
+		light0->lookAt(QVector3D(128,0,128));
+		light0->setColour(QColor(255,255,255));
+
+		//Camera setup
+		cameraNode = new Object();
+		cameraSpeedInUnitsPerSecond = 100;
+		cameraFocusPoint = QVector3D(128, 10, 128);
+		cameraElevationAngle = 30.0;
+		cameraRotationAngle = 0.0;
+		cameraDistance = 100.0;
+
+		mCamera->setParent(cameraNode);
+
+		//Skybox setup
+		mSkyBox->setMaterialName("CraterLakeMaterial");
+
+		//A fireball
+		fireball = new Entity();
+		fireball->setMeshName("Icosphere7.mesh");
+		fireball->setPosition(QVector3D(128,32,128));
+		fireball->setSize(QVector3D(5,5,5));
+		fireball->setMaterialName("FireballMaterial");
+		explosionSize = 10.0;
+
+		//Cursor
+		cursor = new Entity();
+		cursor->setMeshName("Voxel.mesh");
+		cursor->setSize(QVector3D(1.1,1.1,1.1));
+
+		//Our main volume
+		volume = new Volume();
+		volume->generateMapForTankWars();
+	}
+
+	void ThermiteGameLogic::updateHandler(void)
+	{
+		currentTimeInSeconds = globals.timeSinceAppStart() * 0.001f;
+		timeElapsedInSeconds = currentTimeInSeconds - previousTimeInMS;
+		previousTimeInMS = currentTimeInSeconds;
+
+		//Camera rotation and zooming is allowed in all states.
+		if(mouse->isPressed(Qt::RightButton))
 		{
-			TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load(path.toStdString(), "General");
+			float mouseDeltaX = mouse->position().x() - mouse->previousPosition().x();
+			cameraRotationAngle += mouseDeltaX;
 
-			QString script = QString::fromStdString(pTextResource->getScriptData());
-    
-			//set ScriptContext
-			QScriptContext *context = scriptEngine->currentContext();
-			QScriptContext *parent=context->parentContext();
-			if(parent!=0)
-			{
-				context->setActivationObject(context->parentContext()->activationObject());
-				context->setThisObject(context->parentContext()->thisObject());
-			}
+			float mouseDeltaY = mouse->position().y() - mouse->previousPosition().y();
+			cameraElevationAngle += mouseDeltaY;
 
-			//execute script
-			qDebug() << "Including " << path;
-			QScriptValue result = scriptEngine->evaluate(script);
-			if (scriptEngine->hasUncaughtException())
-			{
-				int line = scriptEngine->uncaughtExceptionLineNumber();
-				qCritical() << "uncaught exception at line" << line << ":" << result.toString();
-				m_bRunScript = false;
-			}
+			cameraElevationAngle = qMin(cameraElevationAngle, 90.0f);
+			cameraElevationAngle = qMax(cameraElevationAngle, 0.0f);
 		}
-		catch(Ogre::Exception& e)
+		if(mouse->isPressed(Qt::LeftButton))
 		{
-			qCritical() << "Failed to include file: " << path;
-			qCritical() << QString::fromStdString(e.getDescription());
+			volume->createSphereAt(cursor->position(), explosionSize, 0, false);
+			fireball->setPosition(cursor->position());
+			explosionStartTime = currentTimeInSeconds;
+		}
+		
+		float wheelDelta = mouse->getWheelDelta();
+		cameraDistance -= wheelDelta / 12; //10 units at a time.
+		cameraDistance = qMin(cameraDistance, 1000.0f);
+		cameraDistance = qMax(cameraDistance, 10.0f);
+
+
+		cameraNode->setOrientation(QQuaternion());	
+		cameraNode->yaw(-cameraRotationAngle);
+		cameraNode->pitch(-cameraElevationAngle);
+
+		cameraNode->setPosition(cameraFocusPoint); //Not from script...
+
+		mCamera->setOrientation(QQuaternion());
+		mCamera->setPosition(QVector3D(0,0,cameraDistance));
+
+		//Update the mouse cursor.
+		QVector3D rayOrigin = getPickingRayOrigin(mouse->position().x(),mouse->position().y());
+		QVector3D rayDir = getPickingRayDir(mouse->position().x(),mouse->position().y());
+		QVector3D intersection = volume->getRayVolumeIntersection(rayOrigin, rayDir);
+		QVector3D clampedIntersection = QVector3D
+		(
+			qRound(intersection.x()),
+			qRound(intersection.y()),
+			qRound(intersection.z())
+		);
+		cursor->setPosition(clampedIntersection);
+
+		//Update the fireball
+		explosionAge = currentTimeInSeconds - explosionStartTime;
+
+		//Compute radius from volume
+		float fireballVolume = explosionAge * 10000.0f;
+		float rCubed = (3.0*fireballVolume) / (4.0f * 3.142f);
+		float r = qPow(rCubed, 1.0f/3.0f);
+
+		float fireballRadius = r;
+		if(fireballRadius > 0.001f)
+		{
+			fireball->setSize(QVector3D(fireballRadius, fireballRadius, fireballRadius));
 		}
 	}
 }

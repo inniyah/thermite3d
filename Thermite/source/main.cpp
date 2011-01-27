@@ -34,6 +34,5 @@ int main(int argc, char *argv[])
 {
 	ThermiteGameLogic* logic = new ThermiteGameLogic;
 	Application app(argc, argv, logic);
-	logic->setupScripting();
 	return app.exec(DisplaySettingsDialog);
 }

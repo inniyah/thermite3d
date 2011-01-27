@@ -3,7 +3,6 @@
 
 #include "Object.h"
 
-#include <QScriptEngine>
 #include <QString>
 
 namespace Thermite
@@ -45,8 +44,6 @@ namespace Thermite
 		bool mLoopAnimation;
 	};
 }
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Entity, QObject*)
 
 
 #endif //ENTITY_H_

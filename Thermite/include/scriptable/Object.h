@@ -4,7 +4,6 @@
 #include <QMatrix4x4>
 #include <QObject>
 #include <QQuaternion>
-#include <QScriptEngine>
 #include <QVector3D>
 
 namespace Thermite
@@ -92,7 +91,5 @@ namespace Thermite
 		static QList<Object*>* mParentList;
 	};
 }
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::Object, QObject*)
 
 #endif //OBJECT_H_

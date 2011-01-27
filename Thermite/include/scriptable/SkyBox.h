@@ -3,8 +3,6 @@
 
 #include "Object.h"
 
-#include <QScriptEngine>
-
 namespace Thermite
 {
 	class SkyBox : public Object
@@ -23,7 +21,5 @@ namespace Thermite
 		QString mMaterialName;
 	};
 }
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(Thermite::SkyBox, QObject*)
 
 #endif //SKYBOX_H_

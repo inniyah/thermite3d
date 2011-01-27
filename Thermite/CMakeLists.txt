@@ -22,7 +22,6 @@ FIND_PACKAGE(QtOgre REQUIRED)
 SET(MAIN_SRC_FILES
 	source/main.cpp
 	source/AnyOption.cpp
-	source/Console.cpp
 	source/DataStreamWrapper.cpp
 	source/LoadMapWidget.cpp
 	source/MainMenu.cpp
@@ -34,7 +33,6 @@ SET(MAIN_SRC_FILES
 
 SET(MAIN_INC_FILES
 	include/AnyOption.h
-	include/Console.h
 	include/DataStreamWrapper.h
 	include/LoadMapWidget.h
 	include/MainMenu.h
@@ -47,10 +45,8 @@ SET(MAIN_INC_FILES
 )
 
 SET(MAIN_UI_FILES
-	ui/Console.ui
 	ui/LoadMapWidget.ui
 	ui/MainMenu.ui
-	ui/ScriptEditorWidget.ui
 )
 
 SOURCE_GROUP("Sources" FILES ${MAIN_SRC_FILES})
@@ -108,10 +104,7 @@ SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Light.cpp
 	source/scriptable/Mouse.cpp
 	source/scriptable/Object.cpp
-	source/scriptable/ScriptEditorWidget.cpp
 	source/scriptable/SkyBox.cpp
-	source/scriptable/Vector3DClass.cpp
-	source/scriptable/Vector3DPrototype.cpp
 	source/scriptable/Volume.cpp
 )
 
@@ -123,10 +116,7 @@ SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Light.h
 	include/scriptable/Mouse.h
 	include/scriptable/Object.h
-	include/scriptable/ScriptEditorWidget.h
 	include/scriptable/SkyBox.h
-	include/scriptable/Vector3DClass.h
-	include/scriptable/Vector3DPrototype.h
 	include/scriptable/Volume.h
 )
 
@@ -172,8 +162,6 @@ IF (WIN32)
 	SET(QT_USE_QTMAIN 1)
 ENDIF (WIN32)
 SET(QT_USE_QTGUI 1)
-SET(QT_USE_QTSCRIPT 1)
-SET(QT_USE_QTSCRIPTTOOLS 1)
 SET(QT_USE_QTUITOOLS 1)
 SET(QT_USE_QTXML 1)
 INCLUDE(${QT_USE_FILE})
@@ -276,41 +264,17 @@ IF(WIN32)
 	#Install the Qt .dll's
 	INSTALL(FILES ${QT_BINARY_DIR}/QtCore4.dll DESTINATION bin CONFIGURATIONS Release)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtGui4.dll DESTINATION bin CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_BINARY_DIR}/QtScript4.dll DESTINATION bin CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_BINARY_DIR}/QtScriptTools4.dll DESTINATION bin CONFIGURATIONS Release)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtSvg4.dll DESTINATION bin CONFIGURATIONS Release)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtXml4.dll DESTINATION bin CONFIGURATIONS Release)
 	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qmng4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Release)
 	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qsvg4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_core.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_gui.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_network.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_opengl.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_phonon.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_sql.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_svg.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_uitools.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_xml.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_xmlpatterns.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
 	
 	INSTALL(FILES ${QT_BINARY_DIR}/QtCored4.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtGuid4.dll DESTINATION bin CONFIGURATIONS Debug)
-	INSTALL(FILES ${QT_BINARY_DIR}/QtScriptd4.dll DESTINATION bin CONFIGURATIONS Debug)
-	INSTALL(FILES ${QT_BINARY_DIR}/QtScriptToolsd4.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtSvgd4.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES ${QT_BINARY_DIR}/QtXmld4.dll DESTINATION bin CONFIGURATIONS Debug)
 	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qmngd4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Debug)
 	INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/qsvgd4.dll DESTINATION bin/qt-plugins/imageformats CONFIGURATIONS Debug)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_cored.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_guid.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_networkd.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_opengld.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_phonond.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_sqld.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_svgd.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_uitoolsd.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_xmld.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
-	INSTALL(FILES ${QT_PLUGINS_DIR}/script/qtscript_xmlpatternsd.dll DESTINATION bin/qt-plugins/script CONFIGURATIONS Release)
 	
 	
 	#Install the qt configuration file

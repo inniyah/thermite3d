@@ -43,7 +43,7 @@ namespace Thermite
 									Ogre::ManualResourceLoader *loader)
 		:Ogre::Resource (creator, name, handle, group, isManual, loader)
 	{		
-		createParamDictionary ("Script");
+		createParamDictionary ("Text");
 	}
 
 	TextResource::~TextResource()
@@ -51,20 +51,20 @@ namespace Thermite
 		unload();
 	}
 
-	std::string TextResource::getScriptData(void) const
+	std::string TextResource::getTextData(void) const
 	{
-		return mScriptData;
+		return mTextData;
 	}
 
 	void TextResource::loadImpl ()
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
-		mScriptData = stream->getAsString();
+		mTextData = stream->getAsString();
 	}
 
 	void TextResource::unloadImpl ()
 	{
-		mScriptData = "";
+		mTextData = "";
 	}
 	
 	size_t TextResource::calculateSize () const

@@ -3,7 +3,6 @@
 
 #include "Object.h"
 
-#include <QScriptEngine>
 #include <QVector3D>
 
 namespace Thermite
