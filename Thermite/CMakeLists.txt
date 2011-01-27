@@ -21,10 +21,7 @@ FIND_PACKAGE(QtOgre REQUIRED)
 
 SET(MAIN_SRC_FILES
 	source/main.cpp
-	source/AnyOption.cpp
 	source/DataStreamWrapper.cpp
-	source/LoadMapWidget.cpp
-	source/MainMenu.cpp
 	source/SurfacePatchRenderable.cpp
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
@@ -32,10 +29,7 @@ SET(MAIN_SRC_FILES
 )
 
 SET(MAIN_INC_FILES
-	include/AnyOption.h
 	include/DataStreamWrapper.h
-	include/LoadMapWidget.h
-	include/MainMenu.h
 	include/QtForwardDeclarations.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
@@ -45,8 +39,6 @@ SET(MAIN_INC_FILES
 )
 
 SET(MAIN_UI_FILES
-	ui/LoadMapWidget.ui
-	ui/MainMenu.ui
 )
 
 SOURCE_GROUP("Sources" FILES ${MAIN_SRC_FILES})

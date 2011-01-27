@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "ThermiteGameLogic.h"
 
 using namespace PolyVox;
+using namespace std;
 
 namespace Thermite
 {

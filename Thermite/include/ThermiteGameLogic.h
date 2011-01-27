@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 #ifndef THERMITEGAMELOGIC_H_
 #define THERMITEGAMELOGIC_H_
 
-#include "AnyOption.h"
 #include "GameLogic.h"
 #include "Serialization.h"
 
@@ -54,8 +53,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class MainMenu;
-
 	class ThermiteGameLogic : public QObject, public QtOgre::GameLogic
 	{
 		Q_OBJECT
@@ -93,7 +90,6 @@ namespace Thermite
 
 		bool loadApp(const QString& appName);
 		void unloadApp(void);
-		QWidget* loadUIFile(const QString& filename);
 
 		//Don't like having these functions here - really they should be inside camera or something. But they are
 		//using Ogre methods which aren't available in the scriptable classes. Eventually they should be rewritten
@@ -112,7 +108,6 @@ namespace Thermite
 
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
-		void exposeFunction(const QString& functionName, const QString& params);
 
 		void initialiseHandler(void);
 		void updateHandler(void);
@@ -147,15 +142,12 @@ namespace Thermite
 		Mouse* mouse;
 
 		//User interface
-		MainMenu* mMainMenu;
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;
 
 		//Other
 		bool mFirstFind;
 		QtOgre::Log* mThermiteLog;
-		AnyOption m_commandLineArgs;
-		QString mCurrentAppName;
 
 		//Game specific
 		Object* cameraNode;

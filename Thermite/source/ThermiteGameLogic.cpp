@@ -39,9 +39,6 @@ freely, subject to the following restrictions:
 #include "Application.h"
 #include "LogManager.h"
 
-#include "MainMenu.h"
-#include "LoadMapWidget.h"
-
 #include <OgreEntity.h>
 #include <OgreRenderWindow.h>
 #include <OgreResourceGroupManager.h>
@@ -55,6 +52,7 @@ freely, subject to the following restrictions:
 #include <QMutex>
 #include <QSettings>
 #include <QThreadPool>
+#include <QTimer>
 #include <QUiLoader>
 #include <QWaitCondition>
 
@@ -98,15 +96,12 @@ namespace Thermite
 		,mouse(0)
 
 		//User interface
-		,mMainMenu(0)
 		,m_pThermiteLogoMovie(0)
 		,m_pThermiteLogoLabel(0)
 
 		//Other
 		,mFirstFind(false)
 		,mThermiteLog(0)
-		//,m_commandLineArgs(0)
-		//mCurrentAppName(0)
 	{
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
@@ -118,10 +113,6 @@ namespace Thermite
 
 	void ThermiteGameLogic::initialise(void)
 	{	
-		//Parse the command line options
-		m_commandLineArgs.setOption("appname");
-		m_commandLineArgs.processCommandArgs(qApp->argc(), qApp->argv());
-
 		//Set up the logging system , to hopefully record any problems.
 		mThermiteLog = mApplication->createLog("Thermite");
 		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
@@ -165,22 +156,9 @@ namespace Thermite
 
 		TextManager* sm = new TextManager;
 
-		//The main menu
-		mMainMenu = new MainMenu(qApp->mainWidget(), Qt::Tool);
-		Application::centerWidget(mMainMenu, qApp->mainWidget());
-		QObject::connect(mMainMenu, SIGNAL(resumeClicked(void)), mMainMenu, SLOT(hide(void)));
-		QObject::connect(mMainMenu, SIGNAL(quitClicked(void)), qApp->mainWidget(), SLOT(close(void)));
-		QObject::connect(mMainMenu, SIGNAL(settingsClicked(void)), mApplication, SLOT(showSettingsDialog(void)));
-		QObject::connect(mMainMenu, SIGNAL(viewLogsClicked(void)), mApplication, SLOT(showLogManager(void)));
-		//mMainMenu->show();
-
-		qApp->mainWidget()->setMouseTracking(true);		
-
-		char* strAppName = m_commandLineArgs.getValue("appname");
-		if(strAppName != 0)
-		{
-			loadApp(QString::fromAscii(strAppName));
-		}
+		qApp->mainWidget()->setMouseTracking(true);	
+		
+		loadApp(QString::fromAscii("TankWars"));
 	}
 
 	bool ThermiteGameLogic::loadApp(const QString& appName)
@@ -196,8 +174,6 @@ namespace Thermite
 			return false;
 		}
 
-		mCurrentAppName = appName;
-
 		//Initialise all resources		
 		addResourceDirectory("./resources/");
 		addResourceDirectory(appDirectory);
@@ -211,8 +187,6 @@ namespace Thermite
 	void ThermiteGameLogic::unloadApp(void)
 	{
 		Ogre::ResourceGroupManager::getSingleton().shutdownAll();
-
-		mCurrentAppName = "";
 	}
 
 	void ThermiteGameLogic::update(void)
@@ -695,11 +669,6 @@ namespace Thermite
 		{
 			qApp->showLogManager();
 		}
-
-		if(event->key() == Qt::Key_Escape)
-		{
-			mMainMenu->show();
-		}
 	}
 
 	void ThermiteGameLogic::onKeyRelease(QKeyEvent* event)
@@ -870,16 +839,6 @@ namespace Thermite
 				deleteSceneNodeChildren(childSceneNode);
 			}
 		}		
-	}
-
-	QWidget* ThermiteGameLogic::loadUIFile(const QString& filename)
-	{
-		TextResourcePtr pTextResource = TextManager::getSingletonPtr()->load(filename.toStdString(), "General");
-		QString str = QString::fromStdString(pTextResource->getTextData());
-		QStringIODevice device(str);
-		QUiLoader loader;
-		QWidget* ui = loader.load(&device);
-		return ui;
 	}
 
 	void ThermiteGameLogic::initialiseHandler(void)
