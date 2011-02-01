@@ -159,6 +159,7 @@ namespace Thermite
 
 		Volume* volume;
 		Entity* cursor;
+		Entity* mMissile;
 		Light* light0;
 		Entity* fireball;
 		float explosionSize;

@@ -876,6 +876,12 @@ namespace Thermite
 		cursor->setMeshName("Voxel.mesh");
 		cursor->setSize(QVector3D(1.1,1.1,1.1));
 
+		//Missile
+		mMissile = new Entity();
+		mMissile->setMeshName("missile.mesh");
+		mMissile->setPosition(QVector3D(128,32,128));
+		mMissile->setMaterialName("VertexColourMaterial");
+
 		//Our main volume
 		volume = new Volume();
 		volume->generateMapForTankWars();
