@@ -13,7 +13,6 @@ ENDIF()
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 FIND_PACKAGE(OGRE 1.6 REQUIRED)
 FIND_PACKAGE(PolyVox REQUIRED)
-FIND_PACKAGE(QtOgre REQUIRED)
 
 ################################################################################
 ## Main files
@@ -26,6 +25,21 @@ SET(MAIN_SRC_FILES
 	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
+	
+	source/AbstractSettingsWidget.cpp
+	source/Application.cpp
+	source/DotSceneHandler.cpp
+	source/EventHandlingOgreWidget.cpp
+	source/FPSDialog.cpp
+	source/GameLogic.cpp
+	source/GraphicsSettingsWidget.cpp
+	source/Log.cpp
+	source/LogEntry.cpp
+	source/LogManager.cpp
+	source/LogModel.cpp
+	source/LogModelSortFilterProxy.cpp
+	source/OgreWidget.cpp
+	source/SettingsDialog.cpp
 )
 
 SET(MAIN_INC_FILES
@@ -36,9 +50,31 @@ SET(MAIN_INC_FILES
 	include/ThermiteGameLogic.h
 	include/Utility.h
 	include/VolumeSerializationProgressListenerImpl.h
+	
+	include/AbstractSettingsWidget.h
+	include/Application.h
+	include/DotSceneHandler.h
+	include/EventHandler.h
+	include/EventHandlingOgreWidget.h
+	include/FPSDialog.h
+	include/GameLogic.h
+	include/GraphicsSettingsWidget.h
+	include/Log.h
+	include/LogEntry.h
+	include/LogLevel.h
+	include/LogManager.h
+	include/LogModel.h
+	include/LogModelSortFilterProxy.h
+	include/OgreWidget.h
+	include/QtOgreForwardDeclarations.h
+	include/SettingsDialog.h
 )
 
 SET(MAIN_UI_FILES
+	ui/FPSDialog.ui
+	ui/GraphicsSettingsWidget.ui
+	ui/Log.ui
+	ui/SettingsDialog.ui
 )
 
 SOURCE_GROUP("Sources" FILES ${MAIN_SRC_FILES})
@@ -147,6 +183,7 @@ SET(UI_FILES ${MAIN_UI_FILES})
 
 SET(RESOURCE_FILES
 	resources/Qt/ThermiteResources.qrc
+	resources/resources.qrc
 )
 
 FIND_PACKAGE(Qt4)
@@ -156,6 +193,7 @@ ENDIF (WIN32)
 SET(QT_USE_QTGUI 1)
 SET(QT_USE_QTUITOOLS 1)
 SET(QT_USE_QTXML 1)
+SET(QT_USE_QTSCRIPT 1)
 INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(MOC_SRCS ${INC_FILES})
@@ -163,10 +201,10 @@ QT4_WRAP_UI(UI_SRCS ${UI_FILES})
 QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${QtOgre_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
-TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${QtOgre_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})
+TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})
 
 
 #IF (WIN32) #Windows
