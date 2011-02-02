@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 #include "AmbientOcclusionTask.h"
 
 #include "Material.h"
-#include "ThermiteGameLogic.h"
 
 #include "AmbientOcclusionCalculator.h"
 

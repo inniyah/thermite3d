@@ -1,5 +1,5 @@
-#ifndef QTOGRE_OGREWIDGET_H_
-#define QTOGRE_OGREWIDGET_H_
+#ifndef THERMITE_OGREWIDGET_H_
+#define THERMITE_OGREWIDGET_H_
 
 #include <OgreCommon.h>
 
@@ -7,7 +7,7 @@
 
 class QSettings;
 
-namespace QtOgre
+namespace Thermite
 {
 	/**
 	 * Widget holding Ogre
@@ -28,7 +28,7 @@ namespace QtOgre
 
 		//Other
 		bool applySettings(QSettings* settings);
-		void initialise(const Ogre::NameValuePairList *miscParams = 0);
+		void initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
 
 	protected:
 		QPaintEngine *paintEngine() const;
@@ -43,4 +43,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_OGREWIDGET_H_*/
+#endif /*THERMITE_OGREWIDGET_H_*/

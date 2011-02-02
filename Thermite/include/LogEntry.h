@@ -1,5 +1,5 @@
-#ifndef QTOGRE_LOGENTRY_H_
-#define QTOGRE_LOGENTRY_H_
+#ifndef THERMITE_LOGENTRY_H_
+#define THERMITE_LOGENTRY_H_
 
 #include "LogLevel.h"
 
@@ -7,7 +7,7 @@
 #include <QTime>
 #include <QVariant>
 
-namespace QtOgre
+namespace Thermite
 {
 	class LogEntry
 	{

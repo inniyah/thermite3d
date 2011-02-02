@@ -1,11 +1,11 @@
-#ifndef QTOGRE_SETTINGSDIALOG_H_
-#define QTOGRE_SETTINGSDIALOG_H_
+#ifndef THERMITE_SETTINGSDIALOG_H_
+#define THERMITE_SETTINGSDIALOG_H_
 
 #include "ui_SettingsDialog.h"
 
 #include "AbstractSettingsWidget.h"
 
-namespace QtOgre
+namespace Thermite
 {
 
 	class SettingsDialog : public QDialog, private Ui::SettingsDialog
@@ -21,4 +21,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_SETTINGSDIALOG_H_*/
+#endif /*THERMITE_SETTINGSDIALOG_H_*/

@@ -1,6 +1,6 @@
 #include "LogModelSortFilterProxy.h"
 
-namespace QtOgre
+namespace Thermite
 {
 	LogModelSortFilterProxy::LogModelSortFilterProxy(QObject *parent)
 		:QSortFilterProxyModel(parent)

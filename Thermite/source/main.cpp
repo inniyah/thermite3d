@@ -22,17 +22,15 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 
 #include "Application.h"
-#include "ThermiteGameLogic.h"
 
 #include <QPushButton>
 #include <QIcon>
 
-using namespace QtOgre;
+using namespace Thermite;
 using namespace Thermite;
 
 int main(int argc, char *argv[])
 {
-	ThermiteGameLogic* logic = new ThermiteGameLogic;
-	Application app(argc, argv, logic);
+	Application app(argc, argv, 0);
 	return app.exec(DisplaySettingsDialog);
 }

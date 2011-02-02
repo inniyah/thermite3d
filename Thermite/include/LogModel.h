@@ -1,12 +1,12 @@
-#ifndef QTOGRE_LOGMODEL_H_
-#define QTOGRE_LOGMODEL_H_
+#ifndef THERMITE_LOGMODEL_H_
+#define THERMITE_LOGMODEL_H_
 
 #include "LogLevel.h"
 #include "LogEntry.h"
 
 #include <QAbstractTableModel>
 
-namespace QtOgre
+namespace Thermite
 {
 	class Log;
 	class LogEntry;

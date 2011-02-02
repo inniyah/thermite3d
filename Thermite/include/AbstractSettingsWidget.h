@@ -1,11 +1,11 @@
-#ifndef QTOGRE_ABSTRACTSETTINGSWIDGET_H_
-#define QTOGRE_ABSTRACTSETTINGSWIDGET_H_
+#ifndef THERMITE_ABSTRACTSETTINGSWIDGET_H_
+#define THERMITE_ABSTRACTSETTINGSWIDGET_H_
 
 #include <QWidget>
 
 class QSettings;
 
-namespace QtOgre
+namespace Thermite
 {
 	class AbstractSettingsWidget : public QWidget
 	{
@@ -31,4 +31,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_ABSTRACTSETTINGSWIDGET_H_*/
+#endif /*THERMITE_ABSTRACTSETTINGSWIDGET_H_*/

@@ -1,9 +1,9 @@
-#ifndef QTOGRE_LOGMODELSORTFILTERPROXY_H_
-#define QTOGRE_LOGMODELSORTFILTERPROXY_H_
+#ifndef THERMITE_LOGMODELSORTFILTERPROXY_H_
+#define THERMITE_LOGMODELSORTFILTERPROXY_H_
 
 #include <QSortFilterProxyModel>
 
-namespace QtOgre
+namespace Thermite
 {
 	class LogModelSortFilterProxy : public QSortFilterProxyModel
 	{

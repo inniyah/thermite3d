@@ -1,11 +1,11 @@
-#ifndef QTOGRE_GRAPHICSSETTINGSWIDGET_H_
-#define QTOGRE_GRAPHICSSETTINGSWIDGET_H_
+#ifndef THERMITE_GRAPHICSSETTINGSWIDGET_H_
+#define THERMITE_GRAPHICSSETTINGSWIDGET_H_
 
 #include "ui_GraphicsSettingsWidget.h"
 
 #include "AbstractSettingsWidget.h"
 
-namespace QtOgre
+namespace Thermite
 {
 
 	class GraphicsSettingsWidget : public AbstractSettingsWidget, private Ui::GraphicsSettingsWidget
@@ -25,4 +25,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_GRAPHICSSETTINGSWIDGET_H_*/
+#endif /*THERMITE_GRAPHICSSETTINGSWIDGET_H_*/

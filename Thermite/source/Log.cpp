@@ -9,7 +9,7 @@
 #include <QScrollBar>
 #include <QSortFilterProxyModel>
 
-namespace QtOgre
+namespace Thermite
 {
 	Log::Log(const QString& name, QWidget* parent)
 	:QWidget(parent)

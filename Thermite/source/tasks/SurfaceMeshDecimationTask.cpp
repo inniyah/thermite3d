@@ -23,8 +23,6 @@ freely, subject to the following restrictions:
 
 #include "SurfaceMeshDecimationTask.h"
 
-#include "ThermiteGameLogic.h"
-
 #include "SurfaceMesh.h"
 #include "MeshDecimator.h"
 

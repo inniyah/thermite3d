@@ -1,7 +1,7 @@
-#ifndef QTOGRE_FORWARDDECLARATIONS_H_
-#define QTOGRE_FORWARDDECLARATIONS_H_
+#ifndef THERMITE_FORWARDDECLARATIONS_H_
+#define THERMITE_FORWARDDECLARATIONS_H_
 
-namespace QtOgre
+namespace Thermite
 {
 	class AbstractSettingsWidget;
 	class Application;
@@ -19,4 +19,4 @@ namespace QtOgre
 	class SettingsDialog;
 }
 
-#endif //QTOGRE_FORWARDDECLARATIONS_H_
+#endif //THERMITE_FORWARDDECLARATIONS_H_

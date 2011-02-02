@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 #include "SurfaceMeshExtractionTask.h"
 
 #include "Material.h"
-#include "ThermiteGameLogic.h"
 
 #include "GradientEstimators.h"
 #include "SurfaceMesh.h"

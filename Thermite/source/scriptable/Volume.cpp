@@ -463,7 +463,7 @@ namespace Thermite
 
 		updateLastModifedArray(regionToLock);
 
-		qApp->getLogByName("Thermite")->logMessage("Volume was modified", QtOgre::LL_INFO);
+		qApp->getLogByName("Thermite")->logMessage("Volume was modified", LL_INFO);
 	}
 
 	void Volume::createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode)
@@ -509,7 +509,7 @@ namespace Thermite
 
 		updateLastModifedArray(regionToLock);
 
-		qApp->getLogByName("Thermite")->logMessage("Volume was modified", QtOgre::LL_INFO);
+		qApp->getLogByName("Thermite")->logMessage("Volume was modified", LL_INFO);
 	}
 
 	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)

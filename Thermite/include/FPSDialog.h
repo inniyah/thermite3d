@@ -1,12 +1,12 @@
-#ifndef QTOGRE_FPSDIALOG_H_
-#define QTOGRE_FPSDIALOG_H_
+#ifndef THERMITE_FPSDIALOG_H_
+#define THERMITE_FPSDIALOG_H_
 
 #include "ui_FPSDialog.h"
 
 #include <QTime>
 #include <QTimer>
 
-namespace QtOgre
+namespace Thermite
 {
 	class FPSDialog : public QDialog, private Ui::FPSDialog
 	{
@@ -31,4 +31,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_FPSWIDGET_H_*/
+#endif /*THERMITE_FPSWIDGET_H_*/

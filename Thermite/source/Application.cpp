@@ -2,7 +2,6 @@
 
 #include "EventHandlingOgreWidget.h"
 #include "FPSDialog.h"
-#include "GameLogic.h"
 #include "GraphicsSettingsWidget.h"
 #include "LogManager.h"
 #include "SettingsDialog.h"
@@ -24,7 +23,7 @@
 //this function. See the Q_INIT_RESOURCE documentation for an explanation.
 //inline void initQtResources() { Q_INIT_RESOURCE(resources); }
 
-namespace QtOgre
+namespace Thermite
 {
 	void qtMessageHandler(QtMsgType type, const char* msg)
      {
@@ -69,10 +68,10 @@ namespace QtOgre
 	,mIsInitialised(false)
 	,mIgnoredConfigWarningMode(ignoredConfigWarningMode)
 	{
-		if(mGameLogic != 0)
+		/*if(mGameLogic != 0)
 		{
 			mGameLogic->mApplication = this;
-		}
+		}*/
 
 		//Initialise the resources.
 		//initQtResources();
@@ -109,6 +108,7 @@ namespace QtOgre
 		mSettings = new QSettings("settings.ini", QSettings::IniFormat);
 
 		mOgreWidget = new EventHandlingOgreWidget(0, 0);
+		mOgreWidget->mApplication = this;
 
 		//Logging should be initialised ASAP, and before Ogre::Root is created.
 		initialiseLogging();
@@ -254,11 +254,6 @@ namespace QtOgre
 
 		//mLogManager->hide();
 
-
-
-
-		mOgreWidget->setEventHandler(mGameLogic);
-
 		//This is a bit of a hack, necessary because we want to use the settings dialog in two different
 		//ways. The first time it is shown (by Application::exec()) no slot is connected - the Accepted
 		//event is handled explicitly because the system is not initialised at that point. But now (and
@@ -269,7 +264,7 @@ namespace QtOgre
 
 		Ogre::NameValuePairList ogreWindowParams;
 		//ogreWindowParams["FSAA"] = "8";
-		mOgreWidget->initialise(&ogreWindowParams);
+		mOgreWidget->initialiseOgre(&ogreWindowParams);
 
 		//Set up resource paths. This can't be done until the OgreWidget
 		//is initialised, because we need the GPUProgramManager.
@@ -285,7 +280,7 @@ namespace QtOgre
 
 		mLogManager->move(mainWidget()->geometry().left() + 10, mainWidget()->geometry().top() + mainWidget()->geometry().height() - mLogManager->frameGeometry().height() - 10);
 
-		mGameLogic->initialise();
+		mOgreWidget->initialise();
 
 		if(mAutoUpdateEnabled)
 		{
@@ -297,7 +292,7 @@ namespace QtOgre
 
 	void Application::update(void)
 	{
-		mGameLogic->update();
+		//mGameLogic->update();
 		mOgreWidget->update();
 		++mFrameCounter;
 	}
@@ -305,7 +300,7 @@ namespace QtOgre
 	void Application::shutdown(void)
 	{
 		mAutoUpdateTimer->stop();
-		mGameLogic->shutdown();
+		mOgreWidget->shutdown();
 		mInternalOgreLog->removeListener(this);
 		this->exit(0);
 	}

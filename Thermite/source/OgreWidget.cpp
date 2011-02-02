@@ -1,7 +1,6 @@
 #include "OgreWidget.h"
 
 #include "Application.h"
-#include "EventHandler.h"
 #include "Log.h"
 
 #include <OgreRenderWindow.h>
@@ -14,7 +13,7 @@
 #include <QX11Info>
 #endif
 
-namespace QtOgre
+namespace Thermite
 {
 	OgreWidget::OgreWidget(QWidget* parent, Qt::WindowFlags f)
 	:QWidget(parent, f | Qt::MSWindowsOwnDC)
@@ -31,7 +30,7 @@ namespace QtOgre
 	{
 	}
 
-	void OgreWidget::initialise(const Ogre::NameValuePairList *miscParams)
+	void OgreWidget::initialiseOgre(const Ogre::NameValuePairList *miscParams)
 	{
 		//These attributes are the same as those use in a QGLWidget
 		setAttribute(Qt::WA_PaintOnScreen);

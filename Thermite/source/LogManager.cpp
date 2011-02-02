@@ -3,7 +3,7 @@
 #include <QDir>
 #include <QTabWidget>
 
-namespace QtOgre
+namespace Thermite
 {
 	LogManager::LogManager(QWidget *parent)
 		:QDialog(parent,Qt::Tool)

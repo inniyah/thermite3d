@@ -4,7 +4,7 @@
 
 #include <QSettings>
 
-namespace QtOgre
+namespace Thermite
 {
 	GraphicsSettingsWidget::GraphicsSettingsWidget(QWidget *parent)
 	:AbstractSettingsWidget(parent)

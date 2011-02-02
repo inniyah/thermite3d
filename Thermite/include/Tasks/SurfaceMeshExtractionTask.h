@@ -33,8 +33,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class ThermiteGameLogic;
-
 	class SurfaceMeshExtractionTask : public Task
 	{
 		Q_OBJECT

@@ -33,7 +33,6 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class ThermiteGameLogic;
 
 	class AmbientOcclusionTask : public Task
 	{

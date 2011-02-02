@@ -1,6 +1,6 @@
 #include "LogEntry.h"
 
-namespace QtOgre
+namespace Thermite
 {
 	LogEntry::LogEntry(const QString &msg, LogLevel level)
 		:mMsg(msg)

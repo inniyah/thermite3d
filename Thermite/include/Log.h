@@ -1,5 +1,5 @@
-#ifndef QTOGRE_LOG_H_
-#define QTOGRE_LOG_H_
+#ifndef THERMITE_LOG_H_
+#define THERMITE_LOG_H_
 
 #include "ui_Log.h"
 
@@ -10,7 +10,7 @@
 
 class QFile;
 
-namespace QtOgre
+namespace Thermite
 {
 	//forward declarations
 	class LogEntry;
@@ -93,4 +93,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_LOG_H_*/
+#endif /*THERMITE_LOG_H_*/

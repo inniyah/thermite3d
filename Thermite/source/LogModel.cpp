@@ -3,7 +3,7 @@
 #include "Log.h"
 #include "LogEntry.h"
 
-namespace QtOgre
+namespace Thermite
 {
 	LogModel::LogModel(Log *log, QObject *parent)
 		:QAbstractTableModel(parent)

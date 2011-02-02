@@ -1,9 +1,9 @@
-#ifndef QTOGRE_LOGLEVEL_H_
-#define QTOGRE_LOGLEVEL_H_
+#ifndef THERMITE_LOGLEVEL_H_
+#define THERMITE_LOGLEVEL_H_
 
 #include <QMetaType>
 
-namespace QtOgre
+namespace Thermite
 {
 	enum LogLevel
 	{ 
@@ -19,6 +19,6 @@ namespace QtOgre
 
 //We want to be able to pass log messages across QT
 //threads, which means making the LogLevel an Qt MetaType.
-Q_DECLARE_METATYPE(QtOgre::LogLevel)
+Q_DECLARE_METATYPE(Thermite::LogLevel)
 
 #endif

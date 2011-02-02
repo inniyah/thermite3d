@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 #include "FindPathTask.h"
 
 #include "Material.h"
-#include "ThermiteGameLogic.h"
 
 using namespace PolyVox;
 using namespace std;

@@ -22,16 +22,13 @@ SET(MAIN_SRC_FILES
 	source/main.cpp
 	source/DataStreamWrapper.cpp
 	source/SurfacePatchRenderable.cpp
-	source/ThermiteGameLogic.cpp
 	source/Utility.cpp
 	source/VolumeSerializationProgressListenerImpl.cpp
 	
 	source/AbstractSettingsWidget.cpp
 	source/Application.cpp
-	source/DotSceneHandler.cpp
 	source/EventHandlingOgreWidget.cpp
 	source/FPSDialog.cpp
-	source/GameLogic.cpp
 	source/GraphicsSettingsWidget.cpp
 	source/Log.cpp
 	source/LogEntry.cpp
@@ -47,17 +44,13 @@ SET(MAIN_INC_FILES
 	include/QtForwardDeclarations.h
 	include/SurfacePatchRenderable.h
 	include/ThermiteForwardDeclarations.h
-	include/ThermiteGameLogic.h
 	include/Utility.h
 	include/VolumeSerializationProgressListenerImpl.h
 	
 	include/AbstractSettingsWidget.h
 	include/Application.h
-	include/DotSceneHandler.h
-	include/EventHandler.h
 	include/EventHandlingOgreWidget.h
 	include/FPSDialog.h
-	include/GameLogic.h
 	include/GraphicsSettingsWidget.h
 	include/Log.h
 	include/LogEntry.h

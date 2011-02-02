@@ -49,7 +49,6 @@ namespace Thermite
 	
 	class SurfacePatchRenderable;
 	
-	class ThermiteGameLogic;
 	class Volume;
 	
 	class VolumeSerializationProgressListener;

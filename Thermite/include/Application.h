@@ -1,5 +1,5 @@
-#ifndef QTOGRE_APPLICATION_H_
-#define QTOGRE_APPLICATION_H_
+#ifndef THERMITE_APPLICATION_H_
+#define THERMITE_APPLICATION_H_
 
 #include <OgreLog.h>
 
@@ -7,7 +7,7 @@
 
 class QSettings;
 
-namespace QtOgre
+namespace Thermite
 {
 	enum SettingsDialogMode
 	{
@@ -37,11 +37,11 @@ namespace QtOgre
 	/// \code
 	/// int main(int argc, char *argv[])
 	/// {
-	/// 	QtOgre::Application app(argc, argv, new MyGameLogic);
+	/// 	Application app(argc, argv, new MyGameLogic);
 	/// 	return app.exec();
 	/// }
 	/// \endcode
-	/// Where \c MyGameLogic is a QtOgre::GameLogic subclass
+	/// Where \c MyGameLogic is a GameLogic subclass
 	/// \author David Williams
 	////////////////////////////////////////////////////////////////////////////////
 	class Application : public QApplication, public Ogre::LogListener
@@ -174,6 +174,6 @@ namespace QtOgre
 #if defined(qApp)
 #undef qApp
 #endif
-#define qApp (static_cast<QtOgre::Application *>(QCoreApplication::instance()))
+#define qApp (static_cast<Thermite::Application *>(QCoreApplication::instance()))
 
-#endif /*QTOGRE_APPLICATION_H_*/
+#endif /*THERMITE_APPLICATION_H_*/

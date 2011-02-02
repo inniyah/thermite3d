@@ -1,6 +1,6 @@
 #include "SettingsDialog.h"
 
-namespace QtOgre
+namespace Thermite
 {
 	SettingsDialog::SettingsDialog(QSettings* settings, QWidget *parent)
 	:QDialog(parent)

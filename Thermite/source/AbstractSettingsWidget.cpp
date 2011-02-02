@@ -3,7 +3,7 @@
 #include <QDialog>
 #include <QSettings>
 
-namespace QtOgre
+namespace Thermite
 {
 	AbstractSettingsWidget::AbstractSettingsWidget(QWidget *parent)
 	:QWidget(parent)

@@ -1,5 +1,5 @@
-#ifndef QTOGRE_LOGMANAGER_H_
-#define QTOGRE_LOGMANAGER_H_
+#ifndef THERMITE_LOGMANAGER_H_
+#define THERMITE_LOGMANAGER_H_
 
 #include "Log.h"
 
@@ -7,7 +7,7 @@
 
 class QTabWidget;
 
-namespace QtOgre
+namespace Thermite
 {
 	/**
 	 * Controls the logs
@@ -42,4 +42,4 @@ namespace QtOgre
 	};
 }
 
-#endif /*QTOGRE_LOGMANAGER_H_*/
+#endif /*THERMITE_LOGMANAGER_H_*/

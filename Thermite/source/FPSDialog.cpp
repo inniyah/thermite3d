@@ -4,7 +4,7 @@
 
 #include <QMouseEvent>
 
-namespace QtOgre
+namespace Thermite
 {
 	FPSDialog::FPSDialog(QWidget* parent, Qt::WindowFlags f)
 	:QDialog(parent, f)
