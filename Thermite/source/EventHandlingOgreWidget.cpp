@@ -55,7 +55,6 @@ namespace Thermite
 {
 	EventHandlingOgreWidget::EventHandlingOgreWidget(QWidget* parent, Qt::WindowFlags f)
 	:OgreWidget(parent, f)
-		,mApplication(0)
 
 		//Scene representation
 		,mCamera(0)
@@ -89,7 +88,6 @@ namespace Thermite
 
 		//Other
 		,mFirstFind(false)
-		,mThermiteLog(0)
 	{	
 		mCamera = new Camera(this);
 		keyboard = new Keyboard(this);
@@ -105,10 +103,6 @@ namespace Thermite
 
 	void EventHandlingOgreWidget::initialise(void)
 	{
-		//Set up the logging system , to hopefully record any problems.
-		mThermiteLog = mApplication->createLog("Thermite");
-		mThermiteLog->logMessage("Initialising Thermite3D Game Engine", LL_INFO);
-
 		//Set the main window icon
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
 		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
@@ -125,7 +119,7 @@ namespace Thermite
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
 		mCameraSceneNode->attachObject(mOgreCamera);
 
-		mMainViewport = mApplication->ogreRenderWindow()->addViewport(mOgreCamera);
+		mMainViewport = getOgreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		createAxis();
@@ -137,9 +131,6 @@ namespace Thermite
 		//addResourceDirectory("./resources/", "Thermite");
 		//Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Thermite");
 		//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-		//Set the frame sate to be as high as possible
-		mApplication->setAutoUpdateInterval(0);
 
 		//Some Ogre related stuff we need to set up
 		Ogre::Root::getSingletonPtr()->addMovableObjectFactory(new SurfacePatchRenderableFactory);
@@ -462,11 +453,6 @@ namespace Thermite
 	void EventHandlingOgreWidget::keyPressEvent(QKeyEvent* event)
 	{
 		keyboard->press(event->key());
-
-		if(event->key() == Qt::Key_F1)
-		{
-			qApp->showLogManager();
-		}
 	}
 
 	void EventHandlingOgreWidget::keyReleaseEvent(QKeyEvent* event)
@@ -510,11 +496,6 @@ namespace Thermite
 		mouse->modifyWheelDelta(event->delta());
 	}
 
-	Log* EventHandlingOgreWidget::thermiteLog(void)
-	{
-		return mThermiteLog;
-	}
-
 	bool EventHandlingOgreWidget::loadApp(const QString& appName)
 	{
 		QString appDirectory("../share/thermite/apps/" + appName);
@@ -523,7 +504,6 @@ namespace Thermite
 		if(!dirToTest.exists())
 		{
 			QString message("Application " + appName + " does not exist. It should be found in the following location: " + appDirectory);
-			mThermiteLog->logMessage(message, LL_ERROR);
 			qApp->showErrorMessageBox(message);
 			return false;
 		}
@@ -790,7 +770,6 @@ namespace Thermite
 
 	void EventHandlingOgreWidget::deleteMovie(void)
 	{
-		thermiteLog()->logMessage("Deleting startup movie", LL_DEBUG);
 		if(m_pThermiteLogoLabel != 0)
 		{
 			delete m_pThermiteLogoLabel;

@@ -9,18 +9,6 @@ class QSettings;
 
 namespace Thermite
 {
-	enum SettingsDialogMode
-	{
-		DisplaySettingsDialog,
-		SuppressSettingsDialog
-	};
-
-	enum IgnoredConfigWarningMode
-	{
-		WarnAboutIgnoredConfigs,
-		DoNotWarnAboutIgnoredConfigs
-	};
-
 	class EventHandlingOgreWidget;
 	class FPSDialog;
 	class GameLogic;
@@ -44,13 +32,13 @@ namespace Thermite
 	/// Where \c MyGameLogic is a GameLogic subclass
 	/// \author David Williams
 	////////////////////////////////////////////////////////////////////////////////
-	class Application : public QApplication, public Ogre::LogListener
+	class Application : public QApplication
 	{
 		Q_OBJECT
 
 	public:
 		/// Creates an instance of the Application class.
-		Application(int & argc, char ** argv, GameLogic* gameLogic = 0, IgnoredConfigWarningMode ignoredConfigWarningMode = WarnAboutIgnoredConfigs);
+		Application(int & argc, char ** argv, GameLogic* gameLogic = 0);
 		/// Destroys an instance of the Application class
 		~Application();
 
@@ -64,8 +52,6 @@ namespace Thermite
 		QWidget* mainWidget(void) const;
 		/// Access the application settings
 		QSettings* settings(void) const;
-		/// Gets the log used by the QtOgre framework.
-		Log* _systemLog(void) const;
 		//@}
 
 		///\name Setters
@@ -84,19 +70,9 @@ namespace Thermite
 		bool isDirect3D9Available(void) const;
 		//@}
 		
-		///\name Other
-		//@{
-		///Creates a new log with a given name.
-		Log* createLog(const QString& name);
-		///Get the log with the specified name.
-		Log* getLogByName(const QString& name);
-		///Adds a new page to the settings dialog
-		void addSettingsWidget(const QString& title, AbstractSettingsWidget* settingsWidget);
-		//@}
-		
 		//Static functions
 		/// Start the main event loop.
-		static int exec(SettingsDialogMode eDialogMode = DisplaySettingsDialog);
+		static int exec();
 		/// Utility function to center a widget.
 		static void centerWidget(QWidget* widgetToCenter, QWidget* parent = 0);
 
@@ -113,49 +89,17 @@ namespace Thermite
 		void shutdown(void);
 		void update(void);	
 
-		/// Hides the FPS counter window.
-		void hideFPSCounter(void);
-		/// Hides the LogManager window.
-		void hideLogManager(void);
-		/// Hides the settings dialog.
-		void hideSettingsDialog(void);
-
-		/// Shows the FPS counter window.
-		void showFPSCounter(void);
-		/// Shows the LogManager window.
-		void showLogManager(void);
-		/// Shows the settings dialog.
-		int showSettingsDialog(void);
-
 	private:
-		//Private functions
-		void initialiseLogging(void);
 		void initialiseOgre(void);
-		///Implemented from Ogre::LogListener to redirect logging 
-		void messageLogged(const Ogre::String& message, Ogre::LogMessageLevel lml, bool maskDebug, const Ogre::String& logName);
-		void loadResourcePathsFromConfigFile(const QString& filename);
 
 		//Widgets
-		FPSDialog* mFPSDialog;
-		GraphicsSettingsWidget* mGraphicsSettingsWidget;
 		EventHandlingOgreWidget* mOgreWidget;
-		SettingsDialog* mSettingsDialog;
-
-		//Logging
-		Ogre::Log* mInternalOgreLog;
-		Ogre::LogManager* mInternalOgreLogManager;
-		LogManager* mLogManager;
-		Log* mOgreLog;
-		Log* mSystemLog;
 
 		//Ogre Stuff
 		Ogre::RenderSystem* mActiveRenderSystem;
 		Ogre::RenderSystem* mOpenGLRenderSystem;
 		Ogre::RenderSystem* mDirect3D9RenderSystem;
 		Ogre::Root* mRoot;
-
-		//Config warnings
-		void warnAboutIgnoredConfigFile(const QString& filename);
 
 		//Misc
 		unsigned int mFrameCounter;
@@ -164,7 +108,6 @@ namespace Thermite
 		QSettings* mSettings;
 		bool mAutoUpdateEnabled;
 		bool mIsInitialised;
-		IgnoredConfigWarningMode mIgnoredConfigWarningMode;
 	};
 }
 

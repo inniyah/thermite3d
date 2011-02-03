@@ -30,11 +30,6 @@ SET(MAIN_SRC_FILES
 	source/EventHandlingOgreWidget.cpp
 	source/FPSDialog.cpp
 	source/GraphicsSettingsWidget.cpp
-	source/Log.cpp
-	source/LogEntry.cpp
-	source/LogManager.cpp
-	source/LogModel.cpp
-	source/LogModelSortFilterProxy.cpp
 	source/OgreWidget.cpp
 	source/SettingsDialog.cpp
 )
@@ -52,12 +47,6 @@ SET(MAIN_INC_FILES
 	include/EventHandlingOgreWidget.h
 	include/FPSDialog.h
 	include/GraphicsSettingsWidget.h
-	include/Log.h
-	include/LogEntry.h
-	include/LogLevel.h
-	include/LogManager.h
-	include/LogModel.h
-	include/LogModelSortFilterProxy.h
 	include/OgreWidget.h
 	include/QtOgreForwardDeclarations.h
 	include/SettingsDialog.h
@@ -89,6 +78,30 @@ SET(HACKS_INC_FILES
 
 SOURCE_GROUP("Sources\\Hacks" FILES ${HACKS_SRC_FILES})
 SOURCE_GROUP("Headers\\Hacks" FILES ${HACKS_INC_FILES})
+
+################################################################################
+## Logging files
+################################################################################
+
+SET(LOGGING_SRC_FILES
+	source/Logging/Log.cpp
+	source/Logging/LogEntry.cpp
+	source/Logging/LogManager.cpp
+	source/Logging/LogModel.cpp
+	source/Logging/LogModelSortFilterProxy.cpp
+)
+
+SET(LOGGING_INC_FILES
+	include/Logging/Log.h
+	include/Logging/LogEntry.h
+	include/Logging/LogLevel.h
+	include/Logging/LogManager.h
+	include/Logging/LogModel.h
+	include/Logging/LogModelSortFilterProxy.h
+)
+
+SOURCE_GROUP("Sources\\Logging" FILES ${LOGGING_SRC_FILES})
+SOURCE_GROUP("Headers\\Logging" FILES ${LOGGING_INC_FILES})
 
 ################################################################################
 ## Resource files
@@ -170,8 +183,8 @@ SOURCE_GROUP("Sources\\Tasks" FILES ${TASKS_SRC_FILES})
 SOURCE_GROUP("Headers\\Tasks" FILES ${TASKS_INC_FILES})
 
 #Combine all the source/include/UI files into a single list
-SET(SRC_FILES ${MAIN_SRC_FILES} ${RESOURCE_SRC_FILES} ${TASKS_SRC_FILES} ${SCRIPTABLE_SRC_FILES} ${HACKS_SRC_FILES})
-SET(INC_FILES ${MAIN_INC_FILES} ${RESOURCE_INC_FILES} ${TASKS_INC_FILES} ${SCRIPTABLE_INC_FILES} ${HACKS_INC_FILES})
+SET(SRC_FILES ${MAIN_SRC_FILES} ${LOGGING_SRC_FILES} ${RESOURCE_SRC_FILES} ${TASKS_SRC_FILES} ${SCRIPTABLE_SRC_FILES} ${HACKS_SRC_FILES})
+SET(INC_FILES ${MAIN_INC_FILES} ${LOGGING_INC_FILES} ${RESOURCE_INC_FILES} ${TASKS_INC_FILES} ${SCRIPTABLE_INC_FILES} ${HACKS_INC_FILES})
 SET(UI_FILES ${MAIN_UI_FILES})
 
 SET(RESOURCE_FILES
@@ -194,7 +207,7 @@ QT4_WRAP_UI(UI_SRCS ${UI_FILES})
 QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Logging ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Logging ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})

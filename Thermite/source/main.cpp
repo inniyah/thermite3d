@@ -32,5 +32,5 @@ using namespace Thermite;
 int main(int argc, char *argv[])
 {
 	Application app(argc, argv, 0);
-	return app.exec(DisplaySettingsDialog);
+	return app.exec();
 }

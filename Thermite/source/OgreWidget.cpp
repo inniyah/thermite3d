@@ -170,7 +170,7 @@ namespace Thermite
 			}
 		}
 
-		if(applied)
+		/*if(applied)
 		{
 			qApp->_systemLog()->logMessage("Set main window resolution to \"" + resolution + "\"", LL_INFO);
 		}
@@ -182,7 +182,7 @@ namespace Thermite
 				qApp->_systemLog()->logMessage("    \"" + res + "\"", LL_WARNING);
 			}
 			qApp->_systemLog()->logMessage("The requested index was: \"" + QString::number(selectedWindowMode) + "\"", LL_WARNING);
-		}
+		}*/
 		return applied;
 	}
 }

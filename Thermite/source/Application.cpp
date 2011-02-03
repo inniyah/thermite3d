@@ -19,43 +19,11 @@
 #include <QTimer>
 #include <QSettings>
 
-//Q_INIT_RESOURCE cannot be called from within a namespace, so we provide
-//this function. See the Q_INIT_RESOURCE documentation for an explanation.
-//inline void initQtResources() { Q_INIT_RESOURCE(resources); }
-
 namespace Thermite
 {
-	void qtMessageHandler(QtMsgType type, const char* msg)
-     {
-         switch (type)
-		 {
-         case QtDebugMsg:
-             qApp->_systemLog()->logMessage(msg, LL_DEBUG);
-             break;
-         case QtWarningMsg:
-             qApp->_systemLog()->logMessage(msg, LL_WARNING);
-             break;
-         case QtCriticalMsg:
-             qApp->_systemLog()->logMessage(msg, LL_ERROR);
-             break;
-         case QtFatalMsg:
-			 //We don't override this one as we are dying and wouldn't see it.
-             fprintf(stderr, "Fatal: %s\n", msg);
-             abort();
-         }
-     }
-
-	Application::Application(int& argc, char** argv, GameLogic* gameLogic, IgnoredConfigWarningMode ignoredConfigWarningMode)
+	Application::Application(int& argc, char** argv, GameLogic* gameLogic)
 	:QApplication(argc, argv)
-	,mFPSDialog(0)
-	,mGraphicsSettingsWidget(0)
 	,mOgreWidget(0)
-	,mSettingsDialog(0)
-	,mInternalOgreLog(0)
-	,mInternalOgreLogManager(0)
-	,mLogManager(0)
-	,mOgreLog(0)
-	,mSystemLog(0)
 	,mActiveRenderSystem(0)
 	,mOpenGLRenderSystem(0)
 	,mDirect3D9RenderSystem(0)
@@ -66,37 +34,7 @@ namespace Thermite
 	,mSettings(0)
 	,mAutoUpdateEnabled(true)
 	,mIsInitialised(false)
-	,mIgnoredConfigWarningMode(ignoredConfigWarningMode)
 	{
-		/*if(mGameLogic != 0)
-		{
-			mGameLogic->mApplication = this;
-		}*/
-
-		//Initialise the resources.
-		//initQtResources();
-
-		//Sanity check for config files
-		if(mIgnoredConfigWarningMode == WarnAboutIgnoredConfigs)
-		{
-			QDirIterator it(".");
-			while (it.hasNext())
-			{
-				it.next();
-				if(QString::compare(it.fileInfo().suffix(), "cfg", Qt::CaseInsensitive) == 0)
-				{
-					if(	(QString::compare(it.fileInfo().baseName(), "plugins", Qt::CaseInsensitive) != 0) &&
-						(QString::compare(it.fileInfo().baseName(), "plugins_d", Qt::CaseInsensitive) != 0) &&
-						(QString::compare(it.fileInfo().baseName(), "resources", Qt::CaseInsensitive) != 0))
-					{
-						//We have found a file with the .cfg extension but which is not
-						//'plugins.cfg' or 'resources.cfg'. Warn the user about this.
-						warnAboutIgnoredConfigFile(it.fileInfo().fileName());
-					}
-				}
-			}
-		}
-
 		mAutoUpdateTimer = new QTimer;
 		QObject::connect(mAutoUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
 		//On the test system, a value of one here gives a high frame rate and still allows
@@ -108,10 +46,6 @@ namespace Thermite
 		mSettings = new QSettings("settings.ini", QSettings::IniFormat);
 
 		mOgreWidget = new EventHandlingOgreWidget(0, 0);
-		mOgreWidget->mApplication = this;
-
-		//Logging should be initialised ASAP, and before Ogre::Root is created.
-		initialiseLogging();
 
 		//Create the Ogre::Root object.
 		qDebug("Creating Ogre::Root object...");
@@ -154,10 +88,6 @@ namespace Thermite
 			qCritical("No rendering subsystems found");
 			showErrorMessageBox("No rendering subsystems found. Please ensure that your 'plugins.cfg' (or 'plugins_d.cfg') is correct and can be found by the executable.");
 		}
-
-		mSettingsDialog = new SettingsDialog(mSettings, mOgreWidget);
-		mGraphicsSettingsWidget = new GraphicsSettingsWidget;
-		mSettingsDialog->addSettingsWidget("Graphics", mGraphicsSettingsWidget);
 	}
 
 	Application::~Application()
@@ -202,19 +132,6 @@ namespace Thermite
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-	///This function is an implementation detail, and should not really be exposed.
-	///It return the log which the QtOgre framework uses for its messages, whereas
-	///users are expected to instead create their own log with createLog(). The reason
-	///it is exposed is that the Qt debugging system (qtMessageHandler()) also redirects
-	///to this log, and that cannot be made a member function.
-	/// \return the log used by the QtOgre framework.
-	////////////////////////////////////////////////////////////////////////////////
-	Log* Application::_systemLog(void) const
-	{
-		return mSystemLog;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////
 	/// \return a pointer to the applications main window.
 	////////////////////////////////////////////////////////////////////////////////
 	QWidget* Application::mainWidget(void) const
@@ -226,7 +143,7 @@ namespace Thermite
 	{
 		//Eventually Application settings might be applied here.
 		//Until then, we just pass the settings on the the MainWindow and GameLogic
-		if(!mOgreWidget->applySettings(mSettingsDialog->mSettings))
+		if(!mOgreWidget->applySettings(mSettings))
 		{
 			showWarningMessageBox("Unable to apply desired settings to the window.\nPlease consult the system log for details");
 		}
@@ -244,41 +161,11 @@ namespace Thermite
 		mOgreWidget->resize(800,600);
 		centerWidget(mOgreWidget);
 
-		centerWidget(mLogManager, mOgreWidget);
-
-		mLogManager->setForceProcessEvents(true);
 		initialiseOgre();
-		
-		
-		mLogManager->setForceProcessEvents(false);
-
-		//mLogManager->hide();
-
-		//This is a bit of a hack, necessary because we want to use the settings dialog in two different
-		//ways. The first time it is shown (by Application::exec()) no slot is connected - the Accepted
-		//event is handled explicitly because the system is not initialised at that point. But now (and
-		//when the dialog is shown in future) we are ready for it, so we connect the accepted() signal.
-		//We also call accept, to do the initial setup. See also Application::exec().
-		connect(mSettingsDialog, SIGNAL(accepted()), this, SLOT(applySettings()));
-		mSettingsDialog->accept();
 
 		Ogre::NameValuePairList ogreWindowParams;
 		//ogreWindowParams["FSAA"] = "8";
 		mOgreWidget->initialiseOgre(&ogreWindowParams);
-
-		//Set up resource paths. This can't be done until the OgreWidget
-		//is initialised, because we need the GPUProgramManager.
-		if(QFile::exists("resources.cfg"))
-		{
-			loadResourcePathsFromConfigFile("resources.cfg");
-			Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-		}
-
-		mFPSDialog = new FPSDialog(mOgreWidget, Qt::ToolTip);
-		mFPSDialog->setWindowOpacity(settings()->value("System/DefaultWindowOpacity", 1.0).toDouble());
-		mFPSDialog->move(mainWidget()->geometry().topLeft() + QPoint(10,10));
-
-		mLogManager->move(mainWidget()->geometry().left() + 10, mainWidget()->geometry().top() + mainWidget()->geometry().height() - mLogManager->frameGeometry().height() - 10);
 
 		mOgreWidget->initialise();
 
@@ -301,36 +188,12 @@ namespace Thermite
 	{
 		mAutoUpdateTimer->stop();
 		mOgreWidget->shutdown();
-		mInternalOgreLog->removeListener(this);
 		this->exit(0);
-	}
-
-	void Application::initialiseLogging(void)
-	{
-		//Initialise our logging system
-		mLogManager = new LogManager(mOgreWidget);
-		mLogManager->resize(550, 400);
-		mLogManager->setWindowOpacity(settings()->value("System/DefaultWindowOpacity", 1.0).toDouble());
-
-		//Redirect Qt's logging system to our own
-		mSystemLog = mLogManager->createLog("System");
-		qInstallMsgHandler(&qtMessageHandler);
-		qDebug("***System log initialised***");
-
-		//Redirect Ogre's logging system to our own
-		//This has to all be done before creating the Root object.
-		mOgreLog = mLogManager->createLog("Ogre");
-		mLogManager->setVisibleLog(mOgreLog);
-		mInternalOgreLogManager = new Ogre::LogManager();
-		mInternalOgreLog = mInternalOgreLogManager->createLog("Ogre.log", false, true, true);
-		mInternalOgreLog->addListener(this);
-		mOgreLog->logMessage("***Ogre log initialised and redirected by QtOgre framework.***", LL_DEBUG);
-		mOgreLog->logMessage("***Any further messages in this log come directly from Ogre.***", LL_DEBUG);
 	}
 
 	void Application::initialiseOgre(void)
 	{
-		QString renderSystem = mSettingsDialog->mSettings->value("Graphics/RenderSystem").toString();
+		QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
 		if(renderSystem.compare("OpenGL Rendering Subsystem") == 0)
 		{
 			mActiveRenderSystem = mOpenGLRenderSystem;
@@ -345,42 +208,14 @@ namespace Thermite
 		Ogre::Root::getSingletonPtr()->initialise(false);
 	}
 
-	void Application::messageLogged(const Ogre::String& message, Ogre::LogMessageLevel lml, bool maskDebug, const Ogre::String& logName)
-	{
-		//Convert message to Qt's string type.
-		QString messageAsQString = QString::fromStdString(message);
-
-		//Map Ogre's LogMessageLevels to our LogLevels
-		switch(lml)
-		{
-		case Ogre::LML_TRIVIAL:
-			mOgreLog->logMessage(messageAsQString, LL_DEBUG);
-			break;
-		case Ogre::LML_NORMAL:
-			mOgreLog->logMessage(messageAsQString, LL_INFO);
-			break;
-		default: //Should be Ogre::LML_CRITICAL
-			mOgreLog->logMessage(messageAsQString, LL_ERROR);
-		}
-	}
-
 	////////////////////////////////////////////////////////////////////////////////
 	/// \param displaySettingsDialog should the settings dialog be displayed
 	/// \return the application return code
 	////////////////////////////////////////////////////////////////////////////////
-	int Application::exec(SettingsDialogMode eDialogMode)
+	int Application::exec()
 	{
-		//If we don't show the setting dialog, or we do show it and it is accepted, then proceed.
-		if((eDialogMode == SuppressSettingsDialog) || (qApp->showSettingsDialog() == QDialog::Accepted))
-		{
-			qApp->initialise();
-			return QApplication::exec();
-		}
-		//Otherwise the user cancelled so exit.
-		else
-		{
-			return 0;
-		}
+		qApp->initialise();
+		return QApplication::exec();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -446,51 +281,6 @@ namespace Thermite
 		msgBox.exec();
 	}
 
-	void Application::hideSettingsDialog(void)
-	{
-		mSettingsDialog->reject();
-	}
-
-	int Application::showSettingsDialog(void)
-	{
-		return mSettingsDialog->exec();
-	}
-
-	////////////////////////////////////////////////////////////////////////////////
-	/// \param name the name of the log
-	/// \return a pointer to the log
-	////////////////////////////////////////////////////////////////////////////////
-	Log* Application::createLog(const QString& name)
-	{
-		//Forward the request to the LogManager.
-		return mLogManager->createLog(name);
-	}
-
-	Log* Application::getLogByName(const QString& name)
-	{
-		//Forward the request to the LogManager.
-		return mLogManager->getLogByName(name);
-	}
-
-	void Application::hideLogManager(void)
-	{
-		mLogManager->setVisible(false);
-	}
-
-	void Application::showLogManager(void)
-	{
-		mLogManager->setVisible(true);
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////
-	/// \param title the title for the settings widget tab
-	/// \param settingsWidget the widget to add to the dialog
-	//////////////////////////////////////////////////////////////////////////////// 
-	void Application::addSettingsWidget(const QString& title, AbstractSettingsWidget* settingsWidget)
-	{
-		mSettingsDialog->addSettingsWidget(title, settingsWidget);
-	}
-
 	////////////////////////////////////////////////////////////////////////////////
 	/// \return a pointer to the Ogre RenderWindow
 	//////////////////////////////////////////////////////////////////////////////// 
@@ -516,16 +306,6 @@ namespace Thermite
 		mAutoUpdateTimer->setInterval(intervalInMilliseconds);
 	}
 
-	void Application::hideFPSCounter(void)
-	{
-		mFPSDialog->setVisible(false);
-	}
-
-	void Application::showFPSCounter(void)
-	{
-		mFPSDialog->setVisible(true);
-	}
-
 	void Application::setAutoUpdateEnabled(bool autoUpdateEnabled)
 	{
 		mAutoUpdateEnabled = autoUpdateEnabled;
@@ -541,45 +321,4 @@ namespace Thermite
 			mAutoUpdateTimer->stop();
 		}
 	}
-
-	void Application::warnAboutIgnoredConfigFile(const QString& filename)
-	{
-		QString message;
-		message += "The file \'" + filename + "\' has been found in the applications working directory.";
-		message += "\n\n";
-		message += "The '.cfg' extension implies the file may usually be used by Ogre and/or the ExampleApplication framework. ";
-		message += "However, the QtOgre framework currently only supports the 'plugins.cfg', 'plugins_d.cfg', and 'resources.cfg' files. ";
-		message += "The file will be ignored by the QtOgre framework, and your application may not behave as expected. ";
-		message += "\n\n";
-		message += "If the file is being used by your application code, or by one of the plugins which you are loading, then you can suppress ";
-		message += "this warning dialog box by passing the appropriate flags to the Application constructor. Please consult the documentation.";
-		showWarningMessageBox(message);
-	}
-
-	//This function is based on code from the Ogre ExampleApplication.
-	//It is not constrained by the Ogre licence (free for any use).
-	void Application::loadResourcePathsFromConfigFile(const QString& filename)
-    {
-        // Load resource paths from config file
-		Ogre::ConfigFile cf;
-		cf.load(filename.toStdString());
-
-        // Go through all sections & settings in the file
-        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-        Ogre::String secName, typeName, archName;
-        while (seci.hasMoreElements())
-        {
-            secName = seci.peekNextKey();
-            Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-            Ogre::ConfigFile::SettingsMultiMap::iterator i;
-            for (i = settings->begin(); i != settings->end(); ++i)
-            {
-                typeName = i->first;
-                archName = i->second;
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    archName, typeName, secName);
-            }
-        }
-    }
 }

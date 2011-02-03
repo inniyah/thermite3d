@@ -63,8 +63,6 @@ namespace Thermite
 
 		void createAxis(void);
 
-		Log* thermiteLog(void);
-
 	public slots:
 		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region, Volume& volume);		
 		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region);
@@ -89,8 +87,6 @@ namespace Thermite
 		void deleteMovie(void);
 
 	public:
-		Application* mApplication;		
-
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
 
@@ -132,7 +128,6 @@ namespace Thermite
 
 		//Other
 		bool mFirstFind;
-		Log* mThermiteLog;
 
 		//Game specific
 		Object* cameraNode;
