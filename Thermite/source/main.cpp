@@ -27,10 +27,10 @@ freely, subject to the following restrictions:
 #include <QIcon>
 
 using namespace Thermite;
-using namespace Thermite;
 
 int main(int argc, char *argv[])
 {
 	Application app(argc, argv, 0);
+	app.initialise();
 	return app.exec();
 }

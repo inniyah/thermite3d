@@ -1,5 +1,5 @@
-#ifndef THERMITE_EVENTHANDLINGOGREWIDGET_H_
-#define THERMITE_EVENTHANDLINGOGREWIDGET_H_
+#ifndef THERMITE_VIEWWIDGET_H_
+#define THERMITE_VIEWWIDGET_H_
 
 #include "OgreWidget.h"
 
@@ -34,29 +34,17 @@ class QWidget;
 namespace Thermite
 {
 
-	class EventHandlingOgreWidget : public OgreWidget
+	class ViewWidget : public OgreWidget
 	{
 		Q_OBJECT
 
 	public:
-		EventHandlingOgreWidget(QWidget* parent=0, Qt::WindowFlags f=0);
-		~EventHandlingOgreWidget();
+		ViewWidget(QWidget* parent=0, Qt::WindowFlags f=0);
+		~ViewWidget();
 
-		void initialise(void);
-		void update(void);
-		void shutdown(void);
-
-		void closeEvent(QCloseEvent *event);
-
-		void keyPressEvent(QKeyEvent* event);
-		void keyReleaseEvent(QKeyEvent* event);
-
-		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
-		void mouseDoubleClickEvent(QMouseEvent* event);
-		void mouseMoveEvent(QMouseEvent* event);
-
-		void wheelEvent(QWheelEvent* event);
+		virtual void initialise(void);
+		virtual void update(void);
+		virtual void shutdown(void);
 
 	public:
 		void addResourceDirectory(const QString& directoryName);
@@ -89,9 +77,6 @@ namespace Thermite
 	public:
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
-
-		void initialiseHandler(void);
-		void updateHandler(void);
 
 		//Scene representation
 		Camera* mCamera;
@@ -128,28 +113,7 @@ namespace Thermite
 
 		//Other
 		bool mFirstFind;
-
-		//Game specific
-		Object* cameraNode;
-		float cameraSpeedInUnitsPerSecond;
-		QVector3D cameraFocusPoint;
-		float cameraElevationAngle;
-		float cameraRotationAngle;
-		float cameraDistance;
-
-		Volume* volume;
-		Entity* cursor;
-		Entity* mMissile;
-		Light* light0;
-		Entity* fireball;
-		float explosionSize;
-		float explosionStartTime;
-		float explosionAge;
-
-		float currentTimeInSeconds;
-		float timeElapsedInSeconds;
-		float previousTimeInMS;
 	};
 }
 
-#endif /*THERMITE_EVENTHANDLINGOGREWIDGET_H_*/
+#endif /*THERMITE_VIEWWIDGET_H_*/

@@ -9,7 +9,8 @@ class QSettings;
 
 namespace Thermite
 {
-	class EventHandlingOgreWidget;
+	class ViewWidget;
+	class TankWarsViewWidget;
 	class FPSDialog;
 	class GameLogic;
 	class GraphicsSettingsWidget;
@@ -71,8 +72,6 @@ namespace Thermite
 		//@}
 		
 		//Static functions
-		/// Start the main event loop.
-		static int exec();
 		/// Utility function to center a widget.
 		static void centerWidget(QWidget* widgetToCenter, QWidget* parent = 0);
 
@@ -93,7 +92,7 @@ namespace Thermite
 		void initialiseOgre(void);
 
 		//Widgets
-		EventHandlingOgreWidget* mOgreWidget;
+		TankWarsViewWidget* mOgreWidget;
 
 		//Ogre Stuff
 		Ogre::RenderSystem* mActiveRenderSystem;

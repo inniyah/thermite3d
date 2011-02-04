@@ -27,11 +27,13 @@ SET(MAIN_SRC_FILES
 	
 	source/AbstractSettingsWidget.cpp
 	source/Application.cpp
-	source/EventHandlingOgreWidget.cpp
 	source/FPSDialog.cpp
 	source/GraphicsSettingsWidget.cpp
 	source/OgreWidget.cpp
 	source/SettingsDialog.cpp
+	source/TankWarsApplication.cpp
+	source/TankWarsViewWidget.cpp
+	source/ViewWidget.cpp
 )
 
 SET(MAIN_INC_FILES
@@ -44,12 +46,14 @@ SET(MAIN_INC_FILES
 	
 	include/AbstractSettingsWidget.h
 	include/Application.h
-	include/EventHandlingOgreWidget.h
 	include/FPSDialog.h
 	include/GraphicsSettingsWidget.h
 	include/OgreWidget.h
 	include/QtOgreForwardDeclarations.h
 	include/SettingsDialog.h
+	include/TankWarsApplication.h
+	include/TankWarsViewWidget.h
+	include/ViewWidget.h
 )
 
 SET(MAIN_UI_FILES

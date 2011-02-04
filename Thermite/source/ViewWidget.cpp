@@ -1,4 +1,4 @@
-#include "EventHandlingOgreWidget.h"
+#include "ViewWidget.h"
 
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -53,7 +53,7 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	EventHandlingOgreWidget::EventHandlingOgreWidget(QWidget* parent, Qt::WindowFlags f)
+	ViewWidget::ViewWidget(QWidget* parent, Qt::WindowFlags f)
 	:OgreWidget(parent, f)
 
 		//Scene representation
@@ -97,15 +97,15 @@ namespace Thermite
 		Object::mParentList = &mObjectList;
 	}
 
-	EventHandlingOgreWidget::~EventHandlingOgreWidget()
+	ViewWidget::~ViewWidget()
 	{
 	}
 
-	void EventHandlingOgreWidget::initialise(void)
+	void ViewWidget::initialise(void)
 	{
 		//Set the main window icon
 		QIcon mainWindowIcon(QPixmap(QString::fromUtf8(":/images/thermite_logo.svg")));
-		qApp->mainWidget()->setWindowIcon(mainWindowIcon);
+		setWindowIcon(mainWindowIcon);
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
@@ -139,15 +139,13 @@ namespace Thermite
 
 		TextManager* sm = new TextManager;
 
-		qApp->mainWidget()->setMouseTracking(true);	
+		setMouseTracking(true);	
 		
 		loadApp(QString::fromAscii("TankWars"));
 	}
 
-	void EventHandlingOgreWidget::update(void)
+	void ViewWidget::update(void)
 	{
-		updateHandler();
-
 		QListIterator<Object*> objectIter(mObjectList);
 		while(objectIter.hasNext())
 		{				
@@ -437,66 +435,12 @@ namespace Thermite
 		OgreWidget::update();
 	}
 
-	void EventHandlingOgreWidget::shutdown(void)
+	void ViewWidget::shutdown(void)
 	{
 		Ogre::Root::getSingleton().destroySceneManager(mOgreSceneManager);
 	}
 
-	void EventHandlingOgreWidget::closeEvent(QCloseEvent *event)
-	{
-		//We ignore this event because we wish to keep the MainWindow
-		//open so that the log file can be seen duing shutdown.
-		event->ignore();
-		qApp->shutdown();		
-	}
-
-	void EventHandlingOgreWidget::keyPressEvent(QKeyEvent* event)
-	{
-		keyboard->press(event->key());
-	}
-
-	void EventHandlingOgreWidget::keyReleaseEvent(QKeyEvent* event)
-	{
-		keyboard->release(event->key());
-	}
-
-	void EventHandlingOgreWidget::mousePressEvent(QMouseEvent* event)
-	{
-		mouse->press(event->button());
-	
-		//Update the mouse position as well or we get 'jumps'
-		mouse->setPosition(event->pos());
-		mouse->setPreviousPosition(mouse->position());
-	}
-
-	void EventHandlingOgreWidget::mouseReleaseEvent(QMouseEvent* event)
-	{
-		mouse->release(event->button());
-	}
-
-	void EventHandlingOgreWidget::mouseDoubleClickEvent(QMouseEvent* event)
-	{
-		/*if(mEventHandler != 0)
-		{
-			mEventHandler->onMouseDoubleClick(event);
-		}
-		else
-		{
-			QWidget::mouseDoubleClickEvent(event);
-		}*/
-	}
-
-	void EventHandlingOgreWidget::mouseMoveEvent(QMouseEvent* event)
-	{
-		mouse->setPosition(event->pos());
-	}
-
-	void EventHandlingOgreWidget::wheelEvent(QWheelEvent* event)
-	{
-		mouse->modifyWheelDelta(event->delta());
-	}
-
-	bool EventHandlingOgreWidget::loadApp(const QString& appName)
+	bool ViewWidget::loadApp(const QString& appName)
 	{
 		QString appDirectory("../share/thermite/apps/" + appName);
 
@@ -513,17 +457,15 @@ namespace Thermite
 		addResourceDirectory(appDirectory);
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-		initialiseHandler();
-
 		return true;
 	}
 
-	void EventHandlingOgreWidget::unloadApp(void)
+	void ViewWidget::unloadApp(void)
 	{
 		Ogre::ResourceGroupManager::getSingleton().shutdownAll();
 	}
 
-	void EventHandlingOgreWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region, Volume& volume)
+	void ViewWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region, Volume& volume)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 
@@ -570,7 +512,7 @@ namespace Thermite
 		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
-	void EventHandlingOgreWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region)
+	void ViewWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region)
 	{
 
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -598,7 +540,7 @@ namespace Thermite
 		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 
-	void EventHandlingOgreWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume)
+	void ViewWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume)
 	{
 		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
 
@@ -653,7 +595,7 @@ namespace Thermite
 		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
-	void EventHandlingOgreWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region)
+	void ViewWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region)
 	{
 
 		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
@@ -705,7 +647,7 @@ namespace Thermite
 		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 
-	void EventHandlingOgreWidget::addResourceDirectory(const QString& directoryName)
+	void ViewWidget::addResourceDirectory(const QString& directoryName)
 	{
 		QDir appDir(directoryName);
 		if(appDir.exists())
@@ -722,7 +664,7 @@ namespace Thermite
 		}
 	}
 
-	void EventHandlingOgreWidget::createAxis(void)
+	void ViewWidget::createAxis(void)
 	{
 		//Create the main node for the axes
 		m_axisNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode();
@@ -751,10 +693,10 @@ namespace Thermite
 		axisNode->attachObject(axis);		
 	}
 
-	void EventHandlingOgreWidget::playStartupMovie(void)
+	void ViewWidget::playStartupMovie(void)
 	{
 		m_pThermiteLogoMovie = new QMovie(QString::fromUtf8(":/animations/thermite_logo.mng"));
-		m_pThermiteLogoLabel = new QLabel(qApp->mainWidget(), Qt::FramelessWindowHint | Qt::Tool);
+		m_pThermiteLogoLabel = new QLabel(this, Qt::FramelessWindowHint | Qt::Tool);
 		connect(m_pThermiteLogoMovie, SIGNAL(finished(void)), this, SLOT(showLastMovieFrame(void)));
 		m_pThermiteLogoLabel->setMovie(m_pThermiteLogoMovie);
 		m_pThermiteLogoMovie->jumpToFrame(0);
@@ -763,12 +705,12 @@ namespace Thermite
 		m_pThermiteLogoMovie->start();
 	}
 
-	void EventHandlingOgreWidget::showLastMovieFrame(void)
+	void ViewWidget::showLastMovieFrame(void)
 	{
 		QTimer::singleShot(1000, this, SLOT(deleteMovie()));
 	}
 
-	void EventHandlingOgreWidget::deleteMovie(void)
+	void ViewWidget::deleteMovie(void)
 	{
 		if(m_pThermiteLogoLabel != 0)
 		{
@@ -782,7 +724,7 @@ namespace Thermite
 		}
 	}
 
-	QVector3D EventHandlingOgreWidget::getPickingRayOrigin(int x, int y)
+	QVector3D ViewWidget::getPickingRayOrigin(int x, int y)
 	{
 		float actualWidth = mOgreCamera->getViewport()->getActualWidth();
 		float actualHeight = mOgreCamera->getViewport()->getActualHeight();
@@ -795,7 +737,7 @@ namespace Thermite
 		return QVector3D(pickingRay.getOrigin().x, pickingRay.getOrigin().y, pickingRay.getOrigin().z);
 	}
 
-	QVector3D EventHandlingOgreWidget::getPickingRayDir(int x, int y)
+	QVector3D ViewWidget::getPickingRayDir(int x, int y)
 	{
 		float actualWidth = mOgreCamera->getViewport()->getActualWidth();
 		float actualHeight = mOgreCamera->getViewport()->getActualHeight();
@@ -808,7 +750,7 @@ namespace Thermite
 		return QVector3D(pickingRay.getDirection().x, pickingRay.getDirection().y, pickingRay.getDirection().z);
 	}
 
-	void EventHandlingOgreWidget::deleteSceneNodeChildren(Ogre::SceneNode* sceneNode)
+	void ViewWidget::deleteSceneNodeChildren(Ogre::SceneNode* sceneNode)
 	{
 		//Delete any attached objects
 		Ogre::SceneNode::ObjectIterator iter =  sceneNode->getAttachedObjectIterator();
@@ -833,118 +775,5 @@ namespace Thermite
 				deleteSceneNodeChildren(childSceneNode);
 			}
 		}		
-	}
-
-	void EventHandlingOgreWidget::initialiseHandler(void)
-	{
-		//Light setup
-		light0 = new Light();
-		light0->setType(Light::DirectionalLight);
-		light0->setPosition(QVector3D(64,128,255));
-		light0->lookAt(QVector3D(128,0,128));
-		light0->setColour(QColor(255,255,255));
-
-		//Camera setup
-		cameraNode = new Object();
-		cameraSpeedInUnitsPerSecond = 100;
-		cameraFocusPoint = QVector3D(128, 10, 128);
-		cameraElevationAngle = 30.0;
-		cameraRotationAngle = 0.0;
-		cameraDistance = 100.0;
-
-		mCamera->setParent(cameraNode);
-
-		//Skybox setup
-		mSkyBox->setMaterialName("CraterLakeMaterial");
-
-		//A fireball
-		fireball = new Entity();
-		fireball->setMeshName("Icosphere7.mesh");
-		fireball->setPosition(QVector3D(128,32,128));
-		fireball->setSize(QVector3D(5,5,5));
-		fireball->setMaterialName("FireballMaterial");
-		explosionSize = 10.0;
-
-		//Cursor
-		cursor = new Entity();
-		cursor->setMeshName("Voxel.mesh");
-		cursor->setSize(QVector3D(1.1,1.1,1.1));
-
-		//Missile
-		mMissile = new Entity();
-		mMissile->setMeshName("missile.mesh");
-		mMissile->setPosition(QVector3D(128,32,128));
-		mMissile->setMaterialName("VertexColourMaterial");
-
-		//Our main volume
-		volume = new Volume();
-		volume->generateMapForTankWars();
-	}
-
-	void EventHandlingOgreWidget::updateHandler(void)
-	{
-		currentTimeInSeconds = globals.timeSinceAppStart() * 0.001f;
-		timeElapsedInSeconds = currentTimeInSeconds - previousTimeInMS;
-		previousTimeInMS = currentTimeInSeconds;
-
-		//Camera rotation and zooming is allowed in all states.
-		if(mouse->isPressed(Qt::RightButton))
-		{
-			float mouseDeltaX = mouse->position().x() - mouse->previousPosition().x();
-			cameraRotationAngle += mouseDeltaX;
-
-			float mouseDeltaY = mouse->position().y() - mouse->previousPosition().y();
-			cameraElevationAngle += mouseDeltaY;
-
-			cameraElevationAngle = qMin(cameraElevationAngle, 90.0f);
-			cameraElevationAngle = qMax(cameraElevationAngle, 0.0f);
-		}
-		if(mouse->isPressed(Qt::LeftButton))
-		{
-			volume->createSphereAt(cursor->position(), explosionSize, 0, false);
-			fireball->setPosition(cursor->position());
-			explosionStartTime = currentTimeInSeconds;
-		}
-		
-		float wheelDelta = mouse->getWheelDelta();
-		cameraDistance -= wheelDelta / 12; //10 units at a time.
-		cameraDistance = qMin(cameraDistance, 1000.0f);
-		cameraDistance = qMax(cameraDistance, 10.0f);
-
-
-		cameraNode->setOrientation(QQuaternion());	
-		cameraNode->yaw(-cameraRotationAngle);
-		cameraNode->pitch(-cameraElevationAngle);
-
-		cameraNode->setPosition(cameraFocusPoint); //Not from script...
-
-		mCamera->setOrientation(QQuaternion());
-		mCamera->setPosition(QVector3D(0,0,cameraDistance));
-
-		//Update the mouse cursor.
-		QVector3D rayOrigin = getPickingRayOrigin(mouse->position().x(),mouse->position().y());
-		QVector3D rayDir = getPickingRayDir(mouse->position().x(),mouse->position().y());
-		QVector3D intersection = volume->getRayVolumeIntersection(rayOrigin, rayDir);
-		QVector3D clampedIntersection = QVector3D
-		(
-			qRound(intersection.x()),
-			qRound(intersection.y()),
-			qRound(intersection.z())
-		);
-		cursor->setPosition(clampedIntersection);
-
-		//Update the fireball
-		explosionAge = currentTimeInSeconds - explosionStartTime;
-
-		//Compute radius from volume
-		float fireballVolume = explosionAge * 10000.0f;
-		float rCubed = (3.0*fireballVolume) / (4.0f * 3.142f);
-		float r = qPow(rCubed, 1.0f/3.0f);
-
-		float fireballRadius = r;
-		if(fireballRadius > 0.001f)
-		{
-			fireball->setSize(QVector3D(fireballRadius, fireballRadius, fireballRadius));
-		}
 	}
 }

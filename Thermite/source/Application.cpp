@@ -1,6 +1,6 @@
 #include "Application.h"
 
-#include "EventHandlingOgreWidget.h"
+#include "TankWarsViewWidget.h"
 #include "FPSDialog.h"
 #include "GraphicsSettingsWidget.h"
 #include "LogManager.h"
@@ -45,7 +45,7 @@ namespace Thermite
 		//Load the settings file. If it doesn't exist it is created.
 		mSettings = new QSettings("settings.ini", QSettings::IniFormat);
 
-		mOgreWidget = new EventHandlingOgreWidget(0, 0);
+		mOgreWidget = new TankWarsViewWidget(0, 0);
 
 		//Create the Ogre::Root object.
 		qDebug("Creating Ogre::Root object...");
@@ -206,16 +206,6 @@ namespace Thermite
 		Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
 
 		Ogre::Root::getSingletonPtr()->initialise(false);
-	}
-
-	////////////////////////////////////////////////////////////////////////////////
-	/// \param displaySettingsDialog should the settings dialog be displayed
-	/// \return the application return code
-	////////////////////////////////////////////////////////////////////////////////
-	int Application::exec()
-	{
-		qApp->initialise();
-		return QApplication::exec();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////

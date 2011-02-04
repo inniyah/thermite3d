@@ -6,7 +6,8 @@ namespace Thermite
 	class AbstractSettingsWidget;
 	class Application;
 	class DotSceneHandler;
-	class EventHandlingOgreWidget;
+	class ViewWidget;
+	class TankWarsViewWidget;
 	class FPSDialog;
 	class GameLogic;
 	class GraphicsSettingsWidget;
