@@ -76,6 +76,7 @@ namespace Thermite
 		void generateMapForTankWars(void);
 		void generateHillyMapForTankWars(void);
 		void generateRockyMapForTankWars(void);
+		void generateMengerSponge(void);
 
 	public:
 		static TaskProcessorThread* m_backgroundThread;

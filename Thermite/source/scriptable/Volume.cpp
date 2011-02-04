@@ -686,6 +686,82 @@ namespace Thermite
 		return;
 	}
 
+	void Volume::generateMengerSponge(void)
+	{
+		const int mapWidth = 128;
+		const int mapHeight = 128;
+		const int mapDepth = 128;
+
+		int spongeWidth = 1;
+		while(spongeWidth < mapWidth / 3)
+		{
+			spongeWidth *= 3;
+		}
+
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,mapHeight,mapDepth);
+
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int y = 0; y < mapHeight; y++)
+			{
+				for(int x = 0; x < mapWidth; x++) 
+				{
+					bool solid = true;
+
+					int i = x;
+					int j = y;
+					int k = z;
+
+					int centred;
+
+					for(int ct = 0; ct < 5; ct++)
+					{
+						centred = 0;
+						if(i % 3 == 1)
+							centred++;
+						if(j % 3 == 1)
+							centred++;
+						if(k % 3 == 1)
+							centred++;
+
+						if(centred >= 2)
+							solid = false;
+
+						i/=3;
+						j/=3;
+						k/=3;
+					}
+
+					if(x >= spongeWidth)
+						solid = false;
+					if(y >= spongeWidth)
+						solid = false;
+					if(z >= spongeWidth)
+						solid = false;
+
+					
+
+					Material8 voxel;
+					if(solid)
+					{
+						voxel.setMaterial(60);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(Material8::getMinDensity());
+					}
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
+		return;
+	}
+
 	int Volume::materialAtPosition(QVector3D position)
 	{
 		int x = qRound(position.x());
