@@ -5,6 +5,8 @@
 
 #include <QApplication>
 
+#include "Object.h"
+
 class QSettings;
 
 namespace Thermite
@@ -12,34 +14,19 @@ namespace Thermite
 	class ViewWidget;
 	class TankWarsViewWidget;
 	class FPSDialog;
-	class GameLogic;
 	class GraphicsSettingsWidget;
 	class Log;
 	class LogManager;
 	class SettingsDialog;
 	class AbstractSettingsWidget;
-	
-	////////////////////////////////////////////////////////////////////////////////
-	/// The entry point for QtOgre
-	/// 
-	/// Usage:
-	/// \code
-	/// int main(int argc, char *argv[])
-	/// {
-	/// 	Application app(argc, argv, new MyGameLogic);
-	/// 	return app.exec();
-	/// }
-	/// \endcode
-	/// Where \c MyGameLogic is a GameLogic subclass
-	/// \author David Williams
-	////////////////////////////////////////////////////////////////////////////////
+
 	class Application : public QApplication
 	{
 		Q_OBJECT
 
 	public:
 		/// Creates an instance of the Application class.
-		Application(int & argc, char ** argv, GameLogic* gameLogic = 0);
+		Application(int & argc, char ** argv);
 		/// Destroys an instance of the Application class
 		~Application();
 
@@ -86,6 +73,9 @@ namespace Thermite
 		virtual void update(void);	
 
 	public:
+		QList<ViewWidget*> mViewWidgets;
+		QList<Object*> mObjectList;
+
 		//Ogre Stuff
 		Ogre::RenderSystem* mActiveRenderSystem;
 		Ogre::RenderSystem* mOpenGLRenderSystem;
@@ -94,7 +84,6 @@ namespace Thermite
 
 		//Misc
 		unsigned int mFrameCounter;
-		GameLogic* mGameLogic;
 		QTimer* mAutoUpdateTimer;
 		QSettings* mSettings;
 		bool mAutoUpdateEnabled;

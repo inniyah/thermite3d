@@ -9,7 +9,6 @@ namespace Thermite
 	class ViewWidget;
 	class TankWarsViewWidget;
 	class FPSDialog;
-	class GameLogic;
 	class GraphicsSettingsWidget;
 	class Log;
 	class LogEntry;

@@ -11,7 +11,7 @@ namespace Thermite
 		TankWarsApplication(int & argc, char ** argv);
 		~TankWarsApplication();
 
-		void update(void);
+		//void update(void);
 		void shutdown(void);
 
 	private:

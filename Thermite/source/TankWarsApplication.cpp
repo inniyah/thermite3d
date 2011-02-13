@@ -8,17 +8,6 @@ namespace Thermite
 		:Application(argc, argv)
 		,mOgreWidget(0)
 	{
-		mOgreWidget = new TankWarsViewWidget(0, 0);
-
-		Ogre::NameValuePairList ogreWindowParams;
-		ogreWindowParams["FSAA"] = "8";
-		mOgreWidget->initialiseOgre(&ogreWindowParams);
-
-		mOgreWidget->initialise();
-
-		mOgreWidget->show();
-		mOgreWidget->resize(800,600);
-		centerWidget(mOgreWidget);
 	}
 
 	TankWarsApplication::~TankWarsApplication()
@@ -30,7 +19,7 @@ namespace Thermite
 		}
 	}
 
-	void TankWarsApplication::update(void)
+	/*void TankWarsApplication::update(void)
 	{
 		if(mOgreWidget)
 		{
@@ -38,7 +27,7 @@ namespace Thermite
 		}
 
 		Application::update();
-	}
+	}*/
 
 	void TankWarsApplication::shutdown(void)
 	{

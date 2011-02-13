@@ -93,8 +93,6 @@ namespace Thermite
 		keyboard = new Keyboard(this);
 		mouse = new Mouse(this);	
 		mSkyBox = new SkyBox(this);
-
-		Object::mParentList = &mObjectList;
 	}
 
 	ViewWidget::~ViewWidget()
@@ -146,7 +144,7 @@ namespace Thermite
 
 	void ViewWidget::update(void)
 	{
-		QListIterator<Object*> objectIter(mObjectList);
+		QListIterator<Object*> objectIter(qApp->mObjectList);
 		while(objectIter.hasNext())
 		{				
 			Object* pObj = objectIter.next();
@@ -160,7 +158,7 @@ namespace Thermite
 
 		if(mOgreSceneManager)
 		{
-			QListIterator<Object*> objectIter(mObjectList);
+			QListIterator<Object*> objectIter(qApp->mObjectList);
 			while(objectIter.hasNext())
 			{				
 				Object* pObj = objectIter.next();

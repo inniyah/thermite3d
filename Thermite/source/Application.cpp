@@ -21,19 +21,20 @@
 
 namespace Thermite
 {
-	Application::Application(int& argc, char** argv, GameLogic* gameLogic)
+	Application::Application(int& argc, char** argv)
 	:QApplication(argc, argv)
 	,mActiveRenderSystem(0)
 	,mOpenGLRenderSystem(0)
 	,mDirect3D9RenderSystem(0)
 	,mRoot(0)
 	,mFrameCounter(0)
-	,mGameLogic(gameLogic)
 	,mAutoUpdateTimer(0)
 	,mSettings(0)
 	,mAutoUpdateEnabled(true)
 	,mIsInitialised(false)
 	{
+		Object::mParentList = &mObjectList;
+
 		mAutoUpdateTimer = new QTimer;
 		QObject::connect(mAutoUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
 		//On the test system, a value of one here gives a high frame rate and still allows
@@ -161,6 +162,11 @@ namespace Thermite
 
 	void Application::update(void)
 	{
+		ViewWidget* viewWidget;
+		foreach(viewWidget, mViewWidgets)
+		{
+			viewWidget->update();
+		}
 		++mFrameCounter;
 	}
 

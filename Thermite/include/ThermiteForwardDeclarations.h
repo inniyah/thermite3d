@@ -42,9 +42,7 @@ namespace Thermite
 	class Task;
 	class TaskProcessorThread;
 
-	//Other
-	class ApplicationGameLogic;
-	
+	//Other	
 	class PhysicalObject;
 	
 	class SurfacePatchRenderable;

@@ -83,7 +83,6 @@ namespace Thermite
 		SkyBox* mSkyBox;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
 		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
-		QList<Object*> mObjectList;
 		uint16_t mCachedVolumeWidthInRegions;
 		uint16_t mCachedVolumeHeightInRegions;
 		uint16_t mCachedVolumeDepthInRegions;

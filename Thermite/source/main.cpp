@@ -22,6 +22,7 @@ freely, subject to the following restrictions:
 *******************************************************************************/
 
 #include "TankWarsApplication.h"
+#include "TankWarsViewWidget.h"
 
 #include <QPushButton>
 #include <QIcon>
@@ -31,5 +32,20 @@ using namespace Thermite;
 int main(int argc, char *argv[])
 {
 	TankWarsApplication app(argc, argv);
+
+	TankWarsViewWidget* mOgreWidget = new TankWarsViewWidget(0, 0);
+
+	Ogre::NameValuePairList ogreWindowParams;
+	ogreWindowParams["FSAA"] = "8";
+	mOgreWidget->initialiseOgre(&ogreWindowParams);
+
+	mOgreWidget->initialise();
+
+	mOgreWidget->show();
+	mOgreWidget->resize(800,600);
+	app.centerWidget(mOgreWidget);
+
+	app.mViewWidgets.append(mOgreWidget);
+
 	return app.exec();
 }
