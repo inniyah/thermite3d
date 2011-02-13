@@ -21,7 +21,7 @@ freely, subject to the following restrictions:
     distribution. 	
 *******************************************************************************/
 
-#include "Application.h"
+#include "TankWarsApplication.h"
 
 #include <QPushButton>
 #include <QIcon>
@@ -30,7 +30,6 @@ using namespace Thermite;
 
 int main(int argc, char *argv[])
 {
-	Application app(argc, argv, 0);
-	app.initialise();
+	TankWarsApplication app(argc, argv);
 	return app.exec();
 }

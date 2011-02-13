@@ -48,9 +48,7 @@ namespace Thermite
 		/// The total number of frames rendered
 		unsigned int frameCount(void) const;
 		/// Get the OGRE RenderWindow for adding viewports   
-		Ogre::RenderWindow* ogreRenderWindow(void) const;
-		/// Get the main window widget
-		QWidget* mainWidget(void) const;
+		//Ogre::RenderWindow* ogreRenderWindow(void) const;
 		/// Access the application settings
 		QSettings* settings(void) const;
 		//@}
@@ -84,16 +82,10 @@ namespace Thermite
 
 	public slots:
 		void applySettings(void);
-		void initialise(void);
-		void shutdown(void);
-		void update(void);	
+		virtual void shutdown(void);
+		virtual void update(void);	
 
-	private:
-		void initialiseOgre(void);
-
-		//Widgets
-		TankWarsViewWidget* mOgreWidget;
-
+	public:
 		//Ogre Stuff
 		Ogre::RenderSystem* mActiveRenderSystem;
 		Ogre::RenderSystem* mOpenGLRenderSystem;

@@ -23,7 +23,6 @@ namespace Thermite
 {
 	Application::Application(int& argc, char** argv, GameLogic* gameLogic)
 	:QApplication(argc, argv)
-	,mOgreWidget(0)
 	,mActiveRenderSystem(0)
 	,mOpenGLRenderSystem(0)
 	,mDirect3D9RenderSystem(0)
@@ -44,8 +43,6 @@ namespace Thermite
 
 		//Load the settings file. If it doesn't exist it is created.
 		mSettings = new QSettings("settings.ini", QSettings::IniFormat);
-
-		mOgreWidget = new TankWarsViewWidget(0, 0);
 
 		//Create the Ogre::Root object.
 		qDebug("Creating Ogre::Root object...");
@@ -88,6 +85,30 @@ namespace Thermite
 			qCritical("No rendering subsystems found");
 			showErrorMessageBox("No rendering subsystems found. Please ensure that your 'plugins.cfg' (or 'plugins_d.cfg') is correct and can be found by the executable.");
 		}
+
+		QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
+		if(renderSystem.compare("OpenGL Rendering Subsystem") == 0)
+		{
+			mActiveRenderSystem = mOpenGLRenderSystem;
+		}
+		if(renderSystem.compare("Direct3D9 Rendering Subsystem") == 0)
+		{
+			mActiveRenderSystem = mDirect3D9RenderSystem;
+		}
+
+		Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
+
+		Ogre::Root::getSingletonPtr()->initialise(false);
+
+
+		/**/
+
+		if(mAutoUpdateEnabled)
+		{
+			mAutoUpdateTimer->start();
+		}
+
+		mIsInitialised = true;
 	}
 
 	Application::~Application()
@@ -96,15 +117,7 @@ namespace Thermite
 		{
             delete mRoot;
 			mRoot = 0;
-		}
-
-		//We delete the OgreWidget last because it
-		//owns the LogManager (through Qt's mechanism).
-		if(mOgreWidget)
-		{
-			delete mOgreWidget;
-			mOgreWidget = 0;
-		}
+		}		
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -131,22 +144,14 @@ namespace Thermite
 		return mFrameCounter;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
-	/// \return a pointer to the applications main window.
-	////////////////////////////////////////////////////////////////////////////////
-	QWidget* Application::mainWidget(void) const
-	{
-		return mOgreWidget;
-	}
-
 	void Application::applySettings(void)
 	{
 		//Eventually Application settings might be applied here.
 		//Until then, we just pass the settings on the the MainWindow and GameLogic
-		if(!mOgreWidget->applySettings(mSettings))
+		/*if(!mOgreWidget->applySettings(mSettings))
 		{
 			showWarningMessageBox("Unable to apply desired settings to the window.\nPlease consult the system log for details");
-		}
+		}*/
 
 		/*if(mGameLogic != 0)
 		{
@@ -154,58 +159,15 @@ namespace Thermite
 		}*/
 	}
 
-	void Application::initialise(void)
-	{
-
-		mOgreWidget->show();
-		mOgreWidget->resize(800,600);
-		centerWidget(mOgreWidget);
-
-		initialiseOgre();
-
-		Ogre::NameValuePairList ogreWindowParams;
-		//ogreWindowParams["FSAA"] = "8";
-		mOgreWidget->initialiseOgre(&ogreWindowParams);
-
-		mOgreWidget->initialise();
-
-		if(mAutoUpdateEnabled)
-		{
-			mAutoUpdateTimer->start();
-		}
-
-		mIsInitialised = true;
-	}
-
 	void Application::update(void)
 	{
-		//mGameLogic->update();
-		mOgreWidget->update();
 		++mFrameCounter;
 	}
 
 	void Application::shutdown(void)
 	{
 		mAutoUpdateTimer->stop();
-		mOgreWidget->shutdown();
 		this->exit(0);
-	}
-
-	void Application::initialiseOgre(void)
-	{
-		QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
-		if(renderSystem.compare("OpenGL Rendering Subsystem") == 0)
-		{
-			mActiveRenderSystem = mOpenGLRenderSystem;
-		}
-		if(renderSystem.compare("Direct3D9 Rendering Subsystem") == 0)
-		{
-			mActiveRenderSystem = mDirect3D9RenderSystem;
-		}
-
-		Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
-
-		Ogre::Root::getSingletonPtr()->initialise(false);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -274,10 +236,10 @@ namespace Thermite
 	////////////////////////////////////////////////////////////////////////////////
 	/// \return a pointer to the Ogre RenderWindow
 	//////////////////////////////////////////////////////////////////////////////// 
-	Ogre::RenderWindow* Application::ogreRenderWindow(void) const
+	/*Ogre::RenderWindow* Application::ogreRenderWindow(void) const
 	{
 		return mOgreWidget->getOgreRenderWindow();
-	}
+	}*/
 
 	////////////////////////////////////////////////////////////////////////////////
 	/// \return a pointer to the application settings

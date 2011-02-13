@@ -58,7 +58,6 @@ namespace Thermite
 		std::istream stdStream(new DataStreamWrapper(stream)); 
 		m_pVolume = new PolyVox::Volume<Material8>(64,64,64,32);
 		loadVolume<Material8>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
-		m_pVolume->tidyUpMemory();
 	}
 
 	void VolumeResource::unloadImpl ()
