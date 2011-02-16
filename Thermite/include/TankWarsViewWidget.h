@@ -53,6 +53,10 @@ namespace Thermite
 		float currentTimeInSeconds;
 		float timeElapsedInSeconds;
 		float previousTimeInMS;
+
+		Object* fireballObject;
+		Object* cursorObject;
+		Object* cameraObject;
 	};
 }
 

@@ -79,8 +79,8 @@ namespace Thermite
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
 
 		//Scene representation
-		Camera* mCamera;
-		SkyBox* mSkyBox;
+		//Camera* mCamera;
+		//SkyBox* mSkyBox;
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
 		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
 		uint16_t mCachedVolumeWidthInRegions;

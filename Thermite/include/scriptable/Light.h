@@ -1,14 +1,14 @@
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-#include "Object.h"
+#include "RenderComponent.h"
 
 #include <QColor>
 #include <QVector3D>
 
 namespace Thermite
 {
-	class Light : public Object
+	class Light : public RenderComponent
 	{
 		Q_OBJECT
 
@@ -26,7 +26,7 @@ namespace Thermite
 			SpotLight = 2
 		};
 
-		Light(QObject* parent = 0);
+		Light(Object* parent = 0);
 
 		const QColor& getColour(void) const;
 		void setColour(const QColor& col);

@@ -2,8 +2,8 @@
 
 namespace Thermite
 {
-	Light::Light(QObject* parent)
-		:Object(parent)
+	Light::Light(Object* parent)
+		:RenderComponent(parent)
 		,m_colColour(255,255,255)
 		,mType(PointLight)
 	{
@@ -17,7 +17,7 @@ namespace Thermite
 	void Light::setColour(const QColor& col)
 	{
 		m_colColour = col;
-		setModified(true);
+		mParent->setModified(true);
 	}
 
 	Light::LightType Light::getType(void) const
@@ -28,6 +28,6 @@ namespace Thermite
 	void Light::setType(Light::LightType type)
 	{
 		mType = type;
-		setModified(true);
+		mParent->setModified(true);
 	}
 }

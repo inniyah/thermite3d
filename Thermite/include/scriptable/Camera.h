@@ -1,18 +1,18 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-#include "Object.h"
+#include "RenderComponent.h"
 
 #include <QVector3D>
 
 namespace Thermite
 {
-	class Camera : public Object
+	class Camera : public RenderComponent
 	{
 		Q_OBJECT
 
 	public:
-		Camera(QObject* parent = 0);
+		Camera(Object* parent = 0);
 
 		Q_PROPERTY(float fieldOfView READ fieldOfView WRITE setFieldOfView)
 

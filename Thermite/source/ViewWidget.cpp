@@ -57,8 +57,8 @@ namespace Thermite
 	:OgreWidget(parent, f)
 
 		//Scene representation
-		,mCamera(0)
-		,mSkyBox(0)
+		//,mCamera(0)
+		//,mSkyBox(0)
 		//,mVolLastUploadedTimeStamps(0)
 		//,mObjectList(0)
 		,mCachedVolumeWidthInRegions(0)
@@ -89,10 +89,10 @@ namespace Thermite
 		//Other
 		,mFirstFind(false)
 	{	
-		mCamera = new Camera(this);
-		keyboard = new Keyboard(this);
-		mouse = new Mouse(this);	
-		mSkyBox = new SkyBox(this);
+		//mCamera = new Camera(0);
+		keyboard = new Keyboard(0);
+		mouse = new Mouse(0);	
+		//mSkyBox = new SkyBox(0);
 	}
 
 	ViewWidget::~ViewWidget()
@@ -115,7 +115,7 @@ namespace Thermite
 		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
 
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
-		mCameraSceneNode->attachObject(mOgreCamera);
+		//mCameraSceneNode->attachObject(mOgreCamera);
 
 		mMainViewport = getOgreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
@@ -149,7 +149,7 @@ namespace Thermite
 		{				
 			Object* pObj = objectIter.next();
 
-			Volume* volume = dynamic_cast<Volume*>(pObj);
+			Volume* volume = dynamic_cast<Volume*>(pObj->mComponent);
 			if(volume)
 			{
 				volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
@@ -199,231 +199,241 @@ namespace Thermite
 
 					sceneNode->setVisible(pObj->isVisible());
 
-					//Update the Light properties
-					Light* light = dynamic_cast<Light*>(pObj);
-					if(light)
+					if(pObj->mComponent)
 					{
-						Ogre::Light* ogreLight;
-						std::string lightName(objAddressAsString + "_Light");
-
-						if(mOgreSceneManager->hasLight(lightName))
+						//Update the Light properties
+						Light* light = dynamic_cast<Light*>(pObj->mComponent);
+						if(light)
 						{
-							ogreLight = mOgreSceneManager->getLight(lightName);
-						}
-						else
-						{
-							ogreLight = mOgreSceneManager->createLight(lightName);
-							Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
-							sceneNode->attachObject(ogreLight);
-							sceneNode->attachObject(ogreEntity);
-						}
+							Ogre::Light* ogreLight;
+							std::string lightName(objAddressAsString + "_Light");
 
-						switch(light->getType())
-						{
-						case Light::PointLight:
-							ogreLight->setType(Ogre::Light::LT_POINT);
-							break;
-						case Light::DirectionalLight:
-							ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
-							break;
-						case Light::SpotLight:
-							ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
-							break;
-						}
+							if(mOgreSceneManager->hasLight(lightName))
+							{
+								ogreLight = mOgreSceneManager->getLight(lightName);
+							}
+							else
+							{
+								ogreLight = mOgreSceneManager->createLight(lightName);
+								Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+								sceneNode->attachObject(ogreLight);
+								sceneNode->attachObject(ogreEntity);
+							}
 
-						//Note we negate the z axis as Thermite considers negative z
-						//to be forwards. This means that lights will match cameras.
-						QVector3D dir = -light->zAxis();
-						ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
+							switch(light->getType())
+							{
+							case Light::PointLight:
+								ogreLight->setType(Ogre::Light::LT_POINT);
+								break;
+							case Light::DirectionalLight:
+								ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
+								break;
+							case Light::SpotLight:
+								ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
+								break;
+							}
 
-						QColor col = light->getColour();
-						ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
-					}
+							//Note we negate the z axis as Thermite considers negative z
+							//to be forwards. This means that lights will match cameras.
+							QVector3D dir = -light->mParent->zAxis();
+							ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
 
-					//Update the Entity properties
-					Entity* entity = dynamic_cast<Entity*>(pObj);
-					if(entity && (entity->meshName().isEmpty() == false))
-					{
-						Ogre::Entity* ogreEntity;
-						std::string entityName(objAddressAsString + "_Entity");
-
-						if(mOgreSceneManager->hasEntity(entityName))
-						{
-							ogreEntity = mOgreSceneManager->getEntity(entityName);
-						}
-						else
-						{
-							ogreEntity = mOgreSceneManager->createEntity(entityName, entity->meshName().toStdString());
-							sceneNode->attachObject(ogreEntity);
-						}						
-
-						//Set a custom material if necessary
-						if(entity->materialName().isEmpty() == false)
-						{
-							//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
-							//But you can only get materials from SubEntities.
-							ogreEntity->setMaterialName(entity->materialName().toStdString());
+							QColor col = light->getColour();
+							ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
 						}
 
-						//Animation
-						Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
-						if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
+						//Update the Entity properties
+						Entity* entity = dynamic_cast<Entity*>(pObj->mComponent);
+						if(entity && (entity->meshName().isEmpty() == false))
 						{
-							Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
-							animationState->setEnabled(entity->animated());
-							animationState->setLoop(entity->loopAnimation());
-						}
-					}				
+							Ogre::Entity* ogreEntity;
+							std::string entityName(objAddressAsString + "_Entity");
 
-					//Update the Volume properties
-					Volume* volume = dynamic_cast<Volume*>(pObj);
-					if(volume)
-					{	
-						//Create a scene node to attach this volume under
-						if(mVolumeSceneNode == 0)
+							if(mOgreSceneManager->hasEntity(entityName))
+							{
+								ogreEntity = mOgreSceneManager->getEntity(entityName);
+							}
+							else
+							{
+								ogreEntity = mOgreSceneManager->createEntity(entityName, entity->meshName().toStdString());
+								sceneNode->attachObject(ogreEntity);
+							}						
+
+							//Set a custom material if necessary
+							if(entity->materialName().isEmpty() == false)
+							{
+								//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
+								//But you can only get materials from SubEntities.
+								ogreEntity->setMaterialName(entity->materialName().toStdString());
+							}
+
+							//Animation
+							Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
+							if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
+							{
+								Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
+								animationState->setEnabled(entity->animated());
+								animationState->setLoop(entity->loopAnimation());
+							}
+						}
+
+						SkyBox* skyBox = dynamic_cast<SkyBox*>(pObj->mComponent);
+						if(skyBox && (skyBox->materialName().isEmpty() == false))
 						{
-							mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
+							mOgreSceneManager->setSkyBox(true, skyBox->materialName().toStdString(), 2500);
 						}
 
-						//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
-						if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
+						Camera* camera = dynamic_cast<Camera*>(pObj->mComponent);
+						if(camera && mOgreCamera)
+						{
+							if(mCameraSceneNode->numAttachedObjects() == 0)
+							{
+								mCameraSceneNode->attachObject(mOgreCamera);
+							}
+
+							QMatrix4x4 qtTransform = camera->mParent->transform();
+							Ogre::Matrix4 ogreTransform;
+							for(int row = 0; row < 4; ++row)
+							{
+								Ogre::Real* rowPtr = ogreTransform[row];
+								for(int col = 0; col < 4; ++col)
+								{
+									Ogre::Real* colPtr = rowPtr + col;
+									*colPtr = qtTransform(row, col);
+								}
+							}
+
+							mCameraSceneNode->setOrientation(ogreTransform.extractQuaternion());
+							mCameraSceneNode->setPosition(ogreTransform.getTrans());
+
+							mOgreCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
+						}
+
+						//Update the Volume properties
+						Volume* volume = dynamic_cast<Volume*>(pObj->mComponent);
+						if(volume)
 						{	
-							deleteSceneNodeChildren(mVolumeSceneNode);
-
-							mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
-							mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
-							mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-							m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
-						
-							uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
-
-							//Create the arrays
-							mVolLastUploadedTimeStamps.resize(dimensions);
-							m_volOgreSceneNodes.resize(dimensions);
-
-							//Lighting
-							mCachedVolumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
-							mCachedVolumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
-							mCachedVolumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
-						
-							uint32_t lightDimensions[3] = {mCachedVolumeWidthInLightRegions, mCachedVolumeHeightInLightRegions, mCachedVolumeDepthInLightRegions}; // Array dimensions
-
-							//Create the arrays
-							mVolLightingLastUploadedTimeStamps.resize(lightDimensions);
-
-							//Clear the arrays
-							std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
-							std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
-
-							std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
-
-							//Resize the ambient occlusion volume texture
-							if(mAmbientOcclusionVolumeTexture.isNull() == false)
+							//Create a scene node to attach this volume under
+							if(mVolumeSceneNode == 0)
 							{
-								//Not sure if we actually need to (or even should) remove the old one first - maybe the smart pointer handles it.
-								Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
+								mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
 							}
 
-							const int iRatio = 4; //Ration od ambient occlusion volume size to main volume size.
-							mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
-							  "AmbientOcclusionVolumeTexture", // Name of texture
-							  "General", // Name of resource group in which the texture should be created
-							  Ogre::TEX_TYPE_3D, // Texture type
-							  volume->m_pPolyVoxVolume->getWidth() / iRatio, // Width
-							  volume->m_pPolyVoxVolume->getHeight() / iRatio, // Height
-							  volume->m_pPolyVoxVolume->getDepth() / iRatio, // Depth (Must be 1 for two dimensional textures)
-							  0, // Number of mipmaps
-							  Ogre::PF_L8, // Pixel format
-							  Ogre::TU_STATIC_WRITE_ONLY // usage
-							  );
-						}
+							//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
+							if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
+							{	
+								deleteSceneNodeChildren(mVolumeSceneNode);
 
-						//Some values we'll need later.
-						uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
-						uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
-						uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
+								mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
+								mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
+								mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
 
-						//Iterate over each region
-						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
-						{		
-							for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
-							{
-								for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
+								m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
+						
+								uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
+
+								//Create the arrays
+								mVolLastUploadedTimeStamps.resize(dimensions);
+								m_volOgreSceneNodes.resize(dimensions);
+
+								//Lighting
+								mCachedVolumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
+								mCachedVolumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
+								mCachedVolumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
+						
+								uint32_t lightDimensions[3] = {mCachedVolumeWidthInLightRegions, mCachedVolumeHeightInLightRegions, mCachedVolumeDepthInLightRegions}; // Array dimensions
+
+								//Create the arrays
+								mVolLightingLastUploadedTimeStamps.resize(lightDimensions);
+
+								//Clear the arrays
+								std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
+								std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
+
+								std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
+
+								//Resize the ambient occlusion volume texture
+								if(mAmbientOcclusionVolumeTexture.isNull() == false)
 								{
-									uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-									uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][regionZ];
-									if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
+									//Not sure if we actually need to (or even should) remove the old one first - maybe the smart pointer handles it.
+									Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
+								}
+
+								const int iRatio = 4; //Ration od ambient occlusion volume size to main volume size.
+								mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
+								  "AmbientOcclusionVolumeTexture", // Name of texture
+								  "General", // Name of resource group in which the texture should be created
+								  Ogre::TEX_TYPE_3D, // Texture type
+								  volume->m_pPolyVoxVolume->getWidth() / iRatio, // Width
+								  volume->m_pPolyVoxVolume->getHeight() / iRatio, // Height
+								  volume->m_pPolyVoxVolume->getDepth() / iRatio, // Depth (Must be 1 for two dimensional textures)
+								  0, // Number of mipmaps
+								  Ogre::PF_L8, // Pixel format
+								  Ogre::TU_STATIC_WRITE_ONLY // usage
+								  );
+							}
+
+							//Some values we'll need later.
+							uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
+							uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
+							uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
+
+							//Iterate over each region
+							for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
+							{		
+								for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
+								{
+									for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
 									{
-										SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
-										PolyVox::Region reg = mesh->m_Region;
-										uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
+										uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
+										uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][regionZ];
+										if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
+										{
+											SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
+											PolyVox::Region reg = mesh->m_Region;
+											uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
+										}
 									}
 								}
 							}
-						}
 
-						//Some values we'll need later.
-						uint16_t volumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
-						uint16_t volumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
-						uint16_t volumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
+							//Some values we'll need later.
+							uint16_t volumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
+							uint16_t volumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
+							uint16_t volumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
 
-						bool needsLightingUpload = false;
-						//Iterate over each region
-						for(std::uint16_t regionZ = 0; regionZ < volumeDepthInLightRegions; ++regionZ)
-						{		
-							for(std::uint16_t regionY = 0; regionY < volumeHeightInLightRegions; ++regionY)
-							{
-								for(std::uint16_t regionX = 0; regionX < volumeWidthInLightRegions; ++regionX)
+							bool needsLightingUpload = false;
+							//Iterate over each region
+							for(std::uint16_t regionZ = 0; regionZ < volumeDepthInLightRegions; ++regionZ)
+							{		
+								for(std::uint16_t regionY = 0; regionY < volumeHeightInLightRegions; ++regionY)
 								{
-									uint32_t volLightingFinsishedTimeStamp = volume->mLightingFinishedArray[regionX][regionY][regionZ];
-									uint32_t volLightingLastUploadedTimeStamp = mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ];
-									if(volLightingFinsishedTimeStamp > volLightingLastUploadedTimeStamp)
+									for(std::uint16_t regionX = 0; regionX < volumeWidthInLightRegions; ++regionX)
 									{
-										needsLightingUpload = true;
+										uint32_t volLightingFinsishedTimeStamp = volume->mLightingFinishedArray[regionX][regionY][regionZ];
+										uint32_t volLightingLastUploadedTimeStamp = mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ];
+										if(volLightingFinsishedTimeStamp > volLightingLastUploadedTimeStamp)
+										{
+											needsLightingUpload = true;
 
-										mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+											mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
+										}
 									}
 								}
 							}
-						}
-						//Ambient Occlusion
-						if(needsLightingUpload)
-						{
-							Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
-							Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), volume->mAmbientOcclusionVolume.getRawData());
-							pixelBuffer->blitFromMemory(pixelBox);
+							//Ambient Occlusion
+							if(needsLightingUpload)
+							{
+								Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
+								Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), volume->mAmbientOcclusionVolume.getRawData());
+								pixelBuffer->blitFromMemory(pixelBox);
+							}
 						}
 					}
 
 					pObj->setModified(false);
 				}
 			}
-		}
-
-		if(mOgreCamera)
-		{
-			QMatrix4x4 qtTransform = mCamera->transform();
-			Ogre::Matrix4 ogreTransform;
-			for(int row = 0; row < 4; ++row)
-			{
-				Ogre::Real* rowPtr = ogreTransform[row];
-				for(int col = 0; col < 4; ++col)
-				{
-					Ogre::Real* colPtr = rowPtr + col;
-					*colPtr = qtTransform(row, col);
-				}
-			}
-
-			mCameraSceneNode->setOrientation(ogreTransform.extractQuaternion());
-			mCameraSceneNode->setPosition(ogreTransform.getTrans());
-
-			mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
-		}
-
-		if(mSkyBox && (mSkyBox->materialName().isEmpty() == false))
-		{
-			mOgreSceneManager->setSkyBox(true, mSkyBox->materialName().toStdString(), 2500);
 		}
 
 		mouse->setPreviousPosition(mouse->position());

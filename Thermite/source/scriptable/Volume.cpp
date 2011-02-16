@@ -51,8 +51,8 @@ namespace Thermite
 {
 	TaskProcessorThread* Volume::m_backgroundThread = 0;
 
-	Volume::Volume(QObject* parent)
-		:Object(parent)
+	Volume::Volume(Object* parent)
+		:RenderComponent(parent)
 		,m_pPolyVoxVolume(0)
 		,mVolumeWidthInRegions(0)
 		,mVolumeHeightInRegions(0)
@@ -244,7 +244,7 @@ namespace Thermite
 					}
 				}
 			}
-			setModified(true);
+			mParent->setModified(true);
 		}
 	}
 
@@ -639,6 +639,8 @@ namespace Thermite
 		int volumeHeight = 64;
 
 		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,volumeHeight,mapDepth);
+
+		pPolyVoxVolume->useCompatibilityMode();
 
 		Perlin perlin(2,4,1,234);
 

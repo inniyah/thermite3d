@@ -1,15 +1,18 @@
 #include "Object.h"
 
+#include "Component.h"
+
 #include <math.h>
 
 namespace Thermite
 {
 	QList<Object*>* Object::mParentList = 0;
 
-	Object::Object(QObject * parent)
+	Object::Object(Object * parent)
 		:QObject(parent)
 		,mModified(true) //It's been constructed
 		,mVisible(true)
+		,mComponent(0)
 	{
 		if(mParentList)
 		{

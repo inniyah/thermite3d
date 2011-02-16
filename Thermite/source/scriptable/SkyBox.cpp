@@ -2,8 +2,8 @@
 
 namespace Thermite
 {
-	SkyBox::SkyBox(QObject* parent)
-		:Object(parent)
+	SkyBox::SkyBox(Object* parent)
+		:RenderComponent(parent)
 	{
 		mMaterialName = "";
 	}
@@ -16,6 +16,6 @@ namespace Thermite
 	void SkyBox::setMaterialName(const QString& name)
 	{
 		mMaterialName = name;
-		setModified(true);
+		mParent->setModified(true);
 	}
 }

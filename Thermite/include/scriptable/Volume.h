@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 #ifndef __THERMITE_VOLUME_H__
 #define __THERMITE_VOLUME_H__
 
-#include "Object.h"
+#include "RenderComponent.h"
 #include "QtForwardDeclarations.h"
 #include "ThermiteForwardDeclarations.h"
 
@@ -40,12 +40,12 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class Volume : public Object
+	class Volume : public RenderComponent
 	{
 		Q_OBJECT
 
 	public:
-		Volume(QObject* parent = 0);
+		Volume(Object* parent = 0);
 		~Volume(void);
 
 		void setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);

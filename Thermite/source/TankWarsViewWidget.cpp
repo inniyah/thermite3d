@@ -67,10 +67,13 @@ namespace Thermite
 		ViewWidget::initialise();
 
 		//Light setup
-		light0 = new Light();
+		Object* lightObject = new Object();
+		light0 = new Light(lightObject);
+		lightObject->setPosition(QVector3D(64,128,255));
+		lightObject->lookAt(QVector3D(128,0,128));
+		lightObject->mComponent = light0;
+
 		light0->setType(Light::DirectionalLight);
-		light0->setPosition(QVector3D(64,128,255));
-		light0->lookAt(QVector3D(128,0,128));
 		light0->setColour(QColor(255,255,255));
 
 		//Camera setup
@@ -81,32 +84,45 @@ namespace Thermite
 		cameraRotationAngle = 0.0;
 		cameraDistance = 100.0;
 
-		mCamera->setParent(cameraNode);
+		cameraObject = new Object(cameraNode);
+		Camera* camera = new Camera(cameraObject);
+		cameraObject->mComponent = camera;
 
 		//Skybox setup
-		mSkyBox->setMaterialName("CraterLakeMaterial");
+		Object* skyboxObject = new Object();
+		SkyBox* skyBox = new SkyBox(skyboxObject);
+		skyboxObject->mComponent = skyBox;
+		skyBox->setMaterialName("CraterLakeMaterial");
 
 		//A fireball
-		fireball = new Entity();
+		fireballObject = new Object();
+		fireball = new Entity(fireballObject);
+		fireballObject->mComponent = fireball;
 		fireball->setMeshName("Icosphere7.mesh");
-		fireball->setPosition(QVector3D(128,32,128));
-		fireball->setSize(QVector3D(5,5,5));
+		fireballObject->setPosition(QVector3D(128,32,128));
+		fireballObject->setSize(QVector3D(5,5,5));
 		fireball->setMaterialName("FireballMaterial");
 		explosionSize = 10.0;
 
 		//Cursor
-		cursor = new Entity();
+		cursorObject = new Object();
+		cursor = new Entity(cursorObject);
+		cursorObject->mComponent = cursor;
 		cursor->setMeshName("Voxel.mesh");
-		cursor->setSize(QVector3D(1.1,1.1,1.1));
+		cursorObject->setSize(QVector3D(1.1,1.1,1.1));
 
 		//Missile
-		mMissile = new Entity();
+		Object* missileObject = new Object();
+		mMissile = new Entity(missileObject);
+		missileObject->mComponent = mMissile;
 		mMissile->setMeshName("missile.mesh");
-		mMissile->setPosition(QVector3D(128,32,128));
+		missileObject->setPosition(QVector3D(128,32,128));
 		mMissile->setMaterialName("VertexColourMaterial");
 
 		//Our main volume
-		volume = new Volume();
+		Object* volumeObject = new Object();
+		volume = new Volume(volumeObject);
+		volumeObject->mComponent = volume;
 		volume->generateMapForTankWars();
 	}
 
@@ -130,8 +146,8 @@ namespace Thermite
 		}
 		if(mouse->isPressed(Qt::LeftButton))
 		{
-			volume->createSphereAt(cursor->position(), explosionSize, 0, false);
-			fireball->setPosition(cursor->position());
+			volume->createSphereAt(cursorObject->position(), explosionSize, 0, false);
+			fireballObject->setPosition(cursorObject->position());
 			explosionStartTime = currentTimeInSeconds;
 		}
 		
@@ -147,8 +163,8 @@ namespace Thermite
 
 		cameraNode->setPosition(cameraFocusPoint); //Not from script...
 
-		mCamera->setOrientation(QQuaternion());
-		mCamera->setPosition(QVector3D(0,0,cameraDistance));
+		cameraObject->setOrientation(QQuaternion());
+		cameraObject->setPosition(QVector3D(0,0,cameraDistance));
 
 		//Update the mouse cursor.
 		QVector3D rayOrigin = getPickingRayOrigin(mouse->position().x(),mouse->position().y());
@@ -160,7 +176,7 @@ namespace Thermite
 			qRound(intersection.y()),
 			qRound(intersection.z())
 		);
-		cursor->setPosition(clampedIntersection);
+		cursorObject->setPosition(clampedIntersection);
 
 		//Update the fireball
 		explosionAge = currentTimeInSeconds - explosionStartTime;
@@ -173,7 +189,7 @@ namespace Thermite
 		float fireballRadius = r;
 		if(fireballRadius > 0.001f)
 		{
-			fireball->setSize(QVector3D(fireballRadius, fireballRadius, fireballRadius));
+			fireballObject->setSize(QVector3D(fireballRadius, fireballRadius, fireballRadius));
 		}
 
 		ViewWidget::update();

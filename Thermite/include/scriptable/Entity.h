@@ -1,18 +1,18 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
-#include "Object.h"
+#include "RenderComponent.h"
 
 #include <QString>
 
 namespace Thermite
 {
-	class Entity : public Object
+	class Entity : public RenderComponent
 	{
 		Q_OBJECT
 
 	public:
-		Entity(QObject* parent = 0);
+		Entity(Object* parent = 0);
 
 		Q_PROPERTY(QString meshName READ meshName WRITE setMeshName)
 		Q_PROPERTY(QString materialName READ materialName WRITE setMaterialName)

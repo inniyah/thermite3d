@@ -1,16 +1,16 @@
 #ifndef SKYBOX_H_
 #define SKYBOX_H_
 
-#include "Object.h"
+#include "RenderComponent.h"
 
 namespace Thermite
 {
-	class SkyBox : public Object
+	class SkyBox : public RenderComponent
 	{
 		Q_OBJECT
 
 	public:		
-		SkyBox(QObject* parent = 0);
+		SkyBox(Object* parent = 0);
 
 		Q_PROPERTY(QString materialName READ materialName WRITE setMaterialName)
 

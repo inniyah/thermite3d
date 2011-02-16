@@ -2,8 +2,8 @@
 
 namespace Thermite
 {
-	Camera::Camera(QObject * parent)
-		:Object(parent)
+	Camera::Camera(Object * parent)
+		:RenderComponent(parent)
 	{
 		mFieldOfView = 1.0;
 	}
@@ -16,6 +16,6 @@ namespace Thermite
 	void Camera::setFieldOfView(float fieldOfView)
 	{
 		mFieldOfView = fieldOfView;
-		setModified(true);
+		mParent->setModified(true);
 	}
 }

@@ -8,12 +8,14 @@
 
 namespace Thermite
 {
+	class Component;
+
 	class Object : public QObject
 	{
 		Q_OBJECT
 
 	public:
-		Object(QObject* parent = 0);
+		Object(Object* parent = 0);
 
 		Q_PROPERTY(QVector3D position READ position WRITE setPosition)
 		Q_PROPERTY(QQuaternion orientation READ orientation WRITE setOrientation)
@@ -89,6 +91,8 @@ namespace Thermite
 		//All Objects are stored in this list so that we
 		//can quickly iterate over them when rendering.
 		static QList<Object*>* mParentList;
+
+		Component* mComponent;
 	};
 }
 
