@@ -3,6 +3,8 @@
 
 #include "Component.h"
 
+#include "OgreSceneNode.h"
+
 namespace Thermite
 {
 	class RenderComponent : public Component
@@ -11,7 +13,11 @@ namespace Thermite
 		RenderComponent(Object* parent);
 		~RenderComponent(void);
 
+		void update(void);
+
 	public:
+
+		Ogre::SceneNode* mOgreSceneNode;
 	};
 }
 

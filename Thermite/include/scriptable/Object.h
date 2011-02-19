@@ -65,6 +65,9 @@ namespace Thermite
 		bool isVisible(void) const;
 		void setVisible(bool visible);
 
+		void setComponent(Component* component);
+		Component* getComponent(void);
+
 	public slots:
 		void translate(const QVector3D & vector);
 		void translate(qreal x, qreal y, qreal z);

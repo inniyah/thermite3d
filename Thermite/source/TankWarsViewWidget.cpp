@@ -68,11 +68,10 @@ namespace Thermite
 
 		//Light setup
 		Object* lightObject = new Object();
-		light0 = new Light(lightObject);
 		lightObject->setPosition(QVector3D(64,128,255));
 		lightObject->lookAt(QVector3D(128,0,128));
-		lightObject->mComponent = light0;
 
+		light0 = new Light(lightObject);
 		light0->setType(Light::DirectionalLight);
 		light0->setColour(QColor(255,255,255));
 
@@ -86,18 +85,15 @@ namespace Thermite
 
 		cameraObject = new Object(cameraNode);
 		Camera* camera = new Camera(cameraObject);
-		cameraObject->mComponent = camera;
 
 		//Skybox setup
 		Object* skyboxObject = new Object();
 		SkyBox* skyBox = new SkyBox(skyboxObject);
-		skyboxObject->mComponent = skyBox;
 		skyBox->setMaterialName("CraterLakeMaterial");
 
 		//A fireball
 		fireballObject = new Object();
 		fireball = new Entity(fireballObject);
-		fireballObject->mComponent = fireball;
 		fireball->setMeshName("Icosphere7.mesh");
 		fireballObject->setPosition(QVector3D(128,32,128));
 		fireballObject->setSize(QVector3D(5,5,5));
@@ -107,14 +103,12 @@ namespace Thermite
 		//Cursor
 		cursorObject = new Object();
 		cursor = new Entity(cursorObject);
-		cursorObject->mComponent = cursor;
 		cursor->setMeshName("Voxel.mesh");
 		cursorObject->setSize(QVector3D(1.1,1.1,1.1));
 
 		//Missile
 		Object* missileObject = new Object();
 		mMissile = new Entity(missileObject);
-		missileObject->mComponent = mMissile;
 		mMissile->setMeshName("missile.mesh");
 		missileObject->setPosition(QVector3D(128,32,128));
 		mMissile->setMaterialName("VertexColourMaterial");
@@ -122,7 +116,6 @@ namespace Thermite
 		//Our main volume
 		Object* volumeObject = new Object();
 		volume = new Volume(volumeObject);
-		volumeObject->mComponent = volume;
 		volume->generateMapForTankWars();
 	}
 

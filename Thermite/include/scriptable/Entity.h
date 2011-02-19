@@ -3,6 +3,8 @@
 
 #include "RenderComponent.h"
 
+#include "OgrePrerequisites.h"
+
 #include <QString>
 
 namespace Thermite
@@ -19,6 +21,8 @@ namespace Thermite
 		Q_PROPERTY(bool animated READ animated WRITE setAnimated)
 		Q_PROPERTY(QString animationName READ animationName WRITE setAnimationName)
 		Q_PROPERTY(bool loopAnimation READ loopAnimation WRITE setLoopAnimation)
+
+		void update(void);
 
 		const QString& meshName(void) const;
 		void setMeshName(const QString& name);
@@ -42,6 +46,8 @@ namespace Thermite
 		bool mAnimated;
 		QString mAnimationName;
 		bool mLoopAnimation;
+
+		Ogre::Entity* mOgreEntity;
 	};
 }
 

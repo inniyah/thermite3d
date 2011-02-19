@@ -107,7 +107,7 @@ namespace Thermite
 
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
-		mOgreSceneManager = new Ogre::DefaultSceneManager("OgreSceneManager");
+		mOgreSceneManager = Ogre::Root::getSingletonPtr()->createSceneManager(Ogre::ST_GENERIC, "OgreSceneManager");
 		mOgreCamera = mOgreSceneManager->createCamera("OgreCamera");
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
@@ -164,123 +164,21 @@ namespace Thermite
 				Object* pObj = objectIter.next();
 				if(pObj->isModified())
 				{
-					//Use the objects address to build unique names
-					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
-
-					//Update the Object properties
-					Ogre::SceneNode* sceneNode;
-					std::string sceneNodeName(objAddressAsString + "_SceneNode");
-					if(mOgreSceneManager->hasSceneNode(sceneNodeName))
-					{
-						sceneNode = mOgreSceneManager->getSceneNode(sceneNodeName);
-					}
-					else
-					{
-						sceneNode = mOgreSceneManager->getRootSceneNode()->createChildSceneNode(sceneNodeName);
-					}
-
-					QMatrix4x4 qtTransform = pObj->transform();
-					Ogre::Matrix4 ogreTransform;
-					for(int row = 0; row < 4; ++row)
-					{
-						Ogre::Real* rowPtr = ogreTransform[row];
-						for(int col = 0; col < 4; ++col)
-						{
-							Ogre::Real* colPtr = rowPtr + col;
-							*colPtr = qtTransform(row, col);
-						}
-					}
-
-					sceneNode->setOrientation(ogreTransform.extractQuaternion());
-					sceneNode->setPosition(ogreTransform.getTrans());
-
-					QVector3D scale = pObj->size();
-					sceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
-
-					sceneNode->setVisible(pObj->isVisible());
-
 					if(pObj->mComponent)
 					{
+						//Use the objects address to build unique names
+						std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
+
 						//Update the Light properties
-						Light* light = dynamic_cast<Light*>(pObj->mComponent);
-						if(light)
+						Component* component = dynamic_cast<Component*>(pObj->mComponent);
+						if(component)
 						{
-							Ogre::Light* ogreLight;
-							std::string lightName(objAddressAsString + "_Light");
-
-							if(mOgreSceneManager->hasLight(lightName))
-							{
-								ogreLight = mOgreSceneManager->getLight(lightName);
-							}
-							else
-							{
-								ogreLight = mOgreSceneManager->createLight(lightName);
-								Ogre::Entity* ogreEntity = mOgreSceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
-								sceneNode->attachObject(ogreLight);
-								sceneNode->attachObject(ogreEntity);
-							}
-
-							switch(light->getType())
-							{
-							case Light::PointLight:
-								ogreLight->setType(Ogre::Light::LT_POINT);
-								break;
-							case Light::DirectionalLight:
-								ogreLight->setType(Ogre::Light::LT_DIRECTIONAL);
-								break;
-							case Light::SpotLight:
-								ogreLight->setType(Ogre::Light::LT_SPOTLIGHT);
-								break;
-							}
-
-							//Note we negate the z axis as Thermite considers negative z
-							//to be forwards. This means that lights will match cameras.
-							QVector3D dir = -light->mParent->zAxis();
-							ogreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
-
-							QColor col = light->getColour();
-							ogreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
 						}
 
-						//Update the Entity properties
-						Entity* entity = dynamic_cast<Entity*>(pObj->mComponent);
-						if(entity && (entity->meshName().isEmpty() == false))
-						{
-							Ogre::Entity* ogreEntity;
-							std::string entityName(objAddressAsString + "_Entity");
-
-							if(mOgreSceneManager->hasEntity(entityName))
-							{
-								ogreEntity = mOgreSceneManager->getEntity(entityName);
-							}
-							else
-							{
-								ogreEntity = mOgreSceneManager->createEntity(entityName, entity->meshName().toStdString());
-								sceneNode->attachObject(ogreEntity);
-							}						
-
-							//Set a custom material if necessary
-							if(entity->materialName().isEmpty() == false)
-							{
-								//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
-								//But you can only get materials from SubEntities.
-								ogreEntity->setMaterialName(entity->materialName().toStdString());
-							}
-
-							//Animation
-							Ogre::AnimationStateSet* animationStateSet = ogreEntity->getAllAnimationStates();		
-							if(animationStateSet && animationStateSet->hasAnimationState(entity->animationName().toStdString()))
-							{
-								Ogre::AnimationState* animationState = animationStateSet->getAnimationState(entity->animationName().toStdString());
-								animationState->setEnabled(entity->animated());
-								animationState->setLoop(entity->loopAnimation());
-							}
-						}
-
-						SkyBox* skyBox = dynamic_cast<SkyBox*>(pObj->mComponent);
-						if(skyBox && (skyBox->materialName().isEmpty() == false))
-						{
-							mOgreSceneManager->setSkyBox(true, skyBox->materialName().toStdString(), 2500);
+						RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
+						if(renderComponent)
+						{			
+							renderComponent->update();							
 						}
 
 						Camera* camera = dynamic_cast<Camera*>(pObj->mComponent);

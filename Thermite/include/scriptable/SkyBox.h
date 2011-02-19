@@ -14,6 +14,8 @@ namespace Thermite
 
 		Q_PROPERTY(QString materialName READ materialName WRITE setMaterialName)
 
+		void update(void);
+
 		const QString& materialName(void) const;
 		void setMaterialName(const QString& name);
 

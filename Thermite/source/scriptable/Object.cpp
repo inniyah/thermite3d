@@ -256,4 +256,15 @@ namespace Thermite
 
 		setModified(true);
 	}
+
+	void Object::setComponent(Component* component)
+	{
+		mComponent = component;
+		mComponent->mParent = this;
+	}
+
+	Component* Object::getComponent(void)
+	{
+		return mComponent;
+	}
 }

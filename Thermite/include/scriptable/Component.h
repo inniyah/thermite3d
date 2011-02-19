@@ -13,6 +13,8 @@ namespace Thermite
 		Component(Object* parent);
 		virtual ~Component(void);
 
+		virtual void update(void);
+
 		Object* mParent;
 	};
 }

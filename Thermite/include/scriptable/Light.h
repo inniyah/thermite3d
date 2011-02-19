@@ -28,6 +28,8 @@ namespace Thermite
 
 		Light(Object* parent = 0);
 
+		void update(void);
+
 		const QColor& getColour(void) const;
 		void setColour(const QColor& col);
 
@@ -37,6 +39,8 @@ namespace Thermite
 	private:
 		QColor m_colColour;
 		LightType mType;
+
+		Ogre::Light* mOgreLight;
 	};
 }
 
