@@ -52,11 +52,11 @@ namespace Thermite
 		void createAxis(void);
 
 	public slots:
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region, Volume& volume);		
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region);
+		//void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region, Volume& volume);		
+		//void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region);
 
-		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume);		
-		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
+		//void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume);		
+		//void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
 
 		bool loadApp(const QString& appName);
 		void unloadApp(void);
@@ -75,27 +75,17 @@ namespace Thermite
 		void deleteMovie(void);
 
 	public:
-		//Deletes all children (both nodes and attached objects) but not the node itself.
-		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
 
 		//Scene representation
-		//Camera* mCamera;
+		Camera* mCamera;
 		//SkyBox* mSkyBox;
-		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
-		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
-		uint16_t mCachedVolumeWidthInRegions;
-		uint16_t mCachedVolumeHeightInRegions;
-		uint16_t mCachedVolumeDepthInRegions;
+		
 
-		uint16_t mCachedVolumeWidthInLightRegions;
-		uint16_t mCachedVolumeHeightInLightRegions;
-		uint16_t mCachedVolumeDepthInLightRegions;
-
-		Ogre::TexturePtr mAmbientOcclusionVolumeTexture;
+		Volume* mVolume;
 
 		//Ogre's scene representation
-		Ogre::SceneNode* mVolumeSceneNode;
-		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
+		
+		
 		Ogre::SceneNode* mCameraSceneNode;
 		Ogre::Camera* mOgreCamera;
 		Ogre::Viewport* mMainViewport;

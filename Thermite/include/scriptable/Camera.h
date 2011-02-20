@@ -1,13 +1,13 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-#include "RenderComponent.h"
+#include "Object.h"
 
 #include <QVector3D>
 
 namespace Thermite
 {
-	class Camera : public RenderComponent
+	class Camera : public Object
 	{
 		Q_OBJECT
 

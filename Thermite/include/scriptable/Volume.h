@@ -24,12 +24,16 @@ freely, subject to the following restrictions:
 #ifndef __THERMITE_VOLUME_H__
 #define __THERMITE_VOLUME_H__
 
-#include "RenderComponent.h"
+#include "Object.h"
 #include "QtForwardDeclarations.h"
 #include "ThermiteForwardDeclarations.h"
 
 #include "Array.h"
 #include "PolyVoxForwardDeclarations.h"
+#include "Region.h"
+
+#include "OgrePrerequisites.h"
+#include "OgreTexture.h"
 
 #include <QVariantList>
 
@@ -40,7 +44,7 @@ freely, subject to the following restrictions:
 
 namespace Thermite
 {
-	class Volume : public RenderComponent
+	class Volume : public QObject
 	{
 		Q_OBJECT
 
@@ -51,12 +55,23 @@ namespace Thermite
 		void setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
 
 		void initialise(void);
+		void update(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
 	signals:
 		void foundPath(QVariantList path);
 
 	public slots:
+
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region, Volume& volume);		
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, PolyVox::Region region);
+
+		void uploadSurfaceMesh(const PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume);		
+		void addSurfacePatchRenderable(std::string materialName, PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, PolyVox::Region region);
+
+		//Deletes all children (both nodes and attached objects) but not the node itself.
+		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
+
 		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode);
 		void createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode);
 		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
@@ -80,6 +95,22 @@ namespace Thermite
 
 	public:
 		static TaskProcessorThread* m_backgroundThread;
+
+		Ogre::SceneNode* mVolumeSceneNode;
+
+		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
+		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
+		uint16_t mCachedVolumeWidthInRegions;
+		uint16_t mCachedVolumeHeightInRegions;
+		uint16_t mCachedVolumeDepthInRegions;
+
+		uint16_t mCachedVolumeWidthInLightRegions;
+		uint16_t mCachedVolumeHeightInLightRegions;
+		uint16_t mCachedVolumeDepthInLightRegions;
+
+		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
+
+		Ogre::TexturePtr mAmbientOcclusionVolumeTexture;
 
 		bool mMultiThreadedSurfaceExtraction;
 
@@ -109,6 +140,8 @@ namespace Thermite
 		PolyVox::Array<3, uint32_t> mLightLastModifiedArray;
 		PolyVox::Array<3, uint32_t> mLightingStartedArray;
 		PolyVox::Array<3, uint32_t> mLightingFinishedArray;
+
+		bool mIsModified;
 
 	private:
 		bool isRegionBeingExtracted(const PolyVox::Region& regionToTest);

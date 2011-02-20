@@ -41,7 +41,7 @@ namespace Thermite
 		float cameraRotationAngle;
 		float cameraDistance;
 
-		Volume* volume;
+		//Volume* volume;
 		Entity* cursor;
 		Entity* mMissile;
 		Light* light0;
@@ -56,7 +56,7 @@ namespace Thermite
 
 		Object* fireballObject;
 		Object* cursorObject;
-		Object* cameraObject;
+		//Object* cameraObject;
 	};
 }
 

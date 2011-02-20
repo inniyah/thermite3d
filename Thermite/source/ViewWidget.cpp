@@ -57,20 +57,15 @@ namespace Thermite
 	:OgreWidget(parent, f)
 
 		//Scene representation
-		//,mCamera(0)
+		,mCamera(0)
+		,mVolume(0)
 		//,mSkyBox(0)
 		//,mVolLastUploadedTimeStamps(0)
 		//,mObjectList(0)
-		,mCachedVolumeWidthInRegions(0)
-		,mCachedVolumeHeightInRegions(0)
-		,mCachedVolumeDepthInRegions(0)
-
-		,mCachedVolumeWidthInLightRegions(0)
-		,mCachedVolumeHeightInLightRegions(0)
-		,mCachedVolumeDepthInLightRegions(0)
+		
 
 		//Ogre's scene representation
-		,mVolumeSceneNode(0)
+		
 		//,m_volOgreSceneNodes(0)
 		,mCameraSceneNode(0)
 		,mOgreCamera(0)
@@ -89,7 +84,7 @@ namespace Thermite
 		//Other
 		,mFirstFind(false)
 	{	
-		//mCamera = new Camera(0);
+		mCamera = new Camera(0);
 		keyboard = new Keyboard(0);
 		mouse = new Mouse(0);	
 		//mSkyBox = new SkyBox(0);
@@ -144,7 +139,7 @@ namespace Thermite
 
 	void ViewWidget::update(void)
 	{
-		QListIterator<Object*> objectIter(qApp->mObjectList);
+		/*QListIterator<Object*> objectIter(qApp->mObjectList);
 		while(objectIter.hasNext())
 		{				
 			Object* pObj = objectIter.next();
@@ -154,10 +149,15 @@ namespace Thermite
 			{
 				volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
 			}
+		}*/
+
+		if(mVolume)
+		{
+			mVolume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
 		}
 
 		if(mOgreSceneManager)
-		{
+		{			
 			QListIterator<Object*> objectIter(qApp->mObjectList);
 			while(objectIter.hasNext())
 			{				
@@ -179,158 +179,44 @@ namespace Thermite
 						if(renderComponent)
 						{			
 							renderComponent->update();							
-						}
-
-						Camera* camera = dynamic_cast<Camera*>(pObj->mComponent);
-						if(camera && mOgreCamera)
-						{
-							if(mCameraSceneNode->numAttachedObjects() == 0)
-							{
-								mCameraSceneNode->attachObject(mOgreCamera);
-							}
-
-							QMatrix4x4 qtTransform = camera->mParent->transform();
-							Ogre::Matrix4 ogreTransform;
-							for(int row = 0; row < 4; ++row)
-							{
-								Ogre::Real* rowPtr = ogreTransform[row];
-								for(int col = 0; col < 4; ++col)
-								{
-									Ogre::Real* colPtr = rowPtr + col;
-									*colPtr = qtTransform(row, col);
-								}
-							}
-
-							mCameraSceneNode->setOrientation(ogreTransform.extractQuaternion());
-							mCameraSceneNode->setPosition(ogreTransform.getTrans());
-
-							mOgreCamera->setFOVy(Ogre::Radian(camera->fieldOfView()));
-						}
-
-						//Update the Volume properties
-						Volume* volume = dynamic_cast<Volume*>(pObj->mComponent);
-						if(volume)
-						{	
-							//Create a scene node to attach this volume under
-							if(mVolumeSceneNode == 0)
-							{
-								mVolumeSceneNode =  mOgreSceneManager->getRootSceneNode()->createChildSceneNode("VolumeSceneNode");
-							}
-
-							//If the size of the volume has changed then we need to start from scratch by throwing away our data and regenerating.
-							if((mCachedVolumeWidthInRegions != volume->mVolumeWidthInRegions) || (mCachedVolumeHeightInRegions != volume->mVolumeHeightInRegions) || (mCachedVolumeDepthInRegions != volume->mVolumeDepthInRegions))
-							{	
-								deleteSceneNodeChildren(mVolumeSceneNode);
-
-								mCachedVolumeWidthInRegions = volume->mVolumeWidthInRegions;
-								mCachedVolumeHeightInRegions = volume->mVolumeHeightInRegions;
-								mCachedVolumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-								m_axisNode->setScale(volume->m_pPolyVoxVolume->getWidth(), volume->m_pPolyVoxVolume->getHeight(), volume->m_pPolyVoxVolume->getDepth());
+						}						
 						
-								uint32_t dimensions[3] = {mCachedVolumeWidthInRegions, mCachedVolumeHeightInRegions, mCachedVolumeDepthInRegions}; // Array dimensions
-
-								//Create the arrays
-								mVolLastUploadedTimeStamps.resize(dimensions);
-								m_volOgreSceneNodes.resize(dimensions);
-
-								//Lighting
-								mCachedVolumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
-								mCachedVolumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
-								mCachedVolumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
-						
-								uint32_t lightDimensions[3] = {mCachedVolumeWidthInLightRegions, mCachedVolumeHeightInLightRegions, mCachedVolumeDepthInLightRegions}; // Array dimensions
-
-								//Create the arrays
-								mVolLightingLastUploadedTimeStamps.resize(lightDimensions);
-
-								//Clear the arrays
-								std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
-								std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
-
-								std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
-
-								//Resize the ambient occlusion volume texture
-								if(mAmbientOcclusionVolumeTexture.isNull() == false)
-								{
-									//Not sure if we actually need to (or even should) remove the old one first - maybe the smart pointer handles it.
-									Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
-								}
-
-								const int iRatio = 4; //Ration od ambient occlusion volume size to main volume size.
-								mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
-								  "AmbientOcclusionVolumeTexture", // Name of texture
-								  "General", // Name of resource group in which the texture should be created
-								  Ogre::TEX_TYPE_3D, // Texture type
-								  volume->m_pPolyVoxVolume->getWidth() / iRatio, // Width
-								  volume->m_pPolyVoxVolume->getHeight() / iRatio, // Height
-								  volume->m_pPolyVoxVolume->getDepth() / iRatio, // Depth (Must be 1 for two dimensional textures)
-								  0, // Number of mipmaps
-								  Ogre::PF_L8, // Pixel format
-								  Ogre::TU_STATIC_WRITE_ONLY // usage
-								  );
-							}
-
-							//Some values we'll need later.
-							uint16_t volumeWidthInRegions = volume->mVolumeWidthInRegions;
-							uint16_t volumeHeightInRegions = volume->mVolumeHeightInRegions;
-							uint16_t volumeDepthInRegions = volume->mVolumeDepthInRegions;
-
-							//Iterate over each region
-							for(std::uint16_t regionZ = 0; regionZ < volumeDepthInRegions; ++regionZ)
-							{		
-								for(std::uint16_t regionY = 0; regionY < volumeHeightInRegions; ++regionY)
-								{
-									for(std::uint16_t regionX = 0; regionX < volumeWidthInRegions; ++regionX)
-									{
-										uint32_t volExtractionFinsishedTimeStamp = volume->mExtractionFinishedArray[regionX][regionY][regionZ];
-										uint32_t volLastUploadedTimeStamp = mVolLastUploadedTimeStamps[regionX][regionY][regionZ];
-										if(volExtractionFinsishedTimeStamp > volLastUploadedTimeStamp)
-										{
-											SurfaceMesh<PositionMaterial>* mesh = volume->m_volSurfaceMeshes[regionX][regionY][regionZ];
-											PolyVox::Region reg = mesh->m_Region;
-											uploadSurfaceMesh(*(volume->m_volSurfaceMeshes[regionX][regionY][regionZ]), reg, *volume);
-										}
-									}
-								}
-							}
-
-							//Some values we'll need later.
-							uint16_t volumeWidthInLightRegions = volume->mVolumeWidthInLightRegions;
-							uint16_t volumeHeightInLightRegions = volume->mVolumeHeightInLightRegions;
-							uint16_t volumeDepthInLightRegions = volume->mVolumeDepthInLightRegions;
-
-							bool needsLightingUpload = false;
-							//Iterate over each region
-							for(std::uint16_t regionZ = 0; regionZ < volumeDepthInLightRegions; ++regionZ)
-							{		
-								for(std::uint16_t regionY = 0; regionY < volumeHeightInLightRegions; ++regionY)
-								{
-									for(std::uint16_t regionX = 0; regionX < volumeWidthInLightRegions; ++regionX)
-									{
-										uint32_t volLightingFinsishedTimeStamp = volume->mLightingFinishedArray[regionX][regionY][regionZ];
-										uint32_t volLightingLastUploadedTimeStamp = mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ];
-										if(volLightingFinsishedTimeStamp > volLightingLastUploadedTimeStamp)
-										{
-											needsLightingUpload = true;
-
-											mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
-										}
-									}
-								}
-							}
-							//Ambient Occlusion
-							if(needsLightingUpload)
-							{
-								Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
-								Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), volume->mAmbientOcclusionVolume.getRawData());
-								pixelBuffer->blitFromMemory(pixelBox);
-							}
-						}
+						pObj->setModified(false);
 					}
-
-					pObj->setModified(false);
 				}
+			}
+
+			if(mVolume)
+			{
+				mVolume->update();
+			}
+
+			
+
+			//Update the camera
+			if(mCamera && mOgreCamera)
+			{
+				if(mCameraSceneNode->numAttachedObjects() == 0)
+				{
+					mCameraSceneNode->attachObject(mOgreCamera);
+				}
+
+				QMatrix4x4 qtTransform = mCamera->transform();
+				Ogre::Matrix4 ogreTransform;
+				for(int row = 0; row < 4; ++row)
+				{
+					Ogre::Real* rowPtr = ogreTransform[row];
+					for(int col = 0; col < 4; ++col)
+					{
+						Ogre::Real* colPtr = rowPtr + col;
+						*colPtr = qtTransform(row, col);
+					}
+				}
+
+				mCameraSceneNode->setOrientation(ogreTransform.extractQuaternion());
+				mCameraSceneNode->setPosition(ogreTransform.getTrans());
+
+				mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 			}
 		}
 
@@ -369,188 +255,6 @@ namespace Thermite
 	void ViewWidget::unloadApp(void)
 	{
 		Ogre::ResourceGroupManager::getSingleton().shutdownAll();
-	}
-
-	void ViewWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region, Volume& volume)
-	{
-		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-
-		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / volume.mRegionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / volume.mRegionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / volume.mRegionSideLength;
-
-		//Create a SceneNode for that location if we don't have one already
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
-		if(pOgreSceneNode == 0)
-		{
-			const std::string& strNodeName = generateUID("SN");
-			pOgreSceneNode = mVolumeSceneNode->createChildSceneNode(strNodeName);
-			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
-			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
-		}
-		else
-		{
-			deleteSceneNodeChildren(pOgreSceneNode);
-		}
-
-		//Get the SurfaceMesh and check it's valid
-		SurfaceMesh<PositionMaterial> meshWhole = mesh;
-		if(meshWhole.isEmpty() == false)
-		{			
-			addSurfacePatchRenderable(volume.m_mapMaterialIds.begin()->first, meshWhole, region); ///[0] is HACK!!
-
-			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
-			/*for(std::map< std::string, std::set<uint8_t> >::iterator iter = volume.m_mapMaterialIds.begin(); iter != volume.m_mapMaterialIds.end(); iter++)
-			{
-				//Get the properties
-				std::string materialName = iter->first;
-				std::set<std::uint8_t> voxelValues = iter->second;
-
-				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				polyvox_shared_ptr< SurfaceMesh<PositionMaterialNormal> > meshSubset = meshWhole.extractSubset(voxelValues);
-
-				//And add it to the SceneNode
-				addSurfacePatchRenderable(materialName, *meshSubset, region);
-			}*/
-		}		
-
-		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
-	}
-
-	void ViewWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region)
-	{
-
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
-		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
-
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
-
-		//Single Material
-		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
-
-		std::string strSprName = generateUID("SPR");
-		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
-		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
-		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
-		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
-		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
-
-		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh);
-
-		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
-		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
-	}
-
-	void ViewWidget::uploadSurfaceMesh(const SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region, Volume& volume)
-	{
-		bool bSimulatePhysics = qApp->settings()->value("Physics/SimulatePhysics", false).toBool();
-
-		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / volume.mRegionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / volume.mRegionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / volume.mRegionSideLength;
-
-		//Create a SceneNode for that location if we don't have one already
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
-		if(pOgreSceneNode == 0)
-		{
-			const std::string& strNodeName = generateUID("SN");
-			pOgreSceneNode = mVolumeSceneNode->createChildSceneNode(strNodeName);
-			pOgreSceneNode->setPosition(Ogre::Vector3(region.getLowerCorner().getX(),region.getLowerCorner().getY(),region.getLowerCorner().getZ()));
-			m_volOgreSceneNodes[regionX][regionY][regionZ] = pOgreSceneNode;
-		}
-		else
-		{
-			deleteSceneNodeChildren(pOgreSceneNode);
-		}
-
-		//Clear any previous geometry		
-		/*Ogre::SceneNode::ObjectIterator iter =  pOgreSceneNode->getAttachedObjectIterator();
-		while (iter.hasMoreElements())
-		{
-			Ogre::MovableObject* obj = iter.getNext();
-			mOgreSceneManager->destroyMovableObject(obj);
-		}
-		pOgreSceneNode->detachAllObjects();*/
-
-		//Get the SurfaceMesh and check it's valid
-		SurfaceMesh<PositionMaterialNormal> meshWhole = mesh;
-		if(meshWhole.isEmpty() == false)
-		{			
-			//The SurfaceMesh needs to be broken into pieces - one for each material. Iterate over the materials...
-			for(std::map< std::string, std::set<uint8_t> >::iterator iter = volume.m_mapMaterialIds.begin(); iter != volume.m_mapMaterialIds.end(); iter++)
-			{
-				//Get the properties
-				std::string materialName = iter->first;
-				std::set<std::uint8_t> voxelValues = iter->second;
-
-				//Extract the part of the InexedSurfacePatch which corresponds to that material
-				//polyvox_shared_ptr< SurfaceMesh<PositionMaterialNormal> > meshSubset = meshWhole.extractSubset(voxelValues);
-				polyvox_shared_ptr< SurfaceMesh<PositionMaterialNormal> > meshSubset = extractSubset(meshWhole, voxelValues);
-
-				//And add it to the SceneNode
-				addSurfacePatchRenderable(materialName, meshWhole, region);
-			}
-		}		
-
-		mVolLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
-	}
-
-	void ViewWidget::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region)
-	{
-
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-
-		//Determine where it came from
-		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
-		uint16_t regionY = region.getLowerCorner().getY() / regionSideLength;
-		uint16_t regionZ = region.getLowerCorner().getZ() / regionSideLength;
-
-		Ogre::SceneNode* pOgreSceneNode = m_volOgreSceneNodes[regionX][regionY][regionZ];
-
-		//Single Material
-		SurfacePatchRenderable* pSingleMaterialSurfacePatchRenderable;
-
-		std::string strSprName = generateUID("SPR");
-		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
-		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
-		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
-		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
-		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
-
-		pSingleMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, true);
-
-		Ogre::AxisAlignedBox aabb(Ogre::Vector3(0.0f,0.0f,0.0f), Ogre::Vector3(regionSideLength, regionSideLength, regionSideLength));
-		pSingleMaterialSurfacePatchRenderable->setBoundingBox(aabb);
-
-		//Multi material
-		SurfacePatchRenderable* pMultiMaterialSurfacePatchRenderable;
-
-		//Create additive material
-		Ogre::String strAdditiveMaterialName = materialName + "_WITH_ADDITIVE_BLENDING";
-		Ogre::MaterialPtr additiveMaterial = Ogre::MaterialManager::getSingleton().getByName(strAdditiveMaterialName);
-		if(additiveMaterial.isNull() == true)
-		{
-			Ogre::MaterialPtr originalMaterial = Ogre::MaterialManager::getSingleton().getByName(materialName);
-			additiveMaterial = originalMaterial->clone(strAdditiveMaterialName);
-			additiveMaterial->setSceneBlending(Ogre::SBT_ADD);
-		}
-
-		strSprName = generateUID("SPR");
-		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(mOgreSceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
-		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
-		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
-		pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
-		pMultiMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
-
-		pMultiMaterialSurfacePatchRenderable->buildRenderOperationFrom(mesh, false);
-
-		pMultiMaterialSurfacePatchRenderable->setBoundingBox(aabb);
 	}
 
 	void ViewWidget::addResourceDirectory(const QString& directoryName)
@@ -654,32 +358,5 @@ namespace Thermite
 		Ogre::Ray pickingRay = mOgreCamera->getCameraToViewportRay(fNormalisedX, fNormalisedY);
 
 		return QVector3D(pickingRay.getDirection().x, pickingRay.getDirection().y, pickingRay.getDirection().z);
-	}
-
-	void ViewWidget::deleteSceneNodeChildren(Ogre::SceneNode* sceneNode)
-	{
-		//Delete any attached objects
-		Ogre::SceneNode::ObjectIterator iter =  sceneNode->getAttachedObjectIterator();
-		while (iter.hasMoreElements())
-		{
-			//Destroy the objects (leaves dangling pointers?)
-			Ogre::MovableObject* obj = iter.getNext();
-			mOgreSceneManager->destroyMovableObject(obj);
-		}
-		//Clean up all dangling pointers.
-		sceneNode->detachAllObjects();
-
-		//Delete any child nodes
-		Ogre::Node::ChildNodeIterator childNodeIter = sceneNode->getChildIterator();
-		while(childNodeIter.hasMoreElements())
-		{
-			//A Node has to actually be a SceneNode or a Bone. We are not concerned with Bones at the moment.
-			Ogre::SceneNode* childSceneNode = dynamic_cast<Ogre::SceneNode*>(childNodeIter.getNext());
-			if(childSceneNode)
-			{
-				//Recursive call
-				deleteSceneNodeChildren(childSceneNode);
-			}
-		}		
 	}
 }

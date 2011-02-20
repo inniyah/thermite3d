@@ -83,8 +83,9 @@ namespace Thermite
 		cameraRotationAngle = 0.0;
 		cameraDistance = 100.0;
 
-		cameraObject = new Object(cameraNode);
-		Camera* camera = new Camera(cameraObject);
+		//cameraObject = new Object(cameraNode);
+		//Camera* camera = new Camera();
+		mCamera->setParent(cameraNode);
 
 		//Skybox setup
 		Object* skyboxObject = new Object();
@@ -114,9 +115,9 @@ namespace Thermite
 		mMissile->setMaterialName("VertexColourMaterial");
 
 		//Our main volume
-		Object* volumeObject = new Object();
-		volume = new Volume(volumeObject);
-		volume->generateMapForTankWars();
+		//Object* volumeObject = new Object();
+		mVolume = new Volume();
+		mVolume->generateMapForTankWars();
 	}
 
 	void TankWarsViewWidget::update(void)
@@ -139,7 +140,7 @@ namespace Thermite
 		}
 		if(mouse->isPressed(Qt::LeftButton))
 		{
-			volume->createSphereAt(cursorObject->position(), explosionSize, 0, false);
+			mVolume->createSphereAt(cursorObject->position(), explosionSize, 0, false);
 			fireballObject->setPosition(cursorObject->position());
 			explosionStartTime = currentTimeInSeconds;
 		}
@@ -156,13 +157,13 @@ namespace Thermite
 
 		cameraNode->setPosition(cameraFocusPoint); //Not from script...
 
-		cameraObject->setOrientation(QQuaternion());
-		cameraObject->setPosition(QVector3D(0,0,cameraDistance));
+		mCamera->setOrientation(QQuaternion());
+		mCamera->setPosition(QVector3D(0,0,cameraDistance));
 
 		//Update the mouse cursor.
 		QVector3D rayOrigin = getPickingRayOrigin(mouse->position().x(),mouse->position().y());
 		QVector3D rayDir = getPickingRayDir(mouse->position().x(),mouse->position().y());
-		QVector3D intersection = volume->getRayVolumeIntersection(rayOrigin, rayDir);
+		QVector3D intersection = mVolume->getRayVolumeIntersection(rayOrigin, rayDir);
 		QVector3D clampedIntersection = QVector3D
 		(
 			qRound(intersection.x()),
