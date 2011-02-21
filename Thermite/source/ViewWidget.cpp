@@ -23,7 +23,7 @@
 
 #include <QDirIterator>
 #include <QKeyEvent>
-#include <QGlobal.h>
+#include <qglobal.h>
 #include <QMouseEvent>
 #include <QMovie>
 #include <QMutex>
