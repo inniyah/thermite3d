@@ -189,6 +189,7 @@ namespace Thermite
 			if(mVolume)
 			{
 				mVolume->update();
+				m_axisNode->setScale(mVolume->m_pPolyVoxVolume->getWidth()+2, mVolume->m_pPolyVoxVolume->getHeight()+2, mVolume->m_pPolyVoxVolume->getDepth()+2);
 			}
 
 			

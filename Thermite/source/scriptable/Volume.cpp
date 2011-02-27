@@ -806,7 +806,7 @@ namespace Thermite
 					Material8 voxel;
 					if(perlinVal + height < 0.0f)
 					{
-						voxel.setMaterial(245);
+						voxel.setMaterial(239);
 						voxel.setDensity(Material8::getMaxDensity());
 					}
 					else
@@ -817,7 +817,7 @@ namespace Thermite
 
 					if(y < 8)
 					{
-						voxel.setMaterial(245);
+						voxel.setMaterial(239);
 						voxel.setDensity(Material8::getMaxDensity());
 					}
 

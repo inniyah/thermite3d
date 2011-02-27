@@ -40,6 +40,7 @@ namespace Thermite
 		QColor m_colColour;
 		LightType mType;
 
+		Ogre::SceneNode* mDirectionalFixupSceneNode;
 		Ogre::Light* mOgreLight;
 	};
 }

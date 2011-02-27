@@ -11,6 +11,7 @@ namespace Thermite
 		:RenderComponent(parent)
 		,m_colColour(255,255,255)
 		,mType(PointLight)
+		,mDirectionalFixupSceneNode(0)
 		,mOgreLight(0)
 	{
 	}
@@ -21,20 +22,23 @@ namespace Thermite
 
 		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
 
-		Ogre::Light* ogreLight;
-		std::string lightName(objAddressAsString + "_Light");
-
-		/*if(mOgreSceneManager->hasLight(lightName))
+		//In general Ogre considers the negative z'axis to be the forward direction. This can be seen with cameras (which point along negative z)
+		//and also with SceneNodes (see here: http://www.ogre3d.org/docs/api/html/classOgre_1_1SceneNode.html#a4a6e34aab331802bc836668e78a08508).
+		//However, when it comes to directional lights the seem to emit light along the positive Z, rather than negative. This is the observed behaviour,
+		//although no documents have been found. As a result we insert this fixup node to reverse the direction, so they are consistant with other types.
+		if(mDirectionalFixupSceneNode == 0)
 		{
-			ogreLight = mOgreSceneManager->getLight(lightName);
+			std::string sceneNodeName(objAddressAsString + "_DirectionalFixupSceneNode");
+			mDirectionalFixupSceneNode = mOgreSceneNode->createChildSceneNode(sceneNodeName);
+			mDirectionalFixupSceneNode->yaw(Ogre::Radian(3.14159265));
 		}
-		else*/
+
 		if(!mOgreLight)
 		{
 			Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
-			mOgreLight = sceneManager->createLight(lightName);
+			mOgreLight = sceneManager->createLight(objAddressAsString + "_Light");
 			Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
-			mOgreSceneNode->attachObject(mOgreLight);
+			mDirectionalFixupSceneNode->attachObject(mOgreLight);
 			mOgreSceneNode->attachObject(ogreEntity);
 		}
 
@@ -50,11 +54,6 @@ namespace Thermite
 			mOgreLight->setType(Ogre::Light::LT_SPOTLIGHT);
 			break;
 		}
-
-		//Note we negate the z axis as Thermite considers negative z
-		//to be forwards. This means that lights will match cameras.
-		QVector3D dir = -mParent->zAxis();
-		mOgreLight->setDirection(Ogre::Vector3(dir.x(), dir.y(), dir.z()));
 
 		QColor col = getColour();
 		mOgreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());

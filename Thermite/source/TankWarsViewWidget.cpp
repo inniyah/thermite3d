@@ -68,7 +68,7 @@ namespace Thermite
 
 		//Light setup
 		Object* lightObject = new Object();
-		lightObject->setPosition(QVector3D(64,128,255));
+		lightObject->setPosition(QVector3D(0,128,128));
 		lightObject->lookAt(QVector3D(128,0,128));
 
 		light0 = new Light(lightObject);
