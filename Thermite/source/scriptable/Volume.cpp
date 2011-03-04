@@ -310,8 +310,8 @@ namespace Thermite
 							mRegionBeingExtracted[regionX][regionY][regionZ] = true;
 
 							//Convert to a real PolyVox::Region
-							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
-							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
+							Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
+							Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
 
@@ -364,8 +364,8 @@ namespace Thermite
 							--lastY;
 							--lastZ;	
 
-							Vector3DInt16 v3dLowerCorner(firstX,firstY,firstZ);
-							Vector3DInt16 v3dUpperCorner(lastX,lastY,lastZ);
+							Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
+							Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
 
@@ -581,7 +581,7 @@ namespace Thermite
 		lastY = std::min(lastY,int(m_pPolyVoxVolume->getHeight()-1));
 		lastZ = std::min(lastZ,int(m_pPolyVoxVolume->getDepth()-1));
 
-		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ));
 
 		if(isRegionBeingExtracted(regionToLock))
 		{
@@ -628,7 +628,7 @@ namespace Thermite
 		lastY = std::min(lastY,int(m_pPolyVoxVolume->getHeight()-1));
 		lastZ = std::min(lastZ,int(m_pPolyVoxVolume->getDepth()-1));
 
-		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt16(firstX, firstY, firstZ), PolyVox::Vector3DInt16(lastX, lastY, lastZ));
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ));
 
 		if(isRegionBeingExtracted(regionToLock))
 		{

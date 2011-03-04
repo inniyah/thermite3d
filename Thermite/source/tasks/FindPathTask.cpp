@@ -40,10 +40,10 @@ namespace Thermite
 
 	void FindPathTask::run(void)
 	{
-		Vector3DInt16 start(mStart.x() + 0.5, mStart.y() + 0.5, mStart.z() + 0.5);
-		Vector3DInt16 end(mEnd.x() + 0.5, mEnd.y() + 0.5, mEnd.z() + 0.5);
+		Vector3DInt32 start(mStart.x() + 0.5, mStart.y() + 0.5, mStart.z() + 0.5);
+		Vector3DInt32 end(mEnd.x() + 0.5, mEnd.y() + 0.5, mEnd.z() + 0.5);
 
-		list<Vector3DInt16> path;
+		list<Vector3DInt32> path;
 		TankWarsVoxelValidator<Material8> validator(start.getY());
 		AStarPathfinderParams<Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
 		pathfinderParams.connectivity = TwentySixConnected;
@@ -59,7 +59,7 @@ namespace Thermite
 
 		int ct = 0;
 		int howOftenToInclude = 10; //Controls whether we include every xth point.
-		list<Vector3DInt16>::iterator iter;
+		list<Vector3DInt32>::iterator iter;
 		for(iter = path.begin(); iter != path.end(); iter++)
 		{
 			if(ct % howOftenToInclude == 0)

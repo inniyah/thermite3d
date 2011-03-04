@@ -49,7 +49,7 @@ namespace Thermite
 		{
 		}
 
-		bool operator() (const PolyVox::Volume<VoxelType>* volData, const PolyVox::Vector3DInt16& v3dPos)
+		bool operator() (const PolyVox::Volume<VoxelType>* volData, const PolyVox::Vector3DInt32& v3dPos)
 		{
 			//For tanks wars, nodes are only valid if they lie on the 2D plane.
 			if(v3dPos.getY() != m_iHeight)
