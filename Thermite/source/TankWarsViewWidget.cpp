@@ -16,6 +16,8 @@
 #include "Application.h"
 #include "LogManager.h"
 
+#include "Perlin.h"
+
 #include <OgreEntity.h>
 #include <OgreRenderWindow.h>
 #include <OgreResourceGroupManager.h>
@@ -116,8 +118,8 @@ namespace Thermite
 
 		//Our main volume
 		//Object* volumeObject = new Object();
-		mVolume = new Volume();
-		mVolume->generateMapForTankWars();
+		mVolume = new Volume(256, 64, 256);
+		generateMapForTankWars(mVolume);
 	}
 
 	void TankWarsViewWidget::update(void)
@@ -238,5 +240,224 @@ namespace Thermite
 	void TankWarsViewWidget::wheelEvent(QWheelEvent* event)
 	{
 		mouse->modifyWheelDelta(event->delta());
+	}
+
+	void TankWarsViewWidget::generateMapForTankWars(Volume* volume)
+	{
+		generateRockyMapForTankWars(volume);
+	}
+
+	void TankWarsViewWidget::generateHillyMapForTankWars(Volume* volume)
+	{
+		const int mapWidth = 256;
+		const int mapHeight = 32;
+		const int mapDepth = 256;
+
+		int volumeHeight = 64;
+
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = volume->m_pPolyVoxVolume;
+
+		//Create a grid of Perlin noise values
+		Perlin perlin(2,4,1,234);
+		float perlinValues[mapWidth][mapDepth];
+		float minPerlinValue = 1000.0f;
+		float maxPerlinValue = -1000.0f;
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{
+				perlinValues[x][z] = perlin.Get(x /static_cast<float>(mapWidth-1), z / static_cast<float>(mapDepth-1));
+				minPerlinValue = std::min(minPerlinValue, perlinValues[x][z]);
+				maxPerlinValue = std::max(maxPerlinValue, perlinValues[x][z]);
+			}
+		}
+
+		//Normalise values so that th smallest is 0.0 and the biggest is 1.0
+		float range = maxPerlinValue - minPerlinValue;
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{
+				perlinValues[x][z] = (perlinValues[x][z] - minPerlinValue) / range;
+			}
+		}
+
+		//Introduce a flat area into the map. This code saves the top and bottom parts and collapses the rest.
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{				
+				float flatAreaSize = 1.0; //0.0 gives no flat area, larger number give increasing flat area.
+
+				perlinValues[x][z] = perlinValues[x][z] * (flatAreaSize + 1.0f);
+
+				float desiredGroundHeight = 0.25f;
+				if(perlinValues[x][z] > desiredGroundHeight)
+				{
+					perlinValues[x][z] = std::max(desiredGroundHeight, perlinValues[x][z] - flatAreaSize);
+				}				
+			}
+		}
+
+		//Copy the data into the volume
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int x = 0; x < mapWidth; x++) 
+			{							
+				int terrainHeight = perlinValues[x][z] * (mapHeight-1);
+
+				for(int y = 0; y < mapHeight; y++)
+				{
+					Material8 voxel;
+					if(y < terrainHeight)
+					{
+						voxel.setMaterial(130);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else if(y == terrainHeight)
+					{
+						voxel.setMaterial(60);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(Material8::getMinDensity());
+					}
+
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		return;
+	}
+
+	void TankWarsViewWidget::generateRockyMapForTankWars(Volume* volume)
+	{
+		const int mapWidth = 256;
+		const int mapHeight = 32;
+		const int mapDepth = 256;
+
+		int volumeHeight = 64;
+
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = volume->m_pPolyVoxVolume;
+
+		Perlin perlin(2,4,1,234);
+
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int y = 0; y < mapHeight; y++)
+			{
+				for(int x = 0; x < mapWidth; x++) 
+				{							
+					//float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
+
+					float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8.0f) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
+
+					float height = y / static_cast<float>(mapHeight);
+
+					height *= height;
+					height *= height;
+					height *= height;
+
+					Material8 voxel;
+					if(perlinVal + height < 0.0f)
+					{
+						voxel.setMaterial(239);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(Material8::getMinDensity());
+					}
+
+					if(y < 8)
+					{
+						voxel.setMaterial(239);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		return;
+	}
+
+	void TankWarsViewWidget::generateMengerSponge(Volume* volume)
+	{
+		const int mapWidth = 128;
+		const int mapHeight = 128;
+		const int mapDepth = 128;
+
+		int spongeWidth = 1;
+		while(spongeWidth < mapWidth / 3)
+		{
+			spongeWidth *= 3;
+		}
+
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = volume->m_pPolyVoxVolume;
+
+		for(int z = 0; z < mapDepth; z++)
+		{
+			for(int y = 0; y < mapHeight; y++)
+			{
+				for(int x = 0; x < mapWidth; x++) 
+				{
+					bool solid = true;
+
+					int i = x;
+					int j = y;
+					int k = z;
+
+					int centred;
+
+					for(int ct = 0; ct < 5; ct++)
+					{
+						centred = 0;
+						if(i % 3 == 1)
+							centred++;
+						if(j % 3 == 1)
+							centred++;
+						if(k % 3 == 1)
+							centred++;
+
+						if(centred >= 2)
+							solid = false;
+
+						i/=3;
+						j/=3;
+						k/=3;
+					}
+
+					if(x >= spongeWidth)
+						solid = false;
+					if(y >= spongeWidth)
+						solid = false;
+					if(z >= spongeWidth)
+						solid = false;
+
+					
+
+					Material8 voxel;
+					if(solid)
+					{
+						voxel.setMaterial(60);
+						voxel.setDensity(Material8::getMaxDensity());
+					}
+					else
+					{
+						voxel.setMaterial(0);
+						voxel.setDensity(Material8::getMinDensity());
+					}
+					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		return;
 	}
 }

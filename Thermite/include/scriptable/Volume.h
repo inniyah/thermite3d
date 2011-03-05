@@ -49,7 +49,7 @@ namespace Thermite
 		Q_OBJECT
 
 	public:
-		Volume(Object* parent = 0);
+		Volume(uint32_t width, uint32_t height, uint32_t depth, Object* parent = 0);
 		~Volume(void);
 
 		void setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
@@ -87,11 +87,6 @@ namespace Thermite
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 		void uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask);
-
-		void generateMapForTankWars(void);
-		void generateHillyMapForTankWars(void);
-		void generateRockyMapForTankWars(void);
-		void generateMengerSponge(void);
 
 	public:
 		static TaskProcessorThread* m_backgroundThread;

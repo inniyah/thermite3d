@@ -32,6 +32,11 @@ namespace Thermite
 
 		void wheelEvent(QWheelEvent* event);
 
+		void generateMapForTankWars(Volume* volume);
+		void generateHillyMapForTankWars(Volume* volume);
+		void generateRockyMapForTankWars(Volume* volume);
+		void generateMengerSponge(Volume* volume);
+
 	public:
 		//Game specific
 		Object* cameraNode;

@@ -37,7 +37,6 @@ freely, subject to the following restrictions:
 
 #include "Utility.h"
 
-#include "Perlin.h"
 #include "FindPathTask.h"
 #include "AmbientOcclusionTask.h"
 #include "SurfaceMeshExtractionTask.h"
@@ -57,7 +56,7 @@ namespace Thermite
 {
 	TaskProcessorThread* Volume::m_backgroundThread = 0;
 
-	Volume::Volume(Object* parent)
+	Volume::Volume(uint32_t width, uint32_t height, uint32_t depth, Object* parent)
 		:QObject(parent)
 		,m_pPolyVoxVolume(0)
 		,mVolumeWidthInRegions(0)
@@ -95,6 +94,11 @@ namespace Thermite
 			m_backgroundThread->setPriority(QThread::LowestPriority);
 			m_backgroundThread->start();
 		}
+
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(width, height, depth);
+		pPolyVoxVolume->useCompatibilityMode();
+		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 	}
 
 	Volume::~Volume(void)
@@ -678,233 +682,6 @@ namespace Thermite
 		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
-	}
-
-	void Volume::generateMapForTankWars(void)
-	{
-		generateRockyMapForTankWars();
-	}
-
-	void Volume::generateHillyMapForTankWars(void)
-	{
-		const int mapWidth = 256;
-		const int mapHeight = 32;
-		const int mapDepth = 256;
-
-		int volumeHeight = 64;
-
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,volumeHeight,mapDepth);
-
-		//Create a grid of Perlin noise values
-		Perlin perlin(2,4,1,234);
-		float perlinValues[mapWidth][mapDepth];
-		float minPerlinValue = 1000.0f;
-		float maxPerlinValue = -1000.0f;
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int x = 0; x < mapWidth; x++) 
-			{
-				perlinValues[x][z] = perlin.Get(x /static_cast<float>(mapWidth-1), z / static_cast<float>(mapDepth-1));
-				minPerlinValue = std::min(minPerlinValue, perlinValues[x][z]);
-				maxPerlinValue = std::max(maxPerlinValue, perlinValues[x][z]);
-			}
-		}
-
-		//Normalise values so that th smallest is 0.0 and the biggest is 1.0
-		float range = maxPerlinValue - minPerlinValue;
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int x = 0; x < mapWidth; x++) 
-			{
-				perlinValues[x][z] = (perlinValues[x][z] - minPerlinValue) / range;
-			}
-		}
-
-		//Introduce a flat area into the map. This code saves the top and bottom parts and collapses the rest.
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int x = 0; x < mapWidth; x++) 
-			{				
-				float flatAreaSize = 1.0; //0.0 gives no flat area, larger number give increasing flat area.
-
-				perlinValues[x][z] = perlinValues[x][z] * (flatAreaSize + 1.0f);
-
-				float desiredGroundHeight = 0.25f;
-				if(perlinValues[x][z] > desiredGroundHeight)
-				{
-					perlinValues[x][z] = std::max(desiredGroundHeight, perlinValues[x][z] - flatAreaSize);
-				}				
-			}
-		}
-
-		//Copy the data into the volume
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int x = 0; x < mapWidth; x++) 
-			{							
-				int terrainHeight = perlinValues[x][z] * (mapHeight-1);
-
-				for(int y = 0; y < mapHeight; y++)
-				{
-					Material8 voxel;
-					if(y < terrainHeight)
-					{
-						voxel.setMaterial(130);
-						voxel.setDensity(Material8::getMaxDensity());
-					}
-					else if(y == terrainHeight)
-					{
-						voxel.setMaterial(60);
-						voxel.setDensity(Material8::getMaxDensity());
-					}
-					else
-					{
-						voxel.setMaterial(0);
-						voxel.setDensity(Material8::getMinDensity());
-					}
-
-					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
-				}
-			}
-		}
-
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
-		return;
-	}
-
-	void Volume::generateRockyMapForTankWars(void)
-	{
-		const int mapWidth = 256;
-		const int mapHeight = 32;
-		const int mapDepth = 256;
-
-		int volumeHeight = 64;
-
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,volumeHeight,mapDepth);
-
-		pPolyVoxVolume->useCompatibilityMode();
-
-		Perlin perlin(2,4,1,234);
-
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int y = 0; y < mapHeight; y++)
-			{
-				for(int x = 0; x < mapWidth; x++) 
-				{							
-					//float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
-
-					float perlinVal = perlin.Get3D(x /static_cast<float>(mapWidth-1), (y/8.0f) / static_cast<float>(mapHeight-1), z / static_cast<float>(mapDepth-1));
-
-					float height = y / static_cast<float>(mapHeight);
-
-					height *= height;
-					height *= height;
-					height *= height;
-
-					Material8 voxel;
-					if(perlinVal + height < 0.0f)
-					{
-						voxel.setMaterial(239);
-						voxel.setDensity(Material8::getMaxDensity());
-					}
-					else
-					{
-						voxel.setMaterial(0);
-						voxel.setDensity(Material8::getMinDensity());
-					}
-
-					if(y < 8)
-					{
-						voxel.setMaterial(239);
-						voxel.setDensity(Material8::getMaxDensity());
-					}
-
-					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
-				}
-			}
-		}
-
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
-		return;
-	}
-
-	void Volume::generateMengerSponge(void)
-	{
-		const int mapWidth = 128;
-		const int mapHeight = 128;
-		const int mapDepth = 128;
-
-		int spongeWidth = 1;
-		while(spongeWidth < mapWidth / 3)
-		{
-			spongeWidth *= 3;
-		}
-
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(mapWidth,mapHeight,mapDepth);
-
-		for(int z = 0; z < mapDepth; z++)
-		{
-			for(int y = 0; y < mapHeight; y++)
-			{
-				for(int x = 0; x < mapWidth; x++) 
-				{
-					bool solid = true;
-
-					int i = x;
-					int j = y;
-					int k = z;
-
-					int centred;
-
-					for(int ct = 0; ct < 5; ct++)
-					{
-						centred = 0;
-						if(i % 3 == 1)
-							centred++;
-						if(j % 3 == 1)
-							centred++;
-						if(k % 3 == 1)
-							centred++;
-
-						if(centred >= 2)
-							solid = false;
-
-						i/=3;
-						j/=3;
-						k/=3;
-					}
-
-					if(x >= spongeWidth)
-						solid = false;
-					if(y >= spongeWidth)
-						solid = false;
-					if(z >= spongeWidth)
-						solid = false;
-
-					
-
-					Material8 voxel;
-					if(solid)
-					{
-						voxel.setMaterial(60);
-						voxel.setDensity(Material8::getMaxDensity());
-					}
-					else
-					{
-						voxel.setMaterial(0);
-						voxel.setDensity(Material8::getMinDensity());
-					}
-					pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
-				}
-			}
-		}
-
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
-		return;
 	}
 
 	int Volume::materialAtPosition(QVector3D position)
