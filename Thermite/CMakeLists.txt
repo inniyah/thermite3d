@@ -19,7 +19,6 @@ FIND_PACKAGE(PolyVox REQUIRED)
 ################################################################################
 
 SET(MAIN_SRC_FILES
-	source/main.cpp
 	source/DataStreamWrapper.cpp
 	source/SurfacePatchRenderable.cpp
 	source/Utility.cpp
@@ -217,7 +216,7 @@ QT4_ADD_RESOURCES(RESOURCE_SRCS ${RESOURCE_FILES})
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/Hacks ${CMAKE_CURRENT_SOURCE_DIR}/include/Logging ${CMAKE_CURRENT_SOURCE_DIR}/include/Resources ${CMAKE_CURRENT_SOURCE_DIR}/include/scriptable ${CMAKE_CURRENT_SOURCE_DIR}/include/Tasks ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/Hacks ${CMAKE_CURRENT_BINARY_DIR}/include/Logging ${CMAKE_CURRENT_BINARY_DIR}/include/Resources ${CMAKE_CURRENT_BINARY_DIR}/include/scriptable ${CMAKE_CURRENT_BINARY_DIR}/include/Tasks ${OGRE_INCLUDE_DIRS} ${PolyVoxCore_INCLUDE_DIRS} ${PolyVoxUtil_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${OGRE_LIBRARY_DIRS} ${QtOgre_LIBRARY_DIRS} ${PolyVoxCore_LIBRARY_DIRS} ${PolyVoxUtil_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
-ADD_EXECUTABLE(Thermite WIN32 ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
+ADD_LIBRARY(Thermite ${SRC_FILES} ${INC_FILES} ${MOC_SRCS} ${UI_SRCS} ${RESOURCE_SRCS})
 TARGET_LINK_LIBRARIES(Thermite ${QT_LIBRARIES} ${OGRE_LIBRARIES} ${PolyVoxCore_LIBRARIES} ${PolyVoxUtil_LIBRARIES} ${BOOST_LIBRARIES})
 
 
