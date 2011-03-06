@@ -30,8 +30,6 @@ SET(MAIN_SRC_FILES
 	source/GraphicsSettingsWidget.cpp
 	source/OgreWidget.cpp
 	source/SettingsDialog.cpp
-	source/TankWarsApplication.cpp
-	source/TankWarsViewWidget.cpp
 	source/ViewWidget.cpp
 )
 
@@ -50,8 +48,6 @@ SET(MAIN_INC_FILES
 	include/OgreWidget.h
 	include/QtOgreForwardDeclarations.h
 	include/SettingsDialog.h
-	include/TankWarsApplication.h
-	include/TankWarsViewWidget.h
 	include/ViewWidget.h
 )
 
@@ -65,19 +61,6 @@ SET(MAIN_UI_FILES
 SOURCE_GROUP("Sources" FILES ${MAIN_SRC_FILES})
 SOURCE_GROUP("Headers" FILES ${MAIN_INC_FILES})
 SOURCE_GROUP("UI" FILES ${MAIN_UI_FILES})
-
-################################################################################
-## Hacks - Tese are files which are added to Thermite
-## temporarily but should really be removed in the future.
-################################################################################
-
-SET(HACKS_SRC_FILES
-	source/Hacks/Perlin.cpp # Needed for terrain generation for tank wars.
-)
-
-SET(HACKS_INC_FILES
-	include/Hacks/Perlin.h
-)
 
 SOURCE_GROUP("Sources\\Hacks" FILES ${HACKS_SRC_FILES})
 SOURCE_GROUP("Headers\\Hacks" FILES ${HACKS_INC_FILES})

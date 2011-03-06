@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 #include "scriptable/Globals.h"
 
 #include "Application.h"
-#include "Log.h"
 
 #include "VolumeManager.h"
 

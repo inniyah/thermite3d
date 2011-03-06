@@ -1,9 +1,8 @@
 #include "Application.h"
 
-#include "TankWarsViewWidget.h"
+#include "ViewWidget.h"
 #include "FPSDialog.h"
 #include "GraphicsSettingsWidget.h"
-#include "LogManager.h"
 #include "SettingsDialog.h"
 
 #include <OgreConfigFile.h>

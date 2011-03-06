@@ -1,7 +1,6 @@
 #include "OgreWidget.h"
 
 #include "Application.h"
-#include "Log.h"
 
 #include <OgreRenderWindow.h>
 #include <OgreRoot.h>
