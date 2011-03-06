@@ -134,23 +134,13 @@ namespace Thermite
 
 		setMouseTracking(true);	
 		
-		loadApp(QString::fromAscii("TankWars"));
+		//loadApp(QString::fromAscii("TankWars"));
+
+		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 	}
 
 	void ViewWidget::update(void)
 	{
-		/*QListIterator<Object*> objectIter(qApp->mObjectList);
-		while(objectIter.hasNext())
-		{				
-			Object* pObj = objectIter.next();
-
-			Volume* volume = dynamic_cast<Volume*>(pObj->mComponent);
-			if(volume)
-			{
-				volume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
-			}
-		}*/
-
 		if(mVolume)
 		{
 			mVolume->updatePolyVoxGeometry(QVector3D(mOgreCamera->getPosition().x, mOgreCamera->getPosition().y, mOgreCamera->getPosition().z));
@@ -231,48 +221,6 @@ namespace Thermite
 	void ViewWidget::shutdown(void)
 	{
 		Ogre::Root::getSingleton().destroySceneManager(mOgreSceneManager);
-	}
-
-	bool ViewWidget::loadApp(const QString& appName)
-	{
-		QString appDirectory("../share/thermite/apps/" + appName);
-
-		QDir dirToTest(appDirectory);
-		if(!dirToTest.exists())
-		{
-			QString message("Application " + appName + " does not exist. It should be found in the following location: " + appDirectory);
-			qApp->showErrorMessageBox(message);
-			return false;
-		}
-
-		//Initialise all resources		
-		addResourceDirectory("./resources/");
-		addResourceDirectory(appDirectory);
-		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-		return true;
-	}
-
-	void ViewWidget::unloadApp(void)
-	{
-		Ogre::ResourceGroupManager::getSingleton().shutdownAll();
-	}
-
-	void ViewWidget::addResourceDirectory(const QString& directoryName)
-	{
-		QDir appDir(directoryName);
-		if(appDir.exists())
-		{
-			//Add the directory to Ogre
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toStdString(), "FileSystem");
-
-			//Add the subdirectories to Ogre
-			QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-			while (it.hasNext())
-			{
-				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
-			}
-		}
 	}
 
 	void ViewWidget::createAxis(void)

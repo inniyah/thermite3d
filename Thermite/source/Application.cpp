@@ -279,4 +279,21 @@ namespace Thermite
 			mAutoUpdateTimer->stop();
 		}
 	}
+
+	void Application::addResourceDirectory(const QString& directoryName)
+	{
+		QDir appDir(directoryName);
+		if(appDir.exists())
+		{
+			//Add the directory to Ogre
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toStdString(), "FileSystem");
+
+			//Add the subdirectories to Ogre
+			QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+			while (it.hasNext())
+			{
+				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
+			}
+		}
+	}
 }

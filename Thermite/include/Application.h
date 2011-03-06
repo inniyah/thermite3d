@@ -55,6 +55,8 @@ namespace Thermite
 		/// Determine whether the Direct3D9 render system is available.
 		bool isDirect3D9Available(void) const;
 		//@}
+
+		void addResourceDirectory(const QString& directoryName);
 		
 		//Static functions
 		/// Utility function to center a widget.

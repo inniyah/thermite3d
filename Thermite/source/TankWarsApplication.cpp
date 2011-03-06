@@ -2,12 +2,24 @@
 
 #include "TankWarsViewWidget.h"
 
+#include <QDir>
+
 namespace Thermite
 {
 	TankWarsApplication::TankWarsApplication(int & argc, char ** argv)
 		:Application(argc, argv)
 		,mOgreWidget(0)
 	{
+		QDir pathToResources("../../");
+		if(!pathToResources.exists())
+		{
+			QString message("Path to resources does not exist: " + pathToResources.path());
+			qApp->showErrorMessageBox(message);
+		}
+
+		//Initialise all resources		
+		addResourceDirectory("./resources/");
+		addResourceDirectory(pathToResources.path());
 	}
 
 	TankWarsApplication::~TankWarsApplication()
