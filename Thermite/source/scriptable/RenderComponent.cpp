@@ -44,7 +44,7 @@ namespace Thermite
 			QVector3D scale = mParent->size();
 			mOgreSceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
 
-			mOgreSceneNode->setVisible(mParent->isVisible());
+			mOgreSceneNode->setVisible(true);
 		}
 	}
 }

@@ -67,7 +67,6 @@ namespace Thermite
 	void Light::setColour(const QColor& col)
 	{
 		m_colColour = col;
-		mParent->setModified(true);
 	}
 
 	Light::LightType Light::getType(void) const
@@ -78,6 +77,5 @@ namespace Thermite
 	void Light::setType(Light::LightType type)
 	{
 		mType = type;
-		mParent->setModified(true);
 	}
 }

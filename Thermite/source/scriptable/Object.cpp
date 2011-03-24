@@ -10,8 +10,6 @@ namespace Thermite
 
 	Object::Object(Object * parent)
 		:QObject(parent)
-		,mModified(true) //It's been constructed
-		,mVisible(true)
 		,mComponent(0)
 	{
 		if(mParentList)
@@ -30,7 +28,6 @@ namespace Thermite
 	void Object::setPosition(const QVector3D& position)
 	{
 		mPosition = position;
-		setModified(true);
 	}
 
 	const QQuaternion& Object::orientation(void) const
@@ -41,7 +38,6 @@ namespace Thermite
 	void Object::setOrientation(const QQuaternion& orientation)
 	{
 		mOrientation = orientation;
-		setModified(true);
 	}
 
 	const QVector3D& Object::size(void) const
@@ -52,7 +48,6 @@ namespace Thermite
 	void Object::setSize(const QVector3D& scale)
 	{
 		mScale = scale;
-		setModified(true);
 	}
 
 	const QVector3D Object::derivedPosition(void) const
@@ -159,37 +154,14 @@ namespace Thermite
 		return derivedOrientation().rotatedVector(axis);
 	}
 
-	bool Object::isModified(void) const
-	{
-		return mModified;
-	}
-	
-	void Object::setModified(bool modified)
-	{
-		mModified = modified;
-	}
-
-	bool Object::isVisible(void) const
-	{
-		return mVisible;
-	}
-	
-	void Object::setVisible(bool visible)
-	{
-		mVisible = visible;
-		setModified(true);
-	}
-
 	void Object::translate(const QVector3D & vector)
 	{
 		mPosition += vector;
-		setModified(true);
 	}
 
 	void Object::translate(qreal x, qreal y, qreal z)
 	{
 		mPosition += QVector3D(x,y,z);
-		setModified(true);
 	}
 
 	void Object::pitch(qreal angleInDegrees)
@@ -197,39 +169,33 @@ namespace Thermite
 
 		QQuaternion rotation = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), angleInDegrees);
 		mOrientation *= rotation;
-		setModified(true);
 	}
 
 	void Object::yaw(qreal angleInDegrees)
 	{
 		QQuaternion rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,1,0), angleInDegrees);
 		mOrientation *= rotation;
-		setModified(true);
 	}
 
 	void Object::roll(qreal angleInDegrees)
 	{
 		QQuaternion rotation = QQuaternion::fromAxisAndAngle(QVector3D(0,0,1), angleInDegrees);
 		mOrientation *= rotation;
-		setModified(true);
 	}
 
 	void Object::scale(qreal factor)
 	{
 		mScale *= QVector3D(factor,factor,factor);
-		setModified(true);
 	}
 
 	void Object::scale(const QVector3D & vector)
 	{
 		mScale *= vector;
-		setModified(true);
 	}
 
 	void Object::scale(qreal x, qreal y, qreal z)
 	{
 		mScale *= QVector3D(x,y,z);
-		setModified(true);
 	}
 
 	// This function rotates the object so that its *negative* z axis points at the target.
@@ -253,8 +219,6 @@ namespace Thermite
 
 		//Set the orientation.
 		mOrientation = QQuaternion::fromAxisAndAngle(axis, angle);
-
-		setModified(true);
 	}
 
 	void Object::setComponent(Component* component)

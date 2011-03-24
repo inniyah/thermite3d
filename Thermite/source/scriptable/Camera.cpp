@@ -16,6 +16,5 @@ namespace Thermite
 	void Camera::setFieldOfView(float fieldOfView)
 	{
 		mFieldOfView = fieldOfView;
-		setModified(true);
 	}
 }

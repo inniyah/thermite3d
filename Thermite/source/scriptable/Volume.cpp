@@ -94,9 +94,9 @@ namespace Thermite
 			m_backgroundThread->start();
 		}
 
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(width, height, depth);
-		pPolyVoxVolume->useCompatibilityMode();
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
+		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
+		pPolyVoxVolume->setCompressionEnabled(false);
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 	}
 
@@ -132,7 +132,7 @@ namespace Thermite
 		mLightingFinishedArray.resize(lightDimensions); std::fill(mLightingFinishedArray.getRawData(), mLightingFinishedArray.getRawData() + mLightingFinishedArray.getNoOfElements(), 0);
 
 		//Ambient Occlusion
-		mAmbientOcclusionVolume.resize(ArraySizes(64)(16)(64));
+		mAmbientOcclusionVolume.resize(ArraySizes(32)(8)(32));
 		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
 
 		/*QTime time;
@@ -199,7 +199,7 @@ namespace Thermite
 					Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
 				}
 
-				const int iRatio = 4; //Ration od ambient occlusion volume size to main volume size.
+				const int iRatio = 4; //Ratio of ambient occlusion volume size to main volume size.
 				mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
 					"AmbientOcclusionVolumeTexture", // Name of texture
 					"General", // Name of resource group in which the texture should be created
@@ -677,7 +677,7 @@ namespace Thermite
 
 	bool Volume::loadFromFile(const QString& filename)
 	{
-		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
 		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
@@ -758,7 +758,7 @@ namespace Thermite
 	void Volume::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterial>& mesh, PolyVox::Region region)
 	{
 
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
 
 		//Determine where it came from
 		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;
@@ -842,7 +842,7 @@ namespace Thermite
 	void Volume::addSurfacePatchRenderable(std::string materialName, SurfaceMesh<PositionMaterialNormal>& mesh, PolyVox::Region region)
 	{
 
-		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 64).toInt();
+		std::uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
 
 		//Determine where it came from
 		uint16_t regionX = region.getLowerCorner().getX() / regionSideLength;

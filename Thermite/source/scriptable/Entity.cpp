@@ -61,7 +61,6 @@ namespace Thermite
 	void Entity::setMeshName(const QString& name)
 	{
 		mMeshName = name;
-		mParent->setModified(true);
 	}
 
 	const QString& Entity::materialName(void) const
@@ -72,7 +71,6 @@ namespace Thermite
 	void Entity::setMaterialName(const QString& name)
 	{
 		mMaterialName = name;
-		mParent->setModified(true);
 	}
 
 	const bool Entity::animated(void) const
@@ -83,7 +81,6 @@ namespace Thermite
 	void Entity::setAnimated(bool animated)
 	{
 		mAnimated = animated;
-		mParent->setModified(true);
 	}
 
 	const QString& Entity::animationName(void) const
@@ -94,7 +91,6 @@ namespace Thermite
 	void Entity::setAnimationName(const QString& name)
 	{
 		mAnimationName = name;
-		mParent->setModified(true);
 	}
 
 	const bool Entity::loopAnimation(void) const
@@ -105,6 +101,5 @@ namespace Thermite
 	void Entity::setLoopAnimation(bool loopAnimation)
 	{
 		mLoopAnimation = loopAnimation;
-		mParent->setModified(true);
 	}
 }

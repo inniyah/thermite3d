@@ -56,7 +56,7 @@ namespace Thermite
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::istream stdStream(new DataStreamWrapper(stream)); 
-		m_pVolume = new PolyVox::Volume<Material8>(64,64,64,32);
+		m_pVolume = new PolyVox::Volume<Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(63,63,63)),32);
 		loadVolume<Material8>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
 	}
 

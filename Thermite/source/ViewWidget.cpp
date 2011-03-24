@@ -151,26 +151,15 @@ namespace Thermite
 			while(objectIter.hasNext())
 			{				
 				Object* pObj = objectIter.next();
-				if(pObj->isModified())
+				if(pObj->mComponent)
 				{
-					if(pObj->mComponent)
+					//Use the objects address to build unique names
+					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
+
+					RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
+					if(renderComponent)
 					{
-						//Use the objects address to build unique names
-						std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
-
-						//Update the Light properties
-						Component* component = dynamic_cast<Component*>(pObj->mComponent);
-						if(component)
-						{
-						}
-
-						RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
-						if(renderComponent)
-						{			
-							renderComponent->update();							
-						}						
-						
-						pObj->setModified(false);
+						renderComponent->update();	
 					}
 				}
 			}

@@ -34,9 +34,6 @@ namespace Thermite
 		Q_PROPERTY(QVector3D derivedYAxis READ derivedYAxis)
 		Q_PROPERTY(QVector3D derivedZAxis READ derivedZAxis)
 
-		Q_PROPERTY(bool modified READ isModified WRITE setModified)
-		Q_PROPERTY(bool visible READ isVisible WRITE setVisible)
-
 		const QVector3D& position(void) const;
 		void setPosition(const QVector3D& position);
 
@@ -59,12 +56,6 @@ namespace Thermite
 		const QVector3D derivedYAxis(void) const;
 		const QVector3D derivedZAxis(void) const;
 
-		bool isModified(void) const;
-		void setModified(bool modified);
-
-		bool isVisible(void) const;
-		void setVisible(bool visible);
-
 		void setComponent(Component* component);
 		Component* getComponent(void);
 
@@ -86,10 +77,6 @@ namespace Thermite
 		QVector3D mPosition;
 		QQuaternion mOrientation;
 		QVector3D mScale;
-
-		//Should be flags...
-		bool mModified;
-		bool mVisible;
 
 		//All Objects are stored in this list so that we
 		//can quickly iterate over them when rendering.
