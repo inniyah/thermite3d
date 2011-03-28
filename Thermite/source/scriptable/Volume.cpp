@@ -576,13 +576,13 @@ namespace Thermite
 		float radiusSquared = radius * radius;
 
 		//Check bounds
-		firstX = std::max(firstX,0);
-		firstY = std::max(firstY,0);
-		firstZ = std::max(firstZ,0);
+		firstX = std::max(firstX,m_pPolyVoxVolume->getEnclosingRegion().getLowerCorner().getX());
+		firstY = std::max(firstY,m_pPolyVoxVolume->getEnclosingRegion().getLowerCorner().getY());
+		firstZ = std::max(firstZ,m_pPolyVoxVolume->getEnclosingRegion().getLowerCorner().getZ());
 
-		lastX = std::min(lastX,int(m_pPolyVoxVolume->getWidth()-1));
-		lastY = std::min(lastY,int(m_pPolyVoxVolume->getHeight()-1));
-		lastZ = std::min(lastZ,int(m_pPolyVoxVolume->getDepth()-1));
+		lastX = std::min(lastX,m_pPolyVoxVolume->getEnclosingRegion().getUpperCorner().getX());
+		lastY = std::min(lastY,m_pPolyVoxVolume->getEnclosingRegion().getUpperCorner().getY());
+		lastZ = std::min(lastZ,m_pPolyVoxVolume->getEnclosingRegion().getUpperCorner().getZ());
 
 		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt32(firstX, firstY, firstZ), PolyVox::Vector3DInt32(lastX, lastY, lastZ));
 

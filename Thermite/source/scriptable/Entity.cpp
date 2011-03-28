@@ -11,42 +11,32 @@ namespace Thermite
 	{
 		mAnimated = false;
 		mLoopAnimation = false;
-		mAnimationName = "";
+		mAnimationName = "";		
 	}
 	
 	Entity::~Entity()
 	{
-		mOgreSceneNode->detachObject(mOgreEntity);
-		mSceneManager->destroyMovableObject(mOgreEntity);
+		if(mOgreEntity)
+		{
+			mOgreSceneNode->detachObject(mOgreEntity);
+			mSceneManager->destroyMovableObject(mOgreEntity);
+		}
 	}
 
 	void Entity::update(void)
 	{
-		RenderComponent::update();
-
-		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
-
-		//Ogre::Entity* ogreEntity;
-		std::string entityName(objAddressAsString + "_Entity");
-
-		/*if(mOgreSceneManager->hasEntity(entityName))
-		{
-			ogreEntity = mOgreSceneManager->getEntity(entityName);
-		}
-		else*/
-		if(!mOgreEntity)
-		{
-			Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
-			mOgreEntity = sceneManager->createEntity(entityName, meshName().toStdString());
-			mOgreSceneNode->attachObject(mOgreEntity);
-		}						
+		RenderComponent::update();							
 
 		//Set a custom material if necessary
 		if(materialName().isEmpty() == false)
 		{
-			//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
-			//But you can only get materials from SubEntities.
-			mOgreEntity->setMaterialName(materialName().toStdString());
+			assert(mOgreEntity);
+			if(mOgreEntity)
+			{
+				//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
+				//But you can only get materials from SubEntities.
+				mOgreEntity->setMaterialName(materialName().toStdString());
+			}
 		}
 
 		//Animation
@@ -67,6 +57,11 @@ namespace Thermite
 	void Entity::setMeshName(const QString& name)
 	{
 		mMeshName = name;
+
+		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
+		std::string entityName(objAddressAsString + "_Entity");
+		mOgreEntity = mSceneManager->createEntity(entityName, meshName().toStdString());
+		mOgreSceneNode->attachObject(mOgreEntity);
 	}
 
 	const QString& Entity::materialName(void) const
