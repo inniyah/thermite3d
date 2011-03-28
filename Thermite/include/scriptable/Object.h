@@ -16,6 +16,7 @@ namespace Thermite
 
 	public:
 		Object(Object* parent = 0);
+		~Object();
 
 		Q_PROPERTY(QVector3D position READ position WRITE setPosition)
 		Q_PROPERTY(QQuaternion orientation READ orientation WRITE setOrientation)

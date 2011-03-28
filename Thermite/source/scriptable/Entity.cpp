@@ -13,6 +13,12 @@ namespace Thermite
 		mLoopAnimation = false;
 		mAnimationName = "";
 	}
+	
+	Entity::~Entity()
+	{
+		mOgreSceneNode->detachObject(mOgreEntity);
+		mSceneManager->destroyMovableObject(mOgreEntity);
+	}
 
 	void Entity::update(void)
 	{

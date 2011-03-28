@@ -13,10 +13,12 @@ namespace Thermite
 		RenderComponent(Object* parent);
 		~RenderComponent(void);
 
+		void onEnabled(bool enabled);
+
 		void update(void);
 
 	public:
-
+		Ogre::SceneManager* mSceneManager;
 		Ogre::SceneNode* mOgreSceneNode;
 	};
 }

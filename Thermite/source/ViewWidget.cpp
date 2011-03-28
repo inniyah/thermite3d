@@ -159,7 +159,7 @@ namespace Thermite
 					RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
 					if(renderComponent)
 					{
-						renderComponent->update();	
+						renderComponent->update();
 					}
 				}
 			}

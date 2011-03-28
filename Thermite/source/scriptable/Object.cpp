@@ -20,6 +20,17 @@ namespace Thermite
 		mScale = QVector3D(1,1,1);
 	}
 
+	Object::~Object()
+	{
+		if(mParentList)
+		{
+			mParentList->removeOne(this);
+		}
+
+		delete mComponent;
+		mComponent = 0;
+	}
+
 	const QVector3D& Object::position(void) const
 	{
 		return mPosition;
