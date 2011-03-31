@@ -61,7 +61,7 @@ namespace Thermite
 		,mVolumeWidthInRegions(0)
 		,mVolumeHeightInRegions(0)
 		,mVolumeDepthInRegions(0)
-		,mMultiThreadedSurfaceExtraction(true)
+		,mMultiThreadedSurfaceExtraction(false)
 		,mCachedVolumeWidthInRegions(0)
 		,mCachedVolumeHeightInRegions(0)
 		,mCachedVolumeDepthInRegions(0)
