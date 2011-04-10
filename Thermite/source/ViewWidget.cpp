@@ -146,7 +146,7 @@ namespace Thermite
 
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-		mOgreSceneManager->setShadowTextureCasterMaterial("Float");
+		mOgreSceneManager->setShadowTextureCasterMaterial("ShadowCasterMaterial");
 	}
 
 	void ViewWidget::update(void)
