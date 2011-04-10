@@ -102,6 +102,15 @@ namespace Thermite
 		//We have to create a scene manager and viewport here so that the screen
 		//can be cleared to black befre the Thermite logo animation is played.
 		mOgreSceneManager = Ogre::Root::getSingletonPtr()->createSceneManager(Ogre::ST_GENERIC, "OgreSceneManager");
+
+		mOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+		mOgreSceneManager->setShadowFarDistance(200.0f);		
+		mOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+		//mOgreSceneManager->setShadowTextureCount(1);
+		//mOgreSceneManager->setShadowTextureSize(512);
+		//mOgreSceneManager->setShowDebugShadows(true);
+
+
 		mOgreCamera = mOgreSceneManager->createCamera("OgreCamera");
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
@@ -136,6 +145,8 @@ namespace Thermite
 		//loadApp(QString::fromAscii("TankWars"));
 
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+		mOgreSceneManager->setShadowTextureCasterMaterial("Float");
 	}
 
 	void ViewWidget::update(void)
