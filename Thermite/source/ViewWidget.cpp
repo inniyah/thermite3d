@@ -138,9 +138,7 @@ namespace Thermite
 		VolumeManager* vm = new VolumeManager;
 		vm->m_pProgressListener = new VolumeSerializationProgressListenerImpl();
 
-		TextManager* sm = new TextManager;
-
-		setMouseTracking(true);	
+		TextManager* sm = new TextManager;	
 		
 		//loadApp(QString::fromAscii("TankWars"));
 
