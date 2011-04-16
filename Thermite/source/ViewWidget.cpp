@@ -106,8 +106,9 @@ namespace Thermite
 		mOgreSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 		mOgreSceneManager->setShadowFarDistance(200.0f);		
 		mOgreSceneManager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-		//mOgreSceneManager->setShadowTextureCount(1);
-		//mOgreSceneManager->setShadowTextureSize(512);
+		mOgreSceneManager->setShadowTextureCount(1);
+		mOgreSceneManager->setShadowTextureSize(512);
+		mOgreSceneManager->setShadowCasterRenderBackFaces(true);
 		//mOgreSceneManager->setShowDebugShadows(true);
 
 
@@ -115,7 +116,7 @@ namespace Thermite
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
 		mOgreCamera->setFarClipDistance(5000);
-		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
+		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
 		//mCameraSceneNode->attachObject(mOgreCamera);

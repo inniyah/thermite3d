@@ -211,6 +211,19 @@ namespace Thermite
 					Ogre::PF_L8, // Pixel format
 					Ogre::TU_STATIC_WRITE_ONLY // usage
 					);
+
+				Ogre::MaterialPtr materialPtr = Ogre::MaterialManager::getSingleton().getByName("ColouredCubicVoxel");
+				Ogre::Technique* pTechnique = materialPtr->getTechnique("Advanced");
+				Ogre::Pass* pPass = pTechnique->getPass("Light0");
+				Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
+				pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
+
+				materialPtr = Ogre::MaterialManager::getSingleton().getByName("VertexColourMaterial");
+				pTechnique = materialPtr->getTechnique("Advanced");
+				pPass = pTechnique->getPass("Light0");
+				pTexUnit = pPass->createTextureUnitState();
+				pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
+				pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
 			}
 
 			//Some values we'll need later.
@@ -774,7 +787,7 @@ namespace Thermite
 		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
 		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(sceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
-		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pSingleMaterialSurfacePatchRenderable->setCastShadows(true);
 		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
 		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
 
@@ -858,7 +871,7 @@ namespace Thermite
 		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
 		pSingleMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(sceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pSingleMaterialSurfacePatchRenderable->setMaterial(materialName);
-		pSingleMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pSingleMaterialSurfacePatchRenderable->setCastShadows(true);
 		pOgreSceneNode->attachObject(pSingleMaterialSurfacePatchRenderable);
 		pSingleMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
 
@@ -883,7 +896,7 @@ namespace Thermite
 		strSprName = generateUID("SPR");
 		pMultiMaterialSurfacePatchRenderable = dynamic_cast<SurfacePatchRenderable*>(sceneManager->createMovableObject(strSprName, SurfacePatchRenderableFactory::FACTORY_TYPE_NAME));
 		pMultiMaterialSurfacePatchRenderable->setMaterial(strAdditiveMaterialName);
-		pMultiMaterialSurfacePatchRenderable->setCastShadows(qApp->settings()->value("Shadows/EnableShadows", false).toBool());
+		pMultiMaterialSurfacePatchRenderable->setCastShadows(true);
 		pOgreSceneNode->attachObject(pMultiMaterialSurfacePatchRenderable);
 		pMultiMaterialSurfacePatchRenderable->m_v3dPos = pOgreSceneNode->getPosition();
 

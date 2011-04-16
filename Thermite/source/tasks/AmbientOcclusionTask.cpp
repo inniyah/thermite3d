@@ -45,7 +45,7 @@ namespace Thermite
 	void AmbientOcclusionTask::run(void)
 	{	
 		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength);
-		//ambientOcclusionCalculator.execute();
+		ambientOcclusionCalculator.execute();
 
 		emit finished(this);
 	}
