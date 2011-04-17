@@ -116,7 +116,6 @@ namespace Thermite
 		mOgreCamera->setFOVy(Ogre::Radian(1.0));
 		mOgreCamera->setNearClipDistance(1.0);
 		mOgreCamera->setFarClipDistance(5000);
-		mOgreSceneManager->setAmbientLight(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
 		//mCameraSceneNode->attachObject(mOgreCamera);
@@ -146,7 +145,17 @@ namespace Thermite
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		mOgreSceneManager->setShadowTextureCasterMaterial("ShadowCasterMaterial");
+
+		/*mLogManager = new LogManager(this);
+		mMainLog = mLogManager->createLog("Main");
+		mLogManager->show();
+		mMainLog->logMessage("Hello", LL_WARNING);*/
 	}
+
+	/*void ViewWidget::log(QString string)
+	{
+		mMainLog->logMessage(string, LL_WARNING);
+	}*/
 
 	void ViewWidget::update(void)
 	{

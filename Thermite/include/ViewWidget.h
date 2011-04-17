@@ -68,6 +68,10 @@ namespace Thermite
 
 	public:
 
+		/*LogManager* mLogManager;
+		Log* mMainLog;
+		void log(QString string);*/
+
 		//Scene representation
 		Camera* mCamera;
 		//SkyBox* mSkyBox;

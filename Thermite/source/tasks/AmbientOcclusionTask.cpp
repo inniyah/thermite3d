@@ -44,7 +44,8 @@ namespace Thermite
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength);
+		uint8_t uNoOfSamplesPerOutputElement = 0; //Max off 255 for max quality.
+		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength, uNoOfSamplesPerOutputElement);
 		ambientOcclusionCalculator.execute();
 
 		emit finished(this);
