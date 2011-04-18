@@ -667,9 +667,11 @@ namespace Thermite
 		updateLastModifedArray(regionToLock);
 	}
 
-	QVector3D Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
+	QPair<bool, QVector3D> Volume::getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir)
 	{
-		QVector3D result = QVector3D(0,0,0);
+		QPair<bool, QVector3D> result;
+		result.first = false;
+		result.second = QVector3D(0,0,0);
 
 		Vector3DFloat start(rayOrigin.x(), rayOrigin.y(), rayOrigin.z());
 		Vector3DFloat direction(rayDir.x(), rayDir.y(), rayDir.z());
@@ -682,7 +684,8 @@ namespace Thermite
 		
 		if(raycastResult.foundIntersection)
 		{
-			result = QVector3D(raycastResult.intersectionVoxel.getX(), raycastResult.intersectionVoxel.getY(), raycastResult.intersectionVoxel.getZ());
+			result.first = true;
+			result.second = QVector3D(raycastResult.intersectionVoxel.getX(), raycastResult.intersectionVoxel.getY(), raycastResult.intersectionVoxel.getZ());
 		}
 
 		return result;

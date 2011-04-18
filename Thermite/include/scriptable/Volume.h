@@ -74,7 +74,7 @@ namespace Thermite
 
 		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode);
 		void createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode);
-		QVector3D getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
+		QPair<bool, QVector3D> getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);
 		int materialAtPosition(QVector3D position);
 
 		void finishedHandler(QVariantList path);
