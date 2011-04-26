@@ -88,10 +88,6 @@ namespace Thermite
 		Ogre::SceneManager* mOgreSceneManager;
 		Ogre::SceneNode* m_axisNode;
 
-		//Input
-		Keyboard* keyboard;
-		Mouse* mouse;
-
 		//User interface
 		QMovie* m_pThermiteLogoMovie;
 		QLabel* m_pThermiteLogoLabel;

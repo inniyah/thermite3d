@@ -121,9 +121,7 @@ SET(SCRIPTABLE_SRC_FILES
 	source/scriptable/Component.cpp
 	source/scriptable/Entity.cpp
 	source/scriptable/Globals.cpp
-	source/scriptable/Keyboard.cpp
 	source/scriptable/Light.cpp
-	source/scriptable/Mouse.cpp
 	source/scriptable/Object.cpp
 	source/scriptable/RenderComponent.cpp
 	source/scriptable/SkyBox.cpp
@@ -135,9 +133,7 @@ SET(SCRIPTABLE_INC_FILES
 	include/scriptable/Component.h
 	include/scriptable/Entity.h
 	include/scriptable/Globals.h
-	include/scriptable/Keyboard.h
 	include/scriptable/Light.h
-	include/scriptable/Mouse.h
 	include/scriptable/Object.h
 	include/scriptable/RenderComponent.h
 	include/scriptable/SkyBox.h

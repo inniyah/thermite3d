@@ -1,7 +1,5 @@
 #include "ViewWidget.h"
 
-#include "Keyboard.h"
-#include "Mouse.h"
 #include "SkyBox.h"
 #include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
@@ -72,10 +70,6 @@ namespace Thermite
 		,mOgreSceneManager(0)
 		,m_axisNode(0)
 
-		//Input
-		,keyboard(0)
-		,mouse(0)
-
 		//User interface
 		,m_pThermiteLogoMovie(0)
 		,m_pThermiteLogoLabel(0)
@@ -83,9 +77,7 @@ namespace Thermite
 		//Other
 		,mFirstFind(false)
 	{	
-		mCamera = new Camera(0);
-		keyboard = new Keyboard(0);
-		mouse = new Mouse(0);	
+		mCamera = new Camera(0);			
 		//mSkyBox = new SkyBox(0);
 	}
 
@@ -217,10 +209,6 @@ namespace Thermite
 				mOgreCamera->setFOVy(Ogre::Radian(mCamera->fieldOfView()));
 			}
 		}
-
-		mouse->setPreviousPosition(mouse->position());
-		mouse->resetWheelDelta();
-
 
 		OgreWidget::update();
 	}

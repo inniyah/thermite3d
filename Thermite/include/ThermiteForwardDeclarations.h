@@ -31,8 +31,6 @@ namespace Thermite
 	class VolumeResourse;
 
 	//Scriptable
-	class Keyboard;
-	class Mouse;
 	class SkyBox;
 
 	//Tasks
