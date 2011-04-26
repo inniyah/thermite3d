@@ -1,13 +1,14 @@
 #ifndef THERMITE_FORWARDDECLARATIONS_H_
 #define THERMITE_FORWARDDECLARATIONS_H_
 
+class TankWarsViewWidget;
+
 namespace Thermite
 {
 	class AbstractSettingsWidget;
 	class Application;
 	class DotSceneHandler;
-	class ViewWidget;
-	class TankWarsViewWidget;
+	class ViewWidget;	
 	class FPSDialog;
 	class GraphicsSettingsWidget;
 	class Log;

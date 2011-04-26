@@ -9,10 +9,11 @@
 
 class QSettings;
 
+class TankWarsViewWidget;
+
 namespace Thermite
 {
 	class ViewWidget;
-	class TankWarsViewWidget;
 	class FPSDialog;
 	class GraphicsSettingsWidget;
 	class Log;
