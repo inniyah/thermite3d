@@ -6,27 +6,15 @@
 
 namespace Thermite
 {
-	QList<Object*>* Object::mParentList = 0;
-
 	Object::Object(Object * parent)
 		:QObject(parent)
 		,mComponent(0)
 	{
-		if(mParentList)
-		{
-			mParentList->append(this);
-		}
-
 		mScale = QVector3D(1,1,1);
 	}
 
 	Object::~Object()
 	{
-		if(mParentList)
-		{
-			mParentList->removeOne(this);
-		}
-
 		delete mComponent;
 		mComponent = 0;
 	}

@@ -79,10 +79,6 @@ namespace Thermite
 		QQuaternion mOrientation;
 		QVector3D mScale;
 
-		//All Objects are stored in this list so that we
-		//can quickly iterate over them when rendering.
-		static QList<Object*>* mParentList;
-
 		Component* mComponent;
 	};
 }
