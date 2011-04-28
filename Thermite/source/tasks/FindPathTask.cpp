@@ -30,7 +30,7 @@ using namespace std;
 
 namespace Thermite
 {
-	FindPathTask::FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume)
+	FindPathTask::FindPathTask(PolyVox::LargeVolume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume)
 		:mPolyVoxVolume(polyVoxVolume)
 		,mStart(start)
 		,mEnd(end)

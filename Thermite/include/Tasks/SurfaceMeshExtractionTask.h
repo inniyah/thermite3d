@@ -37,7 +37,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		SurfaceMeshExtractionTask(PolyVox::Volume<PolyVox::Material8>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp);
+		SurfaceMeshExtractionTask(PolyVox::LargeVolume<PolyVox::Material8>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp);
 
 		void run(void);
 
@@ -47,7 +47,7 @@ namespace Thermite
 	public:
 		PolyVox::Region m_regToProcess;
 		PolyVox::SurfaceMesh<PolyVox::PositionMaterial> m_meshResult;
-		PolyVox::Volume<PolyVox::Material8>* mVolume;
+		PolyVox::LargeVolume<PolyVox::Material8>* mVolume;
 		uint32_t m_uTimeStamp;
 	};
 }

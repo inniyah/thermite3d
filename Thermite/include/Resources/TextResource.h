@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 #include "PolyVoxForwardDeclarations.h"
 #include "PolyVoxImpl/TypeDef.h"
-#include "Volume.h"
 
 #include <OgreResourceManager.h>
 

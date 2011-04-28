@@ -38,7 +38,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		AmbientOcclusionTask(PolyVox::Volume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength);
+		AmbientOcclusionTask(PolyVox::LargeVolume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength);
 
 		void run(void);
 
@@ -48,7 +48,7 @@ namespace Thermite
 	public:
 		PolyVox::Region m_regToProcess;
 		PolyVox::Array<3, uint8_t>* mAmbientOcclusionVolume;
-		PolyVox::Volume<PolyVox::Material8>* mVolume;
+		PolyVox::LargeVolume<PolyVox::Material8>* mVolume;
 		uint32_t m_uTimeStamp;
 		float mRayLength;
 	};

@@ -35,7 +35,7 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	SurfaceMeshExtractionTask::SurfaceMeshExtractionTask(PolyVox::Volume<PolyVox::Material8>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp)
+	SurfaceMeshExtractionTask::SurfaceMeshExtractionTask(PolyVox::LargeVolume<PolyVox::Material8>* volume, PolyVox::Region regToProcess, uint32_t uTimeStamp)
 		:m_regToProcess(regToProcess)
 		,m_uTimeStamp(uTimeStamp)
 		,mVolume(volume)

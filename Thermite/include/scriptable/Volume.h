@@ -52,7 +52,7 @@ namespace Thermite
 		Volume(uint32_t width, uint32_t height, uint32_t depth, Object* parent = 0);
 		~Volume(void);
 
-		void setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
+		void setPolyVoxVolume(PolyVox::LargeVolume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
 
 		void initialise(void);
 		void update(void);
@@ -109,7 +109,7 @@ namespace Thermite
 
 		bool mMultiThreadedSurfaceExtraction;
 
-		PolyVox::Volume<PolyVox::Material8>* m_pPolyVoxVolume;
+		PolyVox::LargeVolume<PolyVox::Material8>* m_pPolyVoxVolume;
 		uint16_t mRegionSideLength;
 		uint16_t mVolumeWidthInRegions;
 		uint16_t mVolumeHeightInRegions;

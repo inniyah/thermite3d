@@ -24,7 +24,6 @@ freely, subject to the following restrictions:
 #include "DataStreamWrapper.h"
 #include "VolumeManager.h"
 #include "VolumeResource.h"
-#include "VolumeSampler.h"
 
 #include "Material.h"
 
@@ -56,7 +55,7 @@ namespace Thermite
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::istream stdStream(new DataStreamWrapper(stream)); 
-		m_pVolume = new PolyVox::Volume<Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(63,63,63)),32);
+		m_pVolume = new PolyVox::LargeVolume<Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(63,63,63)),32);
 		loadVolume<Material8>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
 	}
 
@@ -73,7 +72,7 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	PolyVox::Volume<PolyVox::Material8>* VolumeResource::getVolume(void)
+	PolyVox::LargeVolume<PolyVox::Material8>* VolumeResource::getVolume(void)
 	{
 		return m_pVolume;
 	}

@@ -33,7 +33,7 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::Volume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
+	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::LargeVolume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
 		:m_regToProcess(regToProcess)
 		,mAmbientOcclusionVolume(ambientOcclusionVolume)
 		,m_uTimeStamp(uTimeStamp)

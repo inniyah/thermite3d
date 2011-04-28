@@ -95,7 +95,7 @@ namespace Thermite
 		}
 
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::Volume<PolyVox::Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
+		PolyVox::LargeVolume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::LargeVolume<PolyVox::Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
 		pPolyVoxVolume->setCompressionEnabled(false);
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 	}
@@ -104,7 +104,7 @@ namespace Thermite
 	{
 	}
 
-	void Volume::setPolyVoxVolume(PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength)
+	void Volume::setPolyVoxVolume(PolyVox::LargeVolume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength)
 	{
 		m_pPolyVoxVolume = pPolyVoxVolume;
 		mRegionSideLength = regionSideLength;		
@@ -694,7 +694,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::Volume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		PolyVox::LargeVolume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}

@@ -49,7 +49,7 @@ namespace Thermite
 		{
 		}
 
-		bool operator() (const PolyVox::Volume<VoxelType>* volData, const PolyVox::Vector3DInt32& v3dPos)
+		bool operator() (const PolyVox::LargeVolume<VoxelType>* volData, const PolyVox::Vector3DInt32& v3dPos)
 		{
 			//For tanks wars, nodes are only valid if they lie on the 2D plane.
 			if(v3dPos.getY() != m_iHeight)
@@ -103,7 +103,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		FindPathTask(PolyVox::Volume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
+		FindPathTask(PolyVox::LargeVolume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
 
 		void run(void);
 
@@ -111,7 +111,7 @@ namespace Thermite
 		void finished(QVariantList path);
 
 	public:
-		PolyVox::Volume<PolyVox::Material8>* mPolyVoxVolume;
+		PolyVox::LargeVolume<PolyVox::Material8>* mPolyVoxVolume;
 		QVector3D mStart;
 		QVector3D mEnd;
 		Volume* mThermiteVolume;
