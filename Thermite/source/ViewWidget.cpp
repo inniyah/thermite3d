@@ -116,6 +116,8 @@ namespace Thermite
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		createAxis();
+		//Hide the node
+		m_axisNode->setVisible(false);
 
 		//Set up and start the thermite logo animation. This plays while we initialise.
 		//playStartupMovie();
@@ -244,7 +246,7 @@ namespace Thermite
 
 		//Attach the box to the node
 		Ogre::SceneNode *axisNode = m_axisNode->createChildSceneNode();
-		axisNode->attachObject(axis);		
+		axisNode->attachObject(axis);	
 	}
 
 	void ViewWidget::playStartupMovie(void)

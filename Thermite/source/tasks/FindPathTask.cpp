@@ -45,10 +45,10 @@ namespace Thermite
 
 		list<Vector3DInt32> path;
 		TankWarsVoxelValidator<Material8> validator(start.getY());
-		AStarPathfinderParams<Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
+		AStarPathfinderParams<LargeVolume, Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
 		pathfinderParams.connectivity = TwentySixConnected;
 		pathfinderParams.isVoxelValidForPath = validator;
-		AStarPathfinder<Material8> pathfinder(pathfinderParams);
+		AStarPathfinder<LargeVolume, Material8> pathfinder(pathfinderParams);
 		try
 		{
 			pathfinder.execute();

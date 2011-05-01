@@ -679,7 +679,7 @@ namespace Thermite
 		direction *= 1000.0f;
 
 		RaycastResult raycastResult;
-		Raycast<Material8> raycast(m_pPolyVoxVolume, start, direction, raycastResult);
+		Raycast<LargeVolume, Material8> raycast(m_pPolyVoxVolume, start, direction, raycastResult);
 		raycast.execute();
 		
 		if(raycastResult.foundIntersection)

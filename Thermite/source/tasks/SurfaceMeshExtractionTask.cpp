@@ -46,7 +46,7 @@ namespace Thermite
 	{
 		//This is bad - can we make SurfaceExtractor reenterant (?) and just have one which all runnables share?
 		//Or at least not use 'new'
-		PolyVox::CubicSurfaceExtractor<Material8> surfaceExtractor(mVolume, m_regToProcess, &m_meshResult);
+		PolyVox::CubicSurfaceExtractor<LargeVolume, Material8> surfaceExtractor(mVolume, m_regToProcess, &m_meshResult);
 		
 		surfaceExtractor.execute();
 		//computeNormalsForVertices(m_pGameLogic->mMap->volumeResource->getVolume(),*(m_taskData.m_meshResult.get()), PolyVox::SOBEL_SMOOTHED);
