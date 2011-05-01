@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 
 #include "PolyVoxForwardDeclarations.h"
 #include "PolyVoxImpl/TypeDef.h"
-#include "LargeVolume.h"
+#include "SimpleVolume.h"
 
 #include <OgreResourceManager.h>
 
@@ -43,7 +43,7 @@ namespace Thermite
 			Ogre::ManualResourceLoader *loader = 0);
 		~VolumeResource();		
 
-		PolyVox::LargeVolume<PolyVox::Material8>* getVolume(void);
+		PolyVox::SimpleVolume<PolyVox::Material8>* getVolume(void);
 
 	protected:
 
@@ -52,7 +52,7 @@ namespace Thermite
 		void unloadImpl ();
 		size_t calculateSize () const;
 
-		PolyVox::LargeVolume<PolyVox::Material8>* m_pVolume;
+		PolyVox::SimpleVolume<PolyVox::Material8>* m_pVolume;
 	};
 
 	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 

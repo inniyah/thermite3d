@@ -55,8 +55,8 @@ namespace Thermite
 	{
 		Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (mName, mGroup, true, this);
 		std::istream stdStream(new DataStreamWrapper(stream)); 
-		m_pVolume = new PolyVox::LargeVolume<Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(63,63,63)),32);
-		loadVolume<Material8>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
+		m_pVolume = new PolyVox::SimpleVolume<Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(63,63,63)),32);
+		loadVolume<SimpleVolume, Material8>(stdStream, *m_pVolume, VolumeManager::getSingletonPtr()->m_pProgressListener);
 	}
 
 	void VolumeResource::unloadImpl ()
@@ -72,7 +72,7 @@ namespace Thermite
 		return m_pVolume->getWidth() * m_pVolume->getHeight() * m_pVolume->getDepth();
 	}
 
-	PolyVox::LargeVolume<PolyVox::Material8>* VolumeResource::getVolume(void)
+	PolyVox::SimpleVolume<PolyVox::Material8>* VolumeResource::getVolume(void)
 	{
 		return m_pVolume;
 	}

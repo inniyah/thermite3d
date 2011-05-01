@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include <Material.h>
 #include <PolyVoxForwardDeclarations.h>
 #include <Region.h>
+#include <SimpleVolume.h>
 #include <SurfaceMesh.h>
 
 namespace Thermite
@@ -38,7 +39,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		AmbientOcclusionTask(PolyVox::LargeVolume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength);
+		AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength);
 
 		void run(void);
 
@@ -48,7 +49,7 @@ namespace Thermite
 	public:
 		PolyVox::Region m_regToProcess;
 		PolyVox::Array<3, uint8_t>* mAmbientOcclusionVolume;
-		PolyVox::LargeVolume<PolyVox::Material8>* mVolume;
+		PolyVox::SimpleVolume<PolyVox::Material8>* mVolume;
 		uint32_t m_uTimeStamp;
 		float mRayLength;
 	};

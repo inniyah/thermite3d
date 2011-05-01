@@ -30,7 +30,7 @@ using namespace std;
 
 namespace Thermite
 {
-	FindPathTask::FindPathTask(PolyVox::LargeVolume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume)
+	FindPathTask::FindPathTask(PolyVox::SimpleVolume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume)
 		:mPolyVoxVolume(polyVoxVolume)
 		,mStart(start)
 		,mEnd(end)
@@ -45,10 +45,10 @@ namespace Thermite
 
 		list<Vector3DInt32> path;
 		TankWarsVoxelValidator<Material8> validator(start.getY());
-		AStarPathfinderParams<LargeVolume, Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
+		AStarPathfinderParams<SimpleVolume, Material8> pathfinderParams(mPolyVoxVolume, start, end, &path, 2.0f, 10000);
 		pathfinderParams.connectivity = TwentySixConnected;
 		pathfinderParams.isVoxelValidForPath = validator;
-		AStarPathfinder<LargeVolume, Material8> pathfinder(pathfinderParams);
+		AStarPathfinder<SimpleVolume, Material8> pathfinder(pathfinderParams);
 		try
 		{
 			pathfinder.execute();

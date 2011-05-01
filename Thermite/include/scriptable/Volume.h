@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "Array.h"
 #include "PolyVoxForwardDeclarations.h"
 #include "Region.h"
+#include "SimpleVolume.h"
 
 #include "OgrePrerequisites.h"
 #include "OgreTexture.h"
@@ -52,7 +53,7 @@ namespace Thermite
 		Volume(uint32_t width, uint32_t height, uint32_t depth, Object* parent = 0);
 		~Volume(void);
 
-		void setPolyVoxVolume(PolyVox::LargeVolume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
+		void setPolyVoxVolume(PolyVox::SimpleVolume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength);
 
 		void initialise(void);
 		void update(void);
@@ -109,7 +110,7 @@ namespace Thermite
 
 		bool mMultiThreadedSurfaceExtraction;
 
-		PolyVox::LargeVolume<PolyVox::Material8>* m_pPolyVoxVolume;
+		PolyVox::SimpleVolume<PolyVox::Material8>* m_pPolyVoxVolume;
 		uint16_t mRegionSideLength;
 		uint16_t mVolumeWidthInRegions;
 		uint16_t mVolumeHeightInRegions;
