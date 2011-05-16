@@ -12,6 +12,7 @@
 #include "Utility.h"
 
 #include "Application.h"
+#include "FPSDialog.h"
 #include "LogManager.h"
 
 #include <OgreEntity.h>
@@ -79,6 +80,8 @@ namespace Thermite
 	{	
 		mCamera = new Camera(0);			
 		//mSkyBox = new SkyBox(0);
+		FPSDialog* fpsDialog = new FPSDialog(this);
+		fpsDialog->show();
 	}
 
 	ViewWidget::~ViewWidget()

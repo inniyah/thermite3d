@@ -1,7 +1,6 @@
 #include "Application.h"
 
 #include "ViewWidget.h"
-#include "FPSDialog.h"
 #include "GraphicsSettingsWidget.h"
 #include "SettingsDialog.h"
 
