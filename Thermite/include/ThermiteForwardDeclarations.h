@@ -41,6 +41,9 @@ namespace Thermite
 	class TaskProcessorThread;
 
 	//Other	
+	class Entity;
+	class Light;
+	class Object;
 	class PhysicalObject;
 	
 	class SurfacePatchRenderable;
