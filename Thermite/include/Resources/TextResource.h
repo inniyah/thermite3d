@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
 
-#include "PolyVoxForwardDeclarations.h"
+#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
 #include "PolyVoxImpl/TypeDef.h"
 
 #include <OgreResourceManager.h>

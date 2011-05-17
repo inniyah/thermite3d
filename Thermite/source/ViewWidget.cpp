@@ -5,7 +5,7 @@
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfacePatchRenderable.h"
-#include "Material.h"
+#include "PolyVoxCore/Material.h"
 #include "QStringIODevice.h"
 #include "TextManager.h"
 #include "VolumeManager.h"

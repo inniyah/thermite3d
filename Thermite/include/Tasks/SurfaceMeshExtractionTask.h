@@ -26,11 +26,11 @@ freely, subject to the following restrictions:
 
 #include "Task.h"
 
-#include <Material.h>
-#include <PolyVoxForwardDeclarations.h>
-#include <Region.h>
-#include <SimpleVolume.h>
-#include <SurfaceMesh.h>
+#include <PolyVoxCore/Material.h>
+#include <PolyVoxCore/PolyVoxForwardDeclarations.h>
+#include <PolyVoxCore/Region.h>
+#include <PolyVoxCore/SimpleVolume.h>
+#include <PolyVoxCore/SurfaceMesh.h>
 
 namespace Thermite
 {

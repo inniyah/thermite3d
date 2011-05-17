@@ -3,7 +3,7 @@
 
 #include "OgreWidget.h"
 
-#include "Serialization.h"
+#include "PolyVoxUtil/Serialization.h"
 
 #include "Camera.h"
 #include "Entity.h"

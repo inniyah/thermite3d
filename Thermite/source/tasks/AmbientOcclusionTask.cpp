@@ -23,9 +23,9 @@ freely, subject to the following restrictions:
 
 #include "AmbientOcclusionTask.h"
 
-#include "Material.h"
+#include "PolyVoxCore/Material.h"
 
-#include "AmbientOcclusionCalculator.h"
+#include "PolyVoxCore/AmbientOcclusionCalculator.h"
 
 #include <QMutex>
 

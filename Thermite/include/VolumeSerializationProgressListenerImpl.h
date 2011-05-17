@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 #ifndef __VOLUMESERIALIZATIONPROGRESSLISTENERIMPL_H__
 #define __VOLUMESERIALIZATIONPROGRESSLISTENERIMPL_H__
 
-#include "Serialization.h"
+#include "PolyVoxUtil/Serialization.h"
 
 #include <QObject>
 

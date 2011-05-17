@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 
 #include "Application.h"
 
-#include "VertexTypes.h"
+#include "PolyVoxCore/VertexTypes.h"
 #include "OgreVertexIndexData.h"
 
 #include <QSettings>

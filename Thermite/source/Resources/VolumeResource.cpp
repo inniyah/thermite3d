@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 #include "VolumeManager.h"
 #include "VolumeResource.h"
 
-#include "Material.h"
+#include "PolyVoxCore/Material.h"
 
 #include "OgreVector3.h"
 #include "OgreLogManager.h"

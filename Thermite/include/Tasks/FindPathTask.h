@@ -26,17 +26,17 @@ freely, subject to the following restrictions:
 
 #include "Task.h"
 
-#include <Material.h>
-#include <PolyVoxForwardDeclarations.h>
+#include <PolyVoxCore/Material.h>
+#include <PolyVoxCore/PolyVoxForwardDeclarations.h>
 
 #include <QVariant>
 #include <QVector3D>
 
-#include "Vector.h"
+#include "PolyVoxCore/Vector.h"
 
 #include "scriptable/Volume.h"
 
-#include <AStarPathfinder.h>
+#include <PolyVoxCore/AStarPathfinder.h>
 
 namespace Thermite
 {

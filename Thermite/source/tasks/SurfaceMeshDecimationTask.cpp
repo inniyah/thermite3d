@@ -23,8 +23,8 @@ freely, subject to the following restrictions:
 
 #include "SurfaceMeshDecimationTask.h"
 
-#include "SurfaceMesh.h"
-#include "MeshDecimator.h"
+#include "PolyVoxCore/SurfaceMesh.h"
+#include "PolyVoxCore/MeshDecimator.h"
 
 #include <QMutex>
 

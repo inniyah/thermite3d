@@ -28,10 +28,10 @@ freely, subject to the following restrictions:
 #include "QtForwardDeclarations.h"
 #include "ThermiteForwardDeclarations.h"
 
-#include "Array.h"
-#include "PolyVoxForwardDeclarations.h"
-#include "Region.h"
-#include "SimpleVolume.h"
+#include "PolyVoxCore/Array.h"
+#include "PolyVoxCore/PolyVoxForwardDeclarations.h"
+#include "PolyVoxCore/Region.h"
+#include "PolyVoxCore/SimpleVolume.h"
 
 #include "OgrePrerequisites.h"
 #include "OgreTexture.h"
@@ -41,7 +41,7 @@ freely, subject to the following restrictions:
 #include <map>
 #include <set>
 
-#include "Vector.h"
+#include "PolyVoxCore/Vector.h"
 
 namespace Thermite
 {

@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "Ogre.h"
 #include <vector>
 
-#include "SurfaceMesh.h"
+#include "PolyVoxCore/SurfaceMesh.h"
 
 namespace Thermite
 {

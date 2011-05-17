@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 #define __THERMITE_SURFACE_MESH_DECIMATION_RUNNABLE_H__
 
 #include "Task.h"
-#include "SurfaceMesh.h"
+#include "PolyVoxCore/SurfaceMesh.h"
 
 namespace Thermite
 {

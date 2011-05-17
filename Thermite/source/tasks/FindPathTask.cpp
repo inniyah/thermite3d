@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 
 #include "FindPathTask.h"
 
-#include "Material.h"
+#include "PolyVoxCore/Material.h"
 
 using namespace PolyVox;
 using namespace std;

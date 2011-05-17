@@ -29,10 +29,10 @@ freely, subject to the following restrictions:
 
 #include "VolumeManager.h"
 
-#include "Material.h"
+#include "PolyVoxCore/Material.h"
 
-#include "Raycast.h"
-#include "AmbientOcclusionCalculator.h"
+#include "PolyVoxCore/Raycast.h"
+#include "PolyVoxCore/AmbientOcclusionCalculator.h"
 
 #include "Utility.h"
 
