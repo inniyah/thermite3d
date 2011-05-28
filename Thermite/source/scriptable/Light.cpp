@@ -46,9 +46,11 @@ namespace Thermite
 		{
 		case Light::PointLight:
 			mOgreLight->setType(Ogre::Light::LT_POINT);
+			mOgreLight->setAttenuation(1000, 0.0, 0.01, 0.0);
 			break;
 		case Light::DirectionalLight:
 			mOgreLight->setType(Ogre::Light::LT_DIRECTIONAL);
+			mOgreLight->setAttenuation(1000, 1.0, 1.0, 1.0);
 			break;
 		case Light::SpotLight:
 			mOgreLight->setType(Ogre::Light::LT_SPOTLIGHT);
@@ -57,6 +59,7 @@ namespace Thermite
 
 		QColor col = getColour();
 		mOgreLight->setDiffuseColour(col.redF(), col.greenF(), col.blueF());
+		mOgreLight->setSpecularColour(col.redF(), col.greenF(), col.blueF());		
 	}
 
 	const QColor& Light::getColour(void) const
