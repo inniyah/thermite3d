@@ -39,7 +39,7 @@ namespace Thermite
 			mOgreLight = sceneManager->createLight(objAddressAsString + "_Light");
 			Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
 			mDirectionalFixupSceneNode->attachObject(mOgreLight);
-			mOgreSceneNode->attachObject(ogreEntity);
+			mDirectionalFixupSceneNode->attachObject(ogreEntity);
 		}
 
 		switch(getType())

@@ -81,7 +81,7 @@ namespace Thermite
 		mCamera = new Camera(0);			
 		//mSkyBox = new SkyBox(0);
 		FPSDialog* fpsDialog = new FPSDialog(this);
-		fpsDialog->show();
+		//fpsDialog->show();
 	}
 
 	ViewWidget::~ViewWidget()
