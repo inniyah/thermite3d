@@ -33,7 +33,7 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material8>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
+	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material16>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
 		:m_regToProcess(regToProcess)
 		,mAmbientOcclusionVolume(ambientOcclusionVolume)
 		,m_uTimeStamp(uTimeStamp)
@@ -45,7 +45,7 @@ namespace Thermite
 	void AmbientOcclusionTask::run(void)
 	{	
 		uint8_t uNoOfSamplesPerOutputElement = 0; //Max off 255 for max quality.
-		AmbientOcclusionCalculator<SimpleVolume, Material8> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength, uNoOfSamplesPerOutputElement);
+		AmbientOcclusionCalculator<SimpleVolume, Material16> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength, uNoOfSamplesPerOutputElement);
 		ambientOcclusionCalculator.execute();
 
 		emit finished(this);

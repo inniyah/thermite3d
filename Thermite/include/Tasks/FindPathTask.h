@@ -70,7 +70,7 @@ namespace Thermite
 			{
 				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
 				{
-					PolyVox::Material8 voxel = volData->getVoxelAt(x,y,z);
+					PolyVox::Material16 voxel = volData->getVoxelAt(x,y,z);
 					if(voxel.getMaterial() > 0)
 					{
 						return false;
@@ -84,7 +84,7 @@ namespace Thermite
 			{
 				for(int16_t x = v3dPos.getX() - tankSize; x <= v3dPos.getX() + tankSize; x++)
 				{
-					PolyVox::Material8 voxel = volData->getVoxelAt(x,y,z);
+					PolyVox::Material16 voxel = volData->getVoxelAt(x,y,z);
 					if(voxel.getMaterial() == 0)
 					{
 						return false;
@@ -103,7 +103,7 @@ namespace Thermite
 	{
 		Q_OBJECT
 	public:
-		FindPathTask(PolyVox::SimpleVolume<PolyVox::Material8>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
+		FindPathTask(PolyVox::SimpleVolume<PolyVox::Material16>* polyVoxVolume, QVector3D start, QVector3D end, Volume* thermiteVolume);
 
 		void run(void);
 
@@ -111,7 +111,7 @@ namespace Thermite
 		void finished(QVariantList path);
 
 	public:
-		PolyVox::SimpleVolume<PolyVox::Material8>* mPolyVoxVolume;
+		PolyVox::SimpleVolume<PolyVox::Material16>* mPolyVoxVolume;
 		QVector3D mStart;
 		QVector3D mEnd;
 		Volume* mThermiteVolume;

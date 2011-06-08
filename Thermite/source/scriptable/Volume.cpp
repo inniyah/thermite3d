@@ -95,7 +95,7 @@ namespace Thermite
 		}
 
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::SimpleVolume<PolyVox::Material8>* pPolyVoxVolume = new PolyVox::SimpleVolume<PolyVox::Material8>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
+		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = new PolyVox::SimpleVolume<PolyVox::Material16>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
 		//pPolyVoxVolume->setCompressionEnabled(false);
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 	}
@@ -104,7 +104,7 @@ namespace Thermite
 	{
 	}
 
-	void Volume::setPolyVoxVolume(PolyVox::SimpleVolume<PolyVox::Material8>* pPolyVoxVolume, uint16_t regionSideLength)
+	void Volume::setPolyVoxVolume(PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume, uint16_t regionSideLength)
 	{
 		m_pPolyVoxVolume = pPolyVoxVolume;
 		mRegionSideLength = regionSideLength;		
@@ -137,7 +137,7 @@ namespace Thermite
 
 		/*QTime time;
 		time.start();
-		AmbientOcclusionCalculator<Material8> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
+		AmbientOcclusionCalculator<Material16> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
 		ambientOcclusionCalculator.execute();
 		qDebug() << "Lighting time = " << time.elapsed();*/
 	}
@@ -616,7 +616,7 @@ namespace Thermite
 				{
 					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
 					{
-						Material8 value(material);
+						Material16 value(material);
 						m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 					}
 				}
@@ -661,7 +661,7 @@ namespace Thermite
 			{
 				for(int x = firstX; x <= lastX; ++x)
 				{
-					Material8 value(material);
+					Material16 value(material);
 					m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
 				}
 			}
@@ -682,7 +682,7 @@ namespace Thermite
 		direction *= 1000.0f;
 
 		RaycastResult raycastResult;
-		Raycast<SimpleVolume, Material8> raycast(m_pPolyVoxVolume, start, direction, raycastResult);
+		Raycast<SimpleVolume, Material16> raycast(m_pPolyVoxVolume, start, direction, raycastResult);
 		raycast.execute();
 		
 		if(raycastResult.foundIntersection)
@@ -697,7 +697,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::SimpleVolume<PolyVox::Material8>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
@@ -708,7 +708,7 @@ namespace Thermite
 		int y = qRound(position.y());
 		int z = qRound(position.z());
 
-		Material8 voxel = m_pPolyVoxVolume->getVoxelAt(x,y,z);
+		Material16 voxel = m_pPolyVoxVolume->getVoxelAt(x,y,z);
 
 		return voxel.getMaterial();
 	}
