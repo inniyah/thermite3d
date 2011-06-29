@@ -141,6 +141,8 @@ namespace Thermite
 
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
+		//Note: Shadow caster material is actually broken for the
+		//fireballs, but we don't really want them to cast shadows anyway.
 		mOgreSceneManager->setShadowTextureCasterMaterial("ShadowCasterMaterial");
 
 		/*mLogManager = new LogManager(this);

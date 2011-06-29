@@ -46,7 +46,7 @@ namespace Thermite
 		{
 		case Light::PointLight:
 			mOgreLight->setType(Ogre::Light::LT_POINT);
-			mOgreLight->setAttenuation(1000, 0.0, 0.01, 0.0);
+			mOgreLight->setAttenuation(1000, 0.0, 0.001, 0.0);
 			break;
 		case Light::DirectionalLight:
 			mOgreLight->setType(Ogre::Light::LT_DIRECTIONAL);

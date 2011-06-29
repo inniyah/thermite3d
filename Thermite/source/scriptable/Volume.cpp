@@ -84,7 +84,7 @@ namespace Thermite
 
 		for(int ct = 1; ct < 256; ct++)
 		{
-			m_mapMaterialIds["ColouredCubicVoxel"].insert(ct);
+			m_mapMaterialIds["PolyVoxMaterial"].insert(ct);
 		}
 
 		if(!m_backgroundThread)
@@ -212,17 +212,17 @@ namespace Thermite
 					Ogre::TU_STATIC_WRITE_ONLY // usage
 					);
 
-				Ogre::MaterialPtr materialPtr = Ogre::MaterialManager::getSingleton().getByName("ColouredCubicVoxel");
-				Ogre::Technique* pTechnique = materialPtr->getTechnique("Advanced");
+				Ogre::MaterialPtr materialPtr = Ogre::MaterialManager::getSingleton().getByName("PolyVoxMaterial");
+				Ogre::Technique* pTechnique = materialPtr->getTechnique(0);
 				if(pTechnique)
 				{
-					Ogre::Pass* pPass = pTechnique->getPass("Light0");
+					Ogre::Pass* pPass = pTechnique->getPass(0);
 					Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
 					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
 
-					materialPtr = Ogre::MaterialManager::getSingleton().getByName("VertexColourMaterial");
-					pTechnique = materialPtr->getTechnique("Advanced");
-					pPass = pTechnique->getPass("Light0");
+					materialPtr = Ogre::MaterialManager::getSingleton().getByName("MeshMaterial");
+					pTechnique = materialPtr->getTechnique(0);
+					pPass = pTechnique->getPass(0);
 					pTexUnit = pPass->createTextureUnitState();
 					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
 					pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
