@@ -139,7 +139,7 @@ namespace Thermite
 
 		bool mIsModified;
 
-	private:
+	public:
 		bool isRegionBeingExtracted(const PolyVox::Region& regionToTest);
 		void updateLastModifedArray(const PolyVox::Region& regionToTest);
 	};	

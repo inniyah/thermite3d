@@ -40,7 +40,7 @@ namespace Thermite
 		const bool loopAnimation(void) const;
 		void setLoopAnimation(bool loopAnimation);
 
-	private:
+	public:
 		QString mMeshName;
 		QString mMaterialName;
 
