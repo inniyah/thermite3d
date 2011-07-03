@@ -15,7 +15,7 @@
 namespace Thermite
 {
 	OgreWidget::OgreWidget(QWidget* parent, Qt::WindowFlags f)
-	:QWidget(parent, f | Qt::MSWindowsOwnDC)
+	:ViewWidget(parent, f | Qt::MSWindowsOwnDC)
 	,m_pOgreRenderWindow(0)
 	,mIsInitialised(false)
 	{		

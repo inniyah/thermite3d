@@ -5,6 +5,8 @@
 
 #include <QWidget>
 
+#include "ViewWidget.h"
+
 class QSettings;
 
 namespace Thermite
@@ -16,7 +18,7 @@ namespace Thermite
 	 * 
 	 * \author David Williams
 	 */
-	class OgreWidget : public QWidget
+	class OgreWidget : public ViewWidget
 	{
 		Q_OBJECT
 

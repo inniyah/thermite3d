@@ -1,5 +1,7 @@
 #include "ViewWidget.h"
 
+#include "OgreWidget.h"
+
 #include "SkyBox.h"
 #include "TaskProcessorThread.h"
 #include "SurfaceMeshDecimationTask.h"
@@ -52,7 +54,7 @@ using namespace PolyVox;
 namespace Thermite
 {
 	ViewWidget::ViewWidget(QWidget* parent, Qt::WindowFlags f)
-	:OgreWidget(parent, f)
+	:QWidget(parent, f)
 
 		//Scene representation
 		,mCamera(0)
@@ -115,7 +117,9 @@ namespace Thermite
 		mCameraSceneNode = mOgreSceneManager->createSceneNode("Camera Scene Node");
 		//mCameraSceneNode->attachObject(mOgreCamera);
 
-		mMainViewport = getOgreRenderWindow()->addViewport(mOgreCamera);
+		OgreWidget* pOgreWidget = dynamic_cast<OgreWidget*>(this);
+
+		mMainViewport = pOgreWidget->getOgreRenderWindow()->addViewport(mOgreCamera);
 		mMainViewport->setBackgroundColour(Ogre::ColourValue::Black);
 
 		createAxis();
@@ -217,7 +221,9 @@ namespace Thermite
 			}
 		}
 
-		OgreWidget::update();
+		//mOgreWidget->update();
+
+		QWidget::update();
 	}
 
 	void ViewWidget::shutdown(void)

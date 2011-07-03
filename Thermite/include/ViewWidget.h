@@ -1,8 +1,6 @@
 #ifndef THERMITE_VIEWWIDGET_H_
 #define THERMITE_VIEWWIDGET_H_
 
-#include "OgreWidget.h"
-
 #include "PolyVoxUtil/Serialization.h"
 
 #include "Camera.h"
@@ -34,7 +32,7 @@ class QWidget;
 namespace Thermite
 {
 
-	class ViewWidget : public OgreWidget
+	class ViewWidget : public QWidget
 	{
 		Q_OBJECT
 
