@@ -50,9 +50,6 @@ namespace Thermite
 		//The external windows handle parameters are platform-specific
 		Ogre::String externalWindowHandleParams;
 
-		//Accept input focus
-		setFocusPolicy(Qt::StrongFocus);
-
 	#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
 		//positive integer for W32 (HWND handle) - According to Ogre Docs
 		externalWindowHandleParams = Ogre::StringConverter::toString((unsigned int)(winId()));
@@ -127,7 +124,7 @@ namespace Thermite
 		}
 	}
 
-	bool OgreWidget::applySettings(QSettings* settings)
+	/*bool OgreWidget::applySettings(QSettings* settings)
 	{
 		bool applied = false;
 		QString resolution;
@@ -169,7 +166,7 @@ namespace Thermite
 			}
 		}
 
-		/*if(applied)
+		if(applied)
 		{
 			qApp->_systemLog()->logMessage("Set main window resolution to \"" + resolution + "\"", LL_INFO);
 		}
@@ -181,7 +178,7 @@ namespace Thermite
 				qApp->_systemLog()->logMessage("    \"" + res + "\"", LL_WARNING);
 			}
 			qApp->_systemLog()->logMessage("The requested index was: \"" + QString::number(selectedWindowMode) + "\"", LL_WARNING);
-		}*/
+		}
 		return applied;
-	}
+	}*/
 }

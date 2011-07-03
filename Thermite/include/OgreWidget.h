@@ -29,7 +29,7 @@ namespace Thermite
 		Ogre::RenderWindow* getOgreRenderWindow() const;
 
 		//Other
-		bool applySettings(QSettings* settings);
+		//bool applySettings(QSettings* settings);
 		void initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
 
 	protected:

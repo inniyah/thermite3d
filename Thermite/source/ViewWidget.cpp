@@ -84,6 +84,9 @@ namespace Thermite
 		//mSkyBox = new SkyBox(0);
 		FPSDialog* fpsDialog = new FPSDialog(this);
 		//fpsDialog->show();
+
+		//Accept input focus
+		setFocusPolicy(Qt::StrongFocus);
 	}
 
 	ViewWidget::~ViewWidget()
