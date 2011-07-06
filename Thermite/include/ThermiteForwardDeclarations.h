@@ -45,7 +45,7 @@ namespace Thermite
 	class Light;
 	class Object;
 	class PhysicalObject;
-	
+	class SkyBox;
 	class SurfacePatchRenderable;
 	
 	class Volume;

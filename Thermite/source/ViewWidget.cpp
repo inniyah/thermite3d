@@ -224,7 +224,9 @@ namespace Thermite
 			}
 		}
 
-		//mOgreWidget->update();
+		mCurrentScreen->preUpdate();
+		mCurrentScreen->update();
+		mCurrentScreen->postUpdate();
 
 		QWidget::update();
 	}
