@@ -29,6 +29,7 @@ SET(MAIN_SRC_FILES
 	source/FPSDialog.cpp
 	source/GraphicsSettingsWidget.cpp
 	source/OgreWidget.cpp
+	source/Screen.cpp
 	source/SettingsDialog.cpp
 	source/ViewWidget.cpp
 )
@@ -48,6 +49,7 @@ SET(MAIN_INC_FILES
 	include/OgreWidget.h
 	include/QtOgreForwardDeclarations.h
 	include/SettingsDialog.h
+	include/Screen.h
 	include/ViewWidget.h
 )
 
