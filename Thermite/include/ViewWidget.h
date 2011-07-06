@@ -11,6 +11,8 @@
 #include "scriptable/Volume.h"
 #include "ThermiteForwardDeclarations.h"
 
+#include "Screen.h"
+
 #include "QtOgreForwardDeclarations.h"
 
 #include <OgrePrerequisites.h>
@@ -43,6 +45,18 @@ namespace Thermite
 		virtual void initialise(void);
 		virtual void update(void);
 		virtual void shutdown(void);
+
+		void keyPressEvent(QKeyEvent* event);
+		void keyReleaseEvent(QKeyEvent* event);
+
+		void mousePressEvent(QMouseEvent* event);
+		void mouseReleaseEvent(QMouseEvent* event);
+		void mouseDoubleClickEvent(QMouseEvent* event);
+		void mouseMoveEvent(QMouseEvent* event);
+
+		void wheelEvent(QWheelEvent* event);
+
+		Screen* setScreen(Screen* screen);
 
 	public:
 		
@@ -92,6 +106,9 @@ namespace Thermite
 
 		//Other
 		bool mFirstFind;
+
+		//Screen
+		Screen* mCurrentScreen;
 	};
 }
 

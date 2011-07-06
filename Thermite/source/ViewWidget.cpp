@@ -319,4 +319,49 @@ namespace Thermite
 
 		return QVector3D(pickingRay.getDirection().x, pickingRay.getDirection().y, pickingRay.getDirection().z);
 	}
+
+	void ViewWidget::keyPressEvent(QKeyEvent* event)
+	{
+		mCurrentScreen->keyPressEvent(event);
+	}
+
+	void ViewWidget::keyReleaseEvent(QKeyEvent* event)
+	{
+		mCurrentScreen->keyReleaseEvent(event);
+	}
+
+	void ViewWidget::mousePressEvent(QMouseEvent* event)
+	{
+		mCurrentScreen->mousePressEvent(event);
+	}
+
+	void ViewWidget::mouseReleaseEvent(QMouseEvent* event)
+	{
+		mCurrentScreen->mouseReleaseEvent(event);
+	}
+
+	void ViewWidget::mouseDoubleClickEvent(QMouseEvent* event)
+	{
+		mCurrentScreen->mouseDoubleClickEvent(event);
+	}
+
+	void ViewWidget::mouseMoveEvent(QMouseEvent* event)
+	{
+		mCurrentScreen->mouseMoveEvent(event);
+	}
+
+	void ViewWidget::wheelEvent(QWheelEvent* event)
+	{
+		mCurrentScreen->wheelEvent(event);
+	}
+
+	Screen* ViewWidget::setScreen(Screen* screen)
+	{
+		Screen* previousScreen = mCurrentScreen;
+		mCurrentScreen = screen;
+
+		previousScreen->shutdown();
+		mCurrentScreen->initialise();
+		return previousScreen;
+	}
 }
