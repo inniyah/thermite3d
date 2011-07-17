@@ -132,7 +132,7 @@ namespace Thermite
 		mLightingFinishedArray.resize(lightDimensions); std::fill(mLightingFinishedArray.getRawData(), mLightingFinishedArray.getRawData() + mLightingFinishedArray.getNoOfElements(), 0);
 
 		//Ambient Occlusion
-		mAmbientOcclusionVolume.resize(ArraySizes(32)(8)(32));
+		mAmbientOcclusionVolume.resize(ArraySizes(128)(32)(128));
 		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
 
 		/*QTime time;
@@ -199,7 +199,7 @@ namespace Thermite
 					Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
 				}
 
-				const int iRatio = 4; //Ratio of ambient occlusion volume size to main volume size.
+				const int iRatio = 1; //Ratio of ambient occlusion volume size to main volume size.
 				mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
 					"AmbientOcclusionVolumeTexture", // Name of texture
 					"General", // Name of resource group in which the texture should be created
