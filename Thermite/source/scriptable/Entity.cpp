@@ -30,7 +30,6 @@ namespace Thermite
 		//Set a custom material if necessary
 		if(materialName().isEmpty() == false)
 		{
-			assert(mOgreEntity);
 			if(mOgreEntity)
 			{
 				//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
@@ -40,12 +39,15 @@ namespace Thermite
 		}
 
 		//Animation
-		Ogre::AnimationStateSet* animationStateSet = mOgreEntity->getAllAnimationStates();		
-		if(animationStateSet && animationStateSet->hasAnimationState(animationName().toStdString()))
+		if(mOgreEntity)
 		{
-			Ogre::AnimationState* animationState = animationStateSet->getAnimationState(animationName().toStdString());
-			animationState->setEnabled(animated());
-			animationState->setLoop(loopAnimation());
+			Ogre::AnimationStateSet* animationStateSet = mOgreEntity->getAllAnimationStates();		
+			if(animationStateSet && animationStateSet->hasAnimationState(animationName().toStdString()))
+			{
+				Ogre::AnimationState* animationState = animationStateSet->getAnimationState(animationName().toStdString());
+				animationState->setEnabled(animated());
+				animationState->setLoop(loopAnimation());
+			}
 		}
 	}
 
@@ -58,10 +60,15 @@ namespace Thermite
 	{
 		mMeshName = name;
 
-		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
-		std::string entityName(objAddressAsString + "_Entity");
-		mOgreEntity = mSceneManager->createEntity(entityName, meshName().toStdString());
-		mOgreSceneNode->attachObject(mOgreEntity);
+		//Should delete old mesh first!!!
+
+		if(mMeshName.isEmpty() == false)
+		{
+			std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
+			std::string entityName(objAddressAsString + "_Entity");
+			mOgreEntity = mSceneManager->createEntity(entityName, meshName().toStdString());
+			mOgreSceneNode->attachObject(mOgreEntity);
+		}
 	}
 
 	const QString& Entity::materialName(void) const
