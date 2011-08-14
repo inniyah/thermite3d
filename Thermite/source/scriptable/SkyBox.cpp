@@ -15,7 +15,7 @@ namespace Thermite
 		RenderComponent::update();
 
 		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
-		sceneManager->setSkyBox(true, materialName().toStdString(), 2500);
+		sceneManager->setSkyBox(true, materialName().toAscii().constData(), 2500);
 	}
 
 	const QString& SkyBox::materialName(void) const

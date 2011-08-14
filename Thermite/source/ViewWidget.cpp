@@ -179,7 +179,7 @@ namespace Thermite
 				if(pObj->mComponent)
 				{
 					//Use the objects address to build unique names
-					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
+					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toAscii();
 
 					RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
 					if(renderComponent)

@@ -34,7 +34,7 @@ namespace Thermite
 			{
 				//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
 				//But you can only get materials from SubEntities.
-				mOgreEntity->setMaterialName(materialName().toStdString());
+				mOgreEntity->setMaterialName(materialName().toAscii().constData());
 			}
 		}
 
@@ -42,9 +42,9 @@ namespace Thermite
 		if(mOgreEntity)
 		{
 			Ogre::AnimationStateSet* animationStateSet = mOgreEntity->getAllAnimationStates();		
-			if(animationStateSet && animationStateSet->hasAnimationState(animationName().toStdString()))
+			if(animationStateSet && animationStateSet->hasAnimationState(animationName().toAscii().constData()))
 			{
-				Ogre::AnimationState* animationState = animationStateSet->getAnimationState(animationName().toStdString());
+				Ogre::AnimationState* animationState = animationStateSet->getAnimationState(animationName().toAscii().constData());
 				animationState->setEnabled(animated());
 				animationState->setLoop(loopAnimation());
 			}
@@ -64,9 +64,9 @@ namespace Thermite
 
 		if(mMeshName.isEmpty() == false)
 		{
-			std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
+			std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
 			std::string entityName(objAddressAsString + "_Entity");
-			mOgreEntity = mSceneManager->createEntity(entityName, meshName().toStdString());
+			mOgreEntity = mSceneManager->createEntity(entityName, meshName().toAscii().constData());
 			mOgreSceneNode->attachObject(mOgreEntity);
 		}
 	}

@@ -23,6 +23,8 @@ freely, subject to the following restrictions:
 
 #include "AmbientOcclusionTask.h"
 
+#include "PolyVoxCore/Density.h"
+#include "PolyVoxCore/LowPassFilter.h"
 #include "PolyVoxCore/Material.h"
 
 #include "PolyVoxCore/AmbientOcclusionCalculator.h"
@@ -33,6 +35,9 @@ using namespace PolyVox;
 
 namespace Thermite
 {
+	PolyVox::RawVolume<PolyVox::Density8>* AmbientOcclusionTask::mThresholdVolume = 0;
+	PolyVox::RawVolume<PolyVox::Density8>* AmbientOcclusionTask::mBlurredVolume = 0;
+
 	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material16>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
 		:m_regToProcess(regToProcess)
 		,mAmbientOcclusionVolume(ambientOcclusionVolume)
@@ -40,14 +45,64 @@ namespace Thermite
 		,mVolume(volume)
 		,mRayLength(rayLength)
 	{
+		if(mThresholdVolume == 0)
+		{
+			mThresholdVolume = new PolyVox::RawVolume<PolyVox::Density8>(Region(0,0,0,127,127,127));
+		}
+
+		if(mBlurredVolume == 0)
+		{
+			mBlurredVolume = new PolyVox::RawVolume<PolyVox::Density8>(Region(0,0,0,127,127,127));
+		}
 	}
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		/*uint8_t uNoOfSamplesPerOutputElement = 4; //Max off 255 for max quality.
-		AmbientOcclusionCalculator<SimpleVolume, Material16> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength, uNoOfSamplesPerOutputElement);
+		uint8_t uNoOfSamplesPerOutputElement = 0; //Max off 255 for max quality.
+		/*AmbientOcclusionCalculator<SimpleVolume, Material16> ambientOcclusionCalculator(mVolume, mAmbientOcclusionVolume, m_regToProcess, mRayLength, uNoOfSamplesPerOutputElement);
 		ambientOcclusionCalculator.execute();*/
 
+		for(uint32_t z = 0; z < mThresholdVolume->getDepth(); z++)
+		{
+			for(uint32_t y = 0; y < mThresholdVolume->getHeight(); y++)
+			{
+				for(uint32_t x = 0; x < mThresholdVolume->getWidth(); x++)
+				{
+					if(mVolume->getVoxelAt(x,y,z).getMaterial() == 0)
+					{
+						mThresholdVolume->setVoxelAt(x,y,z,255);
+					}
+					else
+					{
+						mThresholdVolume->setVoxelAt(x,y,z,0);
+					}
+				}
+			}
+		}
+
+		LowPassFilter<RawVolume, RawVolume, Density8> pass1(mThresholdVolume, Region(0,0,0,127,127,127), mBlurredVolume, Region(0,0,0,127,127,127), 5);
+		/*LowPassFilter<RawVolume, RawVolume, Density8> pass2(mBlurredVolume, Region(0,0,0,127,127,127), mThresholdVolume, Region(0,0,0,127,127,127));
+		pass1.execute();
+		pass2.execute();*/
+		//pass1.executeSAT();
+
+		for(uint32_t z = 0; z < mAmbientOcclusionVolume->getDimension(2); z++)
+		{
+			for(uint32_t y = 0; y < mAmbientOcclusionVolume->getDimension(1); y++)
+			{
+				for(uint32_t x = 0; x < mAmbientOcclusionVolume->getDimension(0); x++)
+				{
+					(*mAmbientOcclusionVolume)[z][y][x] = mBlurredVolume->getVoxelAt(x,y,z).getDensity();
+					//(*mAmbientOcclusionVolume)[z][y][x] = 128;
+				}
+			}
+		}
+
+		emit finished(this);
+
+		return;
+
+#ifdef BLAH
 		/*for(int32_t oz = mVolume->getEnclosingRegion().getLowerCorner().getZ(); oz < mVolume->getEnclosingRegion().getUpperCorner().getZ(); oz++)
 		{
 			for(int32_t oy = mVolume->getEnclosingRegion().getLowerCorner().getY(); oy < mVolume->getEnclosingRegion().getUpperCorner().getY(); oy++)
@@ -190,5 +245,7 @@ namespace Thermite
 		}*/
 
 		emit finished(this);
+
+#endif
 	}
 }

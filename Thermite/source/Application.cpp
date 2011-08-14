@@ -282,13 +282,13 @@ namespace Thermite
 		if(appDir.exists())
 		{
 			//Add the directory to Ogre
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toStdString(), "FileSystem");
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toAscii().constData(), "FileSystem");
 
 			//Add the subdirectories to Ogre
 			QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 			while (it.hasNext())
 			{
-				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toStdString(), "FileSystem");
+				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toAscii().constData(), "FileSystem");
 			}
 		}
 	}

@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 
 #include <PolyVoxCore/Material.h>
 #include <PolyVoxCore/PolyVoxForwardDeclarations.h>
+#include <PolyVoxCore/RawVolume.h>
 #include <PolyVoxCore/Region.h>
 #include <PolyVoxCore/SimpleVolume.h>
 #include <PolyVoxCore/SurfaceMesh.h>
@@ -52,6 +53,9 @@ namespace Thermite
 		PolyVox::SimpleVolume<PolyVox::Material16>* mVolume;
 		uint32_t m_uTimeStamp;
 		float mRayLength;
+
+		static PolyVox::RawVolume<PolyVox::Density8>* mThresholdVolume;
+		static PolyVox::RawVolume<PolyVox::Density8>* mBlurredVolume;
 	};
 }
 

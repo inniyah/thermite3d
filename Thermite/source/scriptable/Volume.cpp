@@ -113,10 +113,10 @@ namespace Thermite
 		mVolumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
 		mVolumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-		mLightRegionSideLength = qApp->settings()->value("Engine/LightRegionSideLength", 32).toInt();
-		mVolumeWidthInLightRegions = m_pPolyVoxVolume->getWidth() / mLightRegionSideLength;
-		mVolumeHeightInLightRegions = m_pPolyVoxVolume->getHeight() / mLightRegionSideLength;
-		mVolumeDepthInLightRegions = m_pPolyVoxVolume->getDepth() / mLightRegionSideLength;
+		mLightRegionSideLength = qApp->settings()->value("Engine/LightRegionSideLength", 128).toInt();
+		mVolumeWidthInLightRegions = 1; //m_pPolyVoxVolume->getWidth() / mLightRegionSideLength;
+		mVolumeHeightInLightRegions = 1; //m_pPolyVoxVolume->getHeight() / mLightRegionSideLength;
+		mVolumeDepthInLightRegions = 1; //m_pPolyVoxVolume->getDepth() / mLightRegionSideLength;
 
 		uint32_t dimensions[3] = {mVolumeWidthInRegions, mVolumeHeightInRegions, mVolumeDepthInRegions}; // Array dimensions
 		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), globals.timeStamp());
@@ -697,7 +697,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toStdString(), "General")->getVolume();
+		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toAscii().constData(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
