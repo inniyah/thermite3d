@@ -219,13 +219,19 @@ namespace Thermite
 					Ogre::Pass* pPass = pTechnique->getPass(0);
 					Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
 					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
+					pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);	
+					pTexUnit->setHardwareGammaEnabled(false);
+				}
 
-					materialPtr = Ogre::MaterialManager::getSingleton().getByName("MeshMaterial");
-					pTechnique = materialPtr->getTechnique(0);
-					pPass = pTechnique->getPass(0);
-					pTexUnit = pPass->createTextureUnitState();
+				materialPtr = Ogre::MaterialManager::getSingleton().getByName("MeshMaterial");
+				pTechnique = materialPtr->getTechnique(0);
+				if(pTechnique)
+				{
+					Ogre::Pass* pPass = pTechnique->getPass(0);
+					Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
 					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
 					pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+					pTexUnit->setHardwareGammaEnabled(false);
 				}
 			}
 
