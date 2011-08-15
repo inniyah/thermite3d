@@ -60,46 +60,55 @@ namespace Thermite
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		for(uint32_t z = 0; z < mThresholdVolume->getDepth(); z++)
+		bool calcuateAmbientOcclusion = true;
+		if(calcuateAmbientOcclusion)
 		{
-			for(uint32_t y = 0; y < mThresholdVolume->getHeight(); y++)
+			for(uint32_t z = 0; z < mThresholdVolume->getDepth(); z++)
 			{
-				for(uint32_t x = 0; x < mThresholdVolume->getWidth(); x++)
+				for(uint32_t y = 0; y < mThresholdVolume->getHeight(); y++)
 				{
-					if(mVolume->getVoxelAt(x,y,z).getMaterial() == 0)
+					for(uint32_t x = 0; x < mThresholdVolume->getWidth(); x++)
 					{
-						mThresholdVolume->setVoxelAt(x,y,z,255);
+						if(mVolume->getVoxelAt(x,y,z).getMaterial() == 0)
+						{
+							mThresholdVolume->setVoxelAt(x,y,z,255);
+						}
+						else
+						{
+							mThresholdVolume->setVoxelAt(x,y,z,0);
+						}
 					}
-					else
+				}
+			}
+			//Halfway between 0 and 255, so the surrounding neither brightens nor darkens.
+			mThresholdVolume->setBorderValue(128);
+
+			LowPassFilter<RawVolume, RawVolume, Density8> pass1(mThresholdVolume, Region(0,0,0,127,127,127), mBlurredVolume, Region(0,0,0,127,127,127), 7);
+
+			QTime time;
+			time.start();
+
+			pass1.executeSAT();
+
+			qDebug() << "Ran executeSAT() in " << time.elapsed() << "ms";
+
+			for(uint32_t z = 0; z < mAmbientOcclusionVolume->getDimension(2); z++)
+			{
+				for(uint32_t y = 0; y < mAmbientOcclusionVolume->getDimension(1); y++)
+				{
+					for(uint32_t x = 0; x < mAmbientOcclusionVolume->getDimension(0); x++)
 					{
-						mThresholdVolume->setVoxelAt(x,y,z,0);
+						(*mAmbientOcclusionVolume)[z][y][x] = mBlurredVolume->getVoxelAt(x,y,z).getDensity();
+
+						//(*mAmbientOcclusionVolume)[z][y][x] = x * 2;
 					}
 				}
 			}
 		}
-		//Halfway between 0 and 255, so the surrounding neither brightens nor darkens.
-		mThresholdVolume->setBorderValue(128);
-
-		LowPassFilter<RawVolume, RawVolume, Density8> pass1(mThresholdVolume, Region(0,0,0,127,127,127), mBlurredVolume, Region(0,0,0,127,127,127), 7);
-
-		QTime time;
-		time.start();
-
-		pass1.executeSAT();
-
-		qDebug() << "Ran executeSAT() in " << time.elapsed() << "ms";
-
-		for(uint32_t z = 0; z < mAmbientOcclusionVolume->getDimension(2); z++)
+		else
 		{
-			for(uint32_t y = 0; y < mAmbientOcclusionVolume->getDimension(1); y++)
-			{
-				for(uint32_t x = 0; x < mAmbientOcclusionVolume->getDimension(0); x++)
-				{
-					(*mAmbientOcclusionVolume)[z][y][x] = mBlurredVolume->getVoxelAt(x,y,z).getDensity();
-
-					//(*mAmbientOcclusionVolume)[z][y][x] = x * 2;
-				}
-			}
+			int fillValue = 160; //A kind of average occlusion, given that most parts are not occluded.
+			std::fill(mAmbientOcclusionVolume->getRawData(), mAmbientOcclusionVolume->getRawData() + mAmbientOcclusionVolume->getNoOfElements(), fillValue);
 		}
 
 		emit finished(this);
