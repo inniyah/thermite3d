@@ -27,6 +27,7 @@ namespace Thermite
 		};
 
 		Light(Object* parent = 0);
+		~Light();
 
 		void update(void);
 

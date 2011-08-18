@@ -16,6 +16,19 @@ namespace Thermite
 	{
 	}
 
+	Light::~Light()
+	{
+		if(mDirectionalFixupSceneNode)
+		{
+			if(mOgreLight)
+			{
+				mDirectionalFixupSceneNode->detachObject(mOgreLight);
+			}
+			mSceneManager->destroyLight(mOgreLight);
+			mSceneManager->destroySceneNode(mDirectionalFixupSceneNode);
+		}
+	}
+
 	void Light::update(void)
 	{
 		RenderComponent::update();
@@ -37,9 +50,9 @@ namespace Thermite
 		{
 			Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
 			mOgreLight = sceneManager->createLight(objAddressAsString + "_Light");
-			Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+			//Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
 			mDirectionalFixupSceneNode->attachObject(mOgreLight);
-			mDirectionalFixupSceneNode->attachObject(ogreEntity);
+			//mDirectionalFixupSceneNode->attachObject(ogreEntity);
 		}
 
 		switch(getType())

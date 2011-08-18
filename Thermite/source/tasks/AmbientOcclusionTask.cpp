@@ -60,7 +60,7 @@ namespace Thermite
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		bool calcuateAmbientOcclusion = true;
+		bool calcuateAmbientOcclusion = false;
 		if(calcuateAmbientOcclusion)
 		{
 			for(uint32_t z = 0; z < mThresholdVolume->getDepth(); z++)
