@@ -30,7 +30,7 @@ namespace Thermite
 
 		//Other
 		//bool applySettings(QSettings* settings);
-		void initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
+		bool initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
 
 	protected:
 		QPaintEngine *paintEngine() const;

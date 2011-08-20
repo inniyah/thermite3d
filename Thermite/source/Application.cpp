@@ -45,11 +45,7 @@ namespace Thermite
 		qDebug("Creating Ogre::Root object...");
 		try
 		{
-#ifdef QT_DEBUG
-			mRoot = new Ogre::Root("plugins_d.cfg");
-#else
-			mRoot = new Ogre::Root("plugins.cfg");
-#endif
+			mRoot = new Ogre::Root("", ""); //No use for plugins.cfg - set up in code
 			qDebug("Ogre::Root created successfully.");
 		}
 		catch(Ogre::Exception& e)
@@ -72,26 +68,32 @@ namespace Thermite
 			std::exit(1);
 		}
 
-		//Load the render system plugins. We do that here so that we know what
-		//render systems are available by the time we show the settings dialog.
-		//Note that the render system is not initialised until the user selects one.
-		mOpenGLRenderSystem = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
+		//Only loading the D3D plugin
+		mOpenGLRenderSystem = 0; //mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
+
+#ifdef QT_DEBUG
+		Ogre::String pluginName("./RenderSystem_Direct3D9_d");
+#else
+		Ogre::String pluginName("./RenderSystem_Direct3D9");
+#endif
+		mRoot->loadPlugin(pluginName);
 		mDirect3D9RenderSystem = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
+
 		if(!(mOpenGLRenderSystem || mDirect3D9RenderSystem))
 		{
 			qCritical("No rendering subsystems found");
-			showErrorMessageBox("No rendering subsystems found. Please ensure that your 'plugins.cfg' (or 'plugins_d.cfg') is correct and can be found by the executable.");
+			showErrorMessageBox("No rendering subsystems found.");
 		}
 
-		QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
+		/*QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
 		if(renderSystem.compare("OpenGL Rendering Subsystem") == 0)
 		{
 			mActiveRenderSystem = mOpenGLRenderSystem;
 		}
 		if(renderSystem.compare("Direct3D9 Rendering Subsystem") == 0)
-		{
+		{*/
 			mActiveRenderSystem = mDirect3D9RenderSystem;
-		}
+		//}
 
 		Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
 

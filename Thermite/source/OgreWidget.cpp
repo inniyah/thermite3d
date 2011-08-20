@@ -29,7 +29,7 @@ namespace Thermite
 	{
 	}
 
-	void OgreWidget::initialiseOgre(const Ogre::NameValuePairList *miscParams)
+	bool OgreWidget::initialiseOgre(const Ogre::NameValuePairList *miscParams)
 	{
 		//These attributes are the same as those use in a QGLWidget
 		setAttribute(Qt::WA_PaintOnScreen);
@@ -37,8 +37,10 @@ namespace Thermite
 
 		//Parameters to pass to Ogre::Root::createRenderWindow()
 		Ogre::NameValuePairList params;
-		params["useNVPerfHUD"] = "true";
+		//params["useNVPerfHUD"] = "true";
 		params["gamma"] = "false";
+		params["FSAA"] = "4";
+		params["vsync"] = "true";
 
 		//If the user passed in any parameters then be sure to copy them into our own parameter set.
 		//NOTE: Many of the parameters the user can supply (left, top, border, etc) will be ignored
@@ -82,10 +84,61 @@ namespace Thermite
 		params["macAPICocoaUseNSView"] = "true";
 	#endif 
 
-		//Finally create our window.
-		m_pOgreRenderWindow = Ogre::Root::getSingletonPtr()->createRenderWindow("OgreWindow", width(), height(), false, &params);
+		bool bSupportsFSAA2X = false;
+		bool bSupportsFSAA4X = false;
+		Ogre::RenderSystem* renderSystem = Ogre::Root::getSingletonPtr()->getRenderSystem();
+		Ogre::ConfigOption fsaaOptions = renderSystem->getConfigOptions()["FSAA"];		
+		for(int ct = 0; ct < fsaaOptions.possibleValues.size(); ct++)
+		{
+			std::string value = fsaaOptions.possibleValues[ct];
+			if(value.at(0) == '2')
+			{
+				bSupportsFSAA2X = true;
+				qDebug() << "Render system supports FSAA 2X";
+			}
+			if(value.at(0) == '4')
+			{
+				bSupportsFSAA2X = true;
+				qDebug() << "Render system supports FSAA 4X";
+			}
+		}
 
-		mIsInitialised = true;
+		if(bSupportsFSAA4X)
+		{
+			params["FSAA"] = "4";
+			qDebug() << "Using FSAA 4X";
+		}
+		else if(bSupportsFSAA2X)
+		{
+			params["FSAA"] = "2";
+			qDebug() << "Using FSAA 4X";
+		}
+		else
+		{
+			params["FSAA"] = "0";
+			qDebug() << "Not using FSAA";
+		}
+
+
+		//Finally create our window.
+		try
+		{
+			qDebug() << "Creating RenderWindow...";
+			m_pOgreRenderWindow = Ogre::Root::getSingletonPtr()->createRenderWindow("OgreWindow", width(), height(), false, &params);
+			qDebug() << "Success";
+		}
+		catch(Ogre::Exception& e)
+		{
+			m_pOgreRenderWindow = 0; //Probably zero anyway, but just to make sure.
+			qDebug() << "Failed";
+		}
+
+		if(m_pOgreRenderWindow)
+		{
+			mIsInitialised = true;
+		}
+
+		return mIsInitialised;
 	}
 
 	Ogre::RenderWindow* OgreWidget::getOgreRenderWindow() const
