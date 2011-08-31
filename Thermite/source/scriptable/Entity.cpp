@@ -5,13 +5,16 @@
 
 namespace Thermite
 {
-	Entity::Entity(Object* parent)
+	Entity::Entity(const QString& meshName, const QString& materialName, Object* parent)
 		:RenderComponent(parent)
 		,mOgreEntity(0)
 	{
 		mAnimated = false;
 		mLoopAnimation = false;
-		mAnimationName = "";		
+		mAnimationName = "";
+
+		setMeshName(meshName);
+		setMaterialName(materialName);
 	}
 	
 	Entity::~Entity()

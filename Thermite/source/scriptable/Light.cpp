@@ -50,7 +50,7 @@ namespace Thermite
 		{
 			Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
 			mOgreLight = sceneManager->createLight(objAddressAsString + "_Light");
-			//Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "sphere.mesh");
+			//Ogre::Entity* ogreEntity = sceneManager->createEntity(generateUID("PointLight Marker"), "Icosphere5.mesh");
 			mDirectionalFixupSceneNode->attachObject(mOgreLight);
 			//mDirectionalFixupSceneNode->attachObject(ogreEntity);
 		}

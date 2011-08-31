@@ -14,7 +14,7 @@ namespace Thermite
 		Q_OBJECT
 
 	public:
-		Entity(Object* parent = 0);
+		Entity(const QString& meshName, const QString& materialName, Object* parent = 0);
 		~Entity();
 
 		Q_PROPERTY(QString meshName READ meshName WRITE setMeshName)

@@ -10,7 +10,9 @@ namespace Thermite
 		:QObject(parent)
 		,mComponent(0)
 	{
-		mScale = QVector3D(1,1,1);
+		mPosition = QVector3D(0.0f, 0.0f, 0.0f);
+		mOrientation = QQuaternion(1.0f,0.0f,0.0f,0.0f);
+		mScale = QVector3D(1.0f,1.0f,1.0f);
 	}
 
 	Object::~Object()
