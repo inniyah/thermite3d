@@ -15,7 +15,10 @@ namespace Thermite
 		Q_OBJECT
 
 	public:
-		Object(Object* parent = 0);
+		Object();
+		Object(Object* parent);
+		Object(const QString& name);
+		Object(const QString& name, Object* parent);
 		~Object();
 
 		Q_PROPERTY(QVector3D position READ position WRITE setPosition)

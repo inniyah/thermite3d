@@ -20,6 +20,9 @@ namespace Thermite
 	public:
 		Ogre::SceneManager* mSceneManager;
 		Ogre::SceneNode* mOgreSceneNode;
+
+		bool mIsVisible;
+		bool mUpdateIsVisible;
 	};
 }
 

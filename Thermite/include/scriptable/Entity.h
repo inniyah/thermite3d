@@ -19,11 +19,6 @@ namespace Thermite
 
 		Q_PROPERTY(QString meshName READ meshName WRITE setMeshName)
 		Q_PROPERTY(QString materialName READ materialName WRITE setMaterialName)
-		Q_PROPERTY(bool animated READ animated WRITE setAnimated)
-		Q_PROPERTY(QString animationName READ animationName WRITE setAnimationName)
-		Q_PROPERTY(bool loopAnimation READ loopAnimation WRITE setLoopAnimation)
-
-		void update(void);
 
 		const QString& meshName(void) const;
 		void setMeshName(const QString& name);
@@ -31,22 +26,20 @@ namespace Thermite
 		const QString& materialName(void) const;
 		void setMaterialName(const QString& name);
 
-		const bool animated(void) const;
-		void setAnimated(bool animated);
+		bool castsShadows(void) const;
+		void setCastsShadows(bool value);
 
-		const QString& animationName(void) const;
-		void setAnimationName(const QString& name);
-
-		const bool loopAnimation(void) const;
-		void setLoopAnimation(bool loopAnimation);
+		void update(void);
 
 	public:
 		QString mMeshName;
 		QString mMaterialName;
 
-		bool mAnimated;
-		QString mAnimationName;
-		bool mLoopAnimation;
+		bool mCastsShadows;
+
+		bool mUpdateMesh;
+		bool mUpdateMaterial;
+		bool mUpdateCastsShadows;
 
 		Ogre::Entity* mOgreEntity;
 	};

@@ -6,10 +6,41 @@
 
 namespace Thermite
 {
-	Object::Object(Object * parent)
+	Object::Object()
+		:QObject()
+		,mComponent(0)
+	{
+		mPosition = QVector3D(0.0f, 0.0f, 0.0f);
+		mOrientation = QQuaternion(1.0f,0.0f,0.0f,0.0f);
+		mScale = QVector3D(1.0f,1.0f,1.0f);
+	}
+
+	Object::Object(Object* parent)
 		:QObject(parent)
 		,mComponent(0)
 	{
+		mPosition = QVector3D(0.0f, 0.0f, 0.0f);
+		mOrientation = QQuaternion(1.0f,0.0f,0.0f,0.0f);
+		mScale = QVector3D(1.0f,1.0f,1.0f);
+	}
+
+	Object::Object(const QString& name)
+		:QObject()
+		,mComponent(0)
+	{
+		setObjectName(name);
+
+		mPosition = QVector3D(0.0f, 0.0f, 0.0f);
+		mOrientation = QQuaternion(1.0f,0.0f,0.0f,0.0f);
+		mScale = QVector3D(1.0f,1.0f,1.0f);
+	}
+
+	Object::Object(const QString& name, Object* parent)
+		:QObject(parent)
+		,mComponent(0)
+	{
+		setObjectName(name);
+
 		mPosition = QVector3D(0.0f, 0.0f, 0.0f);
 		mOrientation = QQuaternion(1.0f,0.0f,0.0f,0.0f);
 		mScale = QVector3D(1.0f,1.0f,1.0f);

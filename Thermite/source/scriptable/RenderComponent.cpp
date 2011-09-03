@@ -7,6 +7,8 @@ namespace Thermite
 	RenderComponent::RenderComponent(Object* parent)
 		:Component(parent)
 		,mOgreSceneNode(0)
+		,mIsVisible(true)
+		,mUpdateIsVisible(false)
 	{
 		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
 		std::string sceneNodeName(objAddressAsString + "_SceneNode");
@@ -21,7 +23,9 @@ namespace Thermite
 
 	void RenderComponent::onEnabled(bool enabled)
 	{
-		mOgreSceneNode->setVisible(enabled);
+		//mOgreSceneNode->setVisible(enabled);
+		mIsVisible = enabled;
+		mUpdateIsVisible = true;
 	}
 
 	void RenderComponent::update(void)
@@ -43,5 +47,11 @@ namespace Thermite
 
 		QVector3D scale = mParent->size();
 		mOgreSceneNode->setScale(Ogre::Vector3(scale.x(), scale.y(), scale.z()));
+
+		//if(mUpdateIsVisible) //Don't know why this doesn't work...
+		{
+			mOgreSceneNode->setVisible(mIsVisible);
+			mUpdateIsVisible = false;
+		}
 	}
 }

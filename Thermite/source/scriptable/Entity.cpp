@@ -8,13 +8,12 @@ namespace Thermite
 	Entity::Entity(const QString& meshName, const QString& materialName, Object* parent)
 		:RenderComponent(parent)
 		,mOgreEntity(0)
+		,mUpdateMesh(false)
+		,mUpdateMaterial(false)
+		,mUpdateCastsShadows(false)
 	{
-		mAnimated = false;
-		mLoopAnimation = false;
-		mAnimationName = "";
-
-		setMeshName(meshName);
 		setMaterialName(materialName);
+		setMeshName(meshName);
 	}
 	
 	Entity::~Entity()
@@ -26,34 +25,6 @@ namespace Thermite
 		}
 	}
 
-	void Entity::update(void)
-	{
-		RenderComponent::update();							
-
-		//Set a custom material if necessary
-		if(materialName().isEmpty() == false)
-		{
-			if(mOgreEntity)
-			{
-				//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
-				//But you can only get materials from SubEntities.
-				mOgreEntity->setMaterialName(materialName().toAscii().constData());
-			}
-		}
-
-		//Animation
-		if(mOgreEntity)
-		{
-			Ogre::AnimationStateSet* animationStateSet = mOgreEntity->getAllAnimationStates();		
-			if(animationStateSet && animationStateSet->hasAnimationState(animationName().toAscii().constData()))
-			{
-				Ogre::AnimationState* animationState = animationStateSet->getAnimationState(animationName().toAscii().constData());
-				animationState->setEnabled(animated());
-				animationState->setLoop(loopAnimation());
-			}
-		}
-	}
-
 	const QString& Entity::meshName(void) const
 	{
 		return mMeshName;
@@ -62,16 +33,7 @@ namespace Thermite
 	void Entity::setMeshName(const QString& name)
 	{
 		mMeshName = name;
-
-		//Should delete old mesh first!!!
-
-		if(mMeshName.isEmpty() == false)
-		{
-			std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
-			std::string entityName(objAddressAsString + "_Entity");
-			mOgreEntity = mSceneManager->createEntity(entityName, meshName().toAscii().constData());
-			mOgreSceneNode->attachObject(mOgreEntity);
-		}
+		mUpdateMesh = true;
 	}
 
 	const QString& Entity::materialName(void) const
@@ -82,35 +44,66 @@ namespace Thermite
 	void Entity::setMaterialName(const QString& name)
 	{
 		mMaterialName = name;
+		mUpdateMaterial = true;
 	}
 
-	const bool Entity::animated(void) const
+	bool Entity::castsShadows(void) const
 	{
-		return mAnimated;
+		return mCastsShadows;
 	}
 
-	void Entity::setAnimated(bool animated)
+	void Entity::setCastsShadows(bool value)
 	{
-		mAnimated = animated;
+		mCastsShadows = value;
+		mUpdateCastsShadows = true;
 	}
 
-	const QString& Entity::animationName(void) const
+	void Entity::update(void)
 	{
-		return mAnimationName;
-	}
+		RenderComponent::update();	
 
-	void Entity::setAnimationName(const QString& name)
-	{
-		mAnimationName = name;
-	}
+		if(mUpdateMesh)
+		{
+			//Delete the old ogre entity first
+			if(mOgreEntity)
+			{
+				mOgreSceneNode->detachObject(mOgreEntity);
+				mSceneManager->destroyMovableObject(mOgreEntity);
+			}
 
-	const bool Entity::loopAnimation(void) const
-	{
-		return mLoopAnimation;
-	}
+			if(mMeshName.isEmpty() == false)
+			{
+				std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
+				std::string entityName(objAddressAsString + "_Entity");
+				mOgreEntity = mSceneManager->createEntity(entityName, meshName().toAscii().constData());
+				mOgreSceneNode->attachObject(mOgreEntity);
+			}
 
-	void Entity::setLoopAnimation(bool loopAnimation)
-	{
-		mLoopAnimation = loopAnimation;
+			mUpdateMesh = false;
+		}
+
+		//Set a custom material if necessary
+		if(mUpdateMaterial)
+		{
+			if(materialName().isEmpty() == false)
+			{
+				if(mOgreEntity)
+				{
+					//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
+					//But you can only get materials from SubEntities.
+					mOgreEntity->setMaterialName(materialName().toAscii().constData());
+				}
+			}
+
+			mUpdateMaterial = false;
+		}
+
+		if(mUpdateCastsShadows)
+		{
+			if(mOgreEntity)
+			{
+				mOgreEntity->setCastShadows(mCastsShadows);
+			}
+		}
 	}
 }

@@ -31,6 +31,9 @@ namespace Thermite
 	,mAutoUpdateEnabled(true)
 	,mIsInitialised(false)
 	{
+		//Ease distribution of plugins (like phonon backends)
+		//QCoreApplication::addLibraryPath(".");
+
 		mAutoUpdateTimer = new QTimer;
 		QObject::connect(mAutoUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
 		//On the test system, a value of one here gives a high frame rate and still allows
