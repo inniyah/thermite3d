@@ -89,6 +89,8 @@ namespace Thermite
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 		void uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask);
 
+		void computeAmbientOcclusion(void);
+
 	public:
 		static TaskProcessorThread* m_backgroundThread;
 
@@ -138,6 +140,8 @@ namespace Thermite
 		PolyVox::Array<3, uint32_t> mLightingFinishedArray;
 
 		bool mIsModified;
+
+		bool mNeedUpdateAOTexture;
 
 	public:
 		bool isRegionBeingExtracted(const PolyVox::Region& regionToTest);

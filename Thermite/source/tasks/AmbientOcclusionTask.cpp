@@ -40,12 +40,10 @@ namespace Thermite
 	PolyVox::RawVolume<PolyVox::Density8>* AmbientOcclusionTask::mThresholdVolume = 0;
 	PolyVox::RawVolume<PolyVox::Density8>* AmbientOcclusionTask::mBlurredVolume = 0;
 
-	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material16>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess, uint32_t uTimeStamp, float rayLength)
+	AmbientOcclusionTask::AmbientOcclusionTask(PolyVox::SimpleVolume<PolyVox::Material16>* volume, PolyVox::Array<3, uint8_t>* ambientOcclusionVolume, PolyVox::Region regToProcess)
 		:m_regToProcess(regToProcess)
 		,mAmbientOcclusionVolume(ambientOcclusionVolume)
-		,m_uTimeStamp(uTimeStamp)
 		,mVolume(volume)
-		,mRayLength(rayLength)
 	{
 		if(mThresholdVolume == 0)
 		{
@@ -60,7 +58,7 @@ namespace Thermite
 	
 	void AmbientOcclusionTask::run(void)
 	{	
-		bool calcuateAmbientOcclusion = false;
+		bool calcuateAmbientOcclusion = true;
 		if(calcuateAmbientOcclusion)
 		{
 			for(uint32_t z = 0; z < mThresholdVolume->getDepth(); z++)

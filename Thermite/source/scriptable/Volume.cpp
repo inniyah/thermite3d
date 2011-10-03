@@ -72,6 +72,7 @@ namespace Thermite
 
 		,mVolumeSceneNode(0)
 		,mIsModified(true)
+		,mNeedUpdateAOTexture(true)
 	{
 		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
@@ -133,13 +134,13 @@ namespace Thermite
 
 		//Ambient Occlusion
 		mAmbientOcclusionVolume.resize(ArraySizes(128)(32)(128));
-		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 0);
+		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 128);
 
-		/*QTime time;
-		time.start();
-		AmbientOcclusionCalculator<Material16> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
-		ambientOcclusionCalculator.execute();
-		qDebug() << "Lighting time = " << time.elapsed();*/
+		//QTime time;
+		//time.start();
+		//AmbientOcclusionCalculator<Material16> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
+		//ambientOcclusionCalculator.execute();
+		//qDebug() << "Lighting time = " << time.elapsed();
 	}
 
 	void Volume::initialise(void)
@@ -284,11 +285,12 @@ namespace Thermite
 				}
 			}
 			//Ambient Occlusion
-			if(needsLightingUpload)
+			if(mNeedUpdateAOTexture)
 			{
 				Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
 				Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), mAmbientOcclusionVolume.getRawData());
 				pixelBuffer->blitFromMemory(pixelBox);
+				mNeedUpdateAOTexture = false;
 			}
 		}
 		mIsModified = false;
@@ -394,7 +396,7 @@ namespace Thermite
 							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
 							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
 
-							AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ], mLightRegionSideLength);
+							/*AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ], mLightRegionSideLength);
 							ambientOcclusionTask->setAutoDelete(false);
 							QObject::connect(ambientOcclusionTask, SIGNAL(finished(AmbientOcclusionTask*)), this, SLOT(uploadAmbientOcclusionResult(AmbientOcclusionTask*)), Qt::QueuedConnection);
 							if(mMultiThreadedSurfaceExtraction)
@@ -404,7 +406,7 @@ namespace Thermite
 							else
 							{
 								ambientOcclusionTask->run();
-							}
+							}*/
 
 							mLightingStartedArray[regionX][regionY][regionZ] = mLightLastModifiedArray[regionX][regionY][regionZ];
 						}
@@ -426,12 +428,12 @@ namespace Thermite
 		uint16_t regionZ = pTask->m_regToProcess.getLowerCorner().getZ() / mLightRegionSideLength;
 
 		std::uint32_t uRegionTimeStamp = mLightLastModifiedArray[regionX][regionY][regionZ];
-		if(uRegionTimeStamp > pTask->m_uTimeStamp)
+		/*if(uRegionTimeStamp > pTask->m_uTimeStamp)
 		{
 			// The volume has changed since the command to generate this mesh was issued.
 			// Just ignore it, and a correct version should be along soon...
 			return;
-		}
+		}*/
 
 		mLightingFinishedArray[regionX][regionY][regionZ] = globals.timeStamp();
 	}
@@ -943,5 +945,12 @@ namespace Thermite
 				deleteSceneNodeChildren(childSceneNode);
 			}
 		}		
+	}
+
+	void Volume::computeAmbientOcclusion(void)
+	{
+		AmbientOcclusionTask ambientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion());
+		ambientOcclusionTask.run();
+		mNeedUpdateAOTexture = true;
 	}
 }

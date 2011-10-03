@@ -163,8 +163,7 @@ namespace Thermite
 
 	void Application::update(void)
 	{
-		ViewWidget* viewWidget;
-		foreach(viewWidget, mViewWidgets)
+		foreach(ViewWidget* viewWidget, mViewWidgets)
 		{
 			viewWidget->update();
 		}
