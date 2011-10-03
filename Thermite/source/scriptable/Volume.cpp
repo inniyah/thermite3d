@@ -66,10 +66,6 @@ namespace Thermite
 		,mCachedVolumeHeightInRegions(0)
 		,mCachedVolumeDepthInRegions(0)
 
-		,mCachedVolumeWidthInLightRegions(0)
-		,mCachedVolumeHeightInLightRegions(0)
-		,mCachedVolumeDepthInLightRegions(0)
-
 		,mVolumeSceneNode(0)
 		,mIsModified(true)
 		,mNeedUpdateAOTexture(true)
@@ -114,11 +110,6 @@ namespace Thermite
 		mVolumeHeightInRegions = m_pPolyVoxVolume->getHeight() / regionSideLength;
 		mVolumeDepthInRegions = m_pPolyVoxVolume->getDepth() / regionSideLength;
 
-		mLightRegionSideLength = qApp->settings()->value("Engine/LightRegionSideLength", 128).toInt();
-		mVolumeWidthInLightRegions = 1; //m_pPolyVoxVolume->getWidth() / mLightRegionSideLength;
-		mVolumeHeightInLightRegions = 1; //m_pPolyVoxVolume->getHeight() / mLightRegionSideLength;
-		mVolumeDepthInLightRegions = 1; //m_pPolyVoxVolume->getDepth() / mLightRegionSideLength;
-
 		uint32_t dimensions[3] = {mVolumeWidthInRegions, mVolumeHeightInRegions, mVolumeDepthInRegions}; // Array dimensions
 		mLastModifiedArray.resize(dimensions); std::fill(mLastModifiedArray.getRawData(), mLastModifiedArray.getRawData() + mLastModifiedArray.getNoOfElements(), globals.timeStamp());
 		mExtractionStartedArray.resize(dimensions); std::fill(mExtractionStartedArray.getRawData(), mExtractionStartedArray.getRawData() + mExtractionStartedArray.getNoOfElements(), 0);
@@ -126,11 +117,6 @@ namespace Thermite
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (SurfaceMesh<PositionMaterial>*)0);
 		mRegionBeingExtracted.resize(dimensions); std::fill(mRegionBeingExtracted.getRawData(), mRegionBeingExtracted.getRawData() + mRegionBeingExtracted.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
-
-		uint32_t lightDimensions[3] = {mVolumeWidthInLightRegions, mVolumeHeightInLightRegions, mVolumeDepthInLightRegions}; // Array dimensions
-		mLightLastModifiedArray.resize(lightDimensions); std::fill(mLightLastModifiedArray.getRawData(), mLightLastModifiedArray.getRawData() + mLightLastModifiedArray.getNoOfElements(), globals.timeStamp());
-		mLightingStartedArray.resize(lightDimensions); std::fill(mLightingStartedArray.getRawData(), mLightingStartedArray.getRawData() + mLightingStartedArray.getNoOfElements(), 0);
-		mLightingFinishedArray.resize(lightDimensions); std::fill(mLightingFinishedArray.getRawData(), mLightingFinishedArray.getRawData() + mLightingFinishedArray.getNoOfElements(), 0);
 
 		//Ambient Occlusion
 		mAmbientOcclusionVolume.resize(ArraySizes(128)(32)(128));
@@ -177,21 +163,9 @@ namespace Thermite
 				mVolLastUploadedTimeStamps.resize(dimensions);
 				m_volOgreSceneNodes.resize(dimensions);
 
-				//Lighting
-				mCachedVolumeWidthInLightRegions = mVolumeWidthInLightRegions;
-				mCachedVolumeHeightInLightRegions = mVolumeHeightInLightRegions;
-				mCachedVolumeDepthInLightRegions = mVolumeDepthInLightRegions;
-						
-				uint32_t lightDimensions[3] = {mCachedVolumeWidthInLightRegions, mCachedVolumeHeightInLightRegions, mCachedVolumeDepthInLightRegions}; // Array dimensions
-
-				//Create the arrays
-				mVolLightingLastUploadedTimeStamps.resize(lightDimensions);
-
 				//Clear the arrays
 				std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
 				std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
-
-				std::fill(mVolLightingLastUploadedTimeStamps.getRawData(), mVolLightingLastUploadedTimeStamps.getRawData() + mVolLightingLastUploadedTimeStamps.getNoOfElements(), 0);
 
 				//Resize the ambient occlusion volume texture
 				if(mAmbientOcclusionVolumeTexture.isNull() == false)
@@ -260,30 +234,6 @@ namespace Thermite
 				}
 			}
 
-			//Some values we'll need later.
-			uint16_t volumeWidthInLightRegions = mVolumeWidthInLightRegions;
-			uint16_t volumeHeightInLightRegions = mVolumeHeightInLightRegions;
-			uint16_t volumeDepthInLightRegions = mVolumeDepthInLightRegions;
-
-			bool needsLightingUpload = false;
-			//Iterate over each region
-			for(std::uint16_t regionZ = 0; regionZ < volumeDepthInLightRegions; ++regionZ)
-			{		
-				for(std::uint16_t regionY = 0; regionY < volumeHeightInLightRegions; ++regionY)
-				{
-					for(std::uint16_t regionX = 0; regionX < volumeWidthInLightRegions; ++regionX)
-					{
-						uint32_t volLightingFinsishedTimeStamp = mLightingFinishedArray[regionX][regionY][regionZ];
-						uint32_t volLightingLastUploadedTimeStamp = mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ];
-						if(volLightingFinsishedTimeStamp > volLightingLastUploadedTimeStamp)
-						{
-							needsLightingUpload = true;
-
-							mVolLightingLastUploadedTimeStamps[regionX][regionY][regionZ] = globals.timeStamp();
-						}
-					}
-				}
-			}
 			//Ambient Occlusion
 			if(mNeedUpdateAOTexture)
 			{
@@ -366,76 +316,8 @@ namespace Thermite
 				}
 			}
 
-			//NOTE: Technically I don't believe it is correct to just update the ambient lighting for blocks which have
-			//changed - the ambient light of neighbouring blocks could change as well. So we should probably take this
-			//'modified' array and dilate it by one. But in practive I haven't seen any artifacts yet when not doing this.
-			for(std::uint16_t regionZ = 0; regionZ < mVolumeDepthInLightRegions; ++regionZ)
-			{		
-				for(std::uint16_t regionY = 0; regionY < mVolumeHeightInLightRegions; ++regionY)
-				{
-					for(std::uint16_t regionX = 0; regionX < mVolumeWidthInLightRegions; ++regionX)
-					{
-						if(mLightLastModifiedArray[regionX][regionY][regionZ] > mLightingStartedArray[regionX][regionY][regionZ])
-						{
-							//Compute the extents of the current region
-							const std::uint16_t firstX = regionX * mLightRegionSideLength;
-							const std::uint16_t firstY = regionY * mLightRegionSideLength;
-							const std::uint16_t firstZ = regionZ * mLightRegionSideLength;
-
-							/*const*/ std::uint16_t lastX = firstX + mLightRegionSideLength;
-							/*const*/ std::uint16_t lastY = firstY + mLightRegionSideLength;
-							/*const*/ std::uint16_t lastZ = firstZ + mLightRegionSideLength;	
-							
-							//For lighting the regions touch like cubic rather than MC surface extractor.
-							--lastX;
-							--lastY;
-							--lastZ;	
-
-							Vector3DInt32 v3dLowerCorner(firstX,firstY,firstZ);
-							Vector3DInt32 v3dUpperCorner(lastX,lastY,lastZ);
-							PolyVox::Region region(v3dLowerCorner, v3dUpperCorner);
-							region.cropTo(m_pPolyVoxVolume->getEnclosingRegion());
-
-							/*AmbientOcclusionTask* ambientOcclusionTask = new AmbientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume,region, mLightLastModifiedArray[regionX][regionY][regionZ], mLightRegionSideLength);
-							ambientOcclusionTask->setAutoDelete(false);
-							QObject::connect(ambientOcclusionTask, SIGNAL(finished(AmbientOcclusionTask*)), this, SLOT(uploadAmbientOcclusionResult(AmbientOcclusionTask*)), Qt::QueuedConnection);
-							if(mMultiThreadedSurfaceExtraction)
-							{
-								QThreadPool::globalInstance()->start(ambientOcclusionTask);
-							}
-							else
-							{
-								ambientOcclusionTask->run();
-							}*/
-
-							mLightingStartedArray[regionX][regionY][regionZ] = mLightLastModifiedArray[regionX][regionY][regionZ];
-						}
-					}
-				}
-			}
-
 			mIsModified = true;
 		}
-	}
-
-	void Volume::uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask)
-	{
-		//PolyVox::Array<3, uint8_t>* pAmbientOcclusionVolume = pTask->mAmbientOcclusionVolume;
-
-		//Determine where it came from
-		uint16_t regionX = pTask->m_regToProcess.getLowerCorner().getX() / mLightRegionSideLength;
-		uint16_t regionY = pTask->m_regToProcess.getLowerCorner().getY() / mLightRegionSideLength;
-		uint16_t regionZ = pTask->m_regToProcess.getLowerCorner().getZ() / mLightRegionSideLength;
-
-		std::uint32_t uRegionTimeStamp = mLightLastModifiedArray[regionX][regionY][regionZ];
-		/*if(uRegionTimeStamp > pTask->m_uTimeStamp)
-		{
-			// The volume has changed since the command to generate this mesh was issued.
-			// Just ignore it, and a correct version should be along soon...
-			return;
-		}*/
-
-		mLightingFinishedArray[regionX][regionY][regionZ] = globals.timeStamp();
 	}
 
 	void Volume::uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask)
@@ -562,26 +444,6 @@ namespace Thermite
 				{
 					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
 					mLastModifiedArray[xCt][yCt][zCt] = globals.timeStamp();
-				}
-			}
-		}
-
-		const std::uint16_t firstLightRegionX = regionToTest.getLowerCorner().getX() / mLightRegionSideLength;
-		const std::uint16_t firstLightRegionY = regionToTest.getLowerCorner().getY() / mLightRegionSideLength;
-		const std::uint16_t firstLightRegionZ = regionToTest.getLowerCorner().getZ() / mLightRegionSideLength;
-
-		const std::uint16_t lastLightRegionX = regionToTest.getUpperCorner().getX() / mLightRegionSideLength;
-		const std::uint16_t lastLightRegionY = regionToTest.getUpperCorner().getY() / mLightRegionSideLength;
-		const std::uint16_t lastLightRegionZ = regionToTest.getUpperCorner().getZ() / mLightRegionSideLength;
-
-		for(uint16_t zCt = firstLightRegionZ; zCt <= lastLightRegionZ; zCt++)
-		{
-			for(uint16_t yCt = firstLightRegionY; yCt <= lastLightRegionY; yCt++)
-			{
-				for(uint16_t xCt = firstLightRegionX; xCt <= lastLightRegionX; xCt++)
-				{
-					//volRegionLastModified->setVoxelAt(xCt,yCt,zCt,m_uCurrentTime);
-					mLightLastModifiedArray[xCt][yCt][zCt] = globals.timeStamp();
 				}
 			}
 		}

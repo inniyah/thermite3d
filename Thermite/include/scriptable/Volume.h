@@ -87,7 +87,6 @@ namespace Thermite
 
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
-		void uploadAmbientOcclusionResult(AmbientOcclusionTask* pTask);
 
 		void computeAmbientOcclusion(void);
 
@@ -97,14 +96,9 @@ namespace Thermite
 		Ogre::SceneNode* mVolumeSceneNode;
 
 		PolyVox::Array<3, uint32_t> mVolLastUploadedTimeStamps;
-		PolyVox::Array<3, uint32_t> mVolLightingLastUploadedTimeStamps;
 		uint16_t mCachedVolumeWidthInRegions;
 		uint16_t mCachedVolumeHeightInRegions;
 		uint16_t mCachedVolumeDepthInRegions;
-
-		uint16_t mCachedVolumeWidthInLightRegions;
-		uint16_t mCachedVolumeHeightInLightRegions;
-		uint16_t mCachedVolumeDepthInLightRegions;
 
 		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
 
@@ -116,12 +110,7 @@ namespace Thermite
 		uint16_t mRegionSideLength;
 		uint16_t mVolumeWidthInRegions;
 		uint16_t mVolumeHeightInRegions;
-		uint16_t mVolumeDepthInRegions; 
-
-		uint16_t mLightRegionSideLength;
-		uint16_t mVolumeWidthInLightRegions;
-		uint16_t mVolumeHeightInLightRegions;
-		uint16_t mVolumeDepthInLightRegions;
+		uint16_t mVolumeDepthInRegions;
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
@@ -134,10 +123,6 @@ namespace Thermite
 		PolyVox::Array<3, uint32_t> mExtractionFinishedArray;
 		PolyVox::Array<3, bool> mRegionBeingExtracted;
 		PolyVox::Array<3, SurfaceMeshDecimationTask*> m_volSurfaceDecimators;
-
-		PolyVox::Array<3, uint32_t> mLightLastModifiedArray;
-		PolyVox::Array<3, uint32_t> mLightingStartedArray;
-		PolyVox::Array<3, uint32_t> mLightingFinishedArray;
 
 		bool mIsModified;
 
