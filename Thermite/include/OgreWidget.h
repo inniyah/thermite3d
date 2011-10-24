@@ -5,6 +5,7 @@
 
 #include <QWidget>
 
+#include "OgreGpuCommandBufferFlush.h"
 #include "ViewWidget.h"
 
 class QSettings;
@@ -39,6 +40,7 @@ namespace Thermite
 
 	public:
 		Ogre::RenderWindow* m_pOgreRenderWindow;
+		Ogre::GpuCommandBufferFlush mBufferFlush;
 
 	private:
 		bool mIsInitialised;

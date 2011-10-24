@@ -27,6 +27,7 @@ namespace Thermite
 
 	OgreWidget::~OgreWidget()
 	{
+		mBufferFlush.stop();
 	}
 
 	bool OgreWidget::initialiseOgre(const Ogre::NameValuePairList *miscParams)
@@ -132,6 +133,11 @@ namespace Thermite
 			m_pOgreRenderWindow = 0; //Probably zero anyway, but just to make sure.
 			qDebug() << "Failed";
 		}
+
+		//Prevent the CPU getting too far ahead.
+		//http://www.ogre3d.org/tikiwiki/FlushGPUBuffer
+		//http://www.ogre3d.org/forums/viewtopic.php?f=5&t=50486
+		mBufferFlush.start(2);
 
 		if(m_pOgreRenderWindow)
 		{

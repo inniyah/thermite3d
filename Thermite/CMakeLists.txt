@@ -28,6 +28,7 @@ SET(MAIN_SRC_FILES
 	source/Application.cpp
 	source/FPSDialog.cpp
 	source/GraphicsSettingsWidget.cpp
+	source/OgreGpuCommandBufferFlush.cpp
 	source/OgreWidget.cpp
 	source/Screen.cpp
 	source/SettingsDialog.cpp
@@ -46,6 +47,7 @@ SET(MAIN_INC_FILES
 	include/Application.h
 	include/FPSDialog.h
 	include/GraphicsSettingsWidget.h
+	include/OgreGpuCommandBufferFlush.h
 	include/OgreWidget.h
 	include/QtOgreForwardDeclarations.h
 	include/SettingsDialog.h
