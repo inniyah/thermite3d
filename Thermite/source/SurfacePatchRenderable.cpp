@@ -74,7 +74,51 @@ namespace Thermite
 	const Ogre::LightList& SurfacePatchRenderable::getLights(void) const
 	{
 		// Use movable query lights
-		return queryLights();
+		//return queryLights();
+		typedef std::multimap<float,Ogre::Light*> olm;
+		olm OLM;
+
+		//Ogre::SceneManager* sm =  m_pParentSceneManager;
+		Ogre::SceneManager* sm = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
+		if(sm)
+		{
+			//Ogre::LightList& list = Cache[object];
+			const Ogre::LightList& frlist = sm->_getLightsAffectingFrustum();
+
+			//int halfRegionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt() / 2;
+
+			for(unsigned i=0;i<frlist.size();++i)
+			{
+				Ogre::Light* light = frlist[i];
+
+				if(light->getVisible() == false)
+					continue;
+
+				if(light->getType() == Ogre::Light::LT_DIRECTIONAL)
+				{
+					OLM.insert(olm::value_type(0,light));//distance 0, priority
+					continue;
+				}
+
+				const Ogre::Vector3& lpos = light->getDerivedPosition();
+
+
+				/*Ogre::Vector3 dif(lpos.x-(m_v3dPos.x + halfRegionSideLength),lpos.y-(m_v3dPos.y+halfRegionSideLength), lpos.z-(m_v3dPos.z+halfRegionSideLength));
+				float realDistSquared = dif.x*dif.x+dif.y*dif.y+dif.z*dif.z;
+				OLM.insert(olm::value_type(sqrt(realDistSquared) * lpos.y,light)); //plus lpos.y to ,ake higher lights less significant*/
+
+				OLM.insert(olm::value_type(lpos.y + 100.0f,light)); //Plus 100 to make sure it's always positive.
+
+			}
+		}
+
+		list.clear();
+		//now we have lightst ordered in OLM, push it in
+		for(olm::iterator it = OLM.begin();it!=OLM.end();++it)
+			list.push_back(it->second);
+
+		return list;
+
 	}
 
 	const Ogre::MaterialPtr& SurfacePatchRenderable::getMaterial(void) const

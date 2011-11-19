@@ -78,6 +78,8 @@ namespace Thermite
 		Ogre::Vector3 m_v3dPos;
 
 		std::vector<PolyVox::LodRecord> m_vecLodRecords;
+
+		mutable Ogre::LightList list;
 	};
 
 	/** Factory object for creating Light instances */
