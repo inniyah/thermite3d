@@ -73,6 +73,7 @@ namespace Thermite
 		//Deletes all children (both nodes and attached objects) but not the node itself.
 		void deleteSceneNodeChildren(Ogre::SceneNode* sceneNode);
 
+		void createVerticalHole(int xStart, int yStart, int zStart, int yEnd);
 		void createCuboidAt(QVector3D centre, QVector3D dimensions, int material, bool bPaintMode);
 		void createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode);
 		QPair<bool, QVector3D> getRayVolumeIntersection(QVector3D rayOrigin, const QVector3D& rayDir);

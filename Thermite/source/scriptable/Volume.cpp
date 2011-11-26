@@ -449,6 +449,25 @@ namespace Thermite
 		}
 	}
 
+	void Volume::createVerticalHole(int xStart, int yStart, int zStart, int yEnd)
+	{
+		PolyVox::Region regionToLock = PolyVox::Region(PolyVox::Vector3DInt32(xStart, yStart, zStart), PolyVox::Vector3DInt32(xStart, yEnd, zStart));
+
+		if(isRegionBeingExtracted(regionToLock))
+		{
+			//Just skip doing anything - volume will not be modified. Try again later...
+			return;
+		}
+
+		for(int y = yStart; y <= yEnd; ++y)
+		{
+			Material16 value(0);
+			m_pPolyVoxVolume->setVoxelAt(xStart, y, zStart, value);
+		}
+
+		updateLastModifedArray(regionToLock);
+	}
+
 	void Volume::createSphereAt(QVector3D centre, float radius, int material, bool bPaintMode)
 	{
 		int firstX = static_cast<int>(std::floor(centre.x() - radius));
