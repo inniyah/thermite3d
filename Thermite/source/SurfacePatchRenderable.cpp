@@ -523,14 +523,16 @@ namespace Thermite
 					vert1.setMaterial(mat0);
 					vert2.setMaterial(mat0);
 
-					if(mesh.m_mapUsedMaterials.find(mat0) != mesh.m_mapUsedMaterials.end())
-					{
-						prPos = addVertex(vert0, 1.0, prPos);
-					}
-					else
-					{
+					//I broke this if statement when I removed 'm_mapUsedMaterials' from PolyVox, not realising it was used by Thermite.
+					//I'm not going to fix it as I'm not using this smooth surface functionality in my current project, and Thermite is being decommisioned anyway.
+					//if(mesh.m_mapUsedMaterials.find(mat0) != mesh.m_mapUsedMaterials.end())
+					//{
+					//	prPos = addVertex(vert0, 1.0, prPos);
+					//}
+					//else
+					//{
 						prPos = addVertex(vert0, 0.0, prPos);
-					}
+					//}
 					prPos = addVertex(vert1, 0.0, prPos);
 					prPos = addVertex(vert2, 0.0, prPos);
 
@@ -550,14 +552,16 @@ namespace Thermite
 					vert2.setMaterial(mat1);
 
 					prPos = addVertex(vert0, 0.0, prPos);
-					if(mesh.m_mapUsedMaterials.find(mat1) != mesh.m_mapUsedMaterials.end())
-					{
-						prPos = addVertex(vert1, 1.0, prPos);
-					}
-					else
-					{
+					//I broke this if statement when I removed 'm_mapUsedMaterials' from PolyVox, not realising it was used by Thermite.
+					//I'm not going to fix it as I'm not using this smooth surface functionality in my current project, and Thermite is being decommisioned anyway.
+					//if(mesh.m_mapUsedMaterials.find(mat1) != mesh.m_mapUsedMaterials.end())
+					//{
+					//	prPos = addVertex(vert1, 1.0, prPos);
+					//}
+					//else
+					//{
 						prPos = addVertex(vert1, 0.0, prPos);
-					}
+					//}
 					prPos = addVertex(vert2, 0.0, prPos);
 
 					*pIdx = newVertexIndex;
@@ -577,14 +581,16 @@ namespace Thermite
 
 					prPos = addVertex(vert0, 0.0, prPos);
 					prPos = addVertex(vert1, 0.0, prPos);
-					if(mesh.m_mapUsedMaterials.find(mat2) != mesh.m_mapUsedMaterials.end())
-					{
-						prPos = addVertex(vert2, 1.0, prPos);
-					}
-					else
-					{
+					//I broke this if statement when I removed 'm_mapUsedMaterials' from PolyVox, not realising it was used by Thermite.
+					//I'm not going to fix it as I'm not using this smooth surface functionality in my current project, and Thermite is being decommisioned anyway.
+					//if(mesh.m_mapUsedMaterials.find(mat2) != mesh.m_mapUsedMaterials.end())
+					//{
+					//	prPos = addVertex(vert2, 1.0, prPos);
+					//}
+					//else
+					//{
 						prPos = addVertex(vert2, 0.0, prPos);
-					}
+					//}
 
 					*pIdx = newVertexIndex;
 					pIdx++;
