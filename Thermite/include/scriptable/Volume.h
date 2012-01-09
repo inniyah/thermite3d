@@ -59,6 +59,9 @@ namespace Thermite
 		void update(void);
 		void updatePolyVoxGeometry(const QVector3D& cameraPos);
 
+		bool readFromFile(const QString& path);
+		bool writeToFile(const QString& path);
+
 	signals:
 		void foundPath(QVariantList path);
 

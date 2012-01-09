@@ -46,6 +46,7 @@ freely, subject to the following restrictions:
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"
 
+#include <QFile>
 #include <QSettings>
 #include <QThreadPool>
 
@@ -833,5 +834,71 @@ namespace Thermite
 		AmbientOcclusionTask ambientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion());
 		ambientOcclusionTask.run();
 		mNeedUpdateAOTexture = true;
+	}
+
+	bool Volume::readFromFile(const QString& path)
+	{
+		QFile file(path);
+		if (!file.open(QIODevice::ReadOnly))
+			return false;
+		QDataStream in(&file);
+		
+		/*out << static_cast<quint16>(m_pPolyVoxVolume->getWidth());
+		out << static_cast<quint16>(m_pPolyVoxVolume->getHeight());
+		out << static_cast<quint16>(m_pPolyVoxVolume->getDepth());*/
+
+		quint16 x, y, z;
+		in >> x;
+		in >> y;
+		in >> z;
+
+		Q_ASSERT(x == m_pPolyVoxVolume->getWidth());
+		Q_ASSERT(y == m_pPolyVoxVolume->getHeight());
+		Q_ASSERT(z == m_pPolyVoxVolume->getDepth());
+
+		for(quint32 z = 0; z < m_pPolyVoxVolume->getDepth(); z++)
+		{
+			for(quint32 y = 0; y < m_pPolyVoxVolume->getHeight(); y++)
+			{
+				for(quint32 x = 0; x < m_pPolyVoxVolume->getWidth(); x++)
+				{
+					quint16 val = 0;
+					in >> val;
+					Material16 voxel(val);
+					m_pPolyVoxVolume->setVoxelAt(x,y,z,voxel);
+				}
+			}
+		}
+
+		file.close();
+
+		return true;
+	}
+
+	bool Volume::writeToFile(const QString& path)
+	{
+		QFile file(path);
+		if (!file.open(QIODevice::WriteOnly))
+			return false;
+		QDataStream out(&file);
+		
+		out << static_cast<quint16>(m_pPolyVoxVolume->getWidth());
+		out << static_cast<quint16>(m_pPolyVoxVolume->getHeight());
+		out << static_cast<quint16>(m_pPolyVoxVolume->getDepth());
+
+		for(quint32 z = 0; z < m_pPolyVoxVolume->getDepth(); z++)
+		{
+			for(quint32 y = 0; y < m_pPolyVoxVolume->getHeight(); y++)
+			{
+				for(quint32 x = 0; x < m_pPolyVoxVolume->getWidth(); x++)
+				{
+					out << static_cast<quint16>(m_pPolyVoxVolume->getVoxelAt(x,y,z).getMaterial());
+				}
+			}
+		}
+
+		file.close();
+
+		return true;
 	}
 }
