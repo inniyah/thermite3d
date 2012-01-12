@@ -342,11 +342,6 @@ namespace Thermite
 		mCurrentScreen->mouseReleaseEvent(event);
 	}
 
-	void ViewWidget::mouseDoubleClickEvent(QMouseEvent* event)
-	{
-		mCurrentScreen->mouseDoubleClickEvent(event);
-	}
-
 	void ViewWidget::mouseMoveEvent(QMouseEvent* event)
 	{
 		mCurrentScreen->mouseMoveEvent(event);
