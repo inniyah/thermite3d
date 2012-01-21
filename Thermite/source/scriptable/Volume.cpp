@@ -852,6 +852,7 @@ namespace Thermite
 		in >> y;
 		in >> z;
 
+		//This function can't change the volume size
 		Q_ASSERT(x == m_pPolyVoxVolume->getWidth());
 		Q_ASSERT(y == m_pPolyVoxVolume->getHeight());
 		Q_ASSERT(z == m_pPolyVoxVolume->getDepth());
@@ -871,6 +872,8 @@ namespace Thermite
 		}
 
 		file.close();
+
+		updateLastModifedArray(m_pPolyVoxVolume->getEnclosingRegion());
 
 		return true;
 	}
