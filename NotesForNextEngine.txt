@@ -1,0 +1,5 @@
+Input
+-----
+Input handling is a bit of a mess, particularly with regard to remapping keys, etc. In the new engine, maybe the keyPressEvent() functions in the states should not handle raw key presses, but should instead be inputActionEvent() (or something). The user would be able to define a number of actions which they are interested in, and define which key or mouse button presses correspond to an action. The engine would take care of this mapping, so user code would only see the actions.
+
+Multiple mappings should be possible (both w and up arrow could cause a MoveForwardAction) but I don't think that multiple key simultaneously would cause an action. Instead we would define action modifiers, which could also be remapped to an arbitrary key. So press 'f' and 't' to perfomr a task would be possible (but strange).
