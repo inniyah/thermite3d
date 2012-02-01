@@ -507,7 +507,11 @@ namespace Thermite
 					if((centre - QVector3D(x,y,z)).lengthSquared() <= radiusSquared)
 					{
 						Material16 value(material);
-						m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
+
+						if(y > 0) //Dirty hack for tank wars - stop the ground being destroyed completely.
+						{
+							m_pPolyVoxVolume->setVoxelAt(x,y,z,value);
+						}
 					}
 				}
 			}
