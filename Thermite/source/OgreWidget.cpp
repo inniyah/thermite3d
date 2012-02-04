@@ -18,6 +18,9 @@ namespace Thermite
 	:ViewWidget(parent, f | Qt::MSWindowsOwnDC)
 	,m_pOgreRenderWindow(0)
 	,mIsInitialised(false)
+	,widthBeforeFullscreen(100)
+	,heightBeforeFullscreen(100)
+	,mIsFullscreenMode(false)
 	{		
 		QPalette colourPalette = palette();
 		colourPalette.setColor(QPalette::Active, QPalette::WindowText, Qt::black);
@@ -184,18 +187,28 @@ namespace Thermite
 		}
 	}
 
-	void OgreWidget::changeWindowSetup(int left, int top, int width, int height, bool fullscreen)
+	void OgreWidget::changeWindowSetup(bool fullscreen)
 	{
+		if(fullscreen == mIsFullscreenMode)
+		{
+			//Early out if we are alrady in the correct mode.
+			return;
+		}
+
 		if(fullscreen)
 		{
+			widthBeforeFullscreen = this->width();
+			heightBeforeFullscreen = this->height();
 			setWindowState(windowState() | Qt::WindowFullScreen);
 			m_pOgreRenderWindow->setFullscreen(true, this->width(), this->height());
+			mIsFullscreenMode = true;
 		}
 		else
 		{
 			
-			m_pOgreRenderWindow->setFullscreen(false, width, height);
+			m_pOgreRenderWindow->setFullscreen(false, widthBeforeFullscreen, heightBeforeFullscreen);
 			setWindowState(windowState() & ~Qt::WindowFullScreen);
+			mIsFullscreenMode = false;
 		}
 	}
 

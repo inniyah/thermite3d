@@ -33,7 +33,7 @@ namespace Thermite
 		//bool applySettings(QSettings* settings);
 		bool initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
 
-		void changeWindowSetup(int left, int top, int width, int height, bool fullscreen);
+		void changeWindowSetup(bool fullscreen);
 
 	protected:
 		QPaintEngine *paintEngine() const;
@@ -43,6 +43,10 @@ namespace Thermite
 	public:
 		Ogre::RenderWindow* m_pOgreRenderWindow;
 		Ogre::GpuCommandBufferFlush mBufferFlush;
+
+		int widthBeforeFullscreen;
+		int heightBeforeFullscreen;
+		bool mIsFullscreenMode;
 
 	private:
 		bool mIsInitialised;
