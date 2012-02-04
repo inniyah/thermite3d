@@ -33,6 +33,8 @@ namespace Thermite
 		//bool applySettings(QSettings* settings);
 		bool initialiseOgre(const Ogre::NameValuePairList *miscParams = 0);
 
+		void changeWindowSetup(int left, int top, int width, int height, bool fullscreen);
+
 	protected:
 		QPaintEngine *paintEngine() const;
 		void paintEvent(QPaintEvent* evt);

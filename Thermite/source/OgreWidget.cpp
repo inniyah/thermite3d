@@ -184,6 +184,21 @@ namespace Thermite
 		}
 	}
 
+	void OgreWidget::changeWindowSetup(int left, int top, int width, int height, bool fullscreen)
+	{
+		if(fullscreen)
+		{
+			setWindowState(windowState() | Qt::WindowFullScreen);
+			m_pOgreRenderWindow->setFullscreen(true, this->width(), this->height());
+		}
+		else
+		{
+			
+			m_pOgreRenderWindow->setFullscreen(false, width, height);
+			setWindowState(windowState() & ~Qt::WindowFullScreen);
+		}
+	}
+
 	/*bool OgreWidget::applySettings(QSettings* settings)
 	{
 		bool applied = false;
