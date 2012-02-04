@@ -195,6 +195,7 @@ namespace Thermite
 			return;
 		}
 
+		//We use the Ogre fullscreen methods because the Qt ones don't hide the task bar properly.
 		if(fullscreen)
 		{
 			widthBeforeFullscreen = this->width();
