@@ -32,12 +32,10 @@ freely, subject to the following restrictions:
 #include "PolyVoxCore/Material.h"
 
 #include "PolyVoxCore/Raycast.h"
-#include "PolyVoxCore/AmbientOcclusionCalculator.h"
 
 #include "Utility.h"
 
 #include "FindPathTask.h"
-#include "AmbientOcclusionTask.h"
 #include "SurfaceMeshExtractionTask.h"
 #include "SurfaceMeshDecimationTask.h"
 #include "SurfacePatchRenderable.h"
@@ -69,7 +67,6 @@ namespace Thermite
 
 		,mVolumeSceneNode(0)
 		,mIsModified(true)
-		,mNeedUpdateAOTexture(true)
 	{
 		/*m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(1);
 		m_mapMaterialIds["ShadowMapReceiverForWorldMaterial"].insert(2);
@@ -118,16 +115,6 @@ namespace Thermite
 		m_volSurfaceMeshes.resize(dimensions); std::fill(m_volSurfaceMeshes.getRawData(), m_volSurfaceMeshes.getRawData() + m_volSurfaceMeshes.getNoOfElements(), (SurfaceMesh<PositionMaterial>*)0);
 		mRegionBeingExtracted.resize(dimensions); std::fill(mRegionBeingExtracted.getRawData(), mRegionBeingExtracted.getRawData() + mRegionBeingExtracted.getNoOfElements(), 0);
 		m_volSurfaceDecimators.resize(dimensions); std::fill(m_volSurfaceDecimators.getRawData(), m_volSurfaceDecimators.getRawData() + m_volSurfaceDecimators.getNoOfElements(), (Thermite::SurfaceMeshDecimationTask*)0);
-
-		//Ambient Occlusion
-		mAmbientOcclusionVolume.resize(ArraySizes(128)(32)(128));
-		std::fill(mAmbientOcclusionVolume.getRawData(), mAmbientOcclusionVolume.getRawData() + mAmbientOcclusionVolume.getNoOfElements(), 128);
-
-		//QTime time;
-		//time.start();
-		//AmbientOcclusionCalculator<Material16> ambientOcclusionCalculator(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion(), mLightRegionSideLength);
-		//ambientOcclusionCalculator.execute();
-		//qDebug() << "Lighting time = " << time.elapsed();
 	}
 
 	void Volume::initialise(void)
@@ -167,48 +154,6 @@ namespace Thermite
 				//Clear the arrays
 				std::fill(mVolLastUploadedTimeStamps.getRawData(), mVolLastUploadedTimeStamps.getRawData() + mVolLastUploadedTimeStamps.getNoOfElements(), 0);						
 				std::fill(m_volOgreSceneNodes.getRawData(), m_volOgreSceneNodes.getRawData() + m_volOgreSceneNodes.getNoOfElements(), (Ogre::SceneNode*)0);
-
-				//Resize the ambient occlusion volume texture
-				if(mAmbientOcclusionVolumeTexture.isNull() == false)
-				{
-					//Not sure if we actually need to (or even should) remove the old one first - maybe the smart pointer handles it.
-					Ogre::TextureManager::getSingleton().remove("AmbientOcclusionVolumeTexture");
-				}
-
-				const int iRatio = 1; //Ratio of ambient occlusion volume size to main volume size.
-				mAmbientOcclusionVolumeTexture = Ogre::TextureManager::getSingleton().createManual(
-					"AmbientOcclusionVolumeTexture", // Name of texture
-					"General", // Name of resource group in which the texture should be created
-					Ogre::TEX_TYPE_3D, // Texture type
-					m_pPolyVoxVolume->getWidth() / iRatio, // Width
-					m_pPolyVoxVolume->getHeight() / iRatio, // Height
-					m_pPolyVoxVolume->getDepth() / iRatio, // Depth (Must be 1 for two dimensional textures)
-					0, // Number of mipmaps
-					Ogre::PF_L8, // Pixel format
-					Ogre::TU_STATIC_WRITE_ONLY // usage
-					);
-
-				Ogre::MaterialPtr materialPtr = Ogre::MaterialManager::getSingleton().getByName("PolyVoxMaterial");
-				Ogre::Technique* pTechnique = materialPtr->getTechnique(0);
-				if(pTechnique)
-				{
-					Ogre::Pass* pPass = pTechnique->getPass(0);
-					Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
-					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
-					pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);	
-					pTexUnit->setHardwareGammaEnabled(false);
-				}
-
-				materialPtr = Ogre::MaterialManager::getSingleton().getByName("MeshMaterial");
-				pTechnique = materialPtr->getTechnique(0);
-				if(pTechnique)
-				{
-					Ogre::Pass* pPass = pTechnique->getPass(0);
-					Ogre::TextureUnitState* pTexUnit = pPass->createTextureUnitState();
-					pTexUnit->setTextureName("AmbientOcclusionVolumeTexture", Ogre::TEX_TYPE_3D);
-					pTexUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-					pTexUnit->setHardwareGammaEnabled(false);
-				}
 			}
 
 			//Some values we'll need later.
@@ -233,15 +178,6 @@ namespace Thermite
 						}
 					}
 				}
-			}
-
-			//Ambient Occlusion
-			if(mNeedUpdateAOTexture)
-			{
-				Ogre::HardwarePixelBuffer* pixelBuffer = mAmbientOcclusionVolumeTexture.getPointer()->getBuffer().getPointer();
-				Ogre::PixelBox pixelBox(mAmbientOcclusionVolumeTexture->getWidth(),mAmbientOcclusionVolumeTexture->getHeight(),mAmbientOcclusionVolumeTexture->getDepth(), mAmbientOcclusionVolumeTexture->getFormat(), mAmbientOcclusionVolume.getRawData());
-				pixelBuffer->blitFromMemory(pixelBox);
-				mNeedUpdateAOTexture = false;
 			}
 		}
 		mIsModified = false;
@@ -831,13 +767,6 @@ namespace Thermite
 				deleteSceneNodeChildren(childSceneNode);
 			}
 		}		
-	}
-
-	void Volume::computeAmbientOcclusion(void)
-	{
-		AmbientOcclusionTask ambientOcclusionTask(m_pPolyVoxVolume, &mAmbientOcclusionVolume, m_pPolyVoxVolume->getEnclosingRegion());
-		ambientOcclusionTask.run();
-		mNeedUpdateAOTexture = true;
 	}
 
 	bool Volume::readFromFile(const QString& path)

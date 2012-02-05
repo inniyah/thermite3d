@@ -92,8 +92,6 @@ namespace Thermite
 		void uploadSurfaceExtractorResult(SurfaceMeshExtractionTask* pTask);
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 
-		void computeAmbientOcclusion(void);
-
 	public:
 		static TaskProcessorThread* m_backgroundThread;
 
@@ -106,8 +104,6 @@ namespace Thermite
 
 		PolyVox::Array<3, Ogre::SceneNode*> m_volOgreSceneNodes;
 
-		Ogre::TexturePtr mAmbientOcclusionVolumeTexture;
-
 		bool mMultiThreadedSurfaceExtraction;
 
 		PolyVox::SimpleVolume<PolyVox::Material16>* m_pPolyVoxVolume;
@@ -118,8 +114,6 @@ namespace Thermite
 
 		std::map< std::string, std::set<uint8_t> > m_mapMaterialIds;	
 
-		PolyVox::Array<3, uint8_t> mAmbientOcclusionVolume;
-
 		
 		PolyVox::Array<3, PolyVox::SurfaceMesh<PolyVox::PositionMaterial>*> m_volSurfaceMeshes;
 		PolyVox::Array<3, uint32_t> mLastModifiedArray;
@@ -129,8 +123,6 @@ namespace Thermite
 		PolyVox::Array<3, SurfaceMeshDecimationTask*> m_volSurfaceDecimators;
 
 		bool mIsModified;
-
-		bool mNeedUpdateAOTexture;
 
 	public:
 		bool isRegionBeingExtracted(const PolyVox::Region& regionToTest);
