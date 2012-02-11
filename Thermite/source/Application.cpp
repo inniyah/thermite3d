@@ -39,7 +39,7 @@ namespace Thermite
 		//On the test system, a value of one here gives a high frame rate and still allows
 		//event processing to take place. A value of 0 doubles the frame rate but the mouse
 		//becomes jumpy. This property is configerable via setAutoUpdateInterval().
-		mAutoUpdateTimer->setInterval(1);
+		mAutoUpdateTimer->setInterval(0);
 
 		//Load the settings file. If it doesn't exist it is created.
 		mSettings = new QSettings("settings.ini", QSettings::IniFormat);

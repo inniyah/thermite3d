@@ -173,6 +173,7 @@ namespace Thermite
 
 	void OgreWidget::resizeEvent(QResizeEvent* evt)
 	{
+		qDebug() << "Window resized to " << width() << "x" << height();
 		if(m_pOgreRenderWindow)
 		{
 			m_pOgreRenderWindow->resize(width(), height());

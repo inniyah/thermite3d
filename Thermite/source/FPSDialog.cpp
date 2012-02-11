@@ -51,6 +51,8 @@ namespace Thermite
 		//to get the actual time elapsed.
 		float timeElapsedInSeconds = mTime.elapsed() / 1000.0f;
 
+		qDebug() << "FPS = " << framesRendered / timeElapsedInSeconds;
+
 		mLcdNumber->display(static_cast<int>(framesRendered / timeElapsedInSeconds));
 
 		//Reset ready for next time.
