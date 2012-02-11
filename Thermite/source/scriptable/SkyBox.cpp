@@ -13,9 +13,6 @@ namespace Thermite
 	void SkyBox::update(void)
 	{
 		RenderComponent::update();
-
-		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
-		sceneManager->setSkyBox(true, materialName().toAscii().constData(), 2500);
 	}
 
 	const QString& SkyBox::materialName(void) const
@@ -26,5 +23,8 @@ namespace Thermite
 	void SkyBox::setMaterialName(const QString& name)
 	{
 		mMaterialName = name;
+
+		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
+		sceneManager->setSkyBox(true, materialName().toAscii().constData(), 2500);
 	}
 }
