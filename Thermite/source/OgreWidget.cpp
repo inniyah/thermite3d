@@ -171,7 +171,7 @@ namespace Thermite
 		}
 	}
 
-	void OgreWidget::resizeEvent(QResizeEvent* evt)
+	/*void OgreWidget::resizeEvent(QResizeEvent* evt)
 	{
 		qDebug() << "Window resized to " << width() << "x" << height();
 		if(m_pOgreRenderWindow)
@@ -186,7 +186,7 @@ namespace Thermite
 				pCamera->setAspectRatio(static_cast<Ogre::Real>(pViewport->getActualWidth()) / static_cast<Ogre::Real>(pViewport->getActualHeight()));
 			}
 		}
-	}
+	}*/
 
 	void OgreWidget::changeWindowSetup(bool fullscreen)
 	{

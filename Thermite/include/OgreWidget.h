@@ -38,7 +38,7 @@ namespace Thermite
 	protected:
 		QPaintEngine *paintEngine() const;
 		void paintEvent(QPaintEvent* evt);
-		void resizeEvent(QResizeEvent* evt);
+		//void resizeEvent(QResizeEvent* evt);
 
 	public:
 		Ogre::RenderWindow* m_pOgreRenderWindow;
