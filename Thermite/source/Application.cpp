@@ -56,13 +56,9 @@ namespace Thermite
 			QString error
 				(
 				"Failed to create the Ogre::Root object. This is a fatal error and the "
-				"application will now exit. There are a few known reasons why this can occur:\n\n"
-				"    1) Ensure your plugins.cfg has the correct path to the plugins.\n"
-				"    2) In plugins.cfg, use unix style directorary serperators. I.e '/' rather than '\\'.\n"
-				"    3) If your plugins.cfg is trying to load the Direct3D plugin, make sure you have DirectX installed on your machine.\n\n"
-				"The message returned by Ogre was:\n\n"
+				"application will now exit. One possible cause of this is a problem initialising "
+				"DirectX, so please make sure you have the DirectX redistributable installed on your machine."
 				);
-			error += QString::fromStdString(e.getFullDescription().c_str());
 
 			qCritical(error.toAscii());
 			showErrorMessageBox(error);
@@ -79,28 +75,53 @@ namespace Thermite
 #else
 		Ogre::String pluginName("./RenderSystem_Direct3D9");
 #endif
-		mRoot->loadPlugin(pluginName);
-		mDirect3D9RenderSystem = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 
-		if(!(mOpenGLRenderSystem || mDirect3D9RenderSystem))
+		try
 		{
-			qCritical("No rendering subsystems found");
-			showErrorMessageBox("No rendering subsystems found.");
-		}
+			mRoot->loadPlugin(pluginName);
+			mDirect3D9RenderSystem = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 
-		/*QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
-		if(renderSystem.compare("OpenGL Rendering Subsystem") == 0)
-		{
-			mActiveRenderSystem = mOpenGLRenderSystem;
-		}
-		if(renderSystem.compare("Direct3D9 Rendering Subsystem") == 0)
-		{*/
+			if(!(mOpenGLRenderSystem || mDirect3D9RenderSystem))
+			{
+				qCritical("No rendering subsystems found");
+				showErrorMessageBox("No rendering subsystems found.");
+			}
+
 			mActiveRenderSystem = mDirect3D9RenderSystem;
-		//}
 
-		Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
+			Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
+		}
+		catch(Ogre::Exception& e)
+		{
+			QString error
+				(
+				"Failed to initialise Direct3D! Please make sure you have the latest DirectX redistributable installed on your machine. Get is from here: <a href='http://www.microsoft.com/download/en/details.aspx?id=35'>http://www.microsoft.com/download/en/details.aspx?id=35</a>"
+				);
 
-		Ogre::Root::getSingletonPtr()->initialise(false);
+			qCritical(error.toAscii());
+			showErrorMessageBox(error);
+
+			//Not much else we can do here...
+			std::exit(1);
+		}
+
+		try
+		{
+			Ogre::Root::getSingletonPtr()->initialise(false);
+		}
+		catch(Ogre::Exception& e)
+		{
+			QString error
+				(
+				"Failed to initialise Ogre::Root object! "
+				);
+
+			qCritical(error.toAscii());
+			showErrorMessageBox(error);
+
+			//Not much else we can do here...
+			std::exit(1);
+		}
 
 
 		/**/
