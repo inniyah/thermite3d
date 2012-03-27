@@ -52,7 +52,7 @@ using namespace PolyVox;
 
 namespace Thermite
 {
-	TaskProcessorThread* Volume::m_backgroundThread = 0;
+	//TaskProcessorThread* Volume::m_backgroundThread = 0;
 
 	Volume::Volume(uint32_t width, uint32_t height, uint32_t depth, Object* parent)
 		:QObject(parent)
@@ -82,12 +82,12 @@ namespace Thermite
 			m_mapMaterialIds["PolyVoxMaterial"].insert(ct);
 		}
 
-		if(!m_backgroundThread)
-		{
-			m_backgroundThread = new TaskProcessorThread;
-			m_backgroundThread->setPriority(QThread::LowestPriority);
-			m_backgroundThread->start();
-		}
+		//if(!m_backgroundThread)
+		//{
+		//	m_backgroundThread = new TaskProcessorThread;
+		//	m_backgroundThread->setPriority(QThread::LowestPriority);
+		//	m_backgroundThread->start();
+		//}
 
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
 		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = new PolyVox::SimpleVolume<PolyVox::Material16>(Region(Vector3DInt32(0,0,0), Vector3DInt32(width-1, height-1, depth-1)));
@@ -285,7 +285,7 @@ namespace Thermite
 
 		SurfaceMeshDecimationTask* pOldSurfaceDecimator = m_volSurfaceDecimators[regionX][regionY][regionZ];
 
-		m_backgroundThread->removeTask(pOldSurfaceDecimator);
+		//m_backgroundThread->removeTask(pOldSurfaceDecimator);
 
 		SurfaceMeshDecimationTask* surfaceMeshDecimationTask = new SurfaceMeshDecimationTask(pMesh, pTask->m_uTimeStamp);
 		surfaceMeshDecimationTask->setAutoDelete(false);

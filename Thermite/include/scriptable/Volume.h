@@ -93,7 +93,7 @@ namespace Thermite
 		void uploadSurfaceDecimatorResult(SurfaceMeshDecimationTask* pTask);
 
 	public:
-		static TaskProcessorThread* m_backgroundThread;
+		//static TaskProcessorThread* m_backgroundThread;
 
 		Ogre::SceneNode* mVolumeSceneNode;
 
