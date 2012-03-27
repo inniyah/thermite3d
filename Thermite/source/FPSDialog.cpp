@@ -14,7 +14,7 @@ namespace Thermite
 
 		connect(&mTimer, SIGNAL(timeout(void)), this, SLOT(updateLCDDisplay(void)));
 
-		mTimer.start(1000);
+		mTimer.start(60000);
 		mTime.restart();
 	}
 
