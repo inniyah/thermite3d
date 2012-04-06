@@ -7,3 +7,7 @@ Multiple mappings should be possible (both w and up arrow could cause a MoveForw
 But consider that we do sometimes want real chaacters... e.g. for entering high scores in voxeliens. Maybe an 'unknown' input action type where we can retrieve the raw event?
 
 Prevent key being bound to multiple actions.
+
+Gamepad support?
+
+Internationalization support?
