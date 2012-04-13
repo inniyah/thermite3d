@@ -20,6 +20,8 @@ namespace Thermite
 	,mIsInitialised(false)
 	,widthBeforeFullscreen(100)
 	,heightBeforeFullscreen(100)
+	,xPosBeforeFullscreen(50)
+	,yPosBeforeFullscreen(50)
 	,mIsFullscreenMode(false)
 	{		
 		QPalette colourPalette = palette();
@@ -201,6 +203,9 @@ namespace Thermite
 		{
 			widthBeforeFullscreen = this->width();
 			heightBeforeFullscreen = this->height();
+			xPosBeforeFullscreen = this->frameGeometry().left();
+			yPosBeforeFullscreen = this->frameGeometry().top();
+			move(50,50); //Force to be on the primary monitor, as we've seen hangs when fullscreening on the secondary monitor.
 			setWindowState(windowState() | Qt::WindowFullScreen);
 			m_pOgreRenderWindow->setFullscreen(true, this->width(), this->height());
 			mIsFullscreenMode = true;
@@ -209,6 +214,7 @@ namespace Thermite
 		{
 			
 			m_pOgreRenderWindow->setFullscreen(false, widthBeforeFullscreen, heightBeforeFullscreen);
+			move(xPosBeforeFullscreen, yPosBeforeFullscreen);
 			setWindowState(windowState() & ~Qt::WindowFullScreen);
 			mIsFullscreenMode = false;
 		}

@@ -46,6 +46,8 @@ namespace Thermite
 
 		int widthBeforeFullscreen;
 		int heightBeforeFullscreen;
+		int xPosBeforeFullscreen;
+		int yPosBeforeFullscreen;
 		bool mIsFullscreenMode;
 
 	private:
