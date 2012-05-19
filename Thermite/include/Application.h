@@ -49,14 +49,6 @@ namespace Thermite
 		void setAutoUpdateEnabled(bool autoUpdateEnabled);
 		//@}
 
-		///\name Testers
-		//@{
-		/// Determine whether the OpenGL render system is available
-		bool isOpenGLAvailable(void) const;
-		/// Determine whether the Direct3D9 render system is available.
-		bool isDirect3D9Available(void) const;
-		//@}
-
 		void addResourceDirectory(const QString& directoryName);
 		
 		//Static functions
@@ -81,8 +73,6 @@ namespace Thermite
 
 		//Ogre Stuff
 		Ogre::RenderSystem* mActiveRenderSystem;
-		Ogre::RenderSystem* mOpenGLRenderSystem;
-		Ogre::RenderSystem* mDirect3D9RenderSystem;
 		Ogre::Root* mRoot;
 
 		//Misc
@@ -91,6 +81,9 @@ namespace Thermite
 		QSettings* mSettings;
 		bool mAutoUpdateEnabled;
 		bool mIsInitialised;
+
+	private:
+		void initialiseRenderSystem(void);
 	};
 }
 

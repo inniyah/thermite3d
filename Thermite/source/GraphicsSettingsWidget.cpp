@@ -27,8 +27,8 @@ namespace Thermite
 	void GraphicsSettingsWidget::readFromSettings(void)
 	{
 		// ---------- Render System Settings ----------
-		mOpenGLRadioButton->setEnabled(qApp->isOpenGLAvailable());
-		mDirect3D9RadioButton->setEnabled(qApp->isDirect3D9Available());
+		mOpenGLRadioButton->setEnabled(/*qApp->isOpenGLAvailable()*/ false);
+		mDirect3D9RadioButton->setEnabled(/*qApp->isDirect3D9Available()*/ false);
 
 		QString renderSystem = mSettings->value("Graphics/RenderSystem").toString();
 		//Doing OpenGL last here means that is it is the default.

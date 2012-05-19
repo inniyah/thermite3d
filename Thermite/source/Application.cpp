@@ -22,8 +22,6 @@ namespace Thermite
 	Application::Application(int& argc, char** argv)
 	:QApplication(argc, argv)
 	,mActiveRenderSystem(0)
-	,mOpenGLRenderSystem(0)
-	,mDirect3D9RenderSystem(0)
 	,mRoot(0)
 	,mFrameCounter(0)
 	,mAutoUpdateTimer(0)
@@ -67,43 +65,7 @@ namespace Thermite
 			std::exit(1);
 		}
 
-		//Only loading the D3D plugin
-		mOpenGLRenderSystem = 0; //mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
-
-#ifdef QT_DEBUG
-		Ogre::String pluginName("./RenderSystem_Direct3D9_d");
-#else
-		Ogre::String pluginName("./RenderSystem_Direct3D9");
-#endif
-
-		try
-		{
-			mRoot->loadPlugin(pluginName);
-			mDirect3D9RenderSystem = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
-
-			if(!(mOpenGLRenderSystem || mDirect3D9RenderSystem))
-			{
-				qCritical("No rendering subsystems found");
-				showErrorMessageBox("No rendering subsystems found.");
-			}
-
-			mActiveRenderSystem = mDirect3D9RenderSystem;
-
-			Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
-		}
-		catch(Ogre::Exception& e)
-		{
-			QString error
-				(
-				"Failed to initialise Direct3D! Please make sure you have the latest DirectX redistributable installed on your machine. Get is from here: <a href='http://www.microsoft.com/download/en/details.aspx?id=35'>http://www.microsoft.com/download/en/details.aspx?id=35</a>"
-				);
-
-			qCritical(error.toAscii());
-			showErrorMessageBox(error);
-
-			//Not much else we can do here...
-			std::exit(1);
-		}
+		initialiseRenderSystem();
 
 		try
 		{
@@ -144,19 +106,63 @@ namespace Thermite
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
-	/// \return whether the OpenGL render system is available
+	/// 
 	////////////////////////////////////////////////////////////////////////////////
-	bool Application::isOpenGLAvailable(void) const
+	void Application::initialiseRenderSystem(void)
 	{
-		return mOpenGLRenderSystem != 0;
-	}
+		mActiveRenderSystem = 0;
 
-	////////////////////////////////////////////////////////////////////////////////
-	/// \return whether the Direct3D9 render system is available.
-	////////////////////////////////////////////////////////////////////////////////
-	bool Application::isDirect3D9Available(void) const
-	{
-		return mDirect3D9RenderSystem != 0;
+		bool useOpenGL = true;
+		bool useDirect3D9 = !useOpenGL;
+
+		Ogre::String rendererName = useOpenGL ? "OpenGL Rendering Subsystem" : "Direct3D9 Rendering Subsystem";
+		Ogre::String pluginName = useOpenGL ? "./RenderSystem_GL" : "./RenderSystem_Direct3D9";
+
+		assert(isOpenGL || isDirect3D9);
+
+#ifdef QT_DEBUG
+		Ogre::String pluginName = pluginName + "_d");
+#endif
+
+		try
+		{
+			mRoot->loadPlugin(pluginName);
+			mActiveRenderSystem = mRoot->getRenderSystemByName(rendererName);
+
+			if(!mActiveRenderSystem)
+			{
+				qCritical("No rendering subsystems found");
+				showErrorMessageBox("No rendering subsystems found.");
+			}
+
+			Ogre::Root::getSingletonPtr()->setRenderSystem(mActiveRenderSystem);
+		}
+		catch(Ogre::Exception& e)
+		{
+			QString error;
+
+			if(useDirect3D9)
+			{
+				error = QString
+				(
+				"Failed to initialise Direct3D! Please make sure you have the latest DirectX redistributable installed on your machine. Get is from here: <a href='http://www.microsoft.com/download/en/details.aspx?id=35'>http://www.microsoft.com/download/en/details.aspx?id=35</a>"
+				);
+			}
+
+			if(useOpenGL)
+			{
+				error = QString
+				(
+				"Failed to initialise OpenGL!"
+				);
+			}
+
+			qCritical(error.toAscii());
+			showErrorMessageBox(error);
+
+			//Not much else we can do here...
+			std::exit(1);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
