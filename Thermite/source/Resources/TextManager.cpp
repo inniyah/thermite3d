@@ -18,26 +18,26 @@ freely, subject to the following restrictions:
     misrepresented as being the original software.
 
     3. This notice may not be removed or altered from any source
-    distribution. 	
+    distribution. 
 *******************************************************************************/
 
 #include "TextManager.h"
 
 #include "OgreLogManager.h" //FIXME - shouldn't realy need this in this class?'
 
-template<> Thermite::TextManager *Ogre::Singleton<Thermite::TextManager>::ms_Singleton = 0;
+template<> Thermite::TextManager *Ogre::Singleton<Thermite::TextManager>::msSingleton = 0;
 
 namespace Thermite
 {
 	TextManager *TextManager::getSingletonPtr ()
 	{
-		return ms_Singleton;
+		return msSingleton;
 	}
 
 	TextManager &TextManager::getSingleton ()
 	{  
-		assert (ms_Singleton);  
-		return (*ms_Singleton);
+		assert (msSingleton);  
+		return (*msSingleton);
 	}
 
 	TextManager::TextManager ()
@@ -57,13 +57,25 @@ namespace Thermite
 		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager (mResourceType);
 	}
 
+	TextResourcePtr TextManager::create (const Ogre::String& name, const Ogre::String& group,
+					bool isManual, Ogre::ManualResourceLoader* loader,
+					const Ogre::NameValuePairList* createParams)
+	{
+		return std::static_pointer_cast<TextResource>(createResource(name,group,isManual,loader,createParams));
+	}
+
+	TextResourcePtr TextManager::getByName(const Ogre::String& name, const Ogre::String& groupName)
+	{
+		return std::static_pointer_cast<TextResource>(getResourceByName(name, groupName));
+	}
+
 	TextResourcePtr TextManager::load (const Ogre::String &name, const Ogre::String &group)
 	{
 		Ogre::LogManager::getSingleton().logMessage("DAVID - calling getByName");
 		TextResourcePtr textf = getByName (name);
 		Ogre::LogManager::getSingleton().logMessage("DAVID - done getByName");
 
-		if (textf.isNull ())
+		if (textf)
 		{
 			textf = create (name, group);
 		}

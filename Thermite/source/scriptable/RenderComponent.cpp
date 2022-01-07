@@ -10,7 +10,7 @@ namespace Thermite
 		,mIsVisible(true)
 		,mUpdateIsVisible(false)
 	{
-		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
+		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
 		std::string sceneNodeName(objAddressAsString + "_SceneNode");
 		mSceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
 		mOgreSceneNode = mSceneManager->getRootSceneNode()->createChildSceneNode(sceneNodeName);

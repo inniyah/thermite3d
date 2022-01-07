@@ -53,9 +53,9 @@ namespace Thermite
 		//m_pLogTable->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
 		//So instead we hard code the sizes
-		m_pLogTable->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
+		m_pLogTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
 		m_pLogTable->horizontalHeader()->resizeSection(0, 100);
-		m_pLogTable->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
+		m_pLogTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Fixed);
 		m_pLogTable->horizontalHeader()->resizeSection(1, 30);
 		m_pLogTable->horizontalHeader()->resizeSection(2, 120);
 		m_pLogTable->horizontalHeader()->resizeSection(3, 800);

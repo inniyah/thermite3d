@@ -58,7 +58,7 @@ namespace Thermite
 				"DirectX, so please make sure you have the DirectX redistributable installed on your machine."
 				);
 
-			qCritical(error.toAscii());
+			qCritical(error.toLatin1());
 			showErrorMessageBox(error);
 
 			//Not much else we can do here...
@@ -78,7 +78,7 @@ namespace Thermite
 				"Failed to initialise Ogre::Root object! "
 				);
 
-			qCritical(error.toAscii());
+			qCritical(error.toLatin1());
 			showErrorMessageBox(error);
 
 			//Not much else we can do here...
@@ -118,10 +118,10 @@ namespace Thermite
 		Ogre::String rendererName = useOpenGL ? "OpenGL Rendering Subsystem" : "Direct3D9 Rendering Subsystem";
 		Ogre::String pluginName = useOpenGL ? "./RenderSystem_GL" : "./RenderSystem_Direct3D9";
 
-		assert(isOpenGL || isDirect3D9);
+		assert(useOpenGL || useDirect3D9);
 
 #ifdef QT_DEBUG
-		Ogre::String pluginName = pluginName + "_d");
+		pluginName = pluginName + "_d";
 #endif
 
 		try
@@ -157,7 +157,7 @@ namespace Thermite
 				);
 			}
 
-			qCritical(error.toAscii());
+			qCritical(error.toLatin1());
 			showErrorMessageBox(error);
 
 			//Not much else we can do here...
@@ -313,13 +313,13 @@ namespace Thermite
 		if(appDir.exists())
 		{
 			//Add the directory to Ogre
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toAscii().constData(), "FileSystem");
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(directoryName.toLatin1().constData(), "FileSystem");
 
 			//Add the subdirectories to Ogre
 			QDirIterator it(directoryName, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 			while (it.hasNext())
 			{
-				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toAscii().constData(), "FileSystem");
+				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(it.next().toLatin1().constData(), "FileSystem");
 			}
 		}
 	}

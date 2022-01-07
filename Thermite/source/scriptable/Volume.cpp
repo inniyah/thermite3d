@@ -527,7 +527,7 @@ namespace Thermite
 	bool Volume::loadFromFile(const QString& filename)
 	{
 		uint16_t regionSideLength = qApp->settings()->value("Engine/RegionSideLength", 32).toInt();
-		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toAscii().constData(), "General")->getVolume();
+		PolyVox::SimpleVolume<PolyVox::Material16>* pPolyVoxVolume = VolumeManager::getSingletonPtr()->load(filename.toLatin1().constData(), "General")->getVolume();
 		setPolyVoxVolume(pPolyVoxVolume, regionSideLength);
 		return true;
 	}
@@ -722,7 +722,7 @@ namespace Thermite
 		//Create additive material
 		Ogre::String strAdditiveMaterialName = materialName + "_WITH_ADDITIVE_BLENDING";
 		Ogre::MaterialPtr additiveMaterial = Ogre::MaterialManager::getSingleton().getByName(strAdditiveMaterialName);
-		if(additiveMaterial.isNull() == true)
+		if(additiveMaterial)
 		{
 			Ogre::MaterialPtr originalMaterial = Ogre::MaterialManager::getSingleton().getByName(materialName);
 			additiveMaterial = originalMaterial->clone(strAdditiveMaterialName);

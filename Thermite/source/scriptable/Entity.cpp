@@ -73,9 +73,9 @@ namespace Thermite
 
 			if(mMeshName.isEmpty() == false)
 			{
-				std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
+				std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
 				std::string entityName(objAddressAsString + "_Entity");
-				mOgreEntity = mSceneManager->createEntity(entityName, meshName().toAscii().constData());
+				mOgreEntity = mSceneManager->createEntity(entityName, meshName().toLatin1().constData());
 				mOgreSceneNode->attachObject(mOgreEntity);
 			}
 
@@ -91,7 +91,7 @@ namespace Thermite
 				{
 					//NOTE: Might be sensible to check if this really need setting, perhaps it is slow.
 					//But you can only get materials from SubEntities.
-					mOgreEntity->setMaterialName(materialName().toAscii().constData());
+					mOgreEntity->setMaterialName(materialName().toLatin1().constData());
 				}
 			}
 

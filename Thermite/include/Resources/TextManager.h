@@ -39,6 +39,12 @@ namespace Thermite
 			const Ogre::String &group, bool isManual, Ogre::ManualResourceLoader *loader, 
 			const Ogre::NameValuePairList *createParams);
 
+		TextResourcePtr create (const Ogre::String& name, const Ogre::String& group,
+			bool isManual = false, Ogre::ManualResourceLoader* loader = 0,
+			const Ogre::NameValuePairList* createParams = 0);
+
+		TextResourcePtr getByName(const Ogre::String& name, const Ogre::String& groupName = Ogre::RGN_DEFAULT);
+
 	public:
 		TextManager ();
 		virtual ~TextManager ();

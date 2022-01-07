@@ -33,7 +33,7 @@ namespace Thermite
 	{
 		RenderComponent::update();
 
-		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toAscii();
+		std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(mParent), 16).toStdString();
 
 		//In general Ogre considers the negative z'axis to be the forward direction. This can be seen with cameras (which point along negative z)
 		//and also with SceneNodes (see here: http://www.ogre3d.org/docs/api/html/classOgre_1_1SceneNode.html#a4a6e34aab331802bc836668e78a08508).

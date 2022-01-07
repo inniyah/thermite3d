@@ -25,19 +25,19 @@ freely, subject to the following restrictions:
 
 #include "OgreLogManager.h" //FIXME - shouldn't realy need this in this class?'
 
-template<> Thermite::VolumeManager *Ogre::Singleton<Thermite::VolumeManager>::ms_Singleton = 0;
+template<> Thermite::VolumeManager *Ogre::Singleton<Thermite::VolumeManager>::msSingleton = 0;
 
 namespace Thermite
 {
 	VolumeManager *VolumeManager::getSingletonPtr ()
 	{
-		return ms_Singleton;
+		return msSingleton;
 	}
 
 	VolumeManager &VolumeManager::getSingleton ()
 	{  
-		assert (ms_Singleton);  
-		return (*ms_Singleton);
+		assert (msSingleton);  
+		return (*msSingleton);
 	}
 
 	VolumeManager::VolumeManager ()
@@ -58,13 +58,25 @@ namespace Thermite
 		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager (mResourceType);
 	}
 
+	VolumeResourcePtr VolumeManager::create (const Ogre::String& name, const Ogre::String& group,
+					bool isManual, Ogre::ManualResourceLoader* loader,
+					const Ogre::NameValuePairList* createParams)
+	{
+		return std::static_pointer_cast<VolumeResource>(createResource(name,group,isManual,loader,createParams));
+	}
+
+	VolumeResourcePtr VolumeManager::getByName(const Ogre::String& name, const Ogre::String& groupName)
+	{
+		return std::static_pointer_cast<VolumeResource>(getResourceByName(name, groupName));
+	}
+
 	VolumeResourcePtr VolumeManager::load (const Ogre::String &name, const Ogre::String &group)
 	{
 		Ogre::LogManager::getSingleton().logMessage("DAVID - calling getByName");
 		VolumeResourcePtr textf = getByName (name);
 		Ogre::LogManager::getSingleton().logMessage("DAVID - done getByName");
 
-		if (textf.isNull ())
+		if (textf)
 		{
 			textf = create (name, group);
 		}

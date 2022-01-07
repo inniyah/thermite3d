@@ -150,7 +150,8 @@ namespace Thermite
 
 		//Note: Shadow caster material is actually broken for the
 		//fireballs, but we don't really want them to cast shadows anyway.
-		mOgreSceneManager->setShadowTextureCasterMaterial("ShadowCasterMaterial");
+		Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName("ShadowCasterMaterial");
+		mOgreSceneManager->setShadowTextureCasterMaterial(mat);
 
 		/*mLogManager = new LogManager(this);
 		mMainLog = mLogManager->createLog("Main");
@@ -179,7 +180,7 @@ namespace Thermite
 				if(pObj->mComponent)
 				{
 					//Use the objects address to build unique names
-					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toAscii();
+					std::string objAddressAsString = QString::number(reinterpret_cast<qulonglong>(pObj), 16).toStdString();
 
 					RenderComponent* renderComponent = dynamic_cast<RenderComponent*>(pObj->mComponent);
 					if(renderComponent)

@@ -18,7 +18,7 @@ freely, subject to the following restrictions:
     misrepresented as being the original software.
 
     3. This notice may not be removed or altered from any source
-    distribution. 	
+    distribution. 
 *******************************************************************************/
 
 #ifndef __TextResource_H__
@@ -36,11 +36,11 @@ namespace Thermite
 {
 	class TextResource : public Ogre::Resource
 	{
-	public:		
+	public:
 		TextResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
 			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
 			Ogre::ManualResourceLoader *loader = 0);
-		~TextResource();		
+		~TextResource();
 
 		std::string getTextData(void) const;
 
@@ -55,52 +55,7 @@ namespace Thermite
 		std::string mTextData;
 	};
 
-	class TextResourcePtr : public Ogre::SharedPtr<TextResource> 
-	{
-	public:
-		TextResourcePtr () : Ogre::SharedPtr<TextResource> () {}
-		explicit TextResourcePtr (TextResource *rep) : Ogre::SharedPtr<TextResource> (rep) {}
-		TextResourcePtr (const TextResourcePtr &r) : Ogre::SharedPtr<TextResource> (r) {} 
-		TextResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<TextResource> ()
-		{
-			if(r.isNull())
-				return;
-
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<TextResource*> (r.getPointer ());
-			pUseCount = r.useCountPointer ();
-			useFreeMethod = r.freeMethod();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
-		}
-
-		/// Operator used to convert a ResourcePtr to a TextResourcePtr
-		TextResourcePtr& operator=(const Ogre::ResourcePtr& r)
-		{
-			if (pRep == static_cast<TextResource*> (r.getPointer ()))
-				return *this;
-			release ();
-
-			if(r.isNull())
-				return *this;
-
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<TextResource*> (r.getPointer());
-			pUseCount = r.useCountPointer ();
-			useFreeMethod = r.freeMethod();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
-			return *this;
-		}
-	};
+	typedef Ogre::SharedPtr<TextResource> TextResourcePtr;
 }
 
 #endif //__TextResource_H__

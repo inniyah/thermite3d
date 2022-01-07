@@ -174,7 +174,7 @@ namespace Thermite
 	{
 		m_strMatName = matName;
 		m_pMaterial = Ogre::MaterialManager::getSingleton().getByName(m_strMatName);
-		if (m_pMaterial.isNull())
+		if (m_pMaterial)
 			OGRE_EXCEPT( Ogre::Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + m_strMatName,
 			"SurfacePatchRenderable::setMaterial" );
 

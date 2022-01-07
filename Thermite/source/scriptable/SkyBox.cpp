@@ -25,6 +25,6 @@ namespace Thermite
 		mMaterialName = name;
 
 		Ogre::SceneManager* sceneManager = Ogre::Root::getSingletonPtr()->getSceneManager("OgreSceneManager");
-		sceneManager->setSkyBox(true, materialName().toAscii().constData(), 2500);
+		sceneManager->setSkyBox(true, materialName().toLatin1().constData(), 2500);
 	}
 }

@@ -18,7 +18,7 @@ freely, subject to the following restrictions:
     misrepresented as being the original software.
 
     3. This notice may not be removed or altered from any source
-    distribution. 	
+    distribution. 
 *******************************************************************************/
 
 #ifndef __VolumeResource_H__
@@ -37,11 +37,11 @@ namespace Thermite
 {
 	class VolumeResource : public Ogre::Resource
 	{
-	public:		
+	public:
 		VolumeResource (Ogre::ResourceManager *creator, const Ogre::String &name, 
 			Ogre::ResourceHandle handle, const Ogre::String &group, bool isManual = false, 
 			Ogre::ManualResourceLoader *loader = 0);
-		~VolumeResource();		
+		~VolumeResource();
 
 		PolyVox::SimpleVolume<PolyVox::Material16>* getVolume(void);
 
@@ -55,52 +55,7 @@ namespace Thermite
 		PolyVox::SimpleVolume<PolyVox::Material16>* m_pVolume;
 	};
 
-	class VolumeResourcePtr : public Ogre::SharedPtr<VolumeResource> 
-	{
-	public:
-		VolumeResourcePtr () : Ogre::SharedPtr<VolumeResource> () {}
-		explicit VolumeResourcePtr (VolumeResource *rep) : Ogre::SharedPtr<VolumeResource> (rep) {}
-		VolumeResourcePtr (const VolumeResourcePtr &r) : Ogre::SharedPtr<VolumeResource> (r) {} 
-		VolumeResourcePtr (const Ogre::ResourcePtr &r) : Ogre::SharedPtr<VolumeResource> ()
-		{
-			if(r.isNull())
-				return;
-
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX (r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<VolumeResource*> (r.getPointer ());
-			pUseCount = r.useCountPointer ();
-			useFreeMethod = r.freeMethod();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
-		}
-
-		/// Operator used to convert a ResourcePtr to a VolumeResourcePtr
-		VolumeResourcePtr& operator=(const Ogre::ResourcePtr& r)
-		{
-			if (pRep == static_cast<VolumeResource*> (r.getPointer ()))
-				return *this;
-			release ();
-
-			if(r.isNull())
-				return *this;
-
-			// lock & copy other mutex pointer
-			OGRE_LOCK_MUTEX (*r.OGRE_AUTO_MUTEX_NAME)
-				OGRE_COPY_AUTO_SHARED_MUTEX(r.OGRE_AUTO_MUTEX_NAME)
-				pRep = static_cast<VolumeResource*> (r.getPointer());
-			pUseCount = r.useCountPointer ();
-			useFreeMethod = r.freeMethod();
-			if (pUseCount)
-			{
-				++ (*pUseCount);
-			}
-			return *this;
-		}
-	};
+	typedef Ogre::SharedPtr<VolumeResource> VolumeResourcePtr;
 }
 
 #endif
